@@ -13,12 +13,32 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone', 20)->nullable();
+            $table->string('avatar')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->string('nationality', 100)->nullable();
+            $table->string('passport_number', 50)->nullable();
+            $table->text('address')->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('country', 100)->default('Côte d\'Ivoire');
+            $table->string('postal_code', 20)->nullable();
+            $table->enum('preferred_language', ['fr', 'en'])->default('fr');
+            $table->string('preferred_currency', 3)->default('XOF');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('phone_verified_at')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->integer('loyalty_points')->default(0);
             $table->rememberToken();
             $table->timestamps();
+            
+            $table->index('email');
+            $table->index('phone');
+            $table->index('country');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
