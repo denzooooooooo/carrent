@@ -1,0 +1,54 @@
+  name: Deploy to VPS
+
+  on:
+    push:
+      branches:
+        - main
+
+  jobs:
+    deploy:
+      name: Deploy to Production Server
+      runs-on: ubuntu-latest
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      steps:
+        # Checkout du dépôt
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+
+        # Configuration de la clé SSH
+        - name: Set up SSH key
+          uses: webfactory/ssh-agent@v0.8.0
+          with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+        # Ajouter l'hôte connu (requis pour la sécurité)
+        - name: Add known hosts
+          run: |
+            ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+        # composer install --no-dev --no-interaction --prefer-dist
+        # php artisan migrate --force
+        # Déployer sur le serveur
+        - name: Deploy via SSH
+          run: |
+            ssh $SSH_USER@$SSH_HOST << EOF
+              cd  /home/u608034730/domains/monnkama.shop/public_html/back-end
+              git remote -v
+              git fetch origin main
+              git reset --hard origin/main
+
+              composer install
+              
+              composer dump-autoload
+
+              php artisan optimize:clear
+
+              php artisan optimize
+
+              php artisan migrate --force
+
+              echo "Déploiement terminé avec succès !"
+            EOF
