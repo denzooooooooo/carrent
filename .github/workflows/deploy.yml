@@ -25,9 +25,9 @@
             ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
         # Ajouter l'hôte connu (requis pour la sécurité)
-        - name: Add known hosts
-          run: |
-            ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        #- name: Add known hosts
+        #  run: |
+        #    ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
         # composer install --no-dev --no-interaction --prefer-dist
         # php artisan migrate --force
@@ -41,7 +41,7 @@
               git reset --hard origin/main
 
               composer install
-              
+
               composer dump-autoload
 
               php artisan optimize:clear
