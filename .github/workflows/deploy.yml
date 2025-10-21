@@ -12,6 +12,7 @@
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
 
       steps:
         # Checkout du dépôt
@@ -34,7 +35,7 @@
         # Déployer sur le serveur
         - name: Deploy via SSH
           run: |
-            ssh $SSH_USER@$SSH_HOST << EOF
+            ssh $SSH_USER@$SSH_HOST@$SSH_PORT << EOF
               cd  /home/u608034730/domains/monnkama.shop/public_html/back-end
               git remote -v
               git fetch origin main
