@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    
     /**
      * Connexion Admin
      */
@@ -257,8 +258,8 @@ class AuthController extends Controller
             'last_name' => $request->last_name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-            'is_active' => true,
+            'password' => Hash::make($request->password),
+            /* 'is_active' => true, */
         ]);
 
         // 3️⃣ Génération du token API (si tu utilises Laravel Sanctum)
@@ -273,6 +274,55 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Inscription des administrateurs 
+     */
+    public function registerAdmin(Request $request)
+    {
+        // 1️⃣ Validation des données
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:admins,email',
+            'phone' => 'nullable|string|max:20|unique:admins,phone',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:super_admin,admin,moderator',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // 2️⃣ Création du compte administrateur
+        $admin = Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            //'role' => 'super_admin', // 👈 Par défaut : Super Admin
+            'password' => Hash::make($request->password),
+            //'is_active' => true,
+            
+        ]);
+
+        // 3️⃣ Génération du token API (si Laravel Sanctum est activé)
+        $token = $admin->createToken('auth_token')->plainTextToken;
+
+        // 4️⃣ Réponse JSON
+        return response()->json([
+            'status' => true,
+            'message' => 'Inscription du Super-Admin réussie',
+            'admin' => $admin,
+            'token' => $token,
+        ], 201);
+    }
+
+    /**
+     * Envoi mail lorsque l'utilisateur a son compte 
+     */
 
 
 }
