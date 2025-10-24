@@ -50,7 +50,7 @@ jobs:
 
             npm install
 
-            npm run buil
+            npm run build
             
             php artisan optimize
             php artisan migrate --force

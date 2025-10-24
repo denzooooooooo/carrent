@@ -20,31 +20,98 @@ class FlightController extends Controller
     /**
      * 1️⃣ Rechercher des vols
      * Route: GET /api/flights/search
-     */
+     *//* 
+  public function searchFlights(Request $request)
+  {
+      $request->validate([
+          'origin' => 'required|string|size:3',
+          'destination' => 'required|string|size:3',
+          'departureDate' => 'required|date_format:Y-m-d',
+          'adults' => 'sometimes|integer|min:1',
+      ]);
+
+      $offers = $this->amadeusService->searchFlights(
+          $request->origin,
+          $request->destination,
+          $request->departureDate,
+          $request->adults ?? 1
+      );
+
+      if (!$offers) {
+          return response()->json(['message' => 'Erreur lors de la recherche de vols.'], 503);
+      }
+
+      // Vous pouvez aussi stocker les offres en cache ou en base de données pour référence
+      return response()->json($offers);
+  } */
+
     public function searchFlights(Request $request)
     {
-        $request->validate([
-            'origin' => 'required|string|size:3',
-            'destination' => 'required|string|size:3',
-            'departureDate' => 'required|date_format:Y-m-d',
-            'adults' => 'sometimes|integer|min:1',
-        ]);
+        try {
+            // ✅ Validation avec retour clair
+            $validator = \Validator::make($request->all(), [
+                'origin' => 'required|string|size:3',
+                'destination' => 'required|string|size:3',
+                'departureDate' => 'required|date_format:Y-m-d',
+                'adults' => 'sometimes|integer|min:1',
+            ]);
 
-        $offers = $this->amadeusService->searchFlights(
-            $request->origin,
-            $request->destination,
-            $request->departureDate,
-            $request->adults ?? 1
-        );
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'validation_error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        if (!$offers) {
-            return response()->json(['message' => 'Erreur lors de la recherche de vols.'], 503);
+            // ✅ Recherche des vols via ton service
+            $offers = $this->amadeusService->searchFlights(
+                $request->origin,
+                $request->destination,
+                $request->departureDate,
+                $request->adults ?? 1
+            );
+
+            // ✅ Gestion des erreurs API
+            if (isset($offers['error'])) {
+                return response()->json([
+                    'status' => 'api_error',
+                    'message' => $offers['error']['message'] ?? 'Erreur inconnue de l’API Aviasales',
+                    'code' => $offers['error']['code'] ?? 500,
+                    'details' => $offers['error']['details'] ?? null,
+                ], 503);
+            }
+
+            if (!$offers || empty($offers)) {
+                return response()->json([
+                    'status' => 'no_results',
+                    'message' => 'Aucun vol trouvé pour cette recherche.',
+                ], 404);
+            }
+
+            // ✅ Retour clair et structuré
+            return response()->json([
+                'status' => 'success',
+                'results' => $offers,
+            ]);
+
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            // ✅ Erreur HTTP (timeout, 403, etc.)
+            return response()->json([
+                'status' => 'http_error',
+                'message' => 'Erreur lors de la communication avec l’API Aviasales.',
+                'error' => $e->getMessage(),
+                'response' => $e->response ? $e->response->body() : null,
+            ], 502);
+        } catch (\Exception $e) {
+            // ✅ Erreur interne Laravel ou PHP
+            return response()->json([
+                'status' => 'server_error',
+                'message' => 'Erreur interne du serveur.',
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null,
+            ], 500);
         }
-
-        // Vous pouvez aussi stocker les offres en cache ou en base de données pour référence
-        return response()->json($offers);
     }
-
     /**
      * 5️⃣ Rechercher des aéroports
      * Route: GET /api/flights/airports/search
