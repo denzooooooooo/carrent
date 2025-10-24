@@ -46,6 +46,50 @@ class FlightController extends Controller
     }
 
     /**
+     * 5️⃣ Rechercher des aéroports
+     * Route: GET /api/flights/airports/search
+     */
+    public function searchAirports(Request $request)
+    {
+        $request->validate(['keyword' => 'required|string|min:3']);
+
+        $locations = $this->amadeusService->searchLocations($request->keyword, 'AIRPORT');
+
+        if (!$locations) {
+            return response()->json(['message' => 'Erreur lors de la recherche des aéroports.'], 503);
+        }
+
+        return response()->json($locations);
+    }
+
+
+    /**
+     * 7️⃣ Obtenir les détails d'une offre de vol spécifique (Détail de la commande Amadeus)
+     * Route: GET /api/flights/booking-details/{amadeusOrderId}
+     */
+    public function getFlightOrderDetails($amadeusOrderId)
+    {
+        // Vérifiez l'existence et l'appartenance de la réservation locale (facultatif mais recommandé)
+        $booking = Booking::where('booking_number', $amadeusOrderId)
+            ->where('user_id', Auth::id()) // Assurez-vous que l'utilisateur est le propriétaire
+            ->first();
+
+        if (!$booking) {
+            return response()->json(['message' => 'Réservation Amadeus introuvable ou non autorisée.'], 404);
+        }
+
+        $details = $this->amadeusService->getFlightOrderDetails($amadeusOrderId);
+
+        if (!$details) {
+            return response()->json(['message' => 'Impossible de récupérer les détails de la commande Amadeus.'], 503);
+        }
+
+        return response()->json($details);
+    }
+
+
+
+    /**
      * 2️⃣ Confirmer le prix d'une offre de vol
      * Route: POST /api/flights/confirm-price
      */
@@ -96,7 +140,7 @@ class FlightController extends Controller
         $flightOrderId = $amadeusOrder['data']['id'];
         $totalAmount = $amadeusOrder['data']['flightOffers'][0]['price']['total'] ?? 0;
         $currency = $amadeusOrder['data']['flightOffers'][0]['price']['currency'] ?? 'EUR';
-        
+
         // 2. Enregistrer la réservation dans la base de données locale
         try {
             $booking = Booking::create([
@@ -139,8 +183,8 @@ class FlightController extends Controller
         }
 
         $booking = Booking::where('id', $bookingId)
-                          ->where('user_id', Auth::id())
-                          ->first();
+            ->where('user_id', Auth::id())
+            ->first();
 
         if (!$booking || $booking->status === 'CANCELLED') {
             return response()->json(['message' => 'Réservation introuvable ou déjà annulée.'], 404);
@@ -165,22 +209,7 @@ class FlightController extends Controller
         return response()->json(['message' => 'Réservation annulée avec succès.', 'booking' => $booking]);
     }
 
-    /**
-     * 5️⃣ Rechercher des aéroports
-     * Route: GET /api/flights/airports/search
-     */
-    public function searchAirports(Request $request)
-    {
-        $request->validate(['keyword' => 'required|string|min:3']);
 
-        $locations = $this->amadeusService->searchLocations($request->keyword, 'AIRPORT');
-
-        if (!$locations) {
-            return response()->json(['message' => 'Erreur lors de la recherche des aéroports.'], 503);
-        }
-
-        return response()->json($locations);
-    }
 
     /**
      * 6️⃣ Obtenir les réservations de l'utilisateur connecté
@@ -197,29 +226,6 @@ class FlightController extends Controller
         return response()->json($bookings);
     }
 
-    /**
-     * 7️⃣ Obtenir les détails d'une offre de vol spécifique (Détail de la commande Amadeus)
-     * Route: GET /api/flights/booking-details/{amadeusOrderId}
-     */
-    public function getFlightOrderDetails($amadeusOrderId)
-    {
-        // Vérifiez l'existence et l'appartenance de la réservation locale (facultatif mais recommandé)
-        $booking = Booking::where('booking_number', $amadeusOrderId)
-                          ->where('user_id', Auth::id()) // Assurez-vous que l'utilisateur est le propriétaire
-                          ->first();
-        
-        if (!$booking) {
-             return response()->json(['message' => 'Réservation Amadeus introuvable ou non autorisée.'], 404);
-        }
-
-        $details = $this->amadeusService->getFlightOrderDetails($amadeusOrderId);
-
-        if (!$details) {
-            return response()->json(['message' => 'Impossible de récupérer les détails de la commande Amadeus.'], 503);
-        }
-
-        return response()->json($details);
-    }
 
     /**
      * 8️⃣ Obtenir les statistiques de vols pour l'admin (Exemple: prédiction de retard)
@@ -231,7 +237,7 @@ class FlightController extends Controller
         if (!Auth::guard('admin')->check()) {
             return response()->json(['message' => 'Accès refusé. Nécessite un compte administrateur.'], 403);
         }
-        
+
         $request->validate([
             'origin' => 'required|string|size:3',
             'destination' => 'required|string|size:3',

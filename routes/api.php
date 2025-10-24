@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FlightController;
+use App\Http\Controllers\Api\ServiceFlightController;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,18 @@ Route::get('/admin/login', [AuthController::class, 'loginAdmin'])->name('api.adm
 Route::get('/users/login', [AuthController::class, 'loginUser'])->name('api.user.login');
 Route::post('/admin/register', [AuthController::class, 'registerAdmin'])->name('api.admin.register');
 Route::post('/user/register', [AuthController::class, 'register'])->name('api.user.register');
+
+
+/* Route::prefix('services/flights')->controller(ServiceFlightController::class)->group(function () {
+    Route::get('search', 'searchFlights'); // 🔍 rechercher des vols
+    Route::get('latest-prices', 'getLatestPrices'); // 💰 prix récents
+    Route::get('airports/search', 'searchAirports'); // 🛫 recherche d’aéroports
+    Route::get('calendar', 'getPriceCalendar'); // 📊 calendrier des prix
+
+    Route::post('book', [ServiceFlightController::class, 'createBooking']);
+    Route::get('my-bookings', [ServiceFlightController::class, 'getUserBookings']);
+    Route::post('cancel/{id}', [ServiceFlightController::class, 'cancelBooking']);
+}); */
 
 // Routes publiques ou pour les utilisateurs authentifiés
 Route::prefix('flights')->controller(FlightController::class)->group(function () {
@@ -32,5 +45,5 @@ Route::prefix('flights')->controller(FlightController::class)->group(function ()
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
-    
+
 });

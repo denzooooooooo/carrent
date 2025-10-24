@@ -47,6 +47,11 @@ jobs:
 
             echo "⚙️ Optimisation Laravel..."
             php artisan optimize:clear
+
+            npm install
+
+            npm run buil
+            
             php artisan optimize
             php artisan migrate --force
 

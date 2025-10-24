@@ -5,22 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'CARRÉ PREMIUM') }}</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKx3nfrF0gY3jA1M05j1w5oA==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#EDEDEC] font-sans antialiased">
-    @include('layouts.header')
+<body class="min-h-screen bg-gray-100 antialiased">
 
-    <main>
-        {{ $slot }}
+    @php
+        $isAuthenticated = auth()->check(); 
+        $user = auth()->user();
+        $cartItemsCount = session('cart_count', 0);
+        $currentLanguage = session('language', 'fr');
+        $currentCurrency = session('currency', 'XOF');
+    @endphp
+
+    @include('layouts.header', [
+        'isAuthenticated' => $isAuthenticated,
+        'user' => $user,
+        'cartItemsCount' => $cartItemsCount,
+        'currentLanguage' => $currentLanguage,
+        'currentCurrency' => $currentCurrency
+    ])
+
+    <main class="pt-20">
+        @yield('content')
     </main>
 
     @include('layouts.footer')
+
+    <script src="//unpkg.com/alpinejs" defer></script>
 </body>
 </html>
