@@ -3,6 +3,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class AmadeusService
 {
@@ -12,17 +13,14 @@ class AmadeusService
 
     public function __construct()
     {
-        // Assurez-vous d'avoir ces variables définies dans votre fichier .env
-        // AMADEUS_CLIENT_ID="VOTRE_CLIENT_ID"
-        // AMADEUS_CLIENT_SECRET="VOTRE_SECRET"
-        // AMADEUS_API_URL="https://test.api.amadeus.com" // pour l'environnement de test
-        // ou "https://api.amadeus.com" pour la production
         $this->clientId = env('AMADEUS_CLIENT_ID');
         $this->clientSecret = env('AMADEUS_CLIENT_SECRET');
-        $this->apiUrl = env('AMADEUS_API_URL');
+        $this->apiUrl = env('AMADEUS_API_URL', 'https://test.api.amadeus.com');
     }
 
-    // 1️⃣ Récupérer le token
+    /**
+     * Récupérer le token d'accès
+     */
     public function getAccessToken(): ?string
     {
         try {
@@ -32,42 +30,93 @@ class AmadeusService
                 'client_secret' => $this->clientSecret,
             ]);
 
-            $response->throw(); // Lance une exception pour les erreurs de client ou de serveur (4xx, 5xx)
+            if (!$response->successful()) {
+                Log::error('Amadeus Token Error: ' . $response->body());
+                return null;
+            }
 
-            return $response->json()['access_token'] ?? null;
+
+            Log::error('Amadeus Token Error: ' . $response->body());
+            return null;
+
         } catch (Exception $e) {
-            // Loggez l'erreur pour le débogage
-            // \Log::error('Amadeus Token Error: ' . $e->getMessage());
+            Log::error('Amadeus Token Exception: ' . $e->getMessage());
             return null;
         }
     }
 
-    // 2️⃣ Rechercher des vols (Déjà implémenté)
-    public function searchFlights(string $origin, string $destination, string $departureDate, int $adults = 1): ?array
-    {
+    /**
+     * Recherche de vols avec tous les paramètres
+     */
+    public function searchFlights(
+        string $origin,
+        string $destination,
+        string $departureDate,
+        int $adults = 1,
+        ?string $returnDate = null,
+        string $travelClass = 'ECONOMY',
+        int $children = 0,
+        int $infants = 0
+    ): ?array {
+        $token = $this->getAccessToken();
+        \Log::info('Amadeus Token:', ['token' => $token ? 'exists' : 'null']);
+
+        if (!$token) {
+            \Log::error('Amadeus token is null');
+            return null;
+        }
+
+
         $token = $this->getAccessToken();
         if (!$token) {
             return null;
         }
 
         try {
+            $params = [
+                'originLocationCode' => $origin,
+                'destinationLocationCode' => $destination,
+                'departureDate' => $departureDate,
+                'adults' => $adults,
+                'travelClass' => $travelClass,
+            ];
+
+            // Ajouter les paramètres optionnels
+            if ($returnDate) {
+                $params['returnDate'] = $returnDate;
+            }
+            if ($children > 0) {
+                $params['children'] = $children;
+            }
+            if ($infants > 0) {
+                $params['infants'] = $infants;
+            }
+
             $response = Http::withToken($token)
-                ->get("{$this->apiUrl}/v2/shopping/flight-offers", [
-                    'originLocationCode' => $origin,
-                    'destinationLocationCode' => $destination,
-                    'departureDate' => $departureDate,
-                    'adults' => $adults,
-                ]);
+                ->timeout(30)
+                ->get("{$this->apiUrl}/v2/shopping/flight-offers", $params);
 
-            $response->throw();
+            if ($response->successful()) {
+                $body = $response->json();
+                $headers = $response->headers();
 
-            return $response->json();
-        } catch (Exception $e) {
-            // \Log::error('Amadeus Search Flights Error: ' . $e->getMessage());
+                return [
+                    'body' => $body,
+                    'headers' => [
+                        'Ama-request-id' => $headers['Ama-request-id'][0] ?? null,
+                        'Date' => $headers['Date'][0] ?? null,
+                    ],
+                ];
+            }
+
+            Log::error('Amadeus Search Error: ' . $response->body());
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Amadeus Search Exception: ' . $e->getMessage());
             return null;
         }
     }
-
     // 3️⃣ Confirmer le prix d'une offre de vol (Flight Price Check)
     public function confirmFlightPrice(array $flightOffer): ?array
     {
@@ -169,7 +218,7 @@ class AmadeusService
             return null;
         }
     }
-    
+
     // 7️⃣ Obtenir les détails d'une offre de vol spécifique par ID
     // Cette API n'est pas directement disponible. Généralement, on repasse par la recherche.
     // Cependant, si l'ID d'une offre est connu, on peut utiliser un appel GET spécifique, mais l'API de base

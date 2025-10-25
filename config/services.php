@@ -37,5 +37,9 @@ return [
     'aviasales' => [
         'token' => env('AVIASALES_TOKEN'),
     ],
+    'duffel' => [
+        'key' => env('DUFFEL_KEY'),
+    ],
+
 
 ];

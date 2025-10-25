@@ -44,6 +44,18 @@
                 </div>
 
                 {{-- Message d'erreur --}}
+                @if (session('error'))
+                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-5 rounded-xl mb-6">
+                        <div class="flex items-start space-x-3">
+                            <svg class="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-red-700 dark:text-red-400 font-semibold">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                @endif
                 <div id="error-message"
                     class="hidden bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-5 rounded-xl mb-6">
                     <div class="flex items-start space-x-3">
@@ -56,7 +68,7 @@
                     </div>
                 </div>
 
-                <form id="flight-search-form">
+                <form id="flight-search-form" method="POST" action="{{ route('flights.search') }}">
                     @csrf
                     {{-- Aéroports --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -70,10 +82,10 @@
                                 </svg>
                                 <span>Aéroport de Départ *</span>
                             </label>
-                            <input type="text" id="origin-input" name="origin" placeholder="Ex: Paris, ABJ, Abidjan..."
-                                class="w-full pl-12 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 dark:bg-gray-700 dark:text-white text-lg font-semibold"
+                            <input type="text" id="origin-input" name="origin" placeholder="Ex: CDG, Paris, Charles de Gaulle..."
+                                class="w-full pl-4 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 dark:bg-gray-700 dark:text-white text-lg font-semibold"
                                 required autocomplete="off">
-                            <input type="hidden" id="origin-code" name="origin_code">
+                            <input type="hidden" id="origin-code" name="departure_id">
 
                             {{-- Suggestions origine --}}
                             <div id="origin-suggestions"
@@ -92,10 +104,10 @@
                                 <span>Aéroport d'Arrivée *</span>
                             </label>
                             <input type="text" id="destination-input" name="destination"
-                                placeholder="Ex: Paris, CDG, New York..."
-                                class="w-full pl-12 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 dark:bg-gray-700 dark:text-white text-lg font-semibold"
+                                placeholder="Ex: JFK, New York, John F. Kennedy..."
+                                class="w-full pl-4 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 dark:bg-gray-700 dark:text-white text-lg font-semibold"
                                 required autocomplete="off">
-                            <input type="hidden" id="destination-code" name="destination_code">
+                            <input type="hidden" id="destination-code" name="arrival_id">
 
                             {{-- Suggestions destination --}}
                             <div id="destination-suggestions"
@@ -115,7 +127,7 @@
                                 </svg>
                                 <span>Date de Départ *</span>
                             </label>
-                            <input type="date" id="departure-date" name="departure_date" min="{{ date('Y-m-d') }}"
+                            <input type="date" id="departure-date" name="outbound_date" min="{{ date('Y-m-d') }}"
                                 class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 dark:bg-gray-700 dark:text-white text-lg font-semibold"
                                 required>
                         </div>
@@ -204,6 +216,9 @@
                         </label>
                     </div>
 
+                    {{-- Ajout du champ 'currency' nécessaire à l'API, bien que nullable --}}
+                    <input type="hidden" name="currency" value="EUR">
+
                     {{-- Bouton de recherche --}}
                     <button type="submit" id="search-btn"
                         class="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 hover:from-purple-700 hover:via-purple-800 hover:to-amber-700 text-white font-black text-xl py-6 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-3">
@@ -217,282 +232,249 @@
             </div>
         </section>
 
-        {{-- Résultats --}}
+        {{-- Section Résultats --}}
         <section class="container mx-auto px-4 py-8">
-            <div id="loading" class="hidden text-center py-20">
-                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 mx-auto"></div>
-                <p class="mt-4 text-xl text-gray-600">Recherche en cours...</p>
-            </div>
-
-            <div id="no-results" class="hidden text-center py-20 bg-white rounded-2xl shadow-lg">
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-                <h3 class="text-2xl font-bold text-gray-700 mb-2">Aucun vol trouvé</h3>
-                <p class="text-gray-500">Essayez de modifier vos critères de recherche</p>
-            </div>
-
-            <div id="results" class="space-y-6"></div>
+            <p class="text-center text-gray-500 dark:text-gray-400">Les résultats s'afficheront sur la page dédiée après la
+                soumission du formulaire.</p>
         </section>
     </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                let tripType = 'roundtrip';
-                let selectedOrigin = null;
-                let selectedDestination = null;
-                let searchTimeout = null;
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM chargé - initialisation de l\'autocomplétion');
 
-                // Gestion du type de voyage
-                const btnRoundtrip = document.getElementById('btn-roundtrip');
-                const btnOneway = document.getElementById('btn-oneway');
-                const returnDateContainer = document.getElementById('return-date-container');
-                const returnDateInput = document.getElementById('return-date');
+    // Gestion du type de voyage
+    const returnDateContainer = document.getElementById('return-date-container');
+    const returnDateInput = document.getElementById('return-date');
+    const btnRoundtrip = document.getElementById('btn-roundtrip');
+    const btnOneway = document.getElementById('btn-oneway');
 
-                btnRoundtrip.addEventListener('click', function () {
-                    tripType = 'roundtrip';
-                    btnRoundtrip.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-amber-600', 'text-white', 'shadow-xl');
-                    btnRoundtrip.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700');
-                    btnOneway.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-amber-600', 'text-white', 'shadow-xl');
-                    btnOneway.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700');
-                    returnDateContainer.classList.remove('hidden');
-                    returnDateInput.required = true;
-                });
+    function setTripType(isRoundTrip) {
+        if (isRoundTrip) {
+            returnDateContainer.style.display = 'block';
+            returnDateInput.setAttribute('required', 'required');
+            btnRoundtrip.className = 'flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-purple-600 to-amber-600 text-white shadow-xl';
+            btnOneway.className = 'flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200';
+        } else {
+            returnDateContainer.style.display = 'none';
+            returnDateInput.removeAttribute('required');
+            returnDateInput.value = '';
+            btnOneway.className = 'flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-purple-600 to-amber-600 text-white shadow-xl';
+            btnRoundtrip.className = 'flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200';
+        }
+    }
 
-                btnOneway.addEventListener('click', function () {
-                    tripType = 'oneway';
-                    btnOneway.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-amber-600', 'text-white', 'shadow-xl');
-                    btnOneway.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700');
-                    btnRoundtrip.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-amber-600', 'text-white', 'shadow-xl');
-                    btnRoundtrip.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700');
-                    returnDateContainer.classList.add('hidden');
-                    returnDateInput.required = false;
-                    returnDateInput.value = '';
-                });
+    // Initialisation
+    setTripType(true);
 
-                // Recherche d'aéroports
-                // Recherche d'aéroports
-                async function searchAirports(keyword, type) {
-                    if (keyword.length < 3) {
-                        document.getElementById(`${type}-suggestions`).classList.add('hidden');
-                        return;
-                    }
+    btnRoundtrip.addEventListener('click', () => setTripType(true));
+    btnOneway.addEventListener('click', () => setTripType(false));
 
-                    try {
-                        // Requête GET correcte pour l'API Laravel
-                        const response = await fetch(`/api/flights/airports/search?keyword=${encodeURIComponent(keyword)}`);
-                        const data = await response.json();
+    // Autocomplétion des aéroports
+    const originInput = document.getElementById('origin-input');
+    const originCode = document.getElementById('origin-code');
+    const originSuggestions = document.getElementById('origin-suggestions');
 
-                        // ✅ CORRECTION DE LA GESTION DE LA RÉPONSE JSON :
-                        // Le contrôleur renvoie probablement le tableau des aéroports directement.
-                        // On vérifie si la réponse a un champ 'data', sinon on utilise l'objet complet.
-                        const airports = data.data || data;
+    const destinationInput = document.getElementById('destination-input');
+    const destinationCode = document.getElementById('destination-code');
+    const destinationSuggestions = document.getElementById('destination-suggestions');
 
-                        // Le code original vérifiait 'data.success' (qui n'existe pas) et 'data.data.length'.
-                        // On vérifie maintenant que la requête HTTP est OK et que 'airports' est un tableau non vide.
-                        if (response.ok && Array.isArray(airports) && airports.length > 0) {
-                            displaySuggestions(airports, type);
-                        } else {
-                            document.getElementById(`${type}-suggestions`).classList.add('hidden');
-                        }
-                    } catch (error) {
-                        console.error('Erreur recherche aéroports:', error);
-                        // Masquer les suggestions en cas d'erreur de réseau ou de parsing
-                        document.getElementById(`${type}-suggestions`).classList.add('hidden');
-                    }
+    let timeout;
+
+    function fetchLocations(keyword, suggestionsEl, codeInputEl, type) {
+        console.log(`Recherche ${type} pour: "${keyword}"`);
+        
+        if (keyword.length < 2) {
+            console.log(`Mot-clé trop court (${keyword.length} caractères), masquage des suggestions`);
+            suggestionsEl.classList.add('hidden');
+            return;
+        }
+
+        suggestionsEl.innerHTML = '<div class="p-4 text-center text-gray-500">Chargement...</div>';
+        suggestionsEl.classList.remove('hidden');
+
+        const url = `/api/locations/search?q=${encodeURIComponent(keyword)}`;
+        console.log(`Requête API: ${url}`);
+
+        fetch(url)
+            .then(response => {
+                console.log(`Réponse reçue - Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Données reçues: ${data.length} résultats`, data);
+                suggestionsEl.innerHTML = '';
 
-                function displaySuggestions(airports, type) {
-                    const container = document.getElementById(`${type}-suggestions`);
-                    container.innerHTML = airports.map(airport => `
-                    <div class="airport-suggestion px-5 py-4 hover:bg-${type === 'origin' ? 'purple' : 'amber'}-50 dark:hover:bg-${type === 'origin' ? 'purple' : 'amber'}-900/30 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
-                        data-code="${airport.iataCode}"
-                        data-name="${airport.name}"
-                        data-city="${airport.address?.cityName || ''}"
-                        data-type="${type}">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-${type === 'origin' ? 'purple' : 'amber'}-600 to-${type === 'origin' ? 'purple' : 'amber'}-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <span class="text-white font-black text-sm">${airport.iataCode}</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="font-bold text-gray-900 dark:text-white text-lg">${airport.name}</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400 font-semibold">
-                                    ${airport.address?.cityName || ''}, ${airport.address?.countryName || ''}
-                                </div>
-                            </div>
+                if (data.length === 0) {
+                    console.log('Aucun résultat trouvé');
+                    suggestionsEl.innerHTML = `
+                        <div class="p-4 text-center text-gray-500">
+                            <div>Aucun aéroport trouvé</div>
+                            <div class="text-xs mt-1">Essayez avec un autre nom ou code</div>
                         </div>
-                    </div>
-                `).join('');
-                    container.classList.remove('hidden');
-
-                    // Événements de clic sur les suggestions
-                    container.querySelectorAll('.airport-suggestion').forEach(el => {
-                        el.addEventListener('click', function () {
-                            selectAirport({
-                                iataCode: this.dataset.code,
-                                name: this.dataset.name,
-                                city: this.dataset.city
-                            }, this.dataset.type);
-                        });
-                    });
+                    `;
+                    return;
                 }
 
-                function selectAirport(airport, type) {
-                    const displayText = `${airport.name} (${airport.iataCode})`;
-                    document.getElementById(`${type}-input`).value = displayText;
-                    document.getElementById(`${type}-code`).value = airport.iataCode;
-                    document.getElementById(`${type}-suggestions`).classList.add('hidden');
-
-                    if (type === 'origin') {
-                        selectedOrigin = airport;
-                    } else {
-                        selectedDestination = airport;
-                    }
-                }
-
-                // Événements de saisie
-                document.getElementById('origin-input').addEventListener('input', function (e) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => searchAirports(e.target.value, 'origin'), 300);
-                });
-
-                document.getElementById('destination-input').addEventListener('input', function (e) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => searchAirports(e.target.value, 'destination'), 300);
-                });
-
-                // Fermer les suggestions au clic extérieur
-                document.addEventListener('click', function (e) {
-                    if (!e.target.closest('#origin-input') && !e.target.closest('#origin-suggestions')) {
-                        document.getElementById('origin-suggestions').classList.add('hidden');
-                    }
-                    if (!e.target.closest('#destination-input') && !e.target.closest('#destination-suggestions')) {
-                        document.getElementById('destination-suggestions').classList.add('hidden');
-                    }
-                });
-
-                // Soumission du formulaire
-                document.getElementById('flight-search-form').addEventListener('submit', async function (e) {
-                    e.preventDefault();
-
-                    const errorMessage = document.getElementById('error-message');
-                    const errorText = document.getElementById('error-text');
-                    errorMessage.classList.add('hidden');
-
-                    // Validation
-                    if (!selectedOrigin || !selectedDestination) {
-                        errorText.textContent = 'Veuillez sélectionner un aéroport de départ et d\'arrivée valide dans la liste.';
-                        errorMessage.classList.remove('hidden');
-                        return;
-                    }
-
-                    const formData = new FormData(this);
-                    const payload = {
-                        origin: selectedOrigin.iataCode,
-                        destination: selectedDestination.iataCode,
-                        departureDate: formData.get('departure_date'),
-                        adults: parseInt(formData.get('adults')),
-                        children: parseInt(formData.get('children') || 0),
-                        infants: parseInt(formData.get('infants') || 0),
-                        travelClass: formData.get('travel_class'),
-                        nonStop: formData.get('non_stop') === 'on',
-                        currencyCode: 'XOF' // À adapter selon votre configuration
-                    };
-
-                    if (tripType === 'roundtrip') {
-                        payload.returnDate = formData.get('return_date');
-                    }
-
-                    // Afficher le loader
-                    document.getElementById('loading').classList.remove('hidden');
-                    document.getElementById('results').innerHTML = '';
-                    document.getElementById('no-results').classList.add('hidden');
-
-                    try {
-                        const response = await fetch('/api/flights/search', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            body: JSON.stringify(payload)
-                        });
-
-                        const data = await response.json();
-
-                        document.getElementById('loading').classList.add('hidden');
-
-                        if (data.success && data.data.length > 0) {
-                            displayResults(data.data);
-                        } else {
-                            document.getElementById('no-results').classList.remove('hidden');
-                        }
-                    } catch (error) {
-                        console.error('Erreur:', error);
-                        document.getElementById('loading').classList.add('hidden');
-                        errorText.textContent = 'Erreur lors de la recherche de vols. Veuillez réessayer.';
-                        errorMessage.classList.remove('hidden');
-                    }
-                });
-
-                function displayResults(flights) {
-                    const resultsContainer = document.getElementById('results');
-                    resultsContainer.innerHTML = flights.map(flight => {
-                        const itinerary = flight.itineraries[0];
-                        const firstSegment = itinerary.segments[0];
-                        const lastSegment = itinerary.segments[itinerary.segments.length - 1];
-
-                        return `
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-8">
-                                        <div class="text-center">
-                                            <div class="text-3xl font-bold text-gray-800">
-                                                ${new Date(firstSegment.departure.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                            <div class="text-lg font-semibold text-gray-600 mt-1">${firstSegment.departure.iataCode}</div>
-                                        </div>
-
-                                        <div class="flex-1 px-4">
-                                            <div class="border-t-2 border-gray-300 relative">
-                                                <svg class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                                </svg>
-                                            </div>
-                                            <div class="text-center mt-2">
-                                                <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                                                    ${itinerary.segments.length === 1 ? 'Direct' : `${itinerary.segments.length - 1} escale(s)`}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-center">
-                                            <div class="text-3xl font-bold text-gray-800">
-                                                ${new Date(lastSegment.arrival.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                            <div class="text-lg font-semibold text-gray-600 mt-1">${lastSegment.arrival.iataCode}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="text-right ml-8 pl-8 border-l-2 border-gray-200">
-                                    <div class="text-4xl font-bold text-purple-600 mb-1">
-                                        ${Math.round(parseFloat(flight.price.total)).toLocaleString()}
-                                    </div>
-                                    <div class="text-lg text-gray-600 mb-3">${flight.price.currency}</div>
-                                    <a href="/flights/${flight.id}" class="block w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                        Sélectionner
-                                    </a>
-                                </div>
+                data.forEach((location, index) => {
+                    console.log(`Traitement résultat ${index + 1}:`, location);
+                    const div = document.createElement('div');
+                    div.className = 'p-3 cursor-pointer hover:bg-purple-50 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition-colors duration-200';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold text-gray-900 dark:text-white">${location.name}</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">${location.municipality}, ${location.country}</div>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded font-mono font-bold">${location.iataCode}</span>
+                                ${location.icaoCode ? `<span class="text-xs text-gray-500 mt-1">${location.icaoCode}</span>` : ''}
                             </div>
                         </div>
                     `;
-                    }).join('');
-                }
+
+                    div.addEventListener('click', () => {
+                        console.log(`Sélection ${type}:`, location.name, location.iataCode);
+                        if (type === 'origin') {
+                            originInput.value = `${location.name} (${location.iataCode})`;
+                            originCode.value = location.iataCode;
+                            console.log('Origin défini:', originInput.value, 'Code:', originCode.value);
+                        } else {
+                            destinationInput.value = `${location.name} (${location.iataCode})`;
+                            destinationCode.value = location.iataCode;
+                            console.log('Destination définie:', destinationInput.value, 'Code:', destinationCode.value);
+                        }
+                        suggestionsEl.classList.add('hidden');
+                    });
+
+                    // Effet hover
+                    div.addEventListener('mouseenter', () => {
+                        div.classList.add('bg-purple-50', 'dark:bg-gray-700');
+                    });
+                    div.addEventListener('mouseleave', () => {
+                        div.classList.remove('bg-purple-50', 'dark:bg-gray-700');
+                    });
+
+                    suggestionsEl.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Erreur détaillée:', error);
+                suggestionsEl.innerHTML = `
+                    <div class="p-4 text-center text-red-500">
+                        <div>Erreur de connexion</div>
+                        <div class="text-xs mt-1">${error.message}</div>
+                    </div>
+                `;
             });
-        </script>
-    @endpush
+    }
+
+    // Gestion des événements pour l'origine
+    originInput.addEventListener('input', (e) => {
+        const keyword = e.target.value.trim();
+        console.log('Input origine:', keyword);
+        
+        clearTimeout(timeout);
+        originCode.value = ''; // Reset le code IATA
+
+        timeout = setTimeout(() => {
+            fetchLocations(keyword, originSuggestions, originCode, 'origin');
+        }, 300);
+    });
+
+    originInput.addEventListener('focus', () => {
+        const keyword = originInput.value.trim();
+        if (keyword.length >= 2) {
+            fetchLocations(keyword, originSuggestions, originCode, 'origin');
+        }
+    });
+
+    // Gestion des événements pour la destination
+    destinationInput.addEventListener('input', (e) => {
+        const keyword = e.target.value.trim();
+        console.log('Input destination:', keyword);
+        
+        clearTimeout(timeout);
+        destinationCode.value = ''; // Reset le code IATA
+
+        timeout = setTimeout(() => {
+            fetchLocations(keyword, destinationSuggestions, destinationCode, 'destination');
+        }, 300);
+    });
+
+    destinationInput.addEventListener('focus', () => {
+        const keyword = destinationInput.value.trim();
+        if (keyword.length >= 2) {
+            fetchLocations(keyword, destinationSuggestions, destinationCode, 'destination');
+        }
+    });
+
+    // Cacher les suggestions en cliquant ailleurs
+    document.addEventListener('click', (e) => {
+        if (!originInput.contains(e.target) && !originSuggestions.contains(e.target)) {
+            originSuggestions.classList.add('hidden');
+        }
+        if (!destinationInput.contains(e.target) && !destinationSuggestions.contains(e.target)) {
+            destinationSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Empêcher la fermeture quand on clique dans les suggestions
+    [originSuggestions, destinationSuggestions].forEach(suggestionsEl => {
+        suggestionsEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+
+    // Validation du formulaire
+    const form = document.getElementById('flight-search-form');
+    form.addEventListener('submit', (e) => {
+        console.log('Soumission du formulaire');
+        console.log('Origin code:', originCode.value);
+        console.log('Destination code:', destinationCode.value);
+
+        if (!originCode.value || !destinationCode.value) {
+            e.preventDefault();
+            const errorMessage = 'Veuillez sélectionner des aéroports valides dans la liste de suggestions.';
+            console.error(errorMessage);
+            
+            // Afficher le message d'erreur dans l'interface
+            const errorElement = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = errorMessage;
+            errorElement.classList.remove('hidden');
+            
+            // Scroll vers l'erreur
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Highlight des champs problématiques
+            if (!originCode.value) {
+                originInput.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+            }
+            if (!destinationCode.value) {
+                destinationInput.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+            }
+        } else {
+            // Cacher l'erreur si tout est bon
+            document.getElementById('error-message').classList.add('hidden');
+            originInput.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+            destinationInput.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+        }
+    });
+
+    // Réinitialiser les styles d'erreur quand on commence à taper
+    [originInput, destinationInput].forEach(input => {
+        input.addEventListener('input', () => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+        });
+    });
+
+    console.log('Autocomplétion initialisée avec succès');
+});
+</script>
 @endsection

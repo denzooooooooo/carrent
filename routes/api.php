@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AirportController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FlightController;
+use App\Http\Controllers\Api\GoogleFlightsController;
 use App\Http\Controllers\Api\ServiceFlightController;
+use App\Http\Controllers\Api\FlightSearchController;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,8 +18,13 @@ Route::get('/users/login', [AuthController::class, 'loginUser'])->name('api.user
 Route::post('/admin/register', [AuthController::class, 'registerAdmin'])->name('api.admin.register');
 Route::post('/user/register', [AuthController::class, 'register'])->name('api.user.register');
 
+Route::post('/duffel/search', [FlightSearchController::class, 'search'])->name('duffel.search');
 
-/* Route::prefix('services/flights')->controller(ServiceFlightController::class)->group(function () {
+Route::get('/google/search', [GoogleFlightsController::class, 'search']);
+Route::get('/flights/airports/search', [AirportController::class, 'search']);
+
+
+Route::prefix('services/flights')->controller(ServiceFlightController::class)->group(function () {
     Route::get('search', 'searchFlights'); // 🔍 rechercher des vols
     Route::get('latest-prices', 'getLatestPrices'); // 💰 prix récents
     Route::get('airports/search', 'searchAirports'); // 🛫 recherche d’aéroports
@@ -25,7 +33,7 @@ Route::post('/user/register', [AuthController::class, 'register'])->name('api.us
     Route::post('book', [ServiceFlightController::class, 'createBooking']);
     Route::get('my-bookings', [ServiceFlightController::class, 'getUserBookings']);
     Route::post('cancel/{id}', [ServiceFlightController::class, 'cancelBooking']);
-}); */
+});
 
 // Routes publiques ou pour les utilisateurs authentifiés
 Route::prefix('flights')->controller(FlightController::class)->group(function () {

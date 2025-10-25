@@ -21,29 +21,29 @@ class FlightController extends Controller
      * 1️⃣ Rechercher des vols
      * Route: GET /api/flights/search
      *//* 
-  public function searchFlights(Request $request)
-  {
-      $request->validate([
-          'origin' => 'required|string|size:3',
-          'destination' => 'required|string|size:3',
-          'departureDate' => 'required|date_format:Y-m-d',
-          'adults' => 'sometimes|integer|min:1',
-      ]);
+public function searchFlights(Request $request)
+{
+    $request->validate([
+        'origin' => 'required|string|size:3',
+        'destination' => 'required|string|size:3',
+        'departureDate' => 'required|date_format:Y-m-d',
+        'adults' => 'sometimes|integer|min:1',
+    ]);
 
-      $offers = $this->amadeusService->searchFlights(
-          $request->origin,
-          $request->destination,
-          $request->departureDate,
-          $request->adults ?? 1
-      );
+    $offers = $this->amadeusService->searchFlights(
+        $request->origin,
+        $request->destination,
+        $request->departureDate,
+        $request->adults ?? 1
+    );
 
-      if (!$offers) {
-          return response()->json(['message' => 'Erreur lors de la recherche de vols.'], 503);
-      }
+    if (!$offers) {
+        return response()->json(['message' => 'Erreur lors de la recherche de vols.'], 503);
+    }
 
-      // Vous pouvez aussi stocker les offres en cache ou en base de données pour référence
-      return response()->json($offers);
-  } */
+    // Vous pouvez aussi stocker les offres en cache ou en base de données pour référence
+    return response()->json($offers);
+} */
 
     public function searchFlights(Request $request)
     {
@@ -81,12 +81,15 @@ class FlightController extends Controller
                 ], 503);
             }
 
-            if (!$offers || empty($offers)) {
+            if (!$offers || empty($offers['body'])) {
                 return response()->json([
                     'status' => 'no_results',
                     'message' => 'Aucun vol trouvé pour cette recherche.',
+                    'amadeus_request_id' => $offers['headers']['Ama-request-id'] ?? null,
+                    'timestamp' => $offers['headers']['Date'] ?? null,
                 ], 404);
             }
+
 
             // ✅ Retour clair et structuré
             return response()->json([
