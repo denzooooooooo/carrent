@@ -8,7 +8,7 @@
   @include('components.services-carousel')
 
   {{-- Événements à la Une --}}
-  <section class="py-24 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 relative overflow-hidden">
+  <section class="py-24 bg-white relative overflow-hidden">
     <div class="absolute inset-0 opacity-20">
       <div class="absolute top-20 left-20 w-96 h-96 bg-amber-500 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl animate-pulse" style="animation-delay: 2s"></div>
@@ -22,10 +22,10 @@
           </svg>
           <span>ÉVÉNEMENTS SPORTIFS & CULTURELS EXCLUSIFS</span>
         </div>
-        <h2 class="text-6xl md:text-7xl font-black text-white mb-6 leading-tight">
+        <h2 class="text-6xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
           Événements à Ne Pas Manquer
         </h2>
-        <p class="text-2xl text-gray-300 max-w-3xl mx-auto">
+        <p class="text-1xl text-gray-600 max-w-3xl mx-auto">
           Accédez aux plus grands événements sportifs et culturels du monde
         </p>
       </div>
@@ -34,7 +34,7 @@
         {{-- Événements simulés pour l'exemple --}}
         @for ($i = 0; $i < 8; $i++)
           <a
-            href="{{ route('events.index') }}"
+            href="{{ route('events') }}"
             class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-700 hover:-translate-y-6"
           >
             <div class="aspect-[3/4] overflow-hidden relative">
@@ -90,7 +90,7 @@
 
       <div class="text-center">
         <a
-          href="{{ route('events.index') }}"
+          href="{{ route('events') }}"
           class="inline-flex items-center space-x-3 px-12 py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
         >
           <span>VOIR TOUS LES ÉVÉNEMENTS</span>
@@ -102,182 +102,98 @@
     </div>
   </section>
 
-  {{-- Packages Premium --}}
-  <section class="py-24 bg-white dark:bg-gray-800 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full filter blur-3xl opacity-20"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-amber-200 dark:bg-amber-900 rounded-full filter blur-3xl opacity-20"></div>
-
+  {{-- Nos Services Premium --}}
+  <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
     <div class="container mx-auto px-4 relative z-10">
       <div class="text-center mb-16">
-        <div class="inline-flex items-center space-x-3 px-8 py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white rounded-full text-sm font-black mb-6 shadow-lg">
+        <div class="inline-flex items-center space-x-3 px-8 py-3 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-6 border-2 border-white/30">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
-          <span>PACKAGES PREMIUM & LOCATION DE LUXE</span>
+          <span>NOS SERVICES PREMIUM</span>
         </div>
-        <h2 class="text-6xl md:text-7xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
-          Expériences de Luxe<br />
-          <span class="bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-            Sur Mesure
-          </span>
+        <h2 class="text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+          L'Excellence à Votre Portée
         </h2>
-        <p class="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          Hélicoptères • Jets Privés • Quads • Safaris • Yachts • Voitures de Luxe
+        <p class="text-xl text-white/90 max-w-3xl mx-auto">
+          Découvrez notre gamme complète de services premium pour des expériences inoubliables
         </p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-8 mb-16">
-        @php
-          $services = [
-            [
-              'icon' => 'helicopter',
-              'title' => 'Tours en Hélicoptère',
-              'description' => 'Survolez les plus beaux paysages en hélicoptère privé avec champagne à bord',
-              'features' => ['Pilote professionnel', 'Champagne à bord', 'Photos HD incluses', 'Durée flexible'],
-              'price' => 'À partir de 500,000 XOF',
-              'image' => 'https://images.unsplash.com/photo-1589519160732-57fc498494f8?w=600&h=400&fit=crop',
-              'badge' => 'POPULAIRE'
-            ],
-            [
-              'icon' => 'motorcycle',
-              'title' => 'Location Quads & Motos',
-              'description' => 'Explorez en toute liberté avec nos véhicules premium tout-terrain',
-              'features' => ['Équipement complet', 'Assurance incluse', 'Guide disponible', 'Carburant inclus'],
-              'price' => 'À partir de 75,000 XOF/jour',
-              'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-              'badge' => 'NOUVEAU'
-            ],
-            [
-              'icon' => 'jet',
-              'title' => 'Jets Privés',
-              'description' => 'Voyagez en jet privé vers vos destinations de rêve en toute exclusivité',
-              'features' => ['Service VIP complet', 'Flexibilité totale', 'Confort absolu', 'Catering premium'],
-              'price' => 'Sur devis personnalisé',
-              'image' => 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=600&h=400&fit=crop',
-              'badge' => 'LUXE'
-            ]
-          ];
-        @endphp
-
-        @foreach($services as $service)
-          <div
-            class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-purple-500/50 transition-all duration-700 hover:-translate-y-6 bg-white dark:bg-gray-900"
-          >
-            {{-- Badge --}}
-            <div class="absolute top-6 right-6 z-10 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full text-xs font-black shadow-xl">
-              {{ $service['badge'] }}
+      <div class="grid md:grid-cols-4 gap-8">
+        {{-- Service Cards --}}
+        <a href="{{ route('flights') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
             </div>
-
-            <div class="aspect-[4/3] overflow-hidden relative">
-              <img
-                src="{{ $service['image'] }}"
-                alt="{{ $service['title'] }}"
-                class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-
-              <div class="absolute top-6 left-6 w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/30 group-hover:scale-110 transition-transform">
-                @if($service['icon'] === 'helicopter')
-                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                @elseif($service['icon'] === 'motorcycle')
-                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                @else
-                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                @endif
-              </div>
-            </div>
-
-            <div class="p-8">
-              <h3 class="text-3xl font-black text-gray-900 dark:text-white mb-4 group-hover:text-purple-600 transition-colors">
-                {{ $service['title'] }}
-              </h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-6 text-lg">
-                {{ $service['description'] }}
-              </p>
-
-              <div class="space-y-3 mb-6">
-                @foreach($service['features'] as $feature)
-                  <div class="flex items-center text-gray-700 dark:text-gray-300">
-                    <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="font-semibold">{{ $feature }}</span>
-                  </div>
-                @endforeach
-              </div>
-
-              <div class="mb-6 p-5 bg-gradient-to-r from-purple-50 to-amber-50 dark:from-purple-900/30 dark:to-amber-900/30 rounded-2xl border-2 border-purple-200 dark:border-purple-700">
-                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2 font-semibold">Tarif</div>
-                <div class="text-3xl font-black bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                  {{ $service['price'] }}
-                </div>
-              </div>
-
-              <a
-                href="{{ route('packages.index') }}"
-                class="flex items-center justify-center space-x-2 w-full py-4 bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 text-white font-black text-center rounded-2xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105"
-              >
-                <span>RÉSERVER MAINTENANT</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
+            <h3 class="text-2xl font-black text-white mb-4">Vols Privés</h3>
+            <p class="text-white/80 mb-6">Jets privés et hélicoptères pour vos déplacements exclusifs</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>Découvrir</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </div>
           </div>
-        @endforeach
-      </div>
+        </a>
 
-      {{-- Packages de l'API --}}
-      <div class="grid md:grid-cols-3 gap-8">
-        {{-- Packages simulés --}}
-        @for ($i = 0; $i < 3; $i++)
-          <a
-            href="{{ route('packages.index') }}"
-            class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-700 hover:-translate-y-6 bg-white dark:bg-gray-900"
-          >
-            <div class="aspect-[4/3] overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-{{ 1540962351504 + $i }}-03099e0a754b?w=600&h=400&fit=crop"
-                alt="Package Premium {{ $i + 1 }}"
-                class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-
-              <div class="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white rounded-full text-xs font-bold shadow-xl">
-                PREMIUM
-              </div>
+        <a href="{{ route('events') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
             </div>
-
-            <div class="p-6">
-              <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 transition-colors">
-                Package Premium {{ $i + 1 }}
-              </h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                Découvrez une expérience unique et exclusive avec notre package premium personnalisé.
-              </p>
-
-              <div class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-amber-50 dark:from-purple-900/20 dark:to-amber-900/20 rounded-2xl">
-                <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">À partir de</div>
-                <div class="text-3xl font-black bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                  Sur devis
-                </div>
-              </div>
-
-              <button class="flex items-center justify-center space-x-2 w-full py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-2xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105">
-                <span>Découvrir</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
+            <h3 class="text-2xl font-black text-white mb-4">Événements VIP</h3>
+            <p class="text-white/80 mb-6">Accès exclusif aux événements sportifs et culturels mondiaux</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>Réserver</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </div>
-          </a>
-        @endfor
+          </div>
+        </a>
+
+        <a href="{{ route('packages') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-amber-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-4">Packages Luxe</h3>
+            <p class="text-white/80 mb-6">Expériences sur mesure : safaris, yachting, circuits exclusifs</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>Explorer</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        <a href="{{ route('contact') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-4">Conciergerie</h3>
+            <p class="text-white/80 mb-6">Service 24/7 pour organiser vos désirs les plus exclusifs</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>Contacter</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
   </section>
@@ -312,7 +228,7 @@
 
         @foreach($vehicles as $vehicle)
           <a
-            href="{{ route('packages.index') }}"
+            href="{{ route('packages') }}"
             class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-500 hover:-translate-y-4"
           >
             <div class="aspect-square overflow-hidden relative">
@@ -356,22 +272,22 @@
   </section>
 
   {{-- Vols - Section secondaire --}}
-  <section class="py-20 bg-gray-100 dark:bg-gray-900">
+  <section class="py-20 bg-white">
     <div class="container mx-auto px-4">
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center justify-center space-x-3 mb-6">
-          <svg class="w-12 h-12 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </div>
-        <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-6">
+        <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
           Besoin d'un Vol ?
         </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
+        <p class="text-xl text-gray-600 mb-8">
           Nous proposons également la réservation de vols internationaux
         </p>
         <a
-          href="{{ route('flights.index') }}"
+          href="{{ route('flights') }}"
           class="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl"
         >
           <span>Rechercher un Vol</span>
@@ -394,7 +310,7 @@
       </p>
       <div class="flex flex-wrap justify-center gap-6">
         <a
-          href="{{ route('events.index') }}"
+          href="{{ route('events') }}"
           class="inline-flex items-center space-x-2 px-10 py-5 bg-white text-purple-900 font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,7 +319,7 @@
           <span>ÉVÉNEMENTS VIP</span>
         </a>
         <a
-          href="{{ route('packages.index') }}"
+          href="{{ route('packages') }}"
           class="inline-flex items-center space-x-2 px-10 py-5 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

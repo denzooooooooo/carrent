@@ -3,7 +3,7 @@
 @section('title', 'FAQ - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-white">
   {{-- Hero --}}
   <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
@@ -17,12 +17,12 @@
   <section class="py-8">
     <div class="container mx-auto">
       <div class="max-w-2xl mx-auto -mt-8 relative z-20">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4">
+          <div class="bg-white rounded-2xl shadow-2xl p-4">
           <div class="relative">
             <input
               type="text"
               placeholder="Rechercher une question..."
-              class="w-full px-6 py-4 pl-12 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none"
+              class="w-full px-6 py-4 pl-12 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
             />
             <svg class="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -169,7 +169,7 @@
         @endphp
 
         @foreach($faqs as $catIndex => $category)
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+          <div class="bg-white rounded-3xl p-8 shadow-xl">
             <h2 class="text-3xl font-black mb-6 flex items-center">
               <span class="w-12 h-12 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center text-white mr-4">
                 {{ $catIndex + 1 }}
@@ -179,10 +179,10 @@
 
             <div class="space-y-4">
               @foreach($category['questions'] as $qIndex => $faq)
-                <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div class="border-2 border-gray-200 rounded-xl overflow-hidden">
                   <button
                     x-on:click="openIndex = openIndex === '{{ $catIndex }}-{{ $qIndex }}' ? null : '{{ $catIndex }}-{{ $qIndex }}'"
-                    class="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                    class="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
                   >
                     <span class="font-bold text-lg pr-4">{{ $faq['q'] }}</span>
                     <svg
@@ -204,7 +204,7 @@
                     x-transition:leave="transition ease-in duration-150"
                     x-transition:leave-start="opacity-100 max-h-screen"
                     x-transition:leave-end="opacity-0 max-h-0"
-                    class="px-6 pb-6 text-gray-600 dark:text-gray-400 leading-relaxed overflow-hidden"
+                    class="px-6 pb-6 text-gray-600 leading-relaxed overflow-hidden"
                     style="display: none;"
                   >
                     {{ $faq['a'] }}

@@ -3,7 +3,7 @@
 @section('title', 'Contact - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-white">
   {{-- Hero --}}
   <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
@@ -47,29 +47,29 @@
         @endphp
 
         @foreach($contactCards as $card)
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+          <div class="bg-white rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
             <div class="w-16 h-16 bg-gradient-to-r from-purple-600 to-amber-600 rounded-2xl flex items-center justify-center text-white mb-4">
               {!! $card['icon'] !!}
             </div>
             <h3 class="text-lg font-bold mb-2">{{ $card['title'] }}</h3>
-            <p class="text-purple-600 dark:text-purple-400 font-semibold mb-1">{{ $card['info'] }}</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $card['subinfo'] }}</p>
+            <p class="text-purple-600 font-semibold mb-1">{{ $card['info'] }}</p>
+            <p class="text-sm text-gray-600">{{ $card['subinfo'] }}</p>
           </div>
         @endforeach
       </div>
 
       <div class="grid lg:grid-cols-2 gap-12">
         {{-- Contact Form --}}
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+        <div class="bg-white rounded-3xl p-8 shadow-xl">
           <h2 class="text-3xl font-black mb-6">Envoyez-nous un Message</h2>
 
           @if(session('success'))
-            <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-xl">
+            <div class="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-xl">
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <p class="font-bold text-green-700 dark:text-green-400">{{ session('success') }}</p>
+                <p class="font-bold text-green-700">{{ session('success') }}</p>
               </div>
             </div>
           @endif
@@ -83,7 +83,7 @@
                 name="name"
                 value="{{ old('name') }}"
                 placeholder="Votre nom"
-                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                 required
               />
               @error('name')
@@ -99,7 +99,7 @@
                   name="email"
                   value="{{ old('email') }}"
                   placeholder="email@exemple.com"
-                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                   required
                 />
                 @error('email')
@@ -114,7 +114,7 @@
                   name="phone"
                   value="{{ old('phone') }}"
                   placeholder="+225 XX XX XX XX XX"
-                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                 />
                 @error('phone')
                   <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -126,7 +126,7 @@
               <label class="block text-sm font-bold mb-2">Sujet *</label>
               <select
                 name="subject"
-                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                 required
               >
                 <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>Question générale</option>
@@ -147,7 +147,7 @@
                 name="message"
                 placeholder="Décrivez votre demande..."
                 rows="6"
-                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:border-purple-600 focus:outline-none resize-none"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none resize-none"
                 required
               >{{ old('message') }}</textarea>
               @error('message')
@@ -170,7 +170,7 @@
         {{-- FAQ & Info --}}
         <div class="space-y-6">
           {{-- FAQ --}}
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+          <div class="bg-white rounded-3xl p-8 shadow-xl">
             <h2 class="text-3xl font-black mb-6">Questions Fréquentes</h2>
 
             <div class="space-y-4">
@@ -197,13 +197,13 @@
 
               @foreach($faqs as $faq)
                 <details class="group">
-                  <summary class="flex items-center justify-between cursor-pointer p-4 bg-gray-50 dark:bg-gray-900 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                  <summary class="flex items-center justify-between cursor-pointer p-4 bg-gray-50 rounded-xl hover:bg-purple-50 transition-colors">
                     <span class="font-bold">{{ $faq['q'] }}</span>
                     <svg class="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </summary>
-                  <p class="mt-3 px-4 text-gray-600 dark:text-gray-400">{{ $faq['a'] }}</p>
+                  <p class="mt-3 px-4 text-gray-600">{{ $faq['a'] }}</p>
                 </details>
               @endforeach
             </div>
@@ -233,7 +233,7 @@
           </div>
 
           {{-- Social Media --}}
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+          <div class="bg-white rounded-3xl p-8 shadow-xl">
             <h3 class="text-2xl font-black mb-4">Suivez-Nous</h3>
             <div class="grid grid-cols-4 gap-4">
               @php
@@ -260,9 +260,9 @@
       </div>
 
       {{-- Map --}}
-      <div class="mt-12 bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+      <div class="mt-12 bg-white rounded-3xl p-8 shadow-xl">
         <h2 class="text-3xl font-black mb-6">Notre Localisation</h2>
-        <div class="aspect-video bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden">
+        <div class="aspect-video bg-gray-200 rounded-2xl overflow-hidden">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2!2d-4.0!3d5.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTgnMDAuMCJOIDTCsDAwJzAwLjAiVw!5e0!3m2!1sfr!2sci!4v1234567890"
             width="100%"

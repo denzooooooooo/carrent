@@ -1,18 +1,11 @@
 @extends('layouts.app')
 
-<<<<<<< Updated upstream
-@section('title', 'A Propos - Carré Premium')
-
-@section('content')
-
-@endsection
-=======
 @section('title', 'À Propos - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-white">
   {{-- Hero --}}
-  <section class="relative h-[50vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
+  <section class="relative h-[20vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
       <h1 class="text-5xl font-black text-white mb-4">À Propos de Carré Premium</h1>
@@ -26,13 +19,13 @@
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <h2 class="text-4xl font-black mb-6">Notre Histoire</h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
+          <p class="text-lg text-gray-600 mb-4">
             Fondée en 2020, <span class="font-bold text-purple-600">Carré Premium</span> est née d'une passion pour le voyage et d'un désir de rendre l'expérience de réservation simple, rapide et accessible à tous.
           </p>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
+          <p class="text-lg text-gray-600 mb-4">
             Basée à Abidjan, en Côte d'Ivoire, nous sommes rapidement devenus l'un des leaders de la billetterie en ligne en Afrique de l'Ouest, offrant des services de réservation de vols, d'événements sportifs et culturels, ainsi que des packages touristiques exclusifs.
           </p>
-          <p class="text-lg text-gray-600 dark:text-gray-400">
+          <p class="text-lg text-gray-600">
             Aujourd'hui, nous servons des milliers de clients satisfaits chaque année et continuons d'innover pour offrir la meilleure expérience possible.
           </p>
         </div>
@@ -48,7 +41,7 @@
   </section>
 
   {{-- Nos Valeurs --}}
-  <section class="py-16 bg-white dark:bg-gray-800">
+  <section class="py-16 bg-gray-50">
     <div class="container mx-auto">
       <h2 class="text-4xl font-black text-center mb-12">Nos Valeurs</h2>
       <div class="grid md:grid-cols-3 gap-8">
@@ -88,10 +81,10 @@
         @endphp
 
         @foreach($values as $value)
-          <div class="bg-gray-50 dark:bg-gray-900 rounded-3xl p-8 hover:shadow-xl transition-all">
+          <div class="bg-white rounded-3xl p-8 hover:shadow-xl transition-all">
             <div class="text-5xl mb-4">{{ $value['icon'] }}</div>
             <h3 class="text-2xl font-bold mb-3">{{ $value['title'] }}</h3>
-            <p class="text-gray-600 dark:text-gray-400">{{ $value['description'] }}</p>
+            <p class="text-gray-600">{{ $value['description'] }}</p>
           </div>
         @endforeach
       </div>
@@ -122,37 +115,7 @@
     </div>
   </section>
 
-  {{-- Notre Équipe --}}
-  <section class="py-16 bg-white dark:bg-gray-800">
-    <div class="container mx-auto">
-      <h2 class="text-4xl font-black text-center mb-12">Notre Équipe</h2>
-      <div class="grid md:grid-cols-4 gap-8">
-        @php
-          $team = [
-            ['name' => 'Jean Kouassi', 'role' => 'CEO & Fondateur', 'image' => 'https://i.pravatar.cc/300?img=12'],
-            ['name' => 'Marie Diallo', 'role' => 'Directrice Commerciale', 'image' => 'https://i.pravatar.cc/300?img=45'],
-            ['name' => 'Paul Traoré', 'role' => 'Directeur Technique', 'image' => 'https://i.pravatar.cc/300?img=33'],
-            ['name' => 'Sophie Kone', 'role' => 'Responsable Client', 'image' => 'https://i.pravatar.cc/300?img=47']
-          ];
-        @endphp
 
-        @foreach($team as $member)
-          <div class="text-center group">
-            <div class="relative mb-4 overflow-hidden rounded-3xl">
-              <img
-                src="{{ $member['image'] }}"
-                alt="{{ $member['name'] }}"
-                class="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
-            <h3 class="text-xl font-bold mb-1">{{ $member['name'] }}</h3>
-            <p class="text-purple-600 dark:text-purple-400 font-semibold">{{ $member['role'] }}</p>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
 
   {{-- Nos Partenaires --}}
   <section class="py-16">
@@ -167,8 +130,8 @@
         @endphp
 
         @foreach($partners as $partner)
-          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 flex items-center justify-center shadow-lg hover:shadow-xl transition-all">
-            <span class="text-lg font-bold text-gray-600 dark:text-gray-400">{{ $partner }}</span>
+          <div class="bg-white rounded-2xl p-6 flex items-center justify-center shadow-lg hover:shadow-xl transition-all">
+            <span class="text-lg font-bold text-gray-600">{{ $partner }}</span>
           </div>
         @endforeach
       </div>
@@ -192,4 +155,3 @@
   </section>
 </div>
 @endsection
->>>>>>> Stashed changes

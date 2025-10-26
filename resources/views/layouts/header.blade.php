@@ -52,8 +52,8 @@
     @click.away="userMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
     :class="isScrolled
-        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg'
-        : 'bg-transparent'"
+        ? 'bg-gray-900/90 backdrop-blur-xl shadow-lg text-white'
+        : 'bg-white text-gray-900'"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -63,10 +63,10 @@
                     <span class="text-2xl font-black text-white">C</span>
                 </div>
                 <div class="hidden md:block">
-                    <div class="text-xl font-black bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
+                    <div class="text-xl font-black text-gray-900" :class="isScrolled ? 'text-white' : 'text-gray-900'">
                         CARRÉ PREMIUM
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    <div class="text-xs font-medium" :class="isScrolled ? 'text-gray-300' : 'text-gray-500'">
                         Voyages d'Exception
                     </div>
                 </div>
@@ -80,12 +80,12 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => isActiveLink($link['path']) ? false : true,
+                            'text-gray-700 hover:bg-gray-100' => isActiveLink($link['path']) ? false : true,
                             'text-white hover:bg-white/20 backdrop-blur-md' => isActiveLink($link['path']) ? false : false,
                         ])
                         :class="{
-                            'text-white hover:bg-white/20 backdrop-blur-md': !isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }}),
-                            'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800': isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }})
+                            'text-gray-900 hover:bg-gray-100': !isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }}),
+                            'text-white hover:bg-white/20 backdrop-blur-md': isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }})
                         }"
                     >
                         {!! $link['icon'] !!}
@@ -97,15 +97,16 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
                 {{-- Language Selector --}}
-                <div class="hidden md:flex items-center space-x-1 bg-white/10 dark:bg-gray-800/50 backdrop-blur-md rounded-full p-1 border border-white/20">
+                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border transition-all duration-300"
+                     :class="isScrolled ? 'bg-gray-100 border-gray-200' : 'bg-gray-100 border-gray-200'">
                     <button
                         x-on:click="currentLanguage = 'fr'"
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'fr'
                             ? 'bg-purple-600 text-white shadow-lg'
                             : isScrolled
-                            ? 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                            : 'text-white/80 hover:bg-white/20'"
+                            ? 'text-gray-600 hover:bg-gray-200'
+                            : 'text-gray-600 hover:bg-gray-200'"
                     >
                         FR
                     </button>
@@ -115,8 +116,8 @@
                         :class="currentLanguage === 'en'
                             ? 'bg-purple-600 text-white shadow-lg'
                             : isScrolled
-                            ? 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                            : 'text-white/80 hover:bg-white/20'"
+                            ? 'text-gray-600 hover:bg-gray-200'
+                            : 'text-gray-600 hover:bg-gray-200'"
                     >
                         EN
                     </button>
@@ -127,8 +128,8 @@
                     x-model="currentCurrency"
                     class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                     :class="isScrolled
-                        ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
-                        : 'bg-white/10 text-white border-white/20 backdrop-blur-md'"
+                        ? 'bg-gray-100 text-gray-700 border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border-gray-200'"
                 >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
@@ -138,19 +139,23 @@
 
                 {{-- Theme Toggle --}}
                 <button
-                    x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; $root.parentElement.classList.toggle('dark')"
+                    x-data="{ theme: $persist('light').as('theme') }"
+                    x-init="document.body.classList.toggle('dark', theme === 'dark')"
+                    x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; document.body.classList.toggle('dark')"
                     class="p-2.5 rounded-full transition-all duration-300 hover:scale-110"
                     :class="isScrolled
-                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                        : 'bg-white/10 text-white backdrop-blur-md border border-white/20'"
+                        ? 'bg-gray-100 text-gray-700'
+                        : 'bg-gray-100 text-gray-700'"
                     aria-label="Toggle theme"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'dark'">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    {{-- Sun Icon --}}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'light'" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'light'">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
+                    {{-- Moon Icon --}}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'dark'" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg   >
                 </button>
 
                 {{-- Authentication Links / User Menu --}}
@@ -160,8 +165,8 @@
                             href="{{ route('login') }}"
                             class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300"
                             :class="isScrolled
-                                ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                                : 'bg-white/10 text-white backdrop-blur-md border border-white/20 hover:bg-white/20'"
+                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                         >
                             Connexion
                         </a>
@@ -178,8 +183,8 @@
                             x-on:click="userMenuOpen = !userMenuOpen"
                             class="flex items-center space-x-2 p-2.5 rounded-full transition-all duration-300 hover:scale-110"
                             :class="isScrolled
-                                ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                                : 'bg-white/10 text-white backdrop-blur-md border border-white/20'"
+                                ? 'bg-gray-100 text-gray-700'
+                                : 'bg-gray-100 text-gray-700'"
                         >
                             <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
                                 <span class="text-xs font-bold text-white">
@@ -243,8 +248,8 @@
                     href="{{ url('/cart') }}"
                     class="relative p-2.5 rounded-full transition-all duration-300 hover:scale-110"
                     :class="isScrolled
-                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                        : 'bg-white/10 text-white backdrop-blur-md border border-white/20'"
+                        ? 'bg-gray-100 text-gray-700'
+                        : 'bg-gray-100 text-gray-700'"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -261,8 +266,8 @@
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
                     class="lg:hidden p-2.5 rounded-full transition-all duration-300"
                     :class="isScrolled
-                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                        : 'bg-white/10 text-white backdrop-blur-md border border-white/20'"
+                        ? 'bg-gray-100 text-gray-700'
+                        : 'bg-gray-100 text-gray-700'"
                     aria-label="Toggle mobile menu"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
