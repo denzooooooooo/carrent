@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Privacy - Carré Premium')
+@section('title', 'Packages - Carré Premium')
 
 @section('content')
+
+
 
 @endsection

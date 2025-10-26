@@ -22,6 +22,18 @@ Route::post('/flights/search', [FlightController::class, 'search'])->name('fligh
 Route::get('/api/locations/search', [FlightController::class, 'searchLocations'])->name('api.locations.search');
 Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
 
+// Nouvelles routes pour les détails et la réservation
+
+/* Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
+Route::post('/flights/details', [FlightController::class, 'details'])->name('flights.details'); */
+//Route::match(['GET', 'POST'], '/flights/details', [FlightController::class, 'details'])->name('flights.details');
+//Route::get('/flights/details/{booking_token}', [FlightController::class, 'details'])->name('flights.details');
+Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
+
+Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
+
+
+
 // --- Autres pages ---
 Route::get('/events', [HomeController::class, 'events'])->name('events');
 Route::get('/packages', [HomeController::class, 'packages'])->name('packages');

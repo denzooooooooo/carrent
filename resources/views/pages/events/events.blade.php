@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Privacy - Carré Premium')
+@section('title', 'Evenement - Carré Premium')
 
 @section('content')
 
