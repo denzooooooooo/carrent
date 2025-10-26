@@ -1,8 +1,7 @@
-
 @php
     // Les variables $isAuthenticated, $user, etc. doivent être passées par l'appelant (@include)
     // ou définies dans le layout principal (app.blade.php) comme montré précédemment.
-    
+
     // Définition des liens de navigation (similaire au tableau JS)
     $navLinks = [
         [
@@ -35,28 +34,28 @@
     function isActiveLink($path) {
         return request()->is($path === '/' ? $path : ltrim($path, '/'));
     }
-    
+
     // Pour l'action du formulaire/bouton, vous devrez créer les routes Laravel
     // pour changer la langue, la devise, le thème et gérer la déconnexion.
 
 @endphp
 
-<header 
-    x-data="{ 
-        isScrolled: window.scrollY > 50, 
-        mobileMenuOpen: false, 
+<header
+    x-data="{
+        isScrolled: window.scrollY > 50,
+        mobileMenuOpen: false,
         userMenuOpen: false,
         currentLanguage: '{{ $currentLanguage }}',
         currentCurrency: '{{ $currentCurrency }}'
     }"
     x-on:scroll.window="isScrolled = window.scrollY > 50"
-    @click.away="userMenuOpen = false" {{-- Ferme le menu utilisateur en cliquant à l'extérieur --}}
+    @click.away="userMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-    :class="isScrolled 
-        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg' 
+    :class="isScrolled
+        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg'
         : 'bg-transparent'"
 >
-    <div class="container-custom">
+    <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
             {{-- Logo --}}
             <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
@@ -81,17 +80,15 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            // Mise à jour : Remplacement de !$isScrolled et $isScrolled par l'état Alpine.js isScrolled
                             'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => isActiveLink($link['path']) ? false : true,
-                            // L'ancienne ligne 'text-white hover:bg-white/20 backdrop-blur-md' => isActiveLink($link['path']) ? false : !$isScrolled, est remplacée par la logique :isScrolled pour la couleur du texte et du survol
-                            'text-white hover:bg-white/20 backdrop-blur-md' => isActiveLink($link['path']) ? false : false, // Valeur par défaut pour l'état non-défilé (sera écrasée par la classe dynamique)
+                            'text-white hover:bg-white/20 backdrop-blur-md' => isActiveLink($link['path']) ? false : false,
                         ])
-                        :class="{ 
+                        :class="{
                             'text-white hover:bg-white/20 backdrop-blur-md': !isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }}),
                             'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800': isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }})
                         }"
                     >
-                        {!! $link['icon'] !!} {{-- Utiliser {!! !!} pour afficher le HTML de l'icône --}}
+                        {!! $link['icon'] !!}
                         <span>{{ $link['name'] }}</span>
                     </a>
                 @endforeach
@@ -99,10 +96,8 @@
 
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
-                {{-- Language Selector (Alpine.js pour l'état) --}}
+                {{-- Language Selector --}}
                 <div class="hidden md:flex items-center space-x-1 bg-white/10 dark:bg-gray-800/50 backdrop-blur-md rounded-full p-1 border border-white/20">
-                    {{-- Note: Vous devrez ajouter la soumission de formulaire ou une requête AJAX/fetch 
-                           pour changer réellement la langue côté Laravel. --}}
                     <button
                         x-on:click="currentLanguage = 'fr'"
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
@@ -128,8 +123,6 @@
                 </div>
 
                 {{-- Currency Selector --}}
-                {{-- Note: Vous devrez ajouter la soumission de formulaire ou une requête AJAX/fetch 
-                       pour changer réellement la devise côté Laravel. --}}
                 <select
                     x-model="currentCurrency"
                     class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -144,7 +137,6 @@
                 </select>
 
                 {{-- Theme Toggle --}}
-                {{-- Nous utilisons ici le x-data de la balise <html> défini dans app.blade.php pour changer la classe 'dark' --}}
                 <button
                     x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; $root.parentElement.classList.toggle('dark')"
                     class="p-2.5 rounded-full transition-all duration-300 hover:scale-110"
@@ -199,8 +191,8 @@
                             </svg>
                         </button>
 
-                        {{-- User Menu Dropdown (Avec Alpine.js pour l'affichage et la transition) --}}
-                        <div 
+                        {{-- User Menu Dropdown --}}
+                        <div
                             x-show="userMenuOpen"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95"
@@ -208,8 +200,8 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
-                            style="display: none;" {{-- Cache par défaut avant Alpine --}}
+                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
+                            style="display: none;"
                         >
                             <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white">
@@ -235,7 +227,6 @@
                                 <i class="fas fa-ticket-alt mr-2"></i>
                                 Mes Réservations
                             </a>
-                            {{-- Utilisation d'un formulaire pour la déconnexion (méthode standard Laravel) --}}
                             <form method="POST" action="{{ route('logout') }}" x-on:submit="userMenuOpen = false">
                                 @csrf
                                 <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -285,8 +276,8 @@
         </div>
     </div>
 
-    {{-- Mobile Menu (Avec Alpine.js pour l'affichage et la transition) --}}
-    <div 
+    {{-- Mobile Menu --}}
+    <div
         x-show="mobileMenuOpen"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 -translate-y-1"
@@ -297,7 +288,7 @@
         class="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-xl"
         style="display: none;"
     >
-        <div class="container-custom py-4 space-y-2">
+        <div class="container mx-auto px-4 py-4 space-y-2">
             @foreach ($navLinks as $link)
                 <a
                     href="{{ url($link['path']) }}"
@@ -312,7 +303,7 @@
                     <span>{{ $link['name'] }}</span>
                 </a>
             @endforeach
-            
+
             <div class="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
                 {{-- Authentication Links Mobile --}}
                 @if (!$isAuthenticated)
@@ -358,7 +349,6 @@
                             <i class="fas fa-ticket-alt mr-2"></i>
                             Mes Réservations
                         </a>
-                        {{-- Déconnexion mobile (formulaire) --}}
                         <form method="POST" action="{{ route('logout') }}" x-on:submit="mobileMenuOpen = false">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
