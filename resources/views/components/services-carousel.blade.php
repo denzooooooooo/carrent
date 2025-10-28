@@ -1,6 +1,6 @@
 @props(['services' => []])
 
-<section class="relative min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 overflow-hidden">
+<section class="relative h-screen md:min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 overflow-hidden">
   {{-- Background Effects --}}
   <div class="absolute inset-0">
     <div class="absolute top-20 left-20 w-96 h-96 bg-amber-500 rounded-full filter blur-3xl animate-pulse opacity-20"></div>
@@ -70,15 +70,15 @@
               <div class="container mx-auto px-6 text-center">
                 <div class="max-w-5xl mx-auto">
                   {{-- Badge --}}
-                  <div class="inline-flex items-center space-x-3 px-8 py-4 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-12 shadow-2xl border border-white/30 animate-pulse">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="inline-flex items-center space-x-2 md:space-x-3 px-6 md:px-8 py-3 md:py-4 bg-white/20 backdrop-blur-md text-white rounded-full text-xs md:text-sm font-black mb-8 md:mb-12 shadow-2xl border border-white/30 animate-pulse">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                     </svg>
                     <span>EXPÉRIENCES DE LUXE SUR MESURE</span>
                   </div>
 
                   {{-- Main Title --}}
-                  <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
+                  <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-4 md:mb-6 leading-tight">
                     <span x-text="slide.title" class="block"></span>
                     <span class="bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                       CARRÉ PREMIUM
@@ -86,28 +86,28 @@
                   </h1>
 
                   {{-- Subtitle --}}
-                  <h2 class="text-xl md:text-3xl font-bold text-amber-400 mb-8" x-text="slide.subtitle"></h2>
+                  <h2 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-6 md:mb-8" x-text="slide.subtitle"></h2>
 
                   {{-- Description --}}
-                  <p class="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed" x-text="slide.description"></p>
+                  <p class="text-base sm:text-lg md:text-xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed" x-text="slide.description"></p>
 
                   {{-- CTA Buttons --}}
-                  <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                  <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
                     <a
                       href="#services"
-                      class="group inline-flex items-center space-x-3 px-12 py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
+                      class="group inline-flex items-center space-x-2 md:space-x-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-lg md:text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
                     >
                       <span>DÉCOUVRIR</span>
-                      <svg class="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </a>
 
                     <a
                       href="{{ route('contact') }}"
-                      class="group inline-flex items-center space-x-3 px-12 py-6 bg-white/20 backdrop-blur-md text-white font-black text-xl rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300 shadow-2xl border-2 border-white/30"
+                      class="group inline-flex items-center space-x-2 md:space-x-3 px-8 md:px-12 py-4 md:py-6 bg-white/20 backdrop-blur-md text-white font-black text-lg md:text-xl rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300 shadow-2xl border-2 border-white/30"
                     >
-                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       <span>CONTACTER</span>
@@ -122,24 +122,24 @@
         {{-- Navigation Arrows --}}
         <button
           @click="prevSlide()"
-          class="absolute left-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
+          class="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
         <button
           @click="nextSlide()"
-          class="absolute right-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
+          class="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {{-- Indicators --}}
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+        <div class="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 md:space-x-3 z-20">
           <template x-for="(slide, index) in slides" :key="index">
             <button
               @click="goToSlide(index)"
