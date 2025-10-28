@@ -43,8 +43,7 @@ jobs:
 
             echo "📦 Installation des dépendances..."
             composer install 
-            composer dump-autoload
-
+  
             echo "⚙️ Optimisation Laravel..."
             php artisan optimize:clear
 
