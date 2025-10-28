@@ -3,7 +3,7 @@
 @section('title', 'Conditions d\'Utilisation - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-white">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
   {{-- Hero --}}
   <section class="relative h-[30vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
@@ -16,9 +16,9 @@
   {{-- Content --}}
   <section class="py-12">
     <div class="container mx-auto">
-      <div class="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-xl">
+      <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-xl">
 
-        <div class="prose prose-lg max-w-none">
+        <div class="prose prose-lg dark:prose-invert max-w-none">
 
           <h2 class="text-3xl font-black mb-4">1. Acceptation des Conditions</h2>
           <p class="mb-6">
@@ -131,8 +131,8 @@
             <li><strong>Adresse :</strong> Abidjan, Plateau, Côte d'Ivoire</li>
           </ul>
 
-          <div class="mt-12 p-6 bg-purple-50 rounded-2xl border-2 border-purple-200">
-            <p class="text-sm text-gray-600">
+          <div class="mt-12 p-6 bg-purple-50 dark:bg-purple-900/20 rounded-2xl border-2 border-purple-200 dark:border-purple-800">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
               <strong>Note importante :</strong> En utilisant nos services, vous reconnaissez avoir lu, compris et accepté l'intégralité de ces conditions d'utilisation. Si vous avez des questions, n'hésitez pas à contacter notre service client avant d'effectuer une réservation.
             </p>
           </div>
