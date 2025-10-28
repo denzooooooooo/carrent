@@ -144,7 +144,7 @@ class AuthController extends Controller
 
         $data = $request->only([
             'first_name', 'last_name', 'phone', 'date_of_birth', 'gender',
-            'nationality', 'address', 'city', 'country', 'postal_code'
+            'nationality', 'passport_number', 'address', 'city', 'country', 'postal_code'
         ]);
 
         // Handle avatar upload
