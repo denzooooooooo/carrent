@@ -5,13 +5,13 @@
 @section('content')
     <div class="min-h-screen bg-white">
         {{-- Hero Section --}}
-        <section class="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20">
+        <section class="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-12 md:py-20">
             <div class="container mx-auto px-4">
                 <div class="max-w-4xl mx-auto text-center">
-                    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 md:mb-6 leading-tight">
                         Réservez votre <span class="text-yellow-400">Vol</span>
                     </h1>
-                    <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto">
+                    <p class="text-lg sm:text-xl md:text-2xl opacity-90 max-w-2xl mx-auto px-2">
                         Trouvez les meilleurs vols aux meilleurs prix
                     </p>
                 </div>
@@ -20,13 +20,13 @@
 
         {{-- Formulaire de Recherche --}}
         <section class="bg-white shadow-2xl -mt-8 relative z-10">
-            <div class="container mx-auto px-4 py-12">
+            <div class="container mx-auto px-4 py-8 md:py-12">
                 {{-- Type de voyage --}}
-                <div class="flex space-x-4 mb-6">
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
                     <button type="button" id="btn-roundtrip"
-                        class="flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-purple-600 to-amber-600 text-white shadow-xl">
+                        class="flex-1 py-3 md:py-4 px-4 md:px-6 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-purple-600 to-amber-600 text-white shadow-xl text-sm md:text-base">
                         <div class="flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
@@ -34,9 +34,9 @@
                         </div>
                     </button>
                     <button type="button" id="btn-oneway"
-                        class="flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        class="flex-1 py-3 md:py-4 px-4 md:px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base">
                         <div class="flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
@@ -44,9 +44,9 @@
                         </div>
                     </button>
                     <button type="button" id="btn-multicity"
-                        class="flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        class="flex-1 py-3 md:py-4 px-4 md:px-6 rounded-2xl font-bold transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base">
                         <div class="flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
@@ -87,57 +87,57 @@
 
                     {{-- Vol Simple/Aller-Retour --}}
                     <div id="standard-flight-fields">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
                             <div class="relative">
-                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                     </svg>
                                     <span>Aéroport de Départ *</span>
                                 </label>
                                 <input type="text" id="origin-input" placeholder="Ex: CDG, Paris..."
-                                    class="w-full pl-4 pr-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-lg font-semibold"
+                                    class="w-full pl-3 md:pl-4 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-base md:text-lg font-semibold"
                                     autocomplete="off">
                                 <input type="hidden" id="origin-code" name="departure_id">
-                                <div id="origin-suggestions" class="hidden absolute z-50 w-full mt-2 bg-white border-2 border-purple-200 rounded-2xl shadow-2xl max-h-80 overflow-y-auto"></div>
+                                <div id="origin-suggestions" class="hidden absolute z-50 w-full mt-2 bg-white border-2 border-purple-200 rounded-xl md:rounded-2xl shadow-2xl max-h-60 md:max-h-80 overflow-y-auto"></div>
                             </div>
 
                             <div class="relative">
-                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     </svg>
                                     <span>Aéroport d'Arrivée *</span>
                                 </label>
                                 <input type="text" id="destination-input" placeholder="Ex: JFK, New York..."
-                                    class="w-full pl-4 pr-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-lg font-semibold"
+                                    class="w-full pl-3 md:pl-4 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-base md:text-lg font-semibold"
                                     autocomplete="off">
                                 <input type="hidden" id="destination-code" name="arrival_id">
-                                <div id="destination-suggestions" class="hidden absolute z-50 w-full mt-2 bg-white border-2 border-amber-200 rounded-2xl shadow-2xl max-h-80 overflow-y-auto"></div>
+                                <div id="destination-suggestions" class="hidden absolute z-50 w-full mt-2 bg-white border-2 border-amber-200 rounded-xl md:rounded-2xl shadow-2xl max-h-60 md:max-h-80 overflow-y-auto"></div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
                             <div>
-                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     <span>Date de Départ *</span>
                                 </label>
                                 <input type="date" id="departure-date" name="outbound_date" min="{{ date('Y-m-d') }}"
-                                    class="w-full px-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-lg font-semibold">
+                                    class="w-full px-3 md:px-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-base md:text-lg font-semibold">
                             </div>
 
                             <div id="return-date-container">
-                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     <span>Date de Retour *</span>
                                 </label>
                                 <input type="date" id="return-date" name="return_date" min="{{ date('Y-m-d') }}"
-                                    class="w-full px-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-lg font-semibold">
+                                    class="w-full px-3 md:px-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-base md:text-lg font-semibold">
                             </div>
                         </div>
                     </div>
@@ -157,19 +157,19 @@
                     </div>
 
                     {{-- Passagers et Classe --}}
-                    <div class="bg-gradient-to-r from-purple-50 to-amber-50 rounded-2xl p-6 mb-6 border-2 border-purple-100">
+                    <div class="bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 border-2 border-purple-100">
                         <div class="flex items-center space-x-2 mb-4">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <h3 class="text-lg font-black text-gray-900">Passagers & Classe</h3>
+                            <h3 class="text-base md:text-lg font-black text-gray-900">Passagers & Classe</h3>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Adultes (12+)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Adultes (12+)</label>
                                 <select name="adults" id="adults"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold">
+                                    class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 1; $i <= 9; $i++)
                                         <option value="{{ $i }}">{{ $i }}</option>
                                     @endfor
@@ -177,9 +177,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Enfants (2-11)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Enfants (2-11)</label>
                                 <select name="children" id="children"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold">
+                                    class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 0; $i <= 8; $i++)
                                         <option value="{{ $i }}">{{ $i }}</option>
                                     @endfor
@@ -187,9 +187,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Bébés (0-2)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Bébés (0-2)</label>
                                 <select name="infants" id="infants"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold">
+                                    class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 0; $i <= 4; $i++)
                                         <option value="{{ $i }}">{{ $i }}</option>
                                     @endfor
@@ -197,9 +197,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Classe</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Classe</label>
                                 <select name="travel_class" id="travel-class"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold">
+                                    class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     <option value="ECONOMY">Économique</option>
                                     <option value="PREMIUM_ECONOMY">Éco Premium</option>
                                     <option value="BUSINESS">Affaires</option>
@@ -210,29 +210,29 @@
                     </div>
 
                     {{-- Options --}}
-                    <div class="mb-6 space-y-3">
-                        <label class="flex items-center space-x-3 cursor-pointer group">
+                    <div class="mb-6 space-y-2 md:space-y-3">
+                        <label class="flex items-center space-x-2 md:space-x-3 cursor-pointer group">
                             <input type="checkbox" name="non_stop" id="non-stop"
-                                class="w-6 h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
-                            <span class="text-gray-700 font-bold text-lg group-hover:text-purple-600 transition-colors">
+                                class="w-5 h-5 md:w-6 md:h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
+                            <span class="text-gray-700 font-bold text-base md:text-lg group-hover:text-purple-600 transition-colors">
                                 Vols directs uniquement
                             </span>
                         </label>
 
-                        <label class="flex items-center space-x-3 cursor-pointer group">
+                        <label class="flex items-center space-x-2 md:space-x-3 cursor-pointer group">
                             <input type="checkbox" name="deep_search" id="deep-search"
-                                class="w-6 h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
-                            <span class="text-gray-700 font-bold text-lg group-hover:text-purple-600 transition-colors">
+                                class="w-5 h-5 md:w-6 md:h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
+                            <span class="text-gray-700 font-bold text-base md:text-lg group-hover:text-purple-600 transition-colors">
                                 Recherche approfondie (plus lent mais plus de résultats)
                             </span>
                         </label>
                     </div>
 
                     {{-- Tri --}}
-                    <div class="mb-8">
-                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Trier par</label>
+                    <div class="mb-6 md:mb-8">
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">Trier par</label>
                         <select name="sort_by" id="sort-by"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold">
+                            class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                             <option value="1">Meilleurs vols</option>
                             <option value="2">Prix</option>
                             <option value="3">Heure de départ</option>
@@ -246,8 +246,8 @@
 
                     {{-- Bouton de recherche --}}
                     <button type="submit" id="search-btn"
-                        class="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 hover:from-purple-700 hover:via-purple-800 hover:to-amber-700 text-white font-black text-xl py-6 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-3">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 hover:from-purple-700 hover:via-purple-800 hover:to-amber-700 text-white font-black text-lg md:text-xl py-4 md:py-6 px-6 md:px-8 rounded-xl md:rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-2 md:space-x-3">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <span>RECHERCHER DES VOLS</span>
@@ -257,34 +257,34 @@
         </section>
 
         {{-- Section Résultats --}}
-        <section class="container mx-auto px-4 py-16">
+        <section class="container mx-auto px-4 py-12 md:py-16">
             <div class="max-w-4xl mx-auto text-center">
-                <div class="bg-white rounded-3xl p-12 shadow-xl border-2 border-gray-100">
-                    <div class="w-24 h-24 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-2xl md:rounded-3xl p-8 md:p-12 shadow-xl border-2 border-gray-100">
+                    <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <svg class="w-10 h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-black text-gray-900 mb-4">Prêt à rechercher vos vols ?</h3>
-                    <p class="text-gray-600 text-lg mb-8">Remplissez le formulaire ci-dessus et découvrez les meilleurs vols aux meilleurs prix.</p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-3 md:mb-4">Prêt à rechercher vos vols ?</h3>
+                    <p class="text-gray-600 text-base md:text-lg mb-6 md:mb-8 px-2">Remplissez le formulaire ci-dessus et découvrez les meilleurs vols aux meilleurs prix.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                         <div class="flex items-center space-x-2 text-purple-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold">Prix compétitifs</span>
+                            <span class="font-semibold text-sm md:text-base">Prix compétitifs</span>
                         </div>
                         <div class="flex items-center space-x-2 text-purple-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold">Réservation instantanée</span>
+                            <span class="font-semibold text-sm md:text-base">Réservation instantanée</span>
                         </div>
                         <div class="flex items-center space-x-2 text-purple-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold">Support 24/7</span>
+                            <span class="font-semibold text-sm md:text-base">Support 24/7</span>
                         </div>
                     </div>
                 </div>
