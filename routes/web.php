@@ -22,7 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile/change-password', [AuthController::class, 'changePassword'])->name('profile.change-password');
+    Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
 });
 
 // --- Administration ---
