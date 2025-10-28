@@ -190,7 +190,7 @@
                                 </p>
                             </div>
                             <a
-                                href="{{ url('/account/profile') }}"
+                                href="{{ route('profile') }}"
                                 x-on:click="userMenuOpen = false"
                                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
@@ -306,7 +306,7 @@
                             </p>
                         </div>
                         <a
-                            href="{{ url('/account/profile') }}"
+                            href="{{ route('profile') }}"
                             x-on:click="mobileMenuOpen = false"
                             class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                         >

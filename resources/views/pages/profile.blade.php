@@ -66,7 +66,7 @@
     <div id="info-tab" class="tab-content active">
       <div class="bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-2xl font-black text-gray-900 mb-6">Informations Personnelles</h2>
-        <form action="{{ route('profile.update') }}" method="POST" class="space-y-6">
+        <form action="{{ route('profile.update') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
           @csrf
           @method('PUT')
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -111,6 +111,10 @@
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Adresse</label>
             <textarea name="address" rows="3" class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 focus:border-purple-600 focus:ring-0" placeholder="Votre adresse complète">{{ Auth::user()->address }}</textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Photo de profil</label>
+            <input type="file" name="avatar" accept="image/*" class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 focus:border-purple-600 focus:ring-0 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" />
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

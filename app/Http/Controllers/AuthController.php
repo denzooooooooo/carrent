@@ -135,16 +135,30 @@ class AuthController extends Controller
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator);
         }
 
-        $user->update($request->only([
+        $data = $request->only([
             'first_name', 'last_name', 'phone', 'date_of_birth', 'gender',
             'nationality', 'address', 'city', 'country', 'postal_code'
-        ]));
+        ]);
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar && file_exists(public_path('storage/' . $user->avatar))) {
+                unlink(public_path('storage/' . $user->avatar));
+            }
+
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $avatarPath;
+        }
+
+        $user->update($data);
 
         Session::flash('success', 'Profil mis à jour avec succès.');
 
