@@ -42,18 +42,13 @@
 
 <header
     x-data="{
-        isScrolled: window.scrollY > 50,
         mobileMenuOpen: false,
         userMenuOpen: false,
         currentLanguage: '{{ $currentLanguage }}',
         currentCurrency: '{{ $currentCurrency }}'
     }"
-    x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-    :class="isScrolled
-        ? 'bg-gray-900/90 backdrop-blur-xl shadow-lg text-white'
-        : 'bg-white text-gray-900'"
+    class="fixed top-0 left-0 right-0 z-50 bg-white text-gray-900 shadow-lg transition-all duration-500"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -63,10 +58,10 @@
                     <span class="text-2xl font-black text-white">C</span>
                 </div>
                 <div class="hidden md:block">
-                    <div class="text-xl font-black text-gray-900" :class="isScrolled ? 'text-white' : 'text-gray-900'">
+                    <div class="text-xl font-black text-gray-900">
                         CARRÉ PREMIUM
                     </div>
-                    <div class="text-xs font-medium" :class="isScrolled ? 'text-gray-300' : 'text-gray-500'">
+                    <div class="text-xs font-medium text-gray-500">
                         Voyages d'Exception
                     </div>
                 </div>
@@ -80,13 +75,8 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            'text-gray-700 hover:bg-gray-100' => isActiveLink($link['path']) ? false : true,
-                            'text-white hover:bg-white/20 backdrop-blur-md' => isActiveLink($link['path']) ? false : false,
+                            'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
                         ])
-                        :class="{
-                            'text-gray-900 hover:bg-gray-100': !isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }}),
-                            'text-white hover:bg-white/20 backdrop-blur-md': isScrolled && !({{ isActiveLink($link['path']) ? 'true' : 'false' }})
-                        }"
                     >
                         {!! $link['icon'] !!}
                         <span>{{ $link['name'] }}</span>
@@ -97,15 +87,12 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
                 {{-- Language Selector --}}
-                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border transition-all duration-300"
-                     :class="isScrolled ? 'bg-gray-100 border-gray-200' : 'bg-gray-100 border-gray-200'">
+                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 border-gray-200 transition-all duration-300">
                     <button
                         x-on:click="currentLanguage = 'fr'"
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'fr'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : isScrolled
-                            ? 'text-gray-600 hover:bg-gray-200'
                             : 'text-gray-600 hover:bg-gray-200'"
                     >
                         FR
@@ -115,8 +102,6 @@
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'en'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : isScrolled
-                            ? 'text-gray-600 hover:bg-gray-200'
                             : 'text-gray-600 hover:bg-gray-200'"
                     >
                         EN
@@ -126,10 +111,7 @@
                 {{-- Currency Selector --}}
                 <select
                     x-model="currentCurrency"
-                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    :class="isScrolled
-                        ? 'bg-gray-100 text-gray-700 border-gray-200'
-                        : 'bg-gray-100 text-gray-700 border-gray-200'"
+                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
@@ -142,10 +124,7 @@
                     x-data="{ theme: $persist('light').as('theme') }"
                     x-init="document.body.classList.toggle('dark', theme === 'dark')"
                     x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; document.body.classList.toggle('dark')"
-                    class="p-2.5 rounded-full transition-all duration-300 hover:scale-110"
-                    :class="isScrolled
-                        ? 'bg-gray-100 text-gray-700'
-                        : 'bg-gray-100 text-gray-700'"
+                    class="p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
                     aria-label="Toggle theme"
                 >
                     {{-- Sun Icon --}}
@@ -163,10 +142,7 @@
                     <div class="hidden md:flex items-center space-x-3">
                         <a
                             href="{{ route('login') }}"
-                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300"
-                            :class="isScrolled
-                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
                         >
                             Connexion
                         </a>
@@ -181,10 +157,7 @@
                     <div class="relative user-menu-container">
                         <button
                             x-on:click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center space-x-2 p-2.5 rounded-full transition-all duration-300 hover:scale-110"
-                            :class="isScrolled
-                                ? 'bg-gray-100 text-gray-700'
-                                : 'bg-gray-100 text-gray-700'"
+                            class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
                         >
                             <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
                                 <span class="text-xs font-bold text-white">
@@ -246,10 +219,7 @@
                 {{-- Cart --}}
                 <a
                     href="{{ url('/cart') }}"
-                    class="relative p-2.5 rounded-full transition-all duration-300 hover:scale-110"
-                    :class="isScrolled
-                        ? 'bg-gray-100 text-gray-700'
-                        : 'bg-gray-100 text-gray-700'"
+                    class="relative p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -264,10 +234,7 @@
                 {{-- Mobile Menu Button --}}
                 <button
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-full transition-all duration-300"
-                    :class="isScrolled
-                        ? 'bg-gray-100 text-gray-700'
-                        : 'bg-gray-100 text-gray-700'"
+                    class="lg:hidden p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300"
                     aria-label="Toggle mobile menu"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
