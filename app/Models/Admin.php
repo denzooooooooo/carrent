@@ -12,7 +12,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens, LogsActivity, SoftDeletes;
+    use HasFactory, Notifiable, HasApiTokens, LogsActivity;  
+    //SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
