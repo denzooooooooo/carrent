@@ -10,7 +10,7 @@
       <div class="text-center mb-8">
         <div class="relative inline-block">
           <img
-            src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->first_name . ' ' . Auth::user()->last_name) . '&size=120&background=9333EA&color=fff' }}"
+            src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->first_name . ' ' . Auth::user()->last_name) . '&size=120&background=9333EA&color=fff' }}"
             alt="{{ Auth::user()->first_name }}"
             class="w-24 h-24 rounded-full border-4 border-purple-200 object-cover mx-auto"
           />
@@ -51,7 +51,7 @@
     <div class="lg:hidden mb-6">
       <div class="flex items-center space-x-4">
         <img
-          src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->first_name . ' ' . Auth::user()->last_name) . '&size=80&background=9333EA&color=fff' }}"
+          src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->first_name . ' ' . Auth::user()->last_name) . '&size=80&background=9333EA&color=fff' }}"
           alt="{{ Auth::user()->first_name }}"
           class="w-16 h-16 rounded-full border-4 border-purple-200 object-cover"
         />

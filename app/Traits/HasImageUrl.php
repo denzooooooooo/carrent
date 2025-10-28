@@ -17,6 +17,18 @@ trait HasImageUrl
     }
 
     /**
+     * Get the full URL for the avatar
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar && !str_starts_with($this->avatar, 'http')) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        return $this->avatar;
+    }
+
+    /**
      * Get the full URLs for gallery images
      */
     public function getGalleryUrlsAttribute()
