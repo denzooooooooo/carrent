@@ -48,7 +48,7 @@
         </a>
       </p>
     </div>
-    <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
+    <form class="mt-8 space-y-6" action="{{ route('login.post') }}" method="POST">
       @csrf
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
