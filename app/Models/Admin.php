@@ -10,9 +10,13 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Admin extends Authenticatable
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+class Admin extends Authenticatable implements HasMedia
 {
-    use HasFactory, Notifiable, HasApiTokens, LogsActivity;  
+    use HasFactory, Notifiable, HasApiTokens, LogsActivity, InteractsWithMedia;
     //SoftDeletes;
 
     /**
@@ -57,6 +61,28 @@ class Admin extends Authenticatable
             'last_login' => 'datetime',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Définir la collection 'avatar' pour utiliser le disque public directement
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->useDisk('avatars');  // ← disque défini dans config/filesystems.php
+        //->singleFile();        // Garde un seul avatar par admin
+    }
+
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('small')
+            ->width(368)
+            ->nonQueued();
+
+        $this->addMediaConversion('normal')
+            ->width(800)
+            ->nonQueued();
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FlightController;
@@ -27,12 +28,15 @@ Route::middleware('auth')->group(function () {
 
 // --- Administration ---
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/login', [App\Http\Controllers\Admin\AdminController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [App\Http\Controllers\Admin\AdminController::class, 'login'])->name('login.post');
-    Route::post('/logout', [App\Http\Controllers\Admin\AdminController::class, 'logout'])->name('logout');
+    Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('auth:admin')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\AuthController::class, 'dashboard'])->name('dashboard');
+
+        Route::resource('members', MemberController::class);
+
 
         // Gestion des utilisateurs
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
@@ -75,10 +79,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Profil admin
         Route::get('/profile', [App\Http\Controllers\Admin\AdminController::class, 'profile'])->name('profile');
-        Route::put('/profile', [App\Http\Controllers\Admin\AdminController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile', [App\Http\Controllers\Admin\AdminController::class, 'updateProfile'])->name('profile.update');
+
+        // FORMULAIRE CHANGEMENT MOT DE PASSE (GET)
+        Route::get('/password', [App\Http\Controllers\Admin\AdminController::class, 'passwordForm'])->name('password.form');
+        // MISE À JOUR MOT DE PASSE (PUT)
+        Route::put('/password', [App\Http\Controllers\Admin\AdminController::class, 'updatePassword'])->name('password.update');
+
 
         // Notifications
-        Route::get('/notifications', [App\Http\Controllers\Admin\AdminController::class, 'notifications'])->name('notifications');
+        Route::get('/notifications', [App\Http\Controllers\Admin\AuthController::class, 'notifications'])->name('notifications');
     });
 });
 
