@@ -45,10 +45,31 @@
         mobileMenuOpen: false,
         userMenuOpen: false,
         currentLanguage: '{{ $currentLanguage }}',
-        currentCurrency: '{{ $currentCurrency }}'
+        currentCurrency: '{{ $currentCurrency }}',
+        changeCurrency(currency) {
+            fetch('/currency/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                },
+                body: JSON.stringify({ currency: currency })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.currentCurrency = currency;
+                    // Reload the page to update all prices with new currency
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du changement de devise:', error);
+            });
+        }
     }"
     @click.away="userMenuOpen = false"
-    class="fixed top-0 left-0 right-0 z-50 bg-white text-gray-900 shadow-lg transition-all duration-500"
+    class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-lg transition-all duration-500"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -58,10 +79,10 @@
                     <span class="text-2xl font-black text-white">C</span>
                 </div>
                 <div class="hidden md:block">
-                    <div class="text-xl font-black text-gray-900">
+                    <div class="text-xl font-black text-gray-900 dark:text-white">
                         CARRÉ PREMIUM
                     </div>
-                    <div class="text-xs font-medium text-gray-500">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
                         Voyages d'Exception
                     </div>
                 </div>
@@ -75,7 +96,7 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
+                            'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => !isActiveLink($link['path']),
                         ])
                     >
                         {!! $link['icon'] !!}
@@ -87,13 +108,13 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
                 {{-- Language Selector --}}
-                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 border-gray-200 transition-all duration-300">
+                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-300">
                     <button
                         x-on:click="currentLanguage = 'fr'"
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'fr'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 hover:bg-gray-200'"
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
                     >
                         FR
                     </button>
@@ -102,7 +123,7 @@
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'en'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 hover:bg-gray-200'"
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
                     >
                         EN
                     </button>
@@ -111,7 +132,8 @@
                 {{-- Currency Selector --}}
                 <select
                     x-model="currentCurrency"
-                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    x-on:change="changeCurrency($event.target.value)"
+                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
@@ -124,7 +146,7 @@
                     x-data="{ theme: $persist('light').as('theme') }"
                     x-init="document.body.classList.toggle('dark', theme === 'dark')"
                     x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; document.body.classList.toggle('dark')"
-                    class="p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                    class="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                     aria-label="Toggle theme"
                 >
                     {{-- Sun Icon --}}
@@ -142,7 +164,7 @@
                     <div class="hidden md:flex items-center space-x-3">
                         <a
                             href="{{ route('login') }}"
-                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                             Connexion
                         </a>
@@ -157,7 +179,7 @@
                     <div class="relative user-menu-container">
                         <button
                             x-on:click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                         >
                             <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
                                 <span class="text-xs font-bold text-white">
@@ -234,7 +256,7 @@
                 {{-- Mobile Menu Button --}}
                 <button
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300"
+                    class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300"
                     aria-label="Toggle mobile menu"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
@@ -361,6 +383,7 @@
                     <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Devise</span>
                     <select
                         x-model="currentCurrency"
+                        x-on:change="changeCurrency($event.target.value)"
                         class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                         <option value="XOF">XOF</option>
