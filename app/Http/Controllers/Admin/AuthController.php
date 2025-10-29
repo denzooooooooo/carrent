@@ -37,6 +37,12 @@ class AuthController extends Controller
             // Régénère la session pour prévenir les attaques de fixation de session
             $request->session()->regenerate();
 
+            // 🕒 Mettre à jour le champ last_login
+            $admin = Auth::guard('admin')->user();
+            $admin->update([
+                'last_login' => now(),
+            ]);
+
             // Succès : Redirige vers la destination prévue ou le tableau de bord (admin.dashboard)
             return redirect()->intended(route('admin.dashboard'));
         }

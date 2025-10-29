@@ -19,6 +19,7 @@
 
     <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -269,7 +270,7 @@
             @include('admin.layouts.footer')
         </div>
     </div>
-
+        
     <!-- Scripts -->
     <script>
         // Sidebar toggle for mobile

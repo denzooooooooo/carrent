@@ -153,7 +153,7 @@ class UserController extends Controller
                 $data['password'] = Hash::make($request->password);
             }
 
-            $user->update($data);
+            $user->update($data);   
 
             return redirect()->route('admin.users.index')->with('success', 'Utilisateur modifié avec succès.');
         } catch (\Exception $e) {
