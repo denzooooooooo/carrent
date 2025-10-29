@@ -47,6 +47,14 @@
         currentLanguage: '{{ $currentLanguage }}',
         currentCurrency: '{{ $currentCurrency }}',
         isScrolled: false,
+        theme: $persist('light').as('theme'),
+        init() {
+            document.body.classList.toggle('dark', this.theme === 'dark');
+        },
+        toggleTheme() {
+            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+            document.body.classList.toggle('dark');
+        },
         changeCurrency(currency) {
             fetch('/currency/change', {
                 method: 'POST',
@@ -148,9 +156,7 @@
 
                 {{-- Theme Toggle --}}
                 <button
-                    x-data="{ theme: $persist('light').as('theme') }"
-                    x-init="document.body.classList.toggle('dark', theme === 'dark')"
-                    x-on:click="theme = theme === 'dark' ? 'light' : 'dark'; document.body.classList.toggle('dark')"
+                    x-on:click="toggleTheme()"
                     class="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                     aria-label="Toggle theme"
                 >
@@ -161,7 +167,7 @@
                     {{-- Moon Icon --}}
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'dark'" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg   >
+                    </svg>
                 </button>
 
                 {{-- Authentication Links / User Menu --}}
