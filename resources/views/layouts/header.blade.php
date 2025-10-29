@@ -46,6 +46,7 @@
         userMenuOpen: false,
         currentLanguage: '{{ $currentLanguage }}',
         currentCurrency: '{{ $currentCurrency }}',
+        isScrolled: false,
         changeCurrency(currency) {
             fetch('/currency/change', {
                 method: 'POST',
@@ -68,8 +69,12 @@
             });
         }
     }"
+    x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false"
-    class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-lg transition-all duration-500"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+    :class="isScrolled
+        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg'
+        : 'bg-transparent'"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">

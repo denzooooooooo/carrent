@@ -16,7 +16,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-gray-100 antialiased">
+<body class="min-h-screen bg-gray-100 dark:bg-gray-900 antialiased">
 
     @php
         $isAuthenticated = auth()->check(); 

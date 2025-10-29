@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -125,3 +126,7 @@ Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
 Route::get('/cookies', [HomeController::class, 'cookies'])->name('cookies');
+
+// --- Currency Routes ---
+Route::post('/currency/change', [CurrencyController::class, 'change'])->name('currency.change');
+Route::get('/currency/current', [CurrencyController::class, 'current'])->name('currency.current');
