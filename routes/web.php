@@ -47,7 +47,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
 
-        // Gestion des événements
+        // Gestion des événements       
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
 
         // Gestion des packages

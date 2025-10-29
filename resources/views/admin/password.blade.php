@@ -7,7 +7,7 @@
     <div class="max-w-2xl mx-auto py-8">
         <h1 class="text-3xl font-bold mb-8 text-dark gradient-text border-b pb-2">Changer mon Mot de Passe</h1>
 
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 animate-fade">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 animate-fadew">
             <p class="text-gray-600 mb-6 font-poppins">Pour votre sécurité, veuillez choisir un mot de passe fort et unique.
             </p>
 

@@ -27,7 +27,7 @@
             </p>
 
             <a href="{{ route('admin.members.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.membres.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.members.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-users w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Membres</span>
                 <span
@@ -38,14 +38,14 @@
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.users.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-users w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Utilisateurs</span>
-                <span class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">0</span>
+                <span class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\User::count() }}</span>
             </a>
 
             <a href="{{ route('admin.bookings.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.bookings.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-ticket-alt w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Réservations</span>
-                <span class="ml-auto bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">0</span>
+                <span class="ml-auto bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\Booking::count() }}</span>
             </a>
         </div>
 

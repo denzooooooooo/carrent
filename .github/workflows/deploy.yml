@@ -49,10 +49,10 @@ jobs:
 
             npm install
 
-            npm run build
+            echo "npm run build"
             
             php artisan optimize
-            php artisan migrate --force
+            php artisan migrate 
 
             echo "✅ Déploiement terminé avec succès !"
           EOF
