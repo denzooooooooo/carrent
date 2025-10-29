@@ -24,6 +24,8 @@ class RedirectIfAdminAuthenticated
         }
 
         // Si l'utilisateur n'est pas authentifié, permet l'accès (vers la page de connexion)
-        return $next($request);
+        //return $next($request);
+        return redirect()->route('admin.login'); 
+
     }
 }
