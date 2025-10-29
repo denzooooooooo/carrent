@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrencyController;
@@ -53,10 +55,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Gestion des packages
         Route::resource('packages', App\Http\Controllers\Admin\PackageController::class);
+        // Dans la section admin middleware
+        Route::post('packages/{package}/toggle-status', [PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
+        Route::post('packages/{package}/toggle-featured', [PackageController::class, 'toggleFeatured'])->name('packages.toggle-featured');
+        Route::delete('packages/{package}/gallery/{mediaId}', [PackageController::class, 'deleteGalleryImage'])->name('packages.delete-gallery-image');
 
         // Gestion des catégories
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+        Route::post('categories/{id}/toggle-status', [App\Http\Controllers\Admin\CategoryController::class, 'toggleStatus'])
+            ->name('categories.toggle-status');
 
+        /*         Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+
+                // Création
+                Route::get('/categories/{type}/create', [CategoryController::class, 'create'])->name('admin.categories.create');
+                Route::post('/categories/{type}', [CategoryController::class, 'store'])->name('admin.categories.store');
+
+                // Édition et Suppression
+                Route::get('/categories/{type}/{id}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+                Route::put('/categories/{type}/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
+                Route::delete('/categories/{type}/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+         */
         // Gestion des carrousels
         Route::resource('carousels', App\Http\Controllers\Admin\CarouselController::class);
 

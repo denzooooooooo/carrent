@@ -55,11 +55,11 @@
                 Produits
             </p>
 
-            <a href="{{ route('admin.flights.index') }}"
+            <!-- <a href="{{ route('admin.flights.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.flights.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-plane w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Vols</span>
-            </a>
+            </a> -->
 
             <a href="{{ route('admin.events.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.events.*') ? 'active' : 'text-gray-700' }}">
@@ -93,7 +93,7 @@
             </a>
         </div>
 
-        <div class="mt-6">
+        <!-- <div class="mt-6">
             <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
                 <i class="fas fa-store mr-2"></i>
                 Marketing
@@ -143,7 +143,8 @@
                 <i class="fas fa-credit-card w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Paiements</span>
             </a>
-        </div>
+        </div> -->
+    
     </nav>
 
     <!-- User Info -->

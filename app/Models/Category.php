@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Category extends Model
+class Category extends Model implements HasMedia
 {
+    use HasFactory, InteractsWithMedia;
     protected $fillable = [
         'name_fr',
         'name_en',
@@ -23,6 +28,28 @@ class Category extends Model
         'is_active' => 'boolean',
         'order_position' => 'integer',
     ];
+
+    /**
+     * Définir la collection 'avatar' pour utiliser le disque public directement
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->useDisk('avatars');  // ← disque défini dans config/filesystems.php
+        //->singleFile();        // Garde un seul avatar par admin
+    }
+
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('small')
+            ->width(368)
+            ->nonQueued();
+
+        $this->addMediaConversion('normal')
+            ->width(800)
+            ->nonQueued();
+    }
 
     // Relation parent
     public function parent()

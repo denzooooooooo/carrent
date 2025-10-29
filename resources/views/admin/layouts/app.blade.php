@@ -240,7 +240,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- @yield('admin.layouts.header-content') -->
-             @include('admin.layouts.header-content')
+            @include('admin.layouts.header-content')
 
             <!-- Page Content -->
             <main class="flex-1 overflow-y-auto p-4 md:p-6 page-transition">
@@ -270,7 +270,7 @@
             @include('admin.layouts.footer')
         </div>
     </div>
-        
+
     <!-- Scripts -->
     <script>
         // Sidebar toggle for mobile
@@ -316,6 +316,16 @@
                     }, 3000);
                 }
             });
+        });
+    </script>
+
+    <script>
+        // Vérifie si la page est chargée depuis le cache BFCache (cas typique du bouton Retour)
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                // Si c'est le cas, forcer le rechargement pour éviter d'afficher la page déconnectée
+                window.location.reload();
+            }
         });
     </script>
 

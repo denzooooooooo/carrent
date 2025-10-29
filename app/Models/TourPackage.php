@@ -5,19 +5,49 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasImageUrl;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class TourPackage extends Model
+class TourPackage extends Model implements HasMedia
 {
-    use HasFactory, HasImageUrl;
+    use HasFactory, HasImageUrl , InteractsWithMedia;
 
     protected $fillable = [
-        'category_id', 'title_fr', 'title_en', 'slug', 'description_fr', 'description_en',
-        'package_type', 'destination', 'duration', 'duration_text_fr', 'duration_text_en',
-        'departure_city', 'price', 'discount_price', 'max_participants', 'min_participants',
-        'included_services_fr', 'included_services_en', 'excluded_services_fr', 'excluded_services_en',
-        'itinerary_fr', 'itinerary_en', 'image', 'gallery', 'video_url', 'available_dates',
-        'is_featured', 'is_active', 'rating', 'total_reviews',
-        'meta_title_fr', 'meta_title_en', 'meta_description_fr', 'meta_description_en',
+        'category_id',
+        'title_fr',
+        'title_en',
+        'slug',
+        'description_fr',
+        'description_en',
+        'package_type',
+        'destination',
+        'duration',
+        'duration_text_fr',
+        'duration_text_en',
+        'departure_city',
+        'price',
+        'discount_price',
+        'max_participants',
+        'min_participants',
+        'included_services_fr',
+        'included_services_en',
+        'excluded_services_fr',
+        'excluded_services_en',
+        'itinerary_fr',
+        'itinerary_en',
+        'image',
+        'gallery',
+        'video_url',
+        'available_dates',
+        'is_featured',
+        'is_active',
+        'rating',
+        'total_reviews',
+        'meta_title_fr',
+        'meta_title_en',
+        'meta_description_fr',
+        'meta_description_en',
     ];
 
     protected $casts = [
@@ -35,6 +65,35 @@ class TourPackage extends Model
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+
+    // -------------------------
+    // Media Library
+    // -------------------------
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->useDisk('avatars')
+            ->singleFile(); // Image principale
+
+        $this->addMediaCollection('gallery')
+            ->useDisk('avatars'); // Galeries multiples
+
+        $this->addMediaCollection('documents')
+            ->useDisk('avatars'); // Vouchers, itinéraires PDF
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('small')
+            ->width(368)
+            ->nonQueued();
+
+        $this->addMediaConversion('normal')
+            ->width(800)
+            ->nonQueued();
+    }
+
 
     public function category()
     {
