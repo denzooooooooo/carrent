@@ -46,14 +46,12 @@
         userMenuOpen: false,
         currentLanguage: '{{ $currentLanguage }}',
         currentCurrency: '{{ $currentCurrency }}',
+        theme: localStorage.getItem('theme') || 'light',
         isScrolled: false,
-        theme: $persist('light').as('theme'),
-        init() {
-            document.body.classList.toggle('dark', this.theme === 'dark');
-        },
         toggleTheme() {
             this.theme = this.theme === 'dark' ? 'light' : 'dark';
-            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', this.theme);
+            document.documentElement.classList.toggle('dark', this.theme === 'dark');
         },
         changeCurrency(currency) {
             fetch('/currency/change', {
@@ -77,12 +75,17 @@
             });
         }
     }"
+    x-init="
+        const storedTheme = localStorage.getItem('theme') || 'light';
+        theme = storedTheme;
+        document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+    "
     x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
     :class="isScrolled
         ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg'
-        : 'bg-transparent'"
+        : 'bg-white'"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -157,16 +160,30 @@
                 {{-- Theme Toggle --}}
                 <button
                     x-on:click="toggleTheme()"
-                    class="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
+                    class="p-2 z-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
                     aria-label="Toggle theme"
                 >
                     {{-- Sun Icon --}}
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'light'" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="theme !== 'dark'"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:leave="transition ease-in duration-150">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364
+                                 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728
+                                 0l-.707.707M6.343 17.657l-.707.707M16
+                                 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
+
                     {{-- Moon Icon --}}
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="theme === 'dark'" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="theme === 'dark'"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:leave="transition ease-in duration-150">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M20.354 15.354A9 9 0 018.646 3.646
+                                 9.003 9.003 0 0012 21a9.003 9.003 0
+                                 008.354-5.646z" />
                     </svg>
                 </button>
 
@@ -252,7 +269,7 @@
                 {{-- Cart --}}
                 <a
                     href="{{ url('/cart') }}"
-                    class="relative p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                    class="relative p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -267,13 +284,13 @@
                 {{-- Mobile Menu Button --}}
                 <button
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300"
+                    class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
                     aria-label="Toggle mobile menu"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
