@@ -148,17 +148,18 @@
                         <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <a href="mailto:comptabilite@carrepremium.com" class="text-purple-200 hover:text-white transition-colors text-sm">
-                            comptabilite@carrepremium.com
+                        <a href="mailto:infos@carrepremium.com" class="text-purple-200 hover:text-white transition-colors text-sm">
+                            infos@carrepremium.com
                         </a>
                     </li>
                     <li class="flex items-start space-x-3">
                         <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <a href="tel:+2250150608461" class="text-purple-200 hover:text-white transition-colors text-sm">
-                            +225 01 50 60 84 61
-                        </a>
+                        <div class="text-purple-200 text-sm">
+                            <div><a href="tel:+2252721594258" class="hover:text-white transition-colors">Fixe: +225 27 21 59 42 58</a></div>
+                            <div><a href="tel:+2250101221515" class="hover:text-white transition-colors">Mobile: +225 01 01 22 15 15</a></div>
+                        </div>
                     </li>
                     <li class="flex items-start space-x-3">
                         <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
