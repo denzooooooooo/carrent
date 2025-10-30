@@ -52,7 +52,7 @@
               {!! $card['icon'] !!}
             </div>
             <h3 class="text-lg font-bold mb-2">{{ $card['title'] }}</h3>
-            <p class="text-purple-600 font-semibold mb-1">{{ $card['info'] }}</p>
+            <p class="text-purple-600 font-semibold mb-1">{!! $card['info'] !!}</p>
             <p class="text-sm text-gray-600">{{ $card['subinfo'] }}</p>
           </div>
         @endforeach
@@ -98,7 +98,7 @@
                   type="email"
                   name="email"
                   value="{{ old('email') }}"
-                  placeholder="email@exemple.com"
+                  placeholder="infos@carrepremium.com"
                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                   required
                 />
@@ -113,7 +113,7 @@
                   type="tel"
                   name="phone"
                   value="{{ old('phone') }}"
-                  placeholder="+225 XX XX XX XX XX"
+                  placeholder="+225 27 21 59 42 58 ou +225 01 01 22 15 15"
                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                 />
                 @error('phone')
