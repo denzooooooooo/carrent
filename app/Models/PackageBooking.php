@@ -10,6 +10,7 @@ class PackageBooking extends Model
 {
     use HasFactory;
 
+    protected $table = 'package_bookings';
     protected $fillable = [
         'booking_id',
         'package_id',

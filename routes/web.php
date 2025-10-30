@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\AuthController;
@@ -52,7 +53,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Gestion des événements       
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
-
+        Route::post('/event-categories/quick-store', [EventController::class, 'quickStoreCat'])
+            ->name('event-categories.quick-store');
+        Route::post('/event-types/quick-store', [EventController::class, 'quickStoreType'])
+            ->name('event-types.quick-store');
         // Gestion des packages
         Route::resource('packages', App\Http\Controllers\Admin\PackageController::class);
         // Dans la section admin middleware

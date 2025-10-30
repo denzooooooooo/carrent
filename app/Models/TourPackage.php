@@ -11,7 +11,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class TourPackage extends Model implements HasMedia
 {
-    use HasFactory, HasImageUrl , InteractsWithMedia;
+    use HasFactory, HasImageUrl, InteractsWithMedia;
+
+    protected $table = 'tour_packages';
 
     protected $fillable = [
         'category_id',
