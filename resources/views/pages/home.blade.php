@@ -31,17 +31,23 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
-        {{-- Événements simulés pour l'exemple --}}
-        @for ($i = 0; $i < 8; $i++)
+        {{-- Événements réels depuis la base de données --}}
+        @forelse ($latestEvents as $index => $event)
           <a
             href="{{ route('events') }}"
             class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-700 hover:-translate-y-6"
           >
             <div class="aspect-[3/4] overflow-hidden relative">
+              @php
+                  // Utilisation de la méthode de Spatie pour récupérer l'URL de l'image 'normal'
+                  $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
+                  $placeholder = 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=600&fit=crop';
+              @endphp
               <img
-                src="https://images.unsplash.com/photo-146189683{{ 6934 + $i }}-ffe607ba8211?w=400&h=600&fit=crop"
-                alt="Événement Exclusif {{ $i + 1 }}"
+                src="{{ $imageUrl ?: $placeholder }}"
+                alt="{{ $event->title }}"
                 class="w-full h-full object-cover group-hover:scale-125 transition-all duration-1000"
+                onerror="this.onerror=null;this.src='{{ $placeholder }}';"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
@@ -51,7 +57,7 @@
                 VIP
               </div>
 
-              @if($i < 2)
+              @if($index < 2)
                 <div class="absolute top-4 left-4 inline-flex items-center space-x-1 px-3 py-1 bg-red-500 rounded-full text-xs font-black text-white shadow-xl animate-pulse">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -63,7 +69,7 @@
 
             <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
               <h3 class="text-xl font-black mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
-                Événement Exclusif {{ $i + 1 }}
+                {{ $event->title }}
               </h3>
 
               <div class="space-y-2 mb-4">
@@ -71,13 +77,13 @@
                   <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span className="font-semibold">Date à venir</span>
+                  <span class="font-semibold">{{ $event->event_date ? $event->event_date->format('d/m/Y') : 'Date à venir' }}</span>
                 </div>
               </div>
 
               <div class="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/30 to-pink-500/30 backdrop-blur-md rounded-2xl border border-amber-400/50">
                 <span class="text-lg font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
-                  Sur demande
+                  {{ $event->min_price ? 'À partir de ' . number_format($event->min_price, 0, ',', ' ') . ' XOF' : 'Sur demande' }}
                 </span>
                 <svg class="w-5 h-5 text-amber-400 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -85,7 +91,63 @@
               </div>
             </div>
           </a>
-        @endfor
+        @empty
+          {{-- Fallback si aucun événement --}}
+          @for ($i = 0; $i < 8; $i++)
+            <a
+              href="{{ route('events') }}"
+              class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-700 hover:-translate-y-6"
+            >
+              <div class="aspect-[3/4] overflow-hidden relative">
+                <img
+                  src="https://images.unsplash.com/photo-146189683{{ 6934 + $i }}-ffe607ba8211?w=400&h=600&fit=crop"
+                  alt="Événement Exclusif {{ $i + 1 }}"
+                  class="w-full h-full object-cover group-hover:scale-125 transition-all duration-1000"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                <div class="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 rounded-full text-xs font-black uppercase text-white shadow-2xl">
+                  VIP
+                </div>
+
+                @if($i < 2)
+                  <div class="absolute top-4 left-4 inline-flex items-center space-x-1 px-3 py-1 bg-red-500 rounded-full text-xs font-black text-white shadow-xl animate-pulse">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <span>HOT</span>
+                  </div>
+                @endif
+              </div>
+
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 class="text-xl font-black mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
+                  Événement Exclusif {{ $i + 1 }}
+                </h3>
+
+                <div class="space-y-2 mb-4">
+                  <div class="inline-flex items-center space-x-2 text-lg bg-white/10 backdrop-blur-md rounded-full px-3 py-2">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="font-semibold">Date à venir</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/30 to-pink-500/30 backdrop-blur-md rounded-2xl border border-amber-400/50">
+                  <span class="text-lg font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
+                    Sur demande
+                  </span>
+                  <svg class="w-5 h-5 text-amber-400 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+          @endfor
+        @endforelse
       </div>
 
       <div class="text-center">

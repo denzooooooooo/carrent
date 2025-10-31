@@ -5,18 +5,28 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Services\GoogleFlightsService;
+use App\Models\Event;
 
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('pages.home');
+        $latestEvents = Event::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->take(8)
+            ->get();
+
+        return view('pages.home', compact('latestEvents'));
     }
 
     public function events()
     {
-        return view('pages.events');
+        $events = Event::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('pages.events', compact('events'));
     }
 
     public function packages()
