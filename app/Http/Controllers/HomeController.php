@@ -24,6 +24,11 @@ class HomeController extends Controller
         return view('pages.packages');
     }
 
+    public function location()
+    {
+        return view('pages.location');
+    }
+
     public function about()
     {
         return view('pages.about');

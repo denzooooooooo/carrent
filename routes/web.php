@@ -140,6 +140,7 @@ Route::post('/flights/booking', [FlightController::class, 'booking'])->name('fli
 // --- Autres pages ---
 Route::get('/events', [HomeController::class, 'events'])->name('events');
 Route::get('/packages', [HomeController::class, 'packages'])->name('packages');
+Route::get('/location', [HomeController::class, 'location'])->name('location');
 
 // --- Pages de support ---
 Route::get('/about', [HomeController::class, 'about'])->name('about');

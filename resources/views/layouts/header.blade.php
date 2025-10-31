@@ -30,6 +30,20 @@
         ],
     ];
 
+    // Sous-pages pour le dropdown
+    $subPages = [
+        [
+            'name' => 'Location',
+            'path' => '/location',
+            'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>'
+        ],
+        [
+            'name' => 'À propos',
+            'path' => '/about',
+            'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+        ],
+    ];
+
     // Fonction Blade pour déterminer la classe active (simule location.pathname === link.path)
     function isActiveLink($path) {
         return request()->is($path === '/' ? $path : ltrim($path, '/'));
@@ -82,10 +96,7 @@
     "
     x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-    :class="isScrolled
-        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg'
-        : 'bg-white'"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -112,25 +123,65 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => !isActiveLink($link['path']),
+                            'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
                         ])
                     >
                         {!! $link['icon'] !!}
                         <span>{{ $link['name'] }}</span>
                     </a>
                 @endforeach
-            </nav>
 
+                {{-- Dropdown for sub-pages --}}
+                <div class="relative" x-data="{ subMenuOpen: false }">
+                    <button
+                        x-on:click="subMenuOpen = !subMenuOpen"
+                        class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2 text-gray-700 hover:bg-gray-100"
+                        @click.away="subMenuOpen = false"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                        </svg>
+                        <span>Plus</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    {{-- Sub-menu dropdown --}}
+                    <div
+                        x-show="subMenuOpen"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        style="display: none;"
+                    >
+                        @foreach ($subPages as $subPage)
+                            <a
+                                href="{{ url($subPage['path']) }}"
+                                x-on:click="subMenuOpen = false"
+                                class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                                {!! $subPage['icon'] !!}
+                                <span>{{ $subPage['name'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </nav>
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
                 {{-- Language Selector --}}
-                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-300">
+                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 border-gray-200 transition-all duration-300">
                     <button
                         x-on:click="currentLanguage = 'fr'"
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'fr'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                            : 'text-gray-600 hover:bg-gray-200'"
                     >
                         FR
                     </button>
@@ -139,7 +190,7 @@
                         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
                         :class="currentLanguage === 'en'
                             ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                            : 'text-gray-600 hover:bg-gray-200'"
                     >
                         EN
                     </button>
@@ -149,7 +200,7 @@
                 <select
                     x-model="currentCurrency"
                     x-on:change="changeCurrency($event.target.value)"
-                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
@@ -157,42 +208,14 @@
                     <option value="GBP">GBP</option>
                 </select>
 
-                {{-- Theme Toggle --}}
-                <button
-                    x-on:click="toggleTheme()"
-                    class="p-2 z-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
-                    aria-label="Toggle theme"
-                >
-                    {{-- Sun Icon --}}
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        x-show="theme !== 'dark'"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:leave="transition ease-in duration-150">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364
-                                 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728
-                                 0l-.707.707M6.343 17.657l-.707.707M16
-                                 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
 
-                    {{-- Moon Icon --}}
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        x-show="theme === 'dark'"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:leave="transition ease-in duration-150">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M20.354 15.354A9 9 0 018.646 3.646
-                                 9.003 9.003 0 0012 21a9.003 9.003 0
-                                 008.354-5.646z" />
-                    </svg>
-                </button>
 
                 {{-- Authentication Links / User Menu --}}
                 @if (!$isAuthenticated)
                     <div class="hidden md:flex items-center space-x-3">
                         <a
                             href="{{ route('login') }}"
-                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
                         >
                             Connexion
                         </a>
@@ -207,7 +230,7 @@
                     <div class="relative user-menu-container">
                         <button
                             x-on:click="userMenuOpen = !userMenuOpen"
-                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
                         >
                             <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
                                 <span class="text-xs font-bold text-white">
@@ -228,21 +251,21 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
                             style="display: none;"
                         >
-                            <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                                <p class="text-sm font-semibold text-gray-800 dark:text-white">
+                            <div class="px-4 py-2 border-b border-gray-200">
+                                <p class="text-sm font-semibold text-gray-800">
                                     {{ $user->name ?? 'Utilisateur' }}
                                 </p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">
+                                <p class="text-xs text-gray-600">
                                     {{ $user->email ?? '' }}
                                 </p>
                             </div>
                             <a
                                 href="{{ route('profile') }}"
                                 x-on:click="userMenuOpen = false"
-                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                                 <i class="fas fa-user mr-2"></i>
                                 Mon Profil
@@ -250,14 +273,14 @@
                             <a
                                 href="{{ url('/account/bookings') }}"
                                 x-on:click="userMenuOpen = false"
-                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                                 <i class="fas fa-ticket-alt mr-2"></i>
                                 Mes Réservations
                             </a>
                             <form method="POST" action="{{ route('logout') }}" x-on:submit="userMenuOpen = false">
                                 @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
                                     <i class="fas fa-sign-out-alt mr-2"></i>
                                     Déconnexion
                                 </button>
@@ -269,7 +292,7 @@
                 {{-- Cart --}}
                 <a
                     href="{{ url('/cart') }}"
-                    class="relative p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    class="relative p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110 hover:bg-gray-200"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -284,7 +307,7 @@
                 {{-- Mobile Menu Button --}}
                 <button
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    class="lg:hidden p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110 hover:bg-gray-200"
                     aria-label="Toggle mobile menu"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
@@ -307,7 +330,7 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-1"
-        class="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-xl"
+        class="lg:hidden bg-white border-t border-gray-200 shadow-xl"
         style="display: none;"
     >
         <div class="container mx-auto px-4 py-4 space-y-2">
@@ -318,7 +341,7 @@
                     class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300"
                     @class([
                         $link['activeClass'] => isActiveLink($link['path']),
-                        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => !isActiveLink($link['path']),
+                        'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
                     ])
                 >
                     <span class="text-xl">{!! $link['icon'] !!}</span>
@@ -326,7 +349,19 @@
                 </a>
             @endforeach
 
-            <div class="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
+            {{-- Sub-pages in mobile menu --}}
+            @foreach ($subPages as $subPage)
+                <a
+                    href="{{ url($subPage['path']) }}"
+                    x-on:click="mobileMenuOpen = false"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300 text-gray-700 hover:bg-gray-100"
+                >
+                    <span class="text-xl">{!! $subPage['icon'] !!}</span>
+                    <span>{{ $subPage['name'] }}</span>
+                </a>
+            @endforeach
+
+            <div class="pt-4 border-t border-gray-200 space-y-3">
                 {{-- Authentication Links Mobile --}}
                 @if (!$isAuthenticated)
                     <div class="px-4 space-y-2">
@@ -340,25 +375,25 @@
                         <a
                             href="{{ route('register') }}"
                             x-on:click="mobileMenuOpen = false"
-                            class="block w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            class="block w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold text-center hover:bg-gray-200 transition-colors"
                         >
                             Inscription
                         </a>
                     </div>
                 @else
                     <div class="px-4 space-y-2">
-                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                            <p class="text-sm font-semibold text-gray-800 dark:text-white">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-sm font-semibold text-gray-800">
                                 {{ $user->name ?? 'Utilisateur' }}
                             </p>
-                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                            <p class="text-xs text-gray-600">
                                 {{ $user->email ?? '' }}
                             </p>
                         </div>
                         <a
                             href="{{ route('profile') }}"
                             x-on:click="mobileMenuOpen = false"
-                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             <i class="fas fa-user mr-2"></i>
                             Mon Profil
@@ -366,14 +401,14 @@
                         <a
                             href="{{ url('/account/bookings') }}"
                             x-on:click="mobileMenuOpen = false"
-                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             <i class="fas fa-ticket-alt mr-2"></i>
                             Mes Réservations
                         </a>
                         <form method="POST" action="{{ route('logout') }}" x-on:submit="mobileMenuOpen = false">
                             @csrf
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-lg">
                                 <i class="fas fa-sign-out-alt mr-2"></i>
                                 Déconnexion
                             </button>
@@ -383,14 +418,14 @@
 
                 {{-- Language Selector Mobile --}}
                 <div class="flex items-center justify-between px-4">
-                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Langue</span>
+                    <span class="text-sm font-semibold text-gray-700">Langue</span>
                     <div class="flex space-x-2">
                         <button
                             x-on:click="currentLanguage = 'fr'"
                             class="px-4 py-2 rounded-lg text-sm font-semibold"
                             :class="currentLanguage === 'fr'
                                 ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'"
+                                : 'bg-gray-100 text-gray-700'"
                         >
                             FR
                         </button>
@@ -399,7 +434,7 @@
                             class="px-4 py-2 rounded-lg text-sm font-semibold"
                             :class="currentLanguage === 'en'
                                 ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'"
+                                : 'bg-gray-100 text-gray-700'"
                         >
                             EN
                         </button>
@@ -408,11 +443,11 @@
 
                 {{-- Currency Selector Mobile --}}
                 <div class="flex items-center justify-between px-4">
-                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Devise</span>
+                    <span class="text-sm font-semibold text-gray-700">Devise</span>
                     <select
                         x-model="currentCurrency"
                         x-on:change="changeCurrency($event.target.value)"
-                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                         <option value="XOF">XOF</option>
                         <option value="EUR">EUR</option>

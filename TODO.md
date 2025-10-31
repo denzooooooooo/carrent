@@ -11,41 +11,41 @@
 - [x] Make indicators responsive (bottom-8)
 
 ## Events Section
-- [ ] Make section padding responsive (py-24)
-- [ ] Make badge responsive (px-8 py-3, text-sm)
-- [ ] Make title responsive (text-6xl md:text-5xl)
-- [ ] Make subtitle responsive (text-1xl)
-- [ ] Make grid responsive (md:grid-cols-4)
-- [ ] Make event cards responsive (aspect-[3/4], p-6, text-xl, text-lg)
-- [ ] Make CTA button responsive (px-12 py-6, text-xl)
+- [x] Make section padding responsive (py-24)
+- [x] Make badge responsive (px-8 py-3, text-sm)
+- [x] Make title responsive (text-6xl md:text-5xl)
+- [x] Make subtitle responsive (text-xl)
+- [x] Make grid responsive (md:grid-cols-4)
+- [x] Make event cards responsive (aspect-[3/4], p-6, text-xl, text-lg)
+- [x] Make CTA button responsive (px-12 py-6, text-xl)
 
 ## Services Section
-- [ ] Make section padding responsive (py-24)
-- [ ] Make badge responsive (px-8 py-3, text-sm)
-- [ ] Make title responsive (text-5xl md:text-6xl)
-- [ ] Make subtitle responsive (text-xl)
-- [ ] Make grid responsive (md:grid-cols-4)
-- [ ] Make service cards responsive (p-8, w-16 h-16, text-2xl, text-white/80)
+- [x] Make section padding responsive (py-24)
+- [x] Make badge responsive (px-8 py-3, text-sm)
+- [x] Make title responsive (text-5xl md:text-6xl)
+- [x] Make subtitle responsive (text-xl)
+- [x] Make grid responsive (md:grid-cols-4)
+- [x] Make service cards responsive (p-8, w-16 h-16, text-2xl, text-white/80)
 
 ## Vehicles Section
-- [ ] Make section padding responsive (py-24)
-- [ ] Make badge responsive (px-8 py-3, text-sm)
-- [ ] Make title responsive (text-6xl md:text-7xl)
-- [ ] Make subtitle responsive (text-2xl)
-- [ ] Make grid responsive (md:grid-cols-4)
-- [ ] Make vehicle cards responsive (aspect-square, top-6 left-6, w-16 h-16, text-2xl, p-6)
+- [x] Make section padding responsive (py-24)
+- [x] Make badge responsive (px-8 py-3, text-sm)
+- [x] Make title responsive (text-6xl md:text-7xl)
+- [x] Make subtitle responsive (text-2xl)
+- [x] Make grid responsive (md:grid-cols-4)
+- [x] Make vehicle cards responsive (aspect-square, top-6 left-6, w-16 h-16, text-2xl, p-6)
 
 ## Flights Section
-- [ ] Make section padding responsive (py-20)
-- [ ] Make title responsive (text-4xl md:text-5xl)
-- [ ] Make subtitle responsive (text-xl)
-- [ ] Make CTA button responsive (px-8 py-4)
+- [x] Make section padding responsive (py-20)
+- [x] Make title responsive (text-4xl md:text-5xl)
+- [x] Make subtitle responsive (text-xl)
+- [x] Make CTA button responsive (px-8 py-4)
 
 ## Final CTA Section
-- [ ] Make section padding responsive (py-24)
-- [ ] Make title responsive (text-5xl md:text-6xl)
-- [ ] Make subtitle responsive (text-2xl)
-- [ ] Make buttons responsive (flex-wrap, px-10 py-5, text-lg)
+- [x] Make section padding responsive (py-24)
+- [x] Make title responsive (text-5xl md:text-6xl)
+- [x] Make subtitle responsive (text-2xl)
+- [x] Make buttons responsive (flex-wrap, px-10 py-5, text-lg)
 
 ## Push Changes
 - [ ] Commit and push all changes to repository
