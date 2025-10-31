@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
+    Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
 });
 
 // --- Administration ---
@@ -138,8 +139,10 @@ Route::post('/flights/booking', [FlightController::class, 'booking'])->name('fli
 
 
 // --- Autres pages ---
-Route::get('/events', [HomeController::class, 'events'])->name('events');
-Route::get('/packages', [HomeController::class, 'packages'])->name('packages');
+Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events');
+Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
+Route::get('/packages/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
 Route::get('/location', [HomeController::class, 'location'])->name('location');
 
 // --- Pages de support ---

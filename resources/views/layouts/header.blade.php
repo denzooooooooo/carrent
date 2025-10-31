@@ -200,7 +200,7 @@
                 <select
                     x-model="currentCurrency"
                     x-on:change="changeCurrency($event.target.value)"
-                    class="hidden md:block px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="hidden px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
@@ -271,7 +271,7 @@
                                 Mon Profil
                             </a>
                             <a
-                                href="{{ url('/account/bookings') }}"
+                                href="{{ route('bookings') }}"
                                 x-on:click="userMenuOpen = false"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
@@ -399,7 +399,7 @@
                             Mon Profil
                         </a>
                         <a
-                            href="{{ url('/account/bookings') }}"
+                            href="{{ route('bookings') }}"
                             x-on:click="mobileMenuOpen = false"
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                         >

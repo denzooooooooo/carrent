@@ -17,40 +17,45 @@
   <section class="py-6 md:py-8 bg-gray-50">
     <div class="container mx-auto px-4">
       <div class="max-w-6xl mx-auto">
-        <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
+        <form method="GET" action="{{ route('events') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Type d'événement</label>
-              <select class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option>Tous les événements</option>
-                <option>Football</option>
-                <option>Basketball</option>
-                <option>Concerts</option>
-                <option>Théâtre</option>
-                <option>Festivals</option>
+              <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">Tous les événements</option>
+                @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name_fr }}
+                  </option>
+                @endforeach
               </select>
             </div>
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Lieu</label>
-              <select class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option>Tous les lieux</option>
-                <option>Stade Félix Houphouët-Boigny</option>
-                <option>Palais de la Culture</option>
-                <option>Parc des Sports</option>
-                <option>Salle des fêtes</option>
+              <select name="venue" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">Tous les lieux</option>
+                <option value="Stade Félix Houphouët-Boigny" {{ request('venue') == 'Stade Félix Houphouët-Boigny' ? 'selected' : '' }}>Stade Félix Houphouët-Boigny</option>
+                <option value="Palais de la Culture" {{ request('venue') == 'Palais de la Culture' ? 'selected' : '' }}>Palais de la Culture</option>
+                <option value="Parc des Sports" {{ request('venue') == 'Parc des Sports' ? 'selected' : '' }}>Parc des Sports</option>
+                <option value="Salle des fêtes" {{ request('venue') == 'Salle des fêtes' ? 'selected' : '' }}>Salle des fêtes</option>
               </select>
             </div>
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Date</label>
-              <input type="date" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+              <input type="date" name="date" value="{{ request('date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
             </div>
-            <div class="flex items-end">
-              <button class="w-full px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
+            <div class="flex items-end gap-2">
+              <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
                 Rechercher
               </button>
+              @if(request()->hasAny(['category', 'venue', 'date']))
+                <a href="{{ route('events') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
+                  ✕
+                </a>
+              @endif
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </section>
@@ -97,7 +102,7 @@
                     <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($event->min_price)) }}</span>
                     <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
                   </div>
-                  <a href="#" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
+                  <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
                     Réserver
                   </a>
                 </div>

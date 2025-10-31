@@ -114,7 +114,7 @@ class AuthController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        return view('pages.profile', compact('user'));
+        return view('pages.users.profile', compact('user'));
     }
 
     /**
@@ -192,5 +192,19 @@ class AuthController extends Controller
         Session::flash('success', 'Mot de passe changé avec succès.');
 
         return back();
+    }
+
+    /**
+     * Show user bookings
+     */
+    public function bookings()
+    {
+        $user = Auth::user();
+
+        // Get user bookings - assuming there's a Booking model with user relationship
+        // This will need to be adjusted based on your actual Booking model structure
+        $bookings = collect([]); // Placeholder - replace with actual query when Booking model exists
+
+        return view('pages.users.bookings', compact('bookings'));
     }
 }
