@@ -58,42 +58,8 @@
     x-data="{
         mobileMenuOpen: false,
         userMenuOpen: false,
-        currentLanguage: '{{ $currentLanguage }}',
-        currentCurrency: '{{ $currentCurrency }}',
-        theme: localStorage.getItem('theme') || 'light',
-        isScrolled: false,
-        toggleTheme() {
-            this.theme = this.theme === 'dark' ? 'light' : 'dark';
-            localStorage.setItem('theme', this.theme);
-            document.documentElement.classList.toggle('dark', this.theme === 'dark');
-        },
-        changeCurrency(currency) {
-            fetch('/currency/change', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-                },
-                body: JSON.stringify({ currency: currency })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.currentCurrency = currency;
-                    // Reload the page to update all prices with new currency
-                    window.location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors du changement de devise:', error);
-            });
-        }
+        isScrolled: false
     }"
-    x-init="
-        const storedTheme = localStorage.getItem('theme') || 'light';
-        theme = storedTheme;
-        document.documentElement.classList.toggle('dark', storedTheme === 'dark');
-    "
     x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white"
@@ -174,39 +140,6 @@
             </nav>
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
-                {{-- Language Selector --}}
-                <div class="hidden md:flex items-center space-x-1 rounded-full p-1 border bg-gray-100 border-gray-200 transition-all duration-300">
-                    <button
-                        x-on:click="currentLanguage = 'fr'"
-                        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
-                        :class="currentLanguage === 'fr'
-                            ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 hover:bg-gray-200'"
-                    >
-                        FR
-                    </button>
-                    <button
-                        x-on:click="currentLanguage = 'en'"
-                        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
-                        :class="currentLanguage === 'en'
-                            ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-gray-600 hover:bg-gray-200'"
-                    >
-                        EN
-                    </button>
-                </div>
-
-                {{-- Currency Selector --}}
-                <select
-                    x-model="currentCurrency"
-                    x-on:change="changeCurrency($event.target.value)"
-                    class="hidden px-4 py-2 rounded-full text-sm font-semibold border bg-gray-100 text-gray-700 border-gray-200 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                    <option value="XOF">XOF</option>
-                    <option value="EUR">EUR</option>
-                    <option value="USD">USD</option>
-                    <option value="GBP">GBP</option>
-                </select>
 
 
 
@@ -416,45 +349,7 @@
                     </div>
                 @endif
 
-                {{-- Language Selector Mobile --}}
-                <div class="flex items-center justify-between px-4">
-                    <span class="text-sm font-semibold text-gray-700">Langue</span>
-                    <div class="flex space-x-2">
-                        <button
-                            x-on:click="currentLanguage = 'fr'"
-                            class="px-4 py-2 rounded-lg text-sm font-semibold"
-                            :class="currentLanguage === 'fr'
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 text-gray-700'"
-                        >
-                            FR
-                        </button>
-                        <button
-                            x-on:click="currentLanguage = 'en'"
-                            class="px-4 py-2 rounded-lg text-sm font-semibold"
-                            :class="currentLanguage === 'en'
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 text-gray-700'"
-                        >
-                            EN
-                        </button>
-                    </div>
-                </div>
 
-                {{-- Currency Selector Mobile --}}
-                <div class="flex items-center justify-between px-4">
-                    <span class="text-sm font-semibold text-gray-700">Devise</span>
-                    <select
-                        x-model="currentCurrency"
-                        x-on:change="changeCurrency($event.target.value)"
-                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                        <option value="XOF">XOF</option>
-                        <option value="EUR">EUR</option>
-                        <option value="USD">USD</option>
-                        <option value="GBP">GBP</option>
-                    </select>
-                </div>
             </div>
         </div>
     </div>
