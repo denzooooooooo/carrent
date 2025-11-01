@@ -7,9 +7,11 @@
             {{-- Colonne 1: Infos Société --}}
             <div class="space-y-6">
                 <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <span class="text-2xl font-black text-purple-900">C</span>
-                    </div>
+                    <img
+                        src="{{ asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}"
+                        alt="Carré Premium Logo"
+                        class="h-12 w-auto"
+                    />
                     <div>
                         <div class="text-xl font-black text-white">CARRÉ PREMIUM</div>
                         <div class="text-xs text-purple-200">Voyages d'Exception</div>

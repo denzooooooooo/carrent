@@ -68,11 +68,13 @@
         <div class="flex items-center justify-between h-20">
             {{-- Logo --}}
             <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-2xl font-black text-white">C</span>
-                </div>
+                <img
+                    src="{{ asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}"
+                    alt="Carré Premium Logo"
+                    class="h-16 w-auto group-hover:scale-110 transition-transform duration-300"
+                />
                 <div class="hidden md:block">
-                    <div class="text-xl font-black text-gray-900 dark:text-white">
+                    <div class="text-xl font-black text-black">
                         CARRÉ PREMIUM
                     </div>
                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
