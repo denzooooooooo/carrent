@@ -13,7 +13,19 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+
+// Social Authentication Routes
+Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+// Facebook OAuth Routes
+Route::get('auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('auth/facebook/callback', [AuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
+
+Route::get('/flights/details', [FlightController::class, 'details'])->name('flight.details');
+Route::post('/flights/booking', [FlightController::class, 'storeBooking'])->name('flight.store-booking');
 
 // --- Authentification ---
 Route::middleware('guest')->group(function () {
@@ -29,6 +41,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
+
+    /* Route::get('/flights/details', [FlightController::class, 'details'])->name('flight.details');
+    Route::post('/flights/booking', [FlightController::class, 'storeBooking'])->name('flight.store-booking'); */
+    Route::get('/booking/confirmation/{bookingId}', [FlightController::class, 'bookingConfirmation'])->name('booking.confirmation');
+
+
 });
 
 // --- Administration ---
@@ -47,7 +65,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
         // Gestion des réservations
+        /* Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class); */
+        // Gestion des réservations avec actions supplémentaires
         Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class);
+        Route::put('bookings/{id}/status', [App\Http\Controllers\Admin\BookingController::class, 'updateStatus'])
+            ->name('bookings.update-status');
+        Route::put('bookings/{id}/payment-status', [App\Http\Controllers\Admin\BookingController::class, 'updatePaymentStatus'])
+            ->name('bookings.update-payment-status');
+        // Actions spécifiques pour les réservations
+        /* Route::put('bookings/{booking}/confirm', [App\Http\Controllers\Admin\BookingController::class, 'confirm'])
+            ->name('bookings.confirm');
+
+        Route::post('bookings/{booking}/cancel', [App\Http\Controllers\Admin\BookingController::class, 'cancel'])
+            ->name('bookings.cancel');
+
+        Route::put('bookings/{booking}/pay', [App\Http\Controllers\Admin\BookingController::class, 'markAsPaid'])
+            ->name('bookings.pay');
+
+        Route::put('bookings/{booking}/issue-ticket', [App\Http\Controllers\Admin\BookingController::class, 'issueTicket'])
+            ->name('bookings.issue-ticket'); */
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
@@ -124,7 +160,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/flights', [FlightController::class, 'flights'])->name('flights');
 Route::post('/flights/search', [FlightController::class, 'search'])->name('flights.search');
 Route::get('/api/locations/search', [FlightController::class, 'searchLocations'])->name('api.locations.search');
-Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
+//Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
 
 // Nouvelles routes pour les détails et la réservation
 
@@ -134,7 +170,7 @@ Route::post('/flights/details', [FlightController::class, 'details'])->name('fli
 //Route::get('/flights/details/{booking_token}', [FlightController::class, 'details'])->name('flights.details');
 Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
 
-Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
+Route::post('/flights/booking-simple', [FlightController::class, 'booking'])->name('flights.booking');
 
 
 

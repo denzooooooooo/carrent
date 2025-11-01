@@ -163,13 +163,21 @@
                     <div class="relative user-menu-container">
                         <button
                             x-on:click="userMenuOpen = !userMenuOpen"
-                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                            class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
                         >
-                            <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
-                                <span class="text-xs font-bold text-white">
-                                    {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
-                                </span>
-                            </div>
+                            @if($user->avatar_url || $user->avatar)
+                                <img 
+                                    src="{{ $user->avatar_url ?? asset('storage/' . $user->avatar) }}" 
+                                    alt="{{ $user->first_name }}" 
+                                    class="w-8 h-8 rounded-full object-cover"
+                                />
+                            @else
+                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-bold text-white">
+                                        {{ strtoupper(substr($user->first_name ?? 'U', 0, 1)) }}
+                                    </span>
+                                </div>
+                            @endif
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
@@ -223,7 +231,7 @@
                 @endif
 
                 {{-- Cart --}}
-                <a
+                <!-- <a
                     href="{{ url('/cart') }}"
                     class="relative p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110 hover:bg-gray-200"
                 >
@@ -235,7 +243,7 @@
                             {{ $cartItemsCount }}
                         </span>
                     @endif
-                </a>
+                </a> -->
 
                 {{-- Mobile Menu Button --}}
                 <button

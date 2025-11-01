@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\FlightsBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Airport;
 use App\Models\Country;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class FlightController extends Controller
 {
@@ -459,130 +462,9 @@ class FlightController extends Controller
         return $filtered;
     }
 
-
     /**
      * Affiche les détails d'un vol sélectionné
      */
-    /* public function details(Request $request)
-    {
-        $booking_token = $request->input('booking_token');
-        $departure_id = $request->input('departure_id');
-        $arrival_id = $request->input('arrival_id');
-        $outbound_date = $request->input('outbound_date');
-        $return_date = $request->input('return_date');
-
-        // Validation du booking_token
-        if (empty($booking_token)) {
-            return view('pages.flight.details', [
-                'error' => 'Erreur: Jeton de réservation manquant. Veuillez revenir aux résultats de recherche.',
-                'selectedFlight' => null,
-                'bookingOptions' => [],
-            ]);
-        }
-
-        $apiKey = env('SERPAPI_KEY');
-        if (empty($apiKey)) {
-            \Log::error('SERPAPI_KEY manquante dans .env');
-            return view('pages.flight.details', [
-                'error' => 'Erreur serveur: clé API manquante.',
-                'selectedFlight' => null,
-                'bookingOptions' => [],
-            ]);
-        }
-
-        try {
-            // Paramètres pour la requête de détails
-            $params = [
-                'engine' => 'google_flights',
-                'api_key' => $apiKey,
-                'booking_token' => $booking_token,
-                'departure_id' => $departure_id,
-                'arrival_id' => $arrival_id,
-                'outbound_date' => $outbound_date,
-                'hl' => 'fr',
-                'currency' => 'EUR',
-            ];
-
-            // Ajouter return_date si présent (pour les vols aller-retour)
-            if (!empty($return_date)) {
-                $params['return_date'] = $return_date;
-            }
-
-            // Log de la requête
-            \Log::info('Requête détails du vol', [
-                'booking_token' => substr($booking_token, 0, 20) . '...',
-                'departure_id' => $departure_id,
-                'arrival_id' => $arrival_id
-            ]);
-
-            // Appel à l'API SerpApi
-            $response = Http::timeout(30)->get('https://serpapi.com/search.json', $params);
-
-            if (!$response->successful()) {
-                \Log::error('Erreur API SerpApi', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
-                return view('pages.flight.details', [
-                    'error' => 'Impossible de récupérer les détails du vol. Le lien a peut-être expiré.',
-                    'selectedFlight' => null,
-                    'bookingOptions' => [],
-                ]);
-            }
-
-            $flightData = $response->json();
-
-            // Log des clés disponibles dans la réponse
-            \Log::info('Réponse API détails', [
-                'keys' => array_keys($flightData),
-                'has_selected_flights' => isset($flightData['selected_flights']),
-                'has_booking_options' => isset($flightData['booking_options'])
-            ]);
-
-            // Extraction des données
-            $selectedFlight = $flightData['selected_flights'][0] ?? null;
-            $bookingOptions = $flightData['booking_options'] ?? [];
-            $baggagePrices = $flightData['baggage_prices'] ?? [];
-
-            // Vérification que nous avons les données nécessaires
-            if (!$selectedFlight) {
-                \Log::warning('selected_flights manquant dans la réponse API');
-
-                return view('pages.flight.details', [
-                    'error' => 'Les détails du vol ne sont plus disponibles. Le lien a peut-être expiré. Veuillez effectuer une nouvelle recherche.',
-                    'selectedFlight' => null,
-                    'bookingOptions' => [],
-                ]);
-            }
-
-            // Log de succès
-            \Log::info('Détails du vol récupérés avec succès', [
-                'price' => $selectedFlight['price'] ?? 'N/A',
-                'booking_options_count' => count($bookingOptions)
-            ]);
-
-            // Retour de la vue avec les données
-            return view('pages.flight.details', [
-                'selectedFlight' => $selectedFlight,
-                'bookingOptions' => $bookingOptions,
-                'baggagePrices' => $baggagePrices,
-                'error' => null,
-            ]);
-
-        } catch (\Exception $e) {
-            \Log::error('Exception lors de la récupération des détails', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return view('pages.flight.details', [
-                'error' => 'Une erreur est survenue lors de la récupération des détails du vol. Veuillez réessayer.',
-                'selectedFlight' => null,
-                'bookingOptions' => [],
-            ]);
-        }
-    } */
     public function details(Request $request)
     {
         $booking_token = $request->input('booking_token');
@@ -746,384 +628,305 @@ class FlightController extends Controller
         return redirect()->away($validated['booking_url']);
     }
 
-
-
-    /* public function details(Request $request)
-    {
-        $booking_token = $request->input('booking_token');
-        $departure_id = $request->input('departure_id');
-        $arrival_id = $request->input('arrival_id');
-        $outbound_date = $request->input('outbound_date');
-        $return_date = $request->input('return_date');
-
-        if (empty($booking_token)) {
-            return view('pages.flight.details', [
-                'error' => 'Erreur: Jeton de réservation manquant. Veuillez revenir aux résultats de recherche.',
-                'selectedFlight' => null,
-                'bookingOptions' => [],
-            ]);
-        }
-
-        $apiKey = env('SERPAPI_KEY');
-        if (empty($apiKey)) {
-            \Log::error('SERPAPI_KEY manquante dans .env');
-            return view('pages.flight.details', [
-                'error' => 'Erreur serveur: clé API manquante.',
-                'selectedFlight' => null,
-                'bookingOptions' => [],
-            ]);
-        }
-
-        // fonction utilitaire pour appeler SerpApi et journaliser
-        $callSerp = function (array $params) {
-            try {
-                $response = Http::timeout(30)->get('https://serpapi.com/search.json', $params);
-                \Log::info('SerpApi request', ['url' => 'https://serpapi.com/search.json', 'params' => $params, 'status' => $response->status()]);
-                // log body pour debug (attention en prod — peut contenir beaucoup de données)
-                \Log::debug('SerpApi body', ['body' => $response->body()]);
-                return $response;
-            } catch (\Exception $e) {
-                \Log::error('SerpApi exception', ['message' => $e->getMessage(), 'params' => $params]);
-                throw $e;
-            }
-        };
-
-        // 1) Essai direct avec booking_token
-        $queryParameters = array_filter([
-            'engine' => 'google_flights',
-            'api_key' => $apiKey,
-            'booking_token' => $booking_token,
-            'departure_id' => $departure_id,
-            'arrival_id' => $arrival_id,
-            'outbound_date' => $outbound_date,
-            'return_date' => $return_date,
-            'hl' => 'fr',
-            'currency' => 'EUR',
-        ], function ($v) {
-            return $v !== null && $v !== '';
-        });
-
-        try {
-            $response = $callSerp($queryParameters);
-
-            if ($response->successful()) {
-                $flightData = $response->json();
-                \Log::info('response keys', ['keys' => array_keys($flightData)]);
-
-                $selectedFlight = $flightData['selected_flights'][0] ?? null;
-                $bookingOptions = $flightData['booking_options'] ?? [];
-
-                if ($selectedFlight && !empty($bookingOptions)) {
-                    return view('pages.flight.details', [
-                        'selectedFlight' => $selectedFlight,
-                        'bookingOptions' => $bookingOptions,
-                        'baggagePrices' => $flightData['baggage_prices'] ?? [],
-                        'error' => null,
-                    ]);
-                }
-
-                // Si selected_flights manquant ou booking_options vide, on va tenter une "recherche fraîche"
-                \Log::warning('selected_flights manquant ou booking_options vide — tentative de re-search', [
-                    'booking_token' => $booking_token
-                ]);
-            } else {
-                \Log::warning('SerpApi non successful', ['status' => $response->status(), 'body' => $response->body()]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Erreur lors du premier appel SerpApi', ['message' => $e->getMessage()]);
-            // on continue pour tenter une re-search (ou retourner une erreur utilisateur)
-        }
-
-        // 2) Tentative de re-search pour récupérer un booking_token frais
-        // Construction des params de recherche usuels (identiques à search)
-        $searchParams = array_filter([
-            'engine' => 'google_flights',
-            'api_key' => $apiKey,
-            'departure_id' => $departure_id,
-            'arrival_id' => $arrival_id,
-            'outbound_date' => $outbound_date,
-            'return_date' => $return_date,
-            'adults' => $request->input('adults', 1),
-            'children' => $request->input('children', 0),
-            'infants_in_seat' => $request->input('infants', 0),
-            'currency' => 'EUR',
-            'hl' => 'fr',
-            'gl' => 'fr',
-        ], function ($v) {
-            return $v !== null && $v !== '';
-        });
-
-        try {
-            $res2 = $callSerp($searchParams);
-            if ($res2->successful()) {
-                $searchResults = $res2->json();
-
-                // Chercher un vol qui "ressemble" à l'ancien (heuristique: price + first departure time + duration)
-                $candidates = array_merge(
-                    $searchResults['best_flights'] ?? [],
-                    $searchResults['other_flights'] ?? []
-                );
-
-                // heuristique de matching : price + approximate duration + hour du premier segment
-                $matched = null;
-                foreach ($candidates as $c) {
-                    // vérifier existence des clés
-                    $priceMatch = isset($c['price']) && $priceMatch = ($priceMatch ?? false);
-                    // récupère heure du premier segment si dispo
-                    $firstSegHour = null;
-                    if (!empty($c['flights'][0]['departure_airport']['time'])) {
-                        try {
-                            $firstSegHour = \Carbon\Carbon::parse($c['flights'][0]['departure_airport']['time'])->format('H:i');
-                        } catch (\Exception $e) {
-                            $firstSegHour = null;
-                        }
-                    }
-
-                    // heuristique simple : même prix ou prix proche
-                    if (!empty($c['price']) && $c['price'] == ($request->input('price') ?? $c['price'])) {
-                        $matched = $c;
-                        break;
-                    }
-
-                    // fallback: si booking_token présent sur ce candidate, on peut l'utiliser
-                    if (!empty($c['booking_token'])) {
-                        $matched = $c;
-                        break;
-                    }
-                }
-
-                if ($matched && !empty($matched['booking_token'])) {
-                    \Log::info('Found fresh booking_token from re-search', ['booking_token' => '***hidden***']);
-                    // rappel avec ce nouveau token
-                    $secondTryParams = [
-                        'engine' => 'google_flights',
-                        'api_key' => $apiKey,
-                        'booking_token' => $matched['booking_token'],
-                        'hl' => 'fr',
-                        'currency' => 'EUR',
-                    ];
-                    $res3 = $callSerp($secondTryParams);
-                    if ($res3->successful()) {
-                        $fData = $res3->json();
-                        $selectedFlight = $fData['selected_flights'][0] ?? null;
-                        $bookingOptions = $fData['booking_options'] ?? [];
-                        if ($selectedFlight) {
-                            return view('pages.flight.details', [
-                                'selectedFlight' => $selectedFlight,
-                                'bookingOptions' => $bookingOptions,
-                                'baggagePrices' => $fData['baggage_prices'] ?? [],
-                                'error' => null,
-                            ]);
-                        }
-                    }
-                } else {
-                    \Log::warning('Aucun candidate avec booking_token trouvé lors de la re-search', ['count_candidates' => count($candidates)]);
-                }
-            } else {
-                \Log::warning('Re-search SerpApi failed', ['status' => $res2->status(), 'body' => $res2->body()]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Erreur lors de la re-search SerpApi', ['message' => $e->getMessage()]);
-        }
-
-        // ultime fallback : retourner l'erreur à l'utilisateur en expliquant le diagnostic
-        $errorMessage = 'Détails du vol non trouvés. Le jeton de réservation a probablement expiré ou il y a eu une erreur API. Nous avons tenté de récupérer un nouveau jeton automatiquement.';
-        return view('pages.flight.details', [
-            'error' => $errorMessage,
-            'selectedFlight' => null,
-            'bookingOptions' => [],
-        ]);
-    } */
-
-
     /**
-     * Page de réservation (placeholder pour le moment)
+     * Enregistrer une réservation de vol
      */
-
-    /* public function search(Request $request)
+    /* public function storeBooking(Request $request)
     {
-        // Validation des données
         $validated = $request->validate([
+            'booking_token' => 'required|string',
+            'departure_token' => 'nullable|string',
             'departure_id' => 'required|string',
             'arrival_id' => 'required|string',
             'outbound_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:outbound_date',
-            'adults' => 'required|integer|min:1|max:9',
-            'children' => 'integer|min:0|max:8',
-            'infants' => 'integer|min:0|max:4',
+            'return_date' => 'nullable|date',
+            'flight_details' => 'required|json',
+            'booking_options' => 'nullable|json',
+            'base_price' => 'required|numeric',
+            'taxes' => 'nullable|numeric',
+            'final_price' => 'required|numeric',
+            'currency' => 'required|string',
+            'adults' => 'required|integer|min:1',
+            'children' => 'nullable|integer|min:0',
+            'infants' => 'nullable|integer|min:0',
             'travel_class' => 'nullable|string',
-            'currency' => 'nullable|string',
-            'non_stop' => 'nullable|boolean',
+            'passenger_names' => 'nullable|array',
+            'passenger_emails' => 'nullable|array',
+            'passenger_phones' => 'nullable|array',
         ]);
 
         try {
-            // Construction des paramètres pour l'API SerpApi
-            $params = [
-                'engine' => 'google_flights',
-                'api_key' => env('SERPAPI_KEY'),
-                'departure_id' => $validated['departure_id'],
-                'arrival_id' => $validated['arrival_id'],
-                'outbound_date' => $validated['outbound_date'],
-                'return_date' => $validated['return_date'] ?? null,
-                'adults' => $validated['adults'],
-                'children' => $validated['children'] ?? 0,
-                'infants_in_seat' => $validated['infants'] ?? 0,
-                'infants_on_lap' => 0,
-                'currency' => $validated['currency'] ?? 'EUR',
-                'hl' => 'fr',
-                'gl' => 'fr',
-            ];
+            \DB::beginTransaction();
 
-            // Gestion du type de vol
-            if (empty($validated['return_date'])) {
-                $params['type'] = 2; // One way
-            } else {
-                $params['type'] = 1; // Round trip
+            // Générer un numéro de réservation unique
+            $bookingNumber = 'FL' . strtoupper(Str::random(8));
+
+            // Préparer les détails des passagers
+            $passengerDetails = [];
+            $totalPassengers = $validated['adults'] + ($validated['children'] ?? 0) + ($validated['infants'] ?? 0);
+
+            for ($i = 0; $i < $totalPassengers; $i++) {
+                $passengerDetails[] = [
+                    'type' => $i < $validated['adults'] ? 'adult' : ($i < ($validated['adults'] + ($validated['children'] ?? 0)) ? 'child' : 'infant'),
+                    'name' => $validated['passenger_names'][$i] ?? 'Passager ' . ($i + 1),
+                    'email' => $validated['passenger_emails'][$i] ?? null,
+                    'phone' => $validated['passenger_phones'][$i] ?? null,
+                ];
             }
 
-            // Conversion de la classe de voyage
-            if (!empty($validated['travel_class'])) {
-                $params['travel_class'] = $this->convertTravelClass($validated['travel_class']);
+            // Créer la réservation principale
+            $booking = Booking::create([
+                'booking_number' => $bookingNumber,
+                'user_id' => auth()->id(),
+                'booking_type' => 'flight',
+                'booking_date' => now(),
+                'travel_date' => $validated['outbound_date'],
+                'number_of_passengers' => $totalPassengers,
+                'passenger_details' => $passengerDetails,
+                'seat_class' => $validated['travel_class'] ?? 'ECONOMY',
+                'total_amount' => $validated['base_price'],
+                'currency' => $validated['currency'],
+                'tax_amount' => $validated['taxes'] ?? 0,
+                'final_amount' => $validated['final_price'],
+                'status' => 'pending',
+                'payment_status' => 'pending',
+            ]);
+
+            // Décoder les détails du vol
+            $flightDetails = json_decode($validated['flight_details'], true);
+            $bookingOptions = $validated['booking_options'] ? json_decode($validated['booking_options'], true) : null;
+
+            // Extraire les segments de vol
+            $flightSegments = [];
+            if (isset($flightDetails['flights'])) {
+                foreach ($flightDetails['flights'] as $segment) {
+                    $flightSegments[] = [
+                        'airline' => $segment['airline'] ?? '',
+                        'flight_number' => $segment['flight_number'] ?? '',
+                        'departure_airport' => [
+                            'code' => $segment['departure_airport']['id'] ?? '',
+                            'name' => $segment['departure_airport']['name'] ?? '',
+                            'time' => $segment['departure_airport']['time'] ?? '',
+                        ],
+                        'arrival_airport' => [
+                            'code' => $segment['arrival_airport']['id'] ?? '',
+                            'name' => $segment['arrival_airport']['name'] ?? '',
+                            'time' => $segment['arrival_airport']['time'] ?? '',
+                        ],
+                        'duration' => $segment['duration'] ?? 0,
+                        'aircraft' => $segment['airplane'] ?? '',
+                    ];
+                }
             }
 
-            // Gestion des vols directs
-            if (!empty($validated['non_stop'])) {
-                $params['stops'] = 1; // Nonstop only
-            }
+            // Créer la réservation de vol spécifique
+            $flightBooking = FlightsBooking::create([
+                'booking_id' => $booking->id,
+                'booking_token' => $validated['booking_token'],
+                'departure_token' => $validated['departure_token'],
+                'flight_details' => $flightDetails,
+                'flight_segments' => $flightSegments,
+                'passenger_info' => $passengerDetails,
+                'booking_options' => $bookingOptions,
+                'base_price' => $validated['base_price'],
+                'taxes' => $validated['taxes'] ?? 0,
+                'final_price' => $validated['final_price'],
+                'currency' => $validated['currency'],
+                'ticket_status' => 'pending',
+            ]);
 
-            // Nettoyage des paramètres null
-            $params = array_filter($params, function ($value) {
-                return $value !== null;
-            });
+            \DB::commit();
 
-            // Appel à l'API SerpApi
-            $response = Http::timeout(30)->get('https://serpapi.com/search.json', $params);
-
-            if ($response->successful()) {
-                $results = $response->json();
-                $formattedResults = $this->formatResults($results);
-
-                return view('pages.flight.results', [
-                    'results' => $formattedResults,
-                    'searchParams' => $validated,
-                    'rawResults' => $results
-                ]);
-            } else {
-                return back()->with('error', 'Erreur lors de la recherche de vols. Veuillez réessayer.');
-            }
+            return redirect()->route('booking.confirmation', $booking->id)
+                ->with('success', 'Votre réservation a été enregistrée avec succès. Numéro de réservation : ' . $bookingNumber);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Une erreur est survenue: ' . $e->getMessage());
+            \DB::rollBack();
+            \Log::error('Erreur lors de la création de la réservation', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer.');
         }
     } */
 
+    /**
+     * Enregistrer une réservation de vol
+     */
+    /**
+     * Enregistrer une réservation de vol - VERSION CORRIGÉE
+     */
+    public function storeBooking(Request $request)
+    {
+        Log::info('=== DÉBUT storeBooking ===');
 
+        // 🔥 DÉCODAGE DES CHAÎNES JSON AVANT VALIDATION
+        $flightDetails = is_string($request->flight_details)
+            ? json_decode($request->flight_details, true)
+            : $request->flight_details;
 
-    /*     private function convertTravelClass($class)
-        {
-            $mapping = [
-                'ECONOMY' => 1,
-                'PREMIUM_ECONOMY' => 2,
-                'BUSINESS' => 3,
-                'FIRST' => 4
-            ];
+        $bookingOptions = is_string($request->booking_options)
+            ? json_decode($request->booking_options, true)
+            : $request->booking_options;
 
-            return $mapping[$class] ?? 1;
+        // Validation
+        try {
+            $validated = $request->validate([
+                'booking_token' => 'required|string',
+                'departure_id' => 'required|string',
+                'arrival_id' => 'required|string',
+                'outbound_date' => 'required|date',
+                'return_date' => 'nullable|date',
+                'base_price' => 'required|numeric',
+                'taxes' => 'required|numeric',
+                'final_price' => 'required|numeric',
+                'currency' => 'required|string',
+                'adults' => 'required|integer',
+                'children' => 'required|integer',
+                'infants' => 'required|integer',
+                'travel_class' => 'required|string',
+                'passenger_names' => 'required|array',
+                'passenger_emails' => 'required|array',
+                'passenger_phones' => 'required|array',
+            ]);
+
+            // Remplacer les données validées par les versions décodées
+            $validated['flight_details'] = $flightDetails;
+            $validated['booking_options'] = $bookingOptions;
+
+            Log::info('Validation réussie');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Erreur de validation: ' . json_encode([
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]));
+            return back()->withErrors($e->errors())->withInput();
         }
 
-        private function formatResults($apiResults)
-        {
-            $formatted = [
-                'best_flights' => [],
-                'other_flights' => [],
-                'price_insights' => [],
-                'airports' => []
-            ];
+        // Création de la réservation avec transaction
+        try {
+            \DB::beginTransaction();
 
-            if (!empty($apiResults['best_flights'])) {
-                $formatted['best_flights'] = array_map([$this, 'formatFlight'], $apiResults['best_flights']);
+            // Générer un numéro de réservation unique
+            $bookingNumber = 'FL' . strtoupper(Str::random(8));
+
+            // Préparer les détails des passagers
+            $totalPassengers = $validated['adults'] + $validated['children'] + $validated['infants'];
+            $passengerDetails = [];
+
+            for ($i = 0; $i < $totalPassengers; $i++) {
+                $type = $i < $validated['adults']
+                    ? 'adult'
+                    : ($i < ($validated['adults'] + $validated['children']) ? 'child' : 'infant');
+
+                $passengerDetails[] = [
+                    'type' => $type,
+                    'name' => $validated['passenger_names'][$i] ?? '',
+                    'email' => $validated['passenger_emails'][$i] ?? null,
+                    'phone' => $validated['passenger_phones'][$i] ?? null,
+                ];
             }
 
-            if (!empty($apiResults['other_flights'])) {
-                $formatted['other_flights'] = array_map([$this, 'formatFlight'], $apiResults['other_flights']);
-            }
+            // ✅ 1. Créer d'abord la réservation parent (table bookings)
+            $booking = Booking::create([
+                'booking_number' => $bookingNumber,
+                'user_id' => auth()->id(),
+                'booking_type' => 'flight',
+                'booking_date' => now(),
+                'travel_date' => $validated['outbound_date'],
+                'number_of_passengers' => $totalPassengers,
+                'passenger_details' => $passengerDetails,
+                'seat_class' => $validated['travel_class'],
+                'total_amount' => $validated['base_price'],
+                'currency' => $validated['currency'],
+                'tax_amount' => $validated['taxes'],
+                'final_amount' => $validated['final_price'],
+                'status' => 'pending',
+                'payment_status' => 'pending',
+            ]);
 
-            if (!empty($apiResults['price_insights'])) {
-                $formatted['price_insights'] = $apiResults['price_insights'];
-            }
+            Log::info('Booking parent créé', ['booking_id' => $booking->id]);
 
-            if (!empty($apiResults['airports'])) {
-                $formatted['airports'] = $apiResults['airports'];
-            }
-
-            return $formatted;
-        }
-
-        private function formatFlight($flight)
-        {
-            $formatted = [
-                'airline' => $this->getAirlineName($flight),
-                'price' => $flight['price'] ?? 0,
-                'currency' => 'EUR',
-                'total_duration' => $this->formatDuration($flight['total_duration'] ?? 0),
-                'total_duration_minutes' => $flight['total_duration'] ?? 0, // Garder aussi les minutes
-                'flights' => [],
-                'layovers' => [],
-                'departure_token' => $flight['departure_token'] ?? null,
-                'booking_token' => $flight['booking_token'] ?? null
-            ];
-
-            if (!empty($flight['flights'])) {
-                foreach ($flight['flights'] as $segment) {
-                    $formatted['flights'][] = [
+            // Extraire les segments de vol
+            $flightSegments = [];
+            if (isset($validated['flight_details']['flights'])) {
+                foreach ($validated['flight_details']['flights'] as $segment) {
+                    $flightSegments[] = [
                         'airline' => $segment['airline'] ?? '',
                         'flight_number' => $segment['flight_number'] ?? '',
-                        'departure_airport' => $segment['departure_airport'] ?? [],
-                        'departure_time' => $segment['departure_airport']['time'] ?? '',
-                        'arrival_airport' => $segment['arrival_airport'] ?? [],
-                        'arrival_time' => $segment['arrival_airport']['time'] ?? '',
-                        'duration' => $this->formatDuration($segment['duration'] ?? 0), // Déjà formaté
-                        'duration_minutes' => $segment['duration'] ?? 0, // En minutes
-                        'aircraft' => $segment['airplane'] ?? ''
+                        'departure_airport' => [
+                            'code' => $segment['departure_airport']['id'] ?? '',
+                            'name' => $segment['departure_airport']['name'] ?? '',
+                            'time' => $segment['departure_airport']['time'] ?? '',
+                        ],
+                        'arrival_airport' => [
+                            'code' => $segment['arrival_airport']['id'] ?? '',
+                            'name' => $segment['arrival_airport']['name'] ?? '',
+                            'time' => $segment['arrival_airport']['time'] ?? '',
+                        ],
+                        'duration' => $segment['duration'] ?? 0,
+                        'aircraft' => $segment['airplane'] ?? '',
                     ];
                 }
             }
 
-            if (!empty($flight['layovers'])) {
-                foreach ($flight['layovers'] as $layover) {
-                    $formatted['layovers'][] = [
-                        'name' => $layover['name'] ?? '',
-                        'duration' => $this->formatDuration($layover['duration'] ?? 0), // Déjà formaté
-                        'duration_minutes' => $layover['duration'] ?? 0, // En minutes
-                        'overnight' => $layover['overnight'] ?? false
-                    ];
-                }
-            }
+            // ✅ 2. Créer ensuite la réservation de vol (table flights_bookings)
+            $flightBooking = FlightsBooking::create([
+                'booking_id' => $booking->id, // ✅ CORRECTION : Lier à la réservation parent
+                'booking_token' => $validated['booking_token'],
+                'departure_token' => $request->departure_token, // Optionnel
+                'departure_id' => $validated['departure_id'],
+                'arrival_id' => $validated['arrival_id'],
+                'outbound_date' => $validated['outbound_date'],
+                'return_date' => $validated['return_date'],
+                'flight_details' => $validated['flight_details'],
+                'flight_segments' => $flightSegments,
+                'passenger_info' => $passengerDetails,
+                'booking_options' => $validated['booking_options'],
+                'base_price' => $validated['base_price'],
+                'taxes' => $validated['taxes'],
+                'final_price' => $validated['final_price'],
+                'currency' => $validated['currency'],
+                'ticket_status' => 'pending',
+            ]);
 
-            return $formatted;
+            \DB::commit();
+
+            Log::info('Réservation de vol créée avec succès', [
+                'booking_id' => $booking->id,
+                'flight_booking_id' => $flightBooking->id,
+                'booking_number' => $bookingNumber
+            ]);
+
+            return redirect()->route('booking.confirmation', $booking->id)
+                ->with('success', 'Réservation confirmée ! Numéro de réservation : ' . $bookingNumber);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            Log::error('Erreur lors de la création de la réservation', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Erreur lors de la réservation : ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Page de confirmation de réservation
+     */
+    public function bookingConfirmation($bookingId)
+    {
+        $booking = Booking::with('flightBooking')->findOrFail($bookingId);
+
+        // Vérifier que l'utilisateur a accès à cette réservation
+        if (auth()->id() !== $booking->user_id && !auth()->user()->hasRole('admin')) {
+            abort(403, 'Accès non autorisé');
         }
 
-        private function getAirlineName($flight)
-        {
-            if (!empty($flight['flights'])) {
-                return $flight['flights'][0]['airline'] ?? 'Multiple Airlines';
-            }
-            return 'Unknown Airline';
-        }
-
-        private function formatDuration($minutes)
-        {
-            $hours = floor($minutes / 60);
-            $remainingMinutes = $minutes % 60;
-
-            if ($hours > 0 && $remainingMinutes > 0) {
-                return "{$hours}h {$remainingMinutes}min";
-            } elseif ($hours > 0) {
-                return "{$hours}h";
-            } else {
-                return "{$remainingMinutes}min";
-            }
-        } */
-
+        return view('pages.flight.booking-confirmation', compact('booking'));
+    }
 
 }

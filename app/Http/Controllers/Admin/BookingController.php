@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
@@ -8,144 +10,175 @@ use Illuminate\Support\Facades\DB;
 class BookingController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Afficher la liste de toutes les réservations
      */
     public function index(Request $request)
     {
-        // Récupère les bookings avec les relations user et flight (si applicable)
-        $query = Booking::with('user', 'flight')->latest();
+        // Requête de base avec les relations
+        $query = Booking::with([
+            'user:id,first_name,last_name,email',
+            'flight',
+            'event',
+            'package',
+            'seatZone',
+            'flightBooking',
+            'payments'
+        ]);
 
-        // Ajout de filtres
-        if ($request->filled('status') && $request->status !== 'all') {
+        // Filtres optionnels
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        if ($request->filled('payment_status') && $request->payment_status !== 'all') {
+
+        if ($request->filled('booking_type')) {
+            $query->where('booking_type', $request->booking_type);
+        }
+
+        if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
         }
 
-        $bookings = $query->paginate(10);
-        
-        // Les statuts pour les filtres
-        $statuses = [
-            'pending' => 'En Attente', 
-            'confirmed' => 'Confirmée', 
-            'cancelled' => 'Annulée'
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_number', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('first_name', 'like', "%{$search}%") // <-- Utiliser le bon nom de colonne
+                            ->orWhere('last_name', 'like', "%{$search}%") // <-- Et l'autre colonne
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('booking_date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('booking_date', '<=', $request->date_to);
+        }
+
+        // Tri par défaut : les plus récentes en premier
+        $bookings = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Statistiques pour le dashboard
+        $stats = [
+            'total' => Booking::count(),
+            'pending' => Booking::where('status', 'pending')->count(),
+            'confirmed' => Booking::where('status', 'confirmed')->count(),
+            'cancelled' => Booking::where('status', 'cancelled')->count(),
+            'total_revenue' => Booking::where('payment_status', 'paid')
+                ->sum('final_amount'),
         ];
-        $paymentStatuses = ['pending' => 'En Attente', 'paid' => 'Payé', 'failed' => 'Échoué'];
 
-        return view('admin.bookings.index', compact('bookings', 'statuses', 'paymentStatuses'));
+        return view('admin.bookings.index', compact('bookings', 'stats'));
     }
 
     /**
-     * Display the specified resource.
+     * Afficher les détails d'une réservation spécifique
      */
-    public function show(Booking $booking)
+    public function show($id)
     {
-        // Charge les relations détaillées pour l'affichage (user, flight, event, package, payments)
-        $booking->load('user', 'flight.airline', 'flight.departureAirport', 'flight.arrivalAirport', 'event', 'package', 'seatZone', 'payments');
+        $booking = Booking::with([
+            'user',
+            'flight',
+            'event',
+            'package',
+            'seatZone',
+            'flightBooking',
+            'payments.paymentMethod',
+            'reviews'
+        ])->findOrFail($id);
 
-        return view('admin.bookings.show', compact('booking'));
+        // Informations supplémentaires selon le type de réservation
+        $additionalData = [];
+
+        if ($booking->booking_type === 'flight' && $booking->flightBooking) {
+            $additionalData['flight_details'] = [
+                'pnr' => $booking->flightBooking->pnr,
+                'eticket_number' => $booking->flightBooking->eticket_number,
+                'ticket_status' => $booking->flightBooking->ticket_status,
+                'flight_segments' => $booking->flightBooking->flight_segments,
+                'booking_options' => $booking->flightBooking->booking_options,
+            ];
+        }
+
+        return view('admin.bookings.show', compact('booking', 'additionalData'));
     }
 
     /**
-     * Action: Confirmer une réservation (Validation)
+     * Mettre à jour le statut d'une réservation
      */
-    public function confirm(Booking $booking)
+    public function updateStatus(Request $request, $id)
     {
-        if ($booking->status === 'cancelled') {
-            return back()->with('error', 'Impossible de confirmer une réservation déjà annulée.');
-        }
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled,completed',
+            'reason' => 'required_if:status,cancelled|nullable|string'
+        ]);
 
+        $booking = Booking::findOrFail($id);
+
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-            
-            $booking->update([
-                'status' => 'confirmed',
-                'confirmed_at' => now(),
-            ]);
+            $booking->status = $request->status;
 
-            // Logique supplémentaire ici: envoi d'email de confirmation, notification, etc.
-
-            DB::commit();
-            return back()->with('success', "La réservation #{$booking->booking_number} a été **confirmée** (validée) avec succès.");
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Erreur lors de la confirmation: ' . $e->getMessage());
-        }
-    }       
-
-    /**
-     * Action: Annuler une réservation
-     */
-    public function cancel(Request $request, Booking $booking)
-    {
-        $request->validate(['cancellation_reason' => 'required|string|min:10']);
-
-        if ($booking->status === 'cancelled') {
-            return back()->with('error', 'Cette réservation est déjà annulée.');
-        }
-
-        try {
-            DB::beginTransaction();
-            
-            $booking->update([
-                'status' => 'cancelled',
-                'cancellation_reason' => $request->cancellation_reason,
-                'cancelled_at' => now(),
-                'payment_status' => $booking->payment_status === 'paid' ? 'refunded' : 'cancelled' 
-            ]);
-
-            // Logique métier: libérer les sièges, gérer le remboursement (si payé), etc.
-
-            DB::commit();
-            return redirect()->route('admin.bookings.index')->with('success', "La réservation #{$booking->booking_number} a été **annulée** avec succès. (Raison: {$request->cancellation_reason})");
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Erreur lors de l\'annulation: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Action: Marquer la réservation comme Payée (paiement manuel ou validation de paiement différé)
-     */
-    public function markAsPaid(Booking $booking)
-    {
-        if ($booking->payment_status === 'paid') {
-            return back()->with('warning', 'La réservation est déjà marquée comme payée.');
-        }
-
-        try {
-            DB::beginTransaction();
-            
-            $booking->update([
-                'payment_status' => 'paid',
-            ]);
-
-            // Si elle était en attente, on la confirme aussi après le paiement
-            if ($booking->status === 'pending') {
-                $booking->update([
-                    'status' => 'confirmed',
-                    'confirmed_at' => now(),
-                ]);
+            if ($request->status === 'confirmed') {
+                $booking->confirmed_at = now();
             }
 
-            // Logique supplémentaire: génération de facture, envoi de reçus, etc.
+            if ($request->status === 'cancelled') {
+                $booking->cancelled_at = now();
+                $booking->cancellation_reason = $request->reason;
+            }
+
+            $booking->save();
 
             DB::commit();
-            return back()->with('success', "Le paiement de la réservation #{$booking->booking_number} a été **marqué comme payé**.");
-            
+
+            return redirect()
+                ->route('admin.bookings.show', $booking->id)
+                ->with('success', 'Statut de la réservation mis à jour avec succès.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur lors du marquage du paiement: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
-    
-    // Les autres méthodes CRUD ne sont pas utilisées pour l'instant
-    public function create() { abort(404); }
-    public function store(Request $request) { abort(404); }
-    public function edit(string $id) { abort(404); }
-    public function update(Request $request, string $id) { abort(404); }
-    public function destroy(string $id) { abort(404); }
+
+    /**
+     * Mettre à jour le statut de paiement
+     */
+    public function updatePaymentStatus(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:pending,paid,failed,refunded,partially_paid'
+        ]);
+
+        $booking = Booking::findOrFail($id);
+        $booking->payment_status = $request->payment_status;
+        $booking->save();
+
+        return redirect()
+            ->route('admin.bookings.show', $booking->id)
+            ->with('success', 'Statut de paiement mis à jour avec succès.');
+    }
+
+    /**
+     * Supprimer une réservation (soft delete recommandé)
+     */
+    public function destroy($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Vérifier si la réservation peut être supprimée
+        if (in_array($booking->status, ['confirmed', 'completed'])) {
+            return back()->with('error', 'Impossible de supprimer une réservation confirmée ou complétée.');
+        }
+
+        $booking->delete();
+
+        return redirect()
+            ->route('admin.bookings.index')
+            ->with('success', 'Réservation supprimée avec succès.');
+    }
 }

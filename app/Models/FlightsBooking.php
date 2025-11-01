@@ -5,24 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FlightBooking extends Model
+class FlightsBooking extends Model
 {
     use HasFactory;
 
-
     protected $table = 'flights_bookings';
-
     protected $fillable = [
         'booking_id',
         'pnr',
         'eticket_number',
-        'amadeus_booking_ref',
+        'booking_token',
+        'departure_token',
+        'flight_details',
         'flight_segments',
+        'passenger_info',
+        'booking_options',
         'base_price',
         'taxes',
         'margin_amount',
         'margin_percentage',
         'final_price',
+        'currency',
         'ticket_status',
         'ticket_pdf_path',
         'cancellation_reason',
@@ -31,7 +34,10 @@ class FlightBooking extends Model
     ];
 
     protected $casts = [
+        'flight_details' => 'array',
         'flight_segments' => 'array',
+        'passenger_info' => 'array',
+        'booking_options' => 'array',
         'base_price' => 'decimal:2',
         'taxes' => 'decimal:2',
         'margin_amount' => 'decimal:2',
@@ -41,43 +47,33 @@ class FlightBooking extends Model
         'cancelled_at' => 'datetime',
     ];
 
-    /**
-     * Relation avec la réservation principale
-     */
     public function booking()
     {
         return $this->belongsTo(Booking::class);
     }
 
-    /**
-     * Scope pour les billets émis
-     */
     public function scopeIssued($query)
     {
         return $query->where('ticket_status', 'issued');
     }
 
-    /**
-     * Scope pour les billets annulés
-     */
+    public function scopePending($query)
+    {
+        return $query->where('ticket_status', 'pending');
+    }
+
     public function scopeCancelled($query)
     {
         return $query->where('ticket_status', 'cancelled');
     }
 
-    /**
-     * Vérifier si le billet est émis
-     */
     public function isIssued()
     {
         return $this->ticket_status === 'issued';
     }
 
-    /**
-     * Vérifier si le billet peut être annulé
-     */
     public function canBeCancelled()
     {
-        return in_array($this->ticket_status, ['issued', 'pending']);
+        return in_array($this->ticket_status, ['issued', 'pending', 'confirmed']);
     }
 }

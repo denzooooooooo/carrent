@@ -83,4 +83,9 @@ class Booking extends Model
     {
         return $this->hasMany(Review::class);
     }
+    
+    public function flightBooking()
+    {
+        return $this->hasOne(FlightBooking::class);
+    }
 }
