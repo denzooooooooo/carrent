@@ -9,11 +9,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+
+Route::prefix('chatbot')->name('chatbot.')->group(function () {
+    Route::get('/', [ChatbotController::class, 'index'])->name('index');
+    Route::post('/process', [ChatbotController::class, 'processMessage'])->name('process');
+});
 
 
 // Social Authentication Routes
@@ -158,7 +165,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // --- Routes pour les vols ---
 Route::get('/flights', [FlightController::class, 'flights'])->name('flights');
-Route::post('/flights/search', [FlightController::class, 'search'])->name('flights.search');
+//Route::post('/flights/search', [FlightController::class, 'search'])->name('flights.search');
+Route::match(['GET', 'POST'], '/flights/search', [FlightController::class, 'search'])->name('flights.search');      
 Route::get('/api/locations/search', [FlightController::class, 'searchLocations'])->name('api.locations.search');
 //Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
 
