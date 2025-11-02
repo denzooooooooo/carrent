@@ -19,7 +19,7 @@
         </section>
 
         {{-- Formulaire de Recherche --}}
-        <section class="bg-white shadow-2xl -mt-8 relative z-10">
+        <section class="bg-white rounded-3xl shadow-3xl -mt-8 relative z-10 border-2 border-purple-100">
             <div class="container mx-auto px-4 py-8 md:py-12">
                 {{-- Type de voyage --}}
                 <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
@@ -157,7 +157,7 @@
                     </div>
 
                     {{-- Passagers et Classe --}}
-                    <div class="bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 border-2 border-purple-100">
+                    <div class="bg-gradient-to-r from-purple-50 to-amber-50 rounded-2xl p-6 mb-6 border-2 border-purple-200 shadow-lg">
                         <div class="flex items-center space-x-2 mb-4">
                             <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -246,7 +246,7 @@
 
                     {{-- Bouton de recherche --}}
                     <button type="submit" id="search-btn"
-                        class="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 hover:from-purple-700 hover:via-purple-800 hover:to-amber-700 text-white font-black text-lg md:text-xl py-4 md:py-6 px-6 md:px-8 rounded-xl md:rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-2 md:space-x-3">
+                        class="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 hover:from-purple-700 hover:via-purple-800 hover:to-amber-700 text-white font-black text-xl py-6 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-3xl border-2 border-purple-300 flex items-center justify-center space-x-3">
                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -259,7 +259,7 @@
         {{-- Section Résultats --}}
         <section class="container mx-auto px-4 py-12 md:py-16">
             <div class="max-w-4xl mx-auto text-center">
-                <div class="bg-white rounded-2xl md:rounded-3xl p-8 md:p-12 shadow-xl border-2 border-gray-100">
+                <div class="bg-white rounded-3xl p-12 shadow-3xl border-2 border-purple-100">
                     <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                         <svg class="w-10 h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

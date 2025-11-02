@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto">
-        <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 mb-8 shadow-lg">
             <div class="flex items-center mb-4">
                 <svg class="w-12 h-12 text-green-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -20,7 +20,7 @@
         </div>
 
         <!-- Détails de la réservation -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-2xl shadow-3xl p-8 border-2 border-purple-100">
             <h2 class="text-xl font-semibold mb-4">Détails de votre réservation</h2>
             
             <div class="space-y-4">
@@ -46,8 +46,8 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-6 border-t">
-                <a href="{{ route('flights') }}" class="block text-center bg-blue-600 text-white px-6 py-3 rounded font-semibold hover:bg-blue-700">
+            <div class="mt-8 pt-8 border-t-2 border-purple-200">
+                <a href="{{ route('flights') }}" class="block text-center bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-200">
                     Retour à l'accueil
                 </a>
             </div>
