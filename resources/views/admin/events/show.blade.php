@@ -50,11 +50,11 @@
                 </li>
                 <li class="flex justify-between items-center border-t pt-3 mt-3">
                     <span class="font-bold">Prix Min. :</span>
-                    <span class="font-bold text-lg text-primary">{{ number_format($event->min_price, 2, ',', ' ') }} €</span>
+                    <span class="font-bold text-lg text-primary">{{ number_format($event->min_price, 2, ',', ' ') }} FCFA</span>
                 </li>
                 <li class="flex justify-between items-center">
                     <span class="font-bold">Prix Max. :</span>
-                    <span class="font-bold text-lg text-primary">{{ $event->max_price ? number_format($event->max_price, 2, ',', ' ') . ' €' : 'N/A' }}</span>
+                    <span class="font-bold text-lg text-primary">{{ $event->max_price ? number_format($event->max_price, 2, ',', ' ') . ' FCFA' : 'N/A' }}</span>
                 </li>
                 <li class="flex justify-between items-center border-t pt-3 mt-3">
                     <span class="font-medium">Capacité Totale :</span>

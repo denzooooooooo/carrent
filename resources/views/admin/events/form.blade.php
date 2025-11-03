@@ -185,7 +185,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {{-- Prix Minimum --}}
             <div>
-                <label for="min_price" class="block text-sm font-medium text-gray-700 mb-1">Prix Min. (€)</label>
+                <label for="min_price" class="block text-sm font-medium text-gray-700 mb-1">Prix Min. (FCFA)</label>
                 <input type="number" name="min_price" id="min_price" required min="0" step="0.01"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('min_price') border-red-500 @enderror"
                     value="{{ old('min_price', $event->min_price) }}">
@@ -193,7 +193,7 @@
             </div>
             {{-- Prix Maximum --}}
             <div>
-                <label for="max_price" class="block text-sm font-medium text-gray-700 mb-1">Prix Max. (€) (Optionnel)</label>
+                <label for="max_price" class="block text-sm font-medium text-gray-700 mb-1">Prix Max. (FCFA) (Optionnel)</label>
                 <input type="number" name="max_price" id="max_price" min="0" step="0.01"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('max_price') border-red-500 @enderror"
                     value="{{ old('max_price', $event->max_price) }}">

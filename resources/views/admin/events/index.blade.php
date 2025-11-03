@@ -73,7 +73,7 @@
                                 {{ $event->venue_name }}, {{ $event->city }}
                             </p>
                             <p class="flex items-center"><i class="fas fa-tag w-5 text-primary mr-2"></i>
-                                À partir de **{{ number_format($event->min_price, 2, ',', ' ') }} €**
+                                À partir de **{{ number_format($event->min_price, 2, ',', ' ') }} FCFA**
                             </p>
                         </div>
 
