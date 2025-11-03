@@ -11,6 +11,7 @@ class EventSeatZone extends Model
         'zone_name_fr',
         'zone_name_en',
         'zone_code',
+        'zone_type',
         'price',
         'total_seats',
         'available_seats',

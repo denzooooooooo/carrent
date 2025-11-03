@@ -34,6 +34,17 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
                             value="{{ old('seat_zones.' . $index . '.zone_code', $zone->zone_code) }}">
                     </div>
+                    {{-- Type de zone --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
+                        <select name="seat_zones[{{ $index }}][zone_type]" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">
+                            <option value="standard" {{ old('seat_zones.' . $index . '.zone_type', $zone->zone_type) == 'standard' ? 'selected' : '' }}>Standard</option>
+                            <option value="vip" {{ old('seat_zones.' . $index . '.zone_type', $zone->zone_type) == 'vip' ? 'selected' : '' }}>VIP</option>
+                            <option value="vvip" {{ old('seat_zones.' . $index . '.zone_type', $zone->zone_type) == 'vvip' ? 'selected' : '' }}>VVIP</option>
+                            <option value="premium" {{ old('seat_zones.' . $index . '.zone_type', $zone->zone_type) == 'premium' ? 'selected' : '' }}>Premium</option>
+                        </select>
+                    </div>
                     {{-- Prix par siège --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
@@ -102,6 +113,17 @@
                     <input type="text" name="seat_zones[0][zone_code]" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
                         value="{{ old('seat_zones.0.zone_code') }}">
+                </div>
+                {{-- Type de zone --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
+                    <select name="seat_zones[0][zone_type]" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">
+                        <option value="standard" {{ old('seat_zones.0.zone_type') == 'standard' ? 'selected' : '' }}>Standard</option>
+                        <option value="vip" {{ old('seat_zones.0.zone_type') == 'vip' ? 'selected' : '' }}>VIP</option>
+                        <option value="vvip" {{ old('seat_zones.0.zone_type') == 'vvip' ? 'selected' : '' }}>VVIP</option>
+                        <option value="premium" {{ old('seat_zones.0.zone_type') == 'premium' ? 'selected' : '' }}>Premium</option>
+                    </select>
                 </div>
                 {{-- Prix par siège --}}
                 <div>
@@ -177,6 +199,17 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
                 <input type="text" name="seat_zones[__INDEX__][zone_code]" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">
+            </div>
+            {{-- Type de zone --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
+                <select name="seat_zones[__INDEX__][zone_type]" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">
+                    <option value="standard">Standard</option>
+                    <option value="vip">VIP</option>
+                    <option value="vvip">VVIP</option>
+                    <option value="premium">Premium</option>
+                </select>
             </div>
             {{-- Prix par siège --}}
             <div>
