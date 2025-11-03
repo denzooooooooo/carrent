@@ -64,191 +64,187 @@ class AuthController extends Controller
         return view('admin.dashboard');
     } */
     /**
-     * Affiche le tableau de bord de l'administrateur avec des données statiques.
+     * Affiche le tableau de bord de l'administrateur avec des données réelles.
      */
     public function dashboard(): View
     {
-        // Données statiques pour simuler une plateforme active
+        // Import des modèles nécessaires
+        $bookingModel = \App\Models\Booking::class;
+        $userModel = \App\Models\User::class;
+        $eventModel = \App\Models\Event::class;
+        $packageModel = \App\Models\TourPackage::class;
+        $reviewModel = \App\Models\Review::class;
+
+        // Dates pour les calculs
+        $today = Carbon::today();
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
+        // Statistiques principales
         $stats = [
-            'bookings_today' => 42,
-            'bookings_week' => 287,
-            'revenue_today' => 1250000,
-            'revenue_month' => 28500000,
-            'new_users_today' => 23,
-            'total_users' => 1542,
-            'pending_bookings' => 8,
-            'pending_reviews' => 12,
-            'flight_bookings_total' => 156,
-            'event_tickets_sold' => 89,
-            'package_bookings_total' => 67,
-            'average_rating' => 4.7,
-            'cancelled_bookings' => 5,
+            // Réservations aujourd'hui
+            'bookings_today' => $bookingModel::whereDate('created_at', $today)->count(),
+            'bookings_week' => $bookingModel::where('created_at', '>=', $startOfWeek)->count(),
+
+            // Revenus (conversion en XOF)
+            'revenue_today' => $this->convertRevenue($bookingModel::whereDate('created_at', $today)->sum('final_amount')),
+            'revenue_month' => $this->convertRevenue($bookingModel::where('created_at', '>=', $startOfMonth)->sum('final_amount')),
+
+            // Utilisateurs
+            'new_users_today' => $userModel::whereDate('created_at', $today)->count(),
+            'total_users' => $userModel::count(),
+
+            // Statuts des réservations
+            'pending_bookings' => $bookingModel::where('status', 'pending')->count(),
+            'pending_reviews' => 0, // Temporairement à 0 car la table reviews n'a pas de colonne status
+
+            // Réservations par type
+            'flight_bookings_total' => $bookingModel::where('booking_type', 'flight')->count(),
+            'event_tickets_sold' => $bookingModel::where('booking_type', 'event')->count(),
+            'package_bookings_total' => $bookingModel::where('booking_type', 'package')->count(),
+
+            // Note moyenne (calculée à partir des reviews)
+            'average_rating' => $reviewModel::avg('rating') ?? 0,
+
+            // Annulations
+            'cancelled_bookings' => $bookingModel::where('status', 'cancelled')->count(),
         ];
 
-        // Alertes statiques
+        // Alertes basées sur les données réelles
         $alerts = [
-            'low_stock_events' => 2,
-            'low_stock_packages' => 1,
-            'failed_payments' => 3,
+            'low_stock_events' => $eventModel::where('available_seats', '<', 10)->where('is_active', true)->count(),
+            'low_stock_packages' => $packageModel::where('max_participants', '>', 0)
+                ->whereRaw('(SELECT COUNT(*) FROM bookings WHERE package_id = tour_packages.id AND status IN ("confirmed", "pending")) >= max_participants * 0.9')
+                ->count(),
+            'failed_payments' => $bookingModel::where('payment_status', 'failed')->where('created_at', '>=', $sevenDaysAgo)->count(),
         ];
 
         // Données pour les graphiques de revenus (12 derniers mois)
-        $revenueData = collect([
-            ['month' => 'Jan 2024', 'total' => 1850000],
-            ['month' => 'Fév 2024', 'total' => 2100000],
-            ['month' => 'Mar 2024', 'total' => 1980000],
-            ['month' => 'Avr 2024', 'total' => 2450000],
-            ['month' => 'Mai 2024', 'total' => 2780000],
-            ['month' => 'Jun 2024', 'total' => 3120000],
-            ['month' => 'Jul 2024', 'total' => 3450000],
-            ['month' => 'Aoû 2024', 'total' => 2980000],
-            ['month' => 'Sep 2024', 'total' => 3250000],
-            ['month' => 'Oct 2024', 'total' => 3560000],
-            ['month' => 'Nov 2024', 'total' => 3850000],
-            ['month' => 'Déc 2024', 'total' => 4120000],
-        ]);
+        $revenueData = collect();
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $monthStart = $date->copy()->startOfMonth();
+            $monthEnd = $date->copy()->endOfMonth();
+
+            $revenue = $bookingModel::whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->sum('final_amount');
+
+            $revenueData->push([
+                'month' => $date->format('M Y'),
+                'total' => $this->convertRevenue($revenue),
+            ]);
+        }
 
         // Données pour les graphiques de réservations (12 derniers mois)
-        $bookingsData = collect([
-            ['month' => 'Jan 2024', 'total' => 45],
-            ['month' => 'Fév 2024', 'total' => 52],
-            ['month' => 'Mar 2024', 'total' => 48],
-            ['month' => 'Avr 2024', 'total' => 65],
-            ['month' => 'Mai 2024', 'total' => 72],
-            ['month' => 'Jun 2024', 'total' => 78],
-            ['month' => 'Jul 2024', 'total' => 85],
-            ['month' => 'Aoû 2024', 'total' => 76],
-            ['month' => 'Sep 2024', 'total' => 82],
-            ['month' => 'Oct 2024', 'total' => 88],
-            ['month' => 'Nov 2024', 'total' => 92],
-            ['month' => 'Déc 2024', 'total' => 98],
-        ]);
+        $bookingsData = collect();
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $monthStart = $date->copy()->startOfMonth();
+            $monthEnd = $date->copy()->endOfMonth();
+
+            $count = $bookingModel::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+
+            $bookingsData->push([
+                'month' => $date->format('M Y'),
+                'total' => $count,
+            ]);
+        }
 
         // Réservations par type
         $bookingsByType = collect([
-            ['booking_type' => 'flight', 'count' => 156],
-            ['booking_type' => 'event', 'count' => 89],
-            ['booking_type' => 'package', 'count' => 67],
+            ['booking_type' => 'flight', 'count' => $stats['flight_bookings_total']],
+            ['booking_type' => 'event', 'count' => $stats['event_tickets_sold']],
+            ['booking_type' => 'package', 'count' => $stats['package_bookings_total']],
         ]);
 
         // Réservations par statut
         $bookingsByStatus = collect([
-            ['status' => 'confirmed', 'count' => 285],
-            ['status' => 'pending', 'count' => 8],
-            ['status' => 'cancelled', 'count' => 5],
-            ['status' => 'completed', 'count' => 312],
+            ['status' => 'confirmed', 'count' => $bookingModel::where('status', 'confirmed')->count()],
+            ['status' => 'pending', 'count' => $stats['pending_bookings']],
+            ['status' => 'cancelled', 'count' => $stats['cancelled_bookings']],
+            ['status' => 'completed', 'count' => $bookingModel::where('status', 'completed')->count()],
         ]);
 
-        // Top destinations
-        $topDestinations = collect([
-            (object) ['destination' => 'Paris', 'count' => 45],
-            (object) ['destination' => 'Dakar', 'count' => 38],
-            (object) ['destination' => 'Abidjan', 'count' => 32],
-            (object) ['destination' => 'Lomé', 'count' => 28],
-            (object) ['destination' => 'Bamako', 'count' => 25],
-        ]);
+        // Top destinations (basé sur les réservations de vols)
+        $topDestinations = $bookingModel::where('booking_type', 'flight')
+            ->join('flights', 'bookings.flight_id', '=', 'flights.id')
+            ->join('airports as arrival', 'flights.arrival_airport_id', '=', 'arrival.id')
+            ->selectRaw('arrival.municipality as destination, COUNT(*) as count')
+            ->groupBy('arrival.municipality')
+            ->orderBy('count', 'desc')
+            ->limit(5)
+            ->get();
 
         // Statistiques des 7 derniers jours
-        $dailyStats = [
-            ['date' => '01/01', 'bookings' => 35, 'users' => 12],
-            ['date' => '02/01', 'bookings' => 42, 'users' => 18],
-            ['date' => '03/01', 'bookings' => 38, 'users' => 15],
-            ['date' => '04/01', 'bookings' => 45, 'users' => 20],
-            ['date' => '05/01', 'bookings' => 52, 'users' => 22],
-            ['date' => '06/01', 'bookings' => 48, 'users' => 19],
-            ['date' => '07/01', 'bookings' => 42, 'users' => 16],
-        ];
+        $dailyStats = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $dailyStats[] = [
+                'date' => $date->format('d/m'),
+                'bookings' => $bookingModel::whereDate('created_at', $date)->count(),
+                'users' => $userModel::whereDate('created_at', $date)->count(),
+            ];
+        }
 
-        // Top événements
-        $topEvents = collect([
-            (object) ['title' => 'Festival Jazz de Saint-Louis', 'tickets_count' => 156],
-            (object) ['title' => 'Concert Youssou N\'Dour', 'tickets_count' => 142],
-            (object) ['title' => 'Semaine de la Mode Dakar', 'tickets_count' => 128],
-            (object) ['title' => 'Festival des Arts Nègres', 'tickets_count' => 115],
-            (object) ['title' => 'Gala des Entrepreneurs', 'tickets_count' => 98],
-        ]);
+        // Top événements (basé sur le nombre de réservations)
+        $topEvents = $eventModel::withCount(['bookings' => function ($query) {
+            $query->whereIn('status', ['confirmed', 'completed']);
+        }])
+        ->orderBy('bookings_count', 'desc')
+        ->limit(5)
+        ->get()
+        ->map(function ($event) {
+            return (object) [
+                'title' => $event->title_fr,
+                'tickets_count' => $event->bookings_count,
+            ];
+        });
 
-        // Top packages
-        $topPackages = collect([
-            (object) ['title' => 'Package Découverte Sénégal', 'bookings_count' => 67],
-            (object) ['title' => 'Tour Culturel Côte d\'Ivoire', 'bookings_count' => 54],
-            (object) ['title' => 'Aventure Mali', 'bookings_count' => 48],
-            (object) ['title' => 'Escapade Togo', 'bookings_count' => 42],
-            (object) ['title' => 'Expérience Ghana', 'bookings_count' => 38],
-        ]);
+        // Top packages (basé sur le nombre de réservations)
+        $topPackages = $packageModel::withCount(['bookings' => function ($query) {
+            $query->whereIn('status', ['confirmed', 'completed']);
+        }])
+        ->orderBy('bookings_count', 'desc')
+        ->limit(5)
+        ->get()
+        ->map(function ($package) {
+            return (object) [
+                'title' => $package->title_fr,
+                'bookings_count' => $package->bookings_count,
+            ];
+        });
 
-        // Utilisateurs récents simulés
-        $recentUsers = collect([
-            (object) [
-                'name' => 'Marie Diop',
-                'email' => 'marie.diop@example.com',
-                'created_at' => Carbon::now()->subHours(2)
-            ],
-            (object) [
-                'name' => 'Jean Traoré',
-                'email' => 'jean.traore@example.com',
-                'created_at' => Carbon::now()->subHours(5)
-            ],
-            (object) [
-                'name' => 'Aïcha Koné',
-                'email' => 'aicha.kone@example.com',
-                'created_at' => Carbon::now()->subDays(1)
-            ],
-            (object) [
-                'name' => 'Paul Ndiaye',
-                'email' => 'paul.ndiaye@example.com',
-                'created_at' => Carbon::now()->subDays(1)
-            ],
-            (object) [
-                'name' => 'Fatou Sow',
-                'email' => 'fatou.sow@example.com',
-                'created_at' => Carbon::now()->subDays(2)
-            ],
-        ]);
+        // Utilisateurs récents
+        $recentUsers = $userModel::select('first_name', 'last_name', 'email', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($user) {
+                return (object) [
+                    'name' => $user->first_name . ' ' . $user->last_name,
+                    'email' => $user->email,
+                    'created_at' => $user->created_at,
+                ];
+            });
 
-        // Réservations récentes simulées
-        $recentBookings = collect([
-            (object) [
-                'booking_number' => 'FB-001245',
-                'user' => (object) ['name' => 'Marie Diop'],
-                'booking_type' => 'flight',
-                'final_amount' => 245000,
-                'status' => 'confirmed',
-                'created_at' => Carbon::now()->subHours(1)
-            ],
-            (object) [
-                'booking_number' => 'ET-008976',
-                'user' => (object) ['name' => 'Jean Traoré'],
-                'booking_type' => 'event',
-                'final_amount' => 75000,
-                'status' => 'confirmed',
-                'created_at' => Carbon::now()->subHours(3)
-            ],
-            (object) [
-                'booking_number' => 'PB-003421',
-                'user' => (object) ['name' => 'Aïcha Koné'],
-                'booking_type' => 'package',
-                'final_amount' => 450000,
-                'status' => 'pending',
-                'created_at' => Carbon::now()->subHours(6)
-            ],
-            (object) [
-                'booking_number' => 'FB-001246',
-                'user' => (object) ['name' => 'Paul Ndiaye'],
-                'booking_type' => 'flight',
-                'final_amount' => 320000,
-                'status' => 'completed',
-                'created_at' => Carbon::now()->subDays(1)
-            ],
-            (object) [
-                'booking_number' => 'ET-008977',
-                'user' => (object) ['name' => 'Fatou Sow'],
-                'booking_type' => 'event',
-                'final_amount' => 50000,
-                'status' => 'confirmed',
-                'created_at' => Carbon::now()->subDays(1)
-            ],
-        ]);
+        // Réservations récentes
+        $recentBookings = $bookingModel::with('user')
+            ->select('booking_number', 'booking_type', 'final_amount', 'status', 'created_at', 'user_id')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($booking) {
+                return (object) [
+                    'booking_number' => $booking->booking_number,
+                    'user' => (object) ['name' => $booking->user ? $booking->user->first_name . ' ' . $booking->user->last_name : 'N/A'],
+                    'booking_type' => $booking->booking_type,
+                    'final_amount' => $this->convertRevenue($booking->final_amount),
+                    'status' => $booking->status,
+                    'created_at' => $booking->created_at,
+                ];
+            });
 
         return view('admin.dashboard', compact(
             'stats',
@@ -264,6 +260,14 @@ class AuthController extends Controller
             'recentUsers',
             'recentBookings'
         ));
+    }
+
+    /**
+     * Convertit le revenu dans la devise actuelle de l'utilisateur
+     */
+    private function convertRevenue($amount)
+    {
+        return \App\Helpers\CurrencyHelper::convert($amount, 'XOF', session('currency', 'XOF'));
     }
 
     /**
