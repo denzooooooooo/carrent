@@ -100,105 +100,76 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        @php
-          $vehicles = [
-            [
-              'name' => 'Berline Économique',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Terrestre',
-              'passengers' => '4 passagers',
-              'transmission' => 'Manuelle',
-              'features' => ['Climatisation', 'Radio', 'Siège bébé disponible']
-            ],
-            [
-              'name' => 'Quad Aventure',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Terrestre',
-              'passengers' => '2 passagers',
-              'transmission' => 'Automatique',
-              'features' => ['Moteur puissant', 'Suspension tout-terrain', 'Casque fourni']
-            ],
-            [
-              'name' => 'Avion Léger',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Aérien',
-              'passengers' => '4 passagers',
-              'transmission' => 'Propulsion',
-              'features' => ['Pilote certifié', 'Équipement de sécurité', 'Navigation GPS']
-            ],
-            [
-              'name' => 'Bateau de Plaisance',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Nautique',
-              'passengers' => '8 passagers',
-              'transmission' => 'Moteur hors-bord',
-              'features' => ['Gilets de sauvetage', 'Équipement pêche', 'Ancrage inclus']
-            ],
-            [
-              'name' => 'SUV Premium',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Terrestre',
-              'passengers' => '7 passagers',
-              'transmission' => 'Automatique',
-              'features' => ['GPS intégré', 'Portes arrière électriques', 'Toit ouvrant']
-            ],
-            [
-              'name' => 'Hélicoptère',
-              'image' => 'https://images.unsplash.com/photo-1549399735-cef2e2c3f638?w=400&h=300&fit=crop',
-              'category' => 'Aérien',
-              'passengers' => '6 passagers',
-              'transmission' => 'Turbine',
-              'features' => ['Vue panoramique', 'Atterrissage vertical', 'Service VIP']
-            ]
-          ];
-        @endphp
-
-        @foreach($vehicles as $vehicle)
-          <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-            <div class="relative h-48 md:h-56">
-              <img
-                src="{{ $vehicle['image'] }}"
-                alt="{{ $vehicle['name'] }}"
-                class="w-full h-full object-cover"
-              />
-              <div class="absolute top-4 left-4">
-                <span class="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
-                  {{ $vehicle['category'] }}
-                </span>
-              </div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-bold mb-2">{{ $vehicle['name'] }}</h3>
-              <div class="space-y-2 mb-4">
-                <div class="flex items-center text-sm text-gray-600">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                  </svg>
-                  {{ $vehicle['passengers'] }}
-                </div>
-                <div class="flex items-center text-sm text-gray-600">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                  </svg>
-                  {{ $vehicle['transmission'] }}
+        @forelse($locations ?? [] as $location)
+          @if($location->is_active)
+            <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+              <div class="relative h-48 md:h-56">
+                @php
+                  $imageUrl = $location->getImageUrl();
+                  $placeholder = 'https://placehold.co/800x480/4c1d95/ffffff?text=Image+Location';
+                @endphp
+                <img
+                  src="{{ $imageUrl ?: $placeholder }}"
+                  alt="{{ $location->name }}"
+                  class="w-full h-full object-cover"
+                  onerror="this.onerror=null;this.src='{{ $placeholder }}';"
+                />
+                <div class="absolute top-4 left-4">
+                  <span class="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                    {{ ucfirst($location->category) }}
+                  </span>
                 </div>
               </div>
-              <div class="space-y-1 mb-4">
-                @foreach($vehicle['features'] as $feature)
-                  <div class="flex items-center text-sm text-gray-700">
-                    <svg class="w-3 h-3 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              <div class="p-6">
+                <h3 class="text-xl font-bold mb-2">{{ $location->name }}</h3>
+                <div class="space-y-2 mb-4">
+                  <div class="flex items-center text-sm text-gray-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    {{ $feature }}
+                    {{ $location->capacity }} personne(s)
                   </div>
-                @endforeach
+                  <div class="flex items-center text-sm text-gray-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                    </svg>
+                    {{ $location->type }}
+                  </div>
+                </div>
+                @if($location->features && count($location->features) > 0)
+                  <div class="space-y-1 mb-4">
+                    @foreach(array_slice($location->features, 0, 3) as $feature)
+                      <div class="flex items-center text-sm text-gray-700">
+                        <svg class="w-3 h-3 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        {{ $feature }}
+                      </div>
+                    @endforeach
+                    @if(count($location->features) > 3)
+                      <div class="text-sm text-gray-500">
+                        +{{ count($location->features) - 3 }} autres caractéristiques
+                      </div>
+                    @endif
+                  </div>
+                @endif
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
+                    {{ number_format($location->price_per_day, 0, ',', ' ') }} FCFA/jour
+                  </span>
+                </div>
+                <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl hover:shadow-lg transition-all">
+                  Réserver Maintenant
+                </button>
               </div>
-              <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl hover:shadow-lg transition-all">
-                Réserver Maintenant
-              </button>
             </div>
+          @endif
+        @empty
+          <div class="col-span-full bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center">
+            <p class="text-xl text-gray-500">Aucune location disponible pour le moment.</p>
+            <p class="text-gray-400 mt-2">Nos véhicules seront bientôt disponibles.</p>
           </div>
-        @endforeach
+        @endforelse
       </div>
     </div>
   </section>

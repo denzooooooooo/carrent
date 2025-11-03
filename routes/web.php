@@ -145,6 +145,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Gestion des passerelles de paiement
         Route::resource('payment-gateways', App\Http\Controllers\Admin\PaymentGatewayController::class);
 
+        // Gestion des locations
+        Route::resource('locations', App\Http\Controllers\Admin\LocationController::class);
+
         // Profil admin
         Route::get('/profile', [App\Http\Controllers\Admin\AdminController::class, 'profile'])->name('profile');
         Route::post('/profile', [App\Http\Controllers\Admin\AdminController::class, 'updateProfile'])->name('profile.update');

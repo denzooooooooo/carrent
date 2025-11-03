@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Services\GoogleFlightsService;
 use App\Models\Event;
+use App\Models\Location;
 
 
 class HomeController extends Controller
@@ -36,7 +37,11 @@ class HomeController extends Controller
 
     public function location()
     {
-        return view('pages.location');
+        $locations = Location::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.location', compact('locations'));
     }
 
     public function about()

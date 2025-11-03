@@ -270,6 +270,11 @@
                         <i class="fas fa-folder w-5 text-lg"></i>
                         <span class="ml-3 font-medium">Catégories</span>
                     </a>
+
+                    <a href="{{ route('admin.locations.index') }}" class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.locations.*') ? 'active' : 'text-gray-700' }}">
+                        <i class="fas fa-car w-5 text-lg"></i>
+                        <span class="ml-3 font-medium">Locations</span>
+                    </a>
                 </div>
 
                 <div class="mt-6">
