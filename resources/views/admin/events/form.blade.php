@@ -255,8 +255,11 @@
         </div>
 
 
-        {{-- SECTION 6: SEO (OPTIONNEL) --}}
-        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">6. Optimisation SEO (Optionnel)</h2>
+        {{-- SECTION 6: ZONES DE SIÈGES --}}
+        @include('admin.events.partials.seat-zones')
+
+        {{-- SECTION 7: SEO (OPTIONNEL) --}}
+        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">7. Optimisation SEO (Optionnel)</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {{-- Méta Titre FR --}}
             <div>
