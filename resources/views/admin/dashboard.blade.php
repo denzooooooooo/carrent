@@ -331,6 +331,156 @@
                                 </div>
                             </div>
                         @endforeach
-                    </div>
                 </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: @json($revenueData->pluck('month')),
+            datasets: [{
+                label: 'Revenus (XOF)',
+                data: @json($revenueData->pluck('total')),
+                borderColor: 'rgb(147, 51, 234)',
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Évolution des Revenus'
+                }
+            }
+        }
+    });
+
+    // Bookings Chart
+    const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
+    const bookingsChart = new Chart(bookingsCtx, {
+        type: 'bar',
+        data: {
+            labels: @json($bookingsData->pluck('month')),
+            datasets: [{
+                label: 'Réservations',
+                data: @json($bookingsData->pluck('total')),
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Évolution des Réservations'
+                }
+            }
+        }
+    });
+
+    // Type Chart
+    const typeCtx = document.getElementById('typeChart').getContext('2d');
+    const typeChart = new Chart(typeCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Vols', 'Événements', 'Packages'],
+            datasets: [{
+                data: @json($bookingsByType->pluck('count')),
+                backgroundColor: [
+                    'rgb(147, 51, 234)',
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Confirmé', 'En attente', 'Annulé', 'Terminé'],
+            datasets: [{
+                data: @json($bookingsByStatus->pluck('count')),
+                backgroundColor: [
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)',
+                    'rgb(239, 68, 68)',
+                    'rgb(59, 130, 246)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Daily Stats Chart
+    const dailyStatsCtx = document.getElementById('dailyStatsChart').getContext('2d');
+    const dailyStatsChart = new Chart(dailyStatsCtx, {
+        type: 'line',
+        data: {
+            labels: @json(collect($dailyStats)->pluck('date')),
+            datasets: [{
+                label: 'Réservations',
+                data: @json(collect($dailyStats)->pluck('bookings')),
+                borderColor: 'rgb(147, 51, 234)',
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Utilisateurs',
+                data: @json(collect($dailyStats)->pluck('users')),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Activité des 7 Derniers Jours'
+                }
+            }
+        }
+    });
+</script>
+@endpush
+
 @endsection

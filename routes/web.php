@@ -188,6 +188,8 @@ Route::post('/flights/booking-simple', [FlightController::class, 'booking'])->na
 // --- Autres pages ---
 Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events');
 Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::class, 'book'])->name('event.book');
+Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
 Route::get('/packages/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
 Route::get('/location', [HomeController::class, 'location'])->name('location');

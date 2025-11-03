@@ -53,4 +53,54 @@ class EventController extends Controller
 
         return view('pages.event-details', compact('event'));
     }
+
+    /**
+     * Traiter la réservation d'un événement.
+     */
+    public function book(Request $request, Event $event)
+    {
+        $request->validate([
+            'zone_id' => 'required|exists:event_seat_zones,id',
+            'quantity' => 'required|integer|min:1',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $zone = $event->seatZones()->findOrFail($request->zone_id);
+
+        // Vérifier la disponibilité
+        if ($request->quantity > $zone->available_seats) {
+            return back()->withErrors(['quantity' => 'Nombre de places demandé supérieur à la disponibilité.']);
+        }
+
+        // Créer la réservation
+        $booking = \App\Models\EventBooking::create([
+            'event_id' => $event->id,
+            'zone_id' => $zone->id,
+            'user_name' => $request->name,
+            'user_email' => $request->email,
+            'user_phone' => $request->phone,
+            'quantity' => $request->quantity,
+            'unit_price' => $zone->price,
+            'total_price' => $zone->price * $request->quantity,
+            'status' => 'pending',
+            'booking_reference' => 'EVT-' . strtoupper(uniqid()),
+        ]);
+
+        // Mettre à jour les places disponibles
+        $zone->decrement('available_seats', $request->quantity);
+
+        return redirect()->route('event.booking.confirmation', $booking)
+            ->with('success', 'Votre réservation a été créée avec succès!');
+    }
+
+    /**
+     * Afficher la page de confirmation de réservation.
+     */
+    public function bookingConfirmation(\App\Models\EventBooking $booking)
+    {
+        $booking->load(['event', 'zone']);
+        return view('pages.event-booking-confirmation', compact('booking'));
+    }
 }

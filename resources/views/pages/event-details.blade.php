@@ -170,7 +170,11 @@
                     </div>
 
                     @if($zone->available_seats > 0)
-                      <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base">
+                      <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
+                              data-zone-id="{{ $zone->id }}"
+                              data-zone-name="{{ $zone->zone_name }}"
+                              data-price="{{ $zone->price }}"
+                              data-available="{{ $zone->available_seats }}">
                         Sélectionner
                       </button>
                     @else
@@ -214,4 +218,174 @@
     </div>
   </section>
 </div>
+
+{{-- Seat Selection Modal --}}
+<div id="seatModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-gray-900">Sélectionner vos places</h3>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="modalContent">
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-900 mb-2" id="selectedZoneName"></h4>
+            <p class="text-gray-600 text-sm mb-4" id="selectedZonePrice"></p>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de places</label>
+            <div class="flex items-center space-x-3">
+              <button id="decreaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+              </button>
+              <span id="quantity" class="text-xl font-bold text-gray-900 min-w-[3rem] text-center">1</span>
+              <button id="increaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Maximum: <span id="maxAvailable"></span> places disponibles</p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-gray-600">Prix par place:</span>
+              <span id="unitPrice" class="font-semibold"></span>
+            </div>
+            <div class="flex justify-between items-center text-lg font-bold">
+              <span>Total:</span>
+              <span id="totalPrice" class="text-purple-600"></span>
+            </div>
+          </div>
+
+          <form id="bookingForm" method="POST" action="{{ route('event.book', $event) }}">
+            @csrf
+            <input type="hidden" name="zone_id" id="zoneIdInput">
+            <input type="hidden" name="quantity" id="quantityInput" value="1">
+
+            <div class="space-y-4 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <input type="tel" name="phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+              Confirmer la réservation
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('seatModal');
+  const closeModal = document.getElementById('closeModal');
+  const selectButtons = document.querySelectorAll('.select-seat-btn');
+  const decreaseBtn = document.getElementById('decreaseQty');
+  const increaseBtn = document.getElementById('increaseQty');
+  const quantitySpan = document.getElementById('quantity');
+  const quantityInput = document.getElementById('quantityInput');
+  const zoneIdInput = document.getElementById('zoneIdInput');
+
+  let currentZone = null;
+  let currentQuantity = 1;
+  let maxAvailable = 0;
+
+  // Open modal
+  selectButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const zoneId = this.dataset.zoneId;
+      const zoneName = this.dataset.zoneName;
+      const price = parseFloat(this.dataset.price);
+      maxAvailable = parseInt(this.dataset.available);
+
+      currentZone = { id: zoneId, name: zoneName, price: price };
+      currentQuantity = 1;
+
+      // Update modal content
+      document.getElementById('selectedZoneName').textContent = zoneName;
+      document.getElementById('selectedZonePrice').textContent = formatPrice(price) + ' par place';
+      document.getElementById('unitPrice').textContent = formatPrice(price);
+      document.getElementById('maxAvailable').textContent = maxAvailable;
+      updateTotal();
+
+      // Set form inputs
+      zoneIdInput.value = zoneId;
+      quantityInput.value = currentQuantity;
+
+      modal.classList.remove('hidden');
+    });
+  });
+
+  // Close modal
+  closeModal.addEventListener('click', function() {
+    modal.classList.add('hidden');
+  });
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+    }
+  });
+
+  // Quantity controls
+  decreaseBtn.addEventListener('click', function() {
+    if (currentQuantity > 1) {
+      currentQuantity--;
+      updateQuantity();
+    }
+  });
+
+  increaseBtn.addEventListener('click', function() {
+    if (currentQuantity < maxAvailable) {
+      currentQuantity++;
+      updateQuantity();
+    }
+  });
+
+  function updateQuantity() {
+    quantitySpan.textContent = currentQuantity;
+    quantityInput.value = currentQuantity;
+    updateTotal();
+  }
+
+  function updateTotal() {
+    if (currentZone) {
+      const total = currentZone.price * currentQuantity;
+      document.getElementById('totalPrice').textContent = formatPrice(total);
+    }
+  }
+
+  function formatPrice(price) {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    }).format(price);
+  }
+});
+</script>
+
 @endsection
