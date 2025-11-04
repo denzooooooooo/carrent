@@ -83,6 +83,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
+        $event->load('seatZones'); // Load seat zones for the form
         $categories = EventCategory::where('is_active', true)->pluck('name_fr', 'id');
         $types = EventType::where('is_active', true)->pluck('name_fr', 'id');
         $pageTitle = 'Modifier l\'Événement : ' . $event->title_fr;
