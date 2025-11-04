@@ -36,7 +36,7 @@
                     {{-- Image de la Location --}}
                     <a href="{{ route('admin.locations.show', $location) }}" class="block h-48 overflow-hidden group">
                         @php
-                            $imageUrl = $location->getImageUrl();
+                            $imageUrl = $location->image_url;
                             $placeholder = 'https://placehold.co/800x480/4c1d95/ffffff?text=Image+Location';
                         @endphp
                         <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $location->name }}"

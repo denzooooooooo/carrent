@@ -23,7 +23,7 @@
     <div class="lg:col-span-1 space-y-6">
         <div class="bg-white p-4 rounded-xl shadow-xl border border-gray-100">
             @php
-                $imageUrl = $location->getImageUrl();
+                $imageUrl = $location->image_url;
                 $placeholder = 'https://placehold.co/800x600/4c1d95/ffffff?text=Image+Location';
             @endphp
             <img src="{{ $imageUrl ?: $placeholder }}"
