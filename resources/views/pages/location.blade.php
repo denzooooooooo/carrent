@@ -105,7 +105,7 @@
             <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
               <div class="relative h-48 md:h-56">
                 @php
-                  $imageUrl = $location->getImageUrl();
+                  $imageUrl = $location->image_url;
                   $placeholder = 'https://placehold.co/800x480/4c1d95/ffffff?text=Image+Location';
                 @endphp
                 <img
