@@ -180,6 +180,16 @@ class EventController extends Controller
             'meta_title_en' => ['nullable', 'string', 'max:255'],
             'meta_description_fr' => ['nullable', 'string', 'max:500'],
             'meta_description_en' => ['nullable', 'string', 'max:500'],
+            'seat_zones' => ['nullable', 'array', 'min:1'],
+            'seat_zones.*.zone_name_fr' => ['required', 'string', 'max:255'],
+            'seat_zones.*.zone_name_en' => ['required', 'string', 'max:255'],
+            'seat_zones.*.zone_code' => ['required', 'string', 'max:50'],
+            'seat_zones.*.zone_type' => ['required', 'in:standard,vip,vvip,premium'],
+            'seat_zones.*.price' => ['required', 'numeric', 'min:0'],
+            'seat_zones.*.total_seats' => ['required', 'integer', 'min:1'],
+            'seat_zones.*.description_fr' => ['nullable', 'string'],
+            'seat_zones.*.description_en' => ['nullable', 'string'],
+            'seat_zones.*.is_active' => ['nullable', 'boolean'],
         ];
 
         $validated = $request->validate($rules);
