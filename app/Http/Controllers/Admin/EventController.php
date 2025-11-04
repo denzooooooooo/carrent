@@ -54,6 +54,11 @@ class EventController extends Controller
                       ->toMediaCollection('avatar');
             }
 
+            // Gestion des zones de sièges
+            if ($request->has('seat_zones')) {
+                $this->storeSeatZones($event, $request->input('seat_zones'));
+            }
+
             DB::commit();
 
             return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été créé avec succès.');
@@ -109,6 +114,11 @@ class EventController extends Controller
             // Gestion de la suppression de l'image
             if ($request->input('remove_image')) {
                 $event->clearMediaCollection('avatar');
+            }
+
+            // Gestion des zones de sièges
+            if ($request->has('seat_zones')) {
+                $this->updateSeatZones($event, $request->input('seat_zones'));
             }
 
             DB::commit();
@@ -188,5 +198,72 @@ class EventController extends Controller
         $validated['event_type'] = $request->input('type_id'); // Mapping du champ type_id vers event_type dans le modèle
         
         return $validated;
+    }
+
+    /**
+     * Store seat zones for an event
+     */
+    protected function storeSeatZones(Event $event, array $seatZonesData)
+    {
+        foreach ($seatZonesData as $zoneData) {
+            if (!empty($zoneData['zone_name_fr']) && !empty($zoneData['zone_name_en'])) {
+                $event->seatZones()->create([
+                    'zone_name_fr' => $zoneData['zone_name_fr'],
+                    'zone_name_en' => $zoneData['zone_name_en'],
+                    'zone_code' => $zoneData['zone_code'] ?? null,
+                    'zone_type' => $zoneData['zone_type'] ?? 'standard',
+                    'price' => $zoneData['price'] ?? 0,
+                    'total_seats' => $zoneData['total_seats'] ?? 0,
+                    'description_fr' => $zoneData['description_fr'] ?? null,
+                    'description_en' => $zoneData['description_en'] ?? null,
+                    'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Update seat zones for an event
+     */
+    protected function updateSeatZones(Event $event, array $seatZonesData)
+    {
+        // Delete existing zones not in the new data
+        $existingIds = collect($seatZonesData)->pluck('id')->filter()->toArray();
+        $event->seatZones()->whereNotIn('id', $existingIds)->delete();
+
+        foreach ($seatZonesData as $zoneData) {
+            if (!empty($zoneData['zone_name_fr']) && !empty($zoneData['zone_name_en'])) {
+                if (isset($zoneData['id']) && $zoneData['id']) {
+                    // Update existing zone
+                    $zone = $event->seatZones()->find($zoneData['id']);
+                    if ($zone) {
+                        $zone->update([
+                            'zone_name_fr' => $zoneData['zone_name_fr'],
+                            'zone_name_en' => $zoneData['zone_name_en'],
+                            'zone_code' => $zoneData['zone_code'] ?? null,
+                            'zone_type' => $zoneData['zone_type'] ?? 'standard',
+                            'price' => $zoneData['price'] ?? 0,
+                            'total_seats' => $zoneData['total_seats'] ?? 0,
+                            'description_fr' => $zoneData['description_fr'] ?? null,
+                            'description_en' => $zoneData['description_en'] ?? null,
+                            'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
+                        ]);
+                    }
+                } else {
+                    // Create new zone
+                    $event->seatZones()->create([
+                        'zone_name_fr' => $zoneData['zone_name_fr'],
+                        'zone_name_en' => $zoneData['zone_name_en'],
+                        'zone_code' => $zoneData['zone_code'] ?? null,
+                        'zone_type' => $zoneData['zone_type'] ?? 'standard',
+                        'price' => $zoneData['price'] ?? 0,
+                        'total_seats' => $zoneData['total_seats'] ?? 0,
+                        'description_fr' => $zoneData['description_fr'] ?? null,
+                        'description_en' => $zoneData['description_en'] ?? null,
+                        'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
+                    ]);
+                }
+            }
+        }
     }
 }

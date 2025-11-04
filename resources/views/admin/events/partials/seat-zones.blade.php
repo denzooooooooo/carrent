@@ -13,12 +13,13 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- Nom de la zone FR --}}
+            {{-- Nom de la zone FR --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
                         <input type="text" name="seat_zones[{{ $index }}][zone_name_fr]" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
                             value="{{ old('seat_zones.' . $index . '.zone_name_fr', $zone->zone_name_fr) }}">
+                        <input type="hidden" name="seat_zones[{{ $index }}][id]" value="{{ $zone->id }}">
                     </div>
                     {{-- Nom de la zone EN --}}
                     <div>
