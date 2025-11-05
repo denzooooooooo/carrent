@@ -113,34 +113,16 @@
                 Comptabilité
             </p>
 
-            <a href="{{ route('admin.accountant.dashboard') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.dashboard') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-chart-bar w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Dashboard</span>
-            </a>
-
             <a href="{{ route('admin.accountant.reports') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.reports') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-file-alt w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Rapports</span>
             </a>
 
-            <a href="{{ route('admin.accountant.bookings') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.bookings') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-ticket-alt w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Réservations</span>
-            </a>
-
             <a href="{{ route('admin.accountant.payment-gateways') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.payment-gateways') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-credit-card w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Paiements</span>
-            </a>
-
-            <a href="{{ route('admin.accountant.pricing-rules') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.pricing-rules') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-dollar-sign w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Règles de prix</span>
             </a>
         </div>
         @endif

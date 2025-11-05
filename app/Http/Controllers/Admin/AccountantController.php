@@ -13,77 +13,6 @@ use Carbon\Carbon;
 
 class AccountantController extends Controller
 {
-    /**
-     * Display the accountant dashboard
-     */
-    public function dashboard()
-    {
-        // Financial statistics
-        $totalRevenue = Booking::where('status', 'confirmed')->sum('total_amount') +
-                       EventBooking::where('status', 'confirmed')->sum('total_amount');
-
-        $monthlyRevenue = Booking::where('status', 'confirmed')
-                                ->whereMonth('created_at', Carbon::now()->month)
-                                ->whereYear('created_at', Carbon::now()->year)
-                                ->sum('total_amount') +
-                       EventBooking::where('status', 'confirmed')
-                                  ->whereMonth('created_at', Carbon::now()->month)
-                                  ->whereYear('created_at', Carbon::now()->year)
-                                  ->sum('total_amount');
-
-        $totalBookings = Booking::count() + EventBooking::count();
-        $confirmedBookings = Booking::where('status', 'confirmed')->count() +
-                           EventBooking::where('status', 'confirmed')->count();
-
-        $pendingPayments = Booking::where('status', 'pending')->count() +
-                          EventBooking::where('status', 'pending')->count();
-
-        // Recent transactions
-        $recentBookings = collect();
-
-        $packageBookings = Booking::with(['user', 'package'])
-                                 ->latest()
-                                 ->take(5)
-                                 ->get()
-                                 ->map(function($booking) {
-                                     return [
-                                         'id' => $booking->id,
-                                         'type' => 'package',
-                                         'title' => $booking->package->title_fr ?? 'Package',
-                                         'user' => $booking->user->name ?? 'N/A',
-                                         'amount' => $booking->total_amount,
-                                         'status' => $booking->status,
-                                         'date' => $booking->created_at
-                                     ];
-                                 });
-
-        $eventBookings = EventBooking::with(['user', 'event'])
-                                    ->latest()
-                                    ->take(5)
-                                    ->get()
-                                    ->map(function($booking) {
-                                        return [
-                                            'id' => $booking->id,
-                                            'type' => 'event',
-                                            'title' => $booking->event->title_fr ?? 'Événement',
-                                            'user' => $booking->user->name ?? 'N/A',
-                                            'amount' => $booking->total_amount,
-                                            'status' => $booking->status,
-                                            'date' => $booking->created_at
-                                        ];
-                                    });
-
-        $recentBookings = $packageBookings->concat($eventBookings)->sortByDesc('date')->take(10);
-
-        return view('admin.accountant.dashboard', compact(
-            'totalRevenue',
-            'monthlyRevenue',
-            'totalBookings',
-            'confirmedBookings',
-            'pendingPayments',
-            'recentBookings'
-        ));
-    }
 
     /**
      * Display financial reports
@@ -179,86 +108,7 @@ class AccountantController extends Controller
         ));
     }
 
-    /**
-     * Display all bookings for accountant review
-     */
-    public function bookings(Request $request)
-    {
-        $status = $request->get('status', 'all');
-        $type = $request->get('type', 'all'); // package, event, or all
 
-        $query = collect();
-
-        if ($type === 'all' || $type === 'package') {
-            $packageBookings = Booking::with(['user', 'package'])
-                                     ->when($status !== 'all', function($q) use ($status) {
-                                         return $q->where('status', $status);
-                                     })
-                                     ->latest()
-                                     ->get()
-                                     ->map(function($booking) {
-                                         return (object) [
-                                             'id' => $booking->id,
-                                             'type' => 'package',
-                                             'title' => $booking->package->title_fr ?? 'Package',
-                                             'user' => $booking->user,
-                                             'total_amount' => $booking->total_amount,
-                                             'status' => $booking->status,
-                                             'created_at' => $booking->created_at,
-                                             'booking' => $booking
-                                         ];
-                                     });
-            $query = $query->concat($packageBookings);
-        }
-
-        if ($type === 'all' || $type === 'event') {
-            $eventBookings = EventBooking::with(['user', 'event'])
-                                        ->when($status !== 'all', function($q) use ($status) {
-                                            return $q->where('status', $status);
-                                        })
-                                        ->latest()
-                                        ->get()
-                                        ->map(function($booking) {
-                                            return (object) [
-                                                'id' => $booking->id,
-                                                'type' => 'event',
-                                                'title' => $booking->event->title_fr ?? 'Événement',
-                                                'user' => $booking->user,
-                                                'total_amount' => $booking->total_amount,
-                                                'status' => $booking->status,
-                                                'created_at' => $booking->created_at,
-                                                'booking' => $booking
-                                            ];
-                                        });
-            $query = $query->concat($eventBookings);
-        }
-
-        $bookings = $query->sortByDesc('created_at')->paginate(20);
-
-        return view('admin.accountant.bookings', compact('bookings', 'status', 'type'));
-    }
-
-    /**
-     * Update booking payment status
-     */
-    public function updatePaymentStatus(Request $request, $type, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled,refunded'
-        ]);
-
-        if ($type === 'package') {
-            $booking = Booking::findOrFail($id);
-        } elseif ($type === 'event') {
-            $booking = EventBooking::findOrFail($id);
-        } else {
-            return redirect()->back()->with('error', 'Type de réservation invalide');
-        }
-
-        $booking->update(['status' => $request->status]);
-
-        return redirect()->back()->with('success', 'Statut de paiement mis à jour avec succès');
-    }
 
     /**
      * Display payment gateways management
@@ -270,13 +120,5 @@ class AccountantController extends Controller
         return redirect()->route('admin.payment-gateways.index');
     }
 
-    /**
-     * Display pricing rules management
-     */
-    public function pricingRules()
-    {
-        // This would integrate with pricing rules management
-        // For now, just redirect to the existing pricing rules controller
-        return redirect()->route('admin.pricing-rules.index');
-    }
+
 }
