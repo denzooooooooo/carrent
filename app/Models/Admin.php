@@ -110,6 +110,14 @@ class Admin extends Authenticatable implements HasMedia
     }
 
     /**
+     * Check if admin is accountant
+     */
+    public function isAccountant(): bool
+    {
+        return $this->role === 'accountant';
+    }
+
+    /**
      * Get activity logs for this admin
      */
     public function activityLogs()

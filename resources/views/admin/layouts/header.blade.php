@@ -26,6 +26,7 @@
                 Gestion
             </p>
 
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
             <a href="{{ route('admin.members.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.members.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-users w-5 text-lg"></i>
@@ -41,6 +42,7 @@
                 <span
                     class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\User::count() }}</span>
             </a>
+            @endif
 
             <a href="{{ route('admin.bookings.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.bookings.*') ? 'active' : 'text-gray-700' }}">
@@ -56,6 +58,7 @@
                 Produits
             </p>
 
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
             <!-- <a href="{{ route('admin.flights.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.flights.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-plane w-5 text-lg"></i>
@@ -85,6 +88,7 @@
                 <i class="fas fa-car w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Locations</span>
             </a>
+            @endif
         </div>
 
         <div class="mt-6">
@@ -93,12 +97,53 @@
                 Contenu
             </p>
 
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
             <a href="{{ route('admin.carousels.index') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.carousels.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-images w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Carrousels</span>
             </a>
+            @endif
         </div>
+
+        @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin() || auth('admin')->user()->isAccountant())
+        <div class="mt-6">
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                <i class="fas fa-calculator mr-2"></i>
+                Comptabilité
+            </p>
+
+            <a href="{{ route('admin.accountant.dashboard') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.dashboard') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-chart-bar w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Dashboard</span>
+            </a>
+
+            <a href="{{ route('admin.accountant.reports') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.reports') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-file-alt w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Rapports</span>
+            </a>
+
+            <a href="{{ route('admin.accountant.bookings') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.bookings') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-ticket-alt w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Réservations</span>
+            </a>
+
+            <a href="{{ route('admin.accountant.payment-gateways') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.payment-gateways') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-credit-card w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Paiements</span>
+            </a>
+
+            <a href="{{ route('admin.accountant.pricing-rules') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.pricing-rules') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-dollar-sign w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Règles de prix</span>
+            </a>
+        </div>
+        @endif
 
         <!-- <div class="mt-6">
             <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
