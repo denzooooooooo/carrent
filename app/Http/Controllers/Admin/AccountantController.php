@@ -17,6 +17,116 @@ class AccountantController extends Controller
     /**
      * Display financial reports
      */
+    public function dashboard(Request $request)
+    {
+        // Total revenue
+        $totalRevenue = Booking::where('status', 'confirmed')
+                              ->sum('total_amount') +
+                      EventBooking::where('status', 'confirmed')
+                                 ->sum('total_price');
+
+        // Monthly revenue
+        $monthlyRevenue = Booking::where('status', 'confirmed')
+                                ->whereBetween('created_at', [
+                                    Carbon::now()->startOfMonth(),
+                                    Carbon::now()->endOfMonth()
+                                ])
+                                ->sum('total_amount') +
+                        EventBooking::where('status', 'confirmed')
+                                   ->whereBetween('created_at', [
+                                       Carbon::now()->startOfMonth(),
+                                       Carbon::now()->endOfMonth()
+                                   ])
+                                   ->sum('total_price');
+
+        // Total bookings
+        $totalBookings = Booking::count() + EventBooking::count();
+
+        // Confirmed bookings
+        $confirmedBookings = Booking::where('status', 'confirmed')->count() +
+                           EventBooking::where('status', 'confirmed')->count();
+
+        // Package and event revenue breakdown
+        $packageRevenue = Booking::where('status', 'confirmed')
+                                ->sum('total_amount');
+
+        $eventRevenue = EventBooking::where('status', 'confirmed')
+                                   ->sum('total_price');
+
+        // Monthly revenue trend for charts
+        $monthlyRevenueData = collect();
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $monthStart = $date->startOfMonth()->format('Y-m-d');
+            $monthEnd = $date->endOfMonth()->format('Y-m-d');
+
+            $revenue = Booking::where('status', 'confirmed')
+                             ->whereBetween('created_at', [$monthStart, $monthEnd])
+                             ->sum('total_amount') +
+                      EventBooking::where('status', 'confirmed')
+                                 ->whereBetween('created_at', [$monthStart, $monthEnd])
+                                 ->sum('total_price');
+
+            $monthlyRevenueData->push([
+                'month' => $date->format('M Y'),
+                'revenue' => $revenue
+            ]);
+        }
+
+        // Recent bookings
+        $recentBookings = collect();
+
+        // Recent package bookings
+        $packageBookings = Booking::with(['package', 'user'])
+                                 ->latest()
+                                 ->take(5)
+                                 ->get()
+                                 ->map(function ($booking) {
+                                     return [
+                                         'type' => 'package',
+                                         'title' => $booking->package->title_fr ?? 'Package',
+                                         'user' => $booking->user->name ?? 'Utilisateur',
+                                         'amount' => $booking->total_amount,
+                                         'status' => $booking->status,
+                                         'date' => $booking->created_at
+                                     ];
+                                 });
+
+        // Recent event bookings
+        $eventBookings = EventBooking::with(['event', 'user'])
+                                    ->latest()
+                                    ->take(5)
+                                    ->get()
+                                    ->map(function ($booking) {
+                                        return [
+                                            'type' => 'event',
+                                            'title' => $booking->event->title_fr ?? 'Événement',
+                                            'user' => $booking->user->name ?? 'Utilisateur',
+                                            'amount' => $booking->total_price,
+                                            'status' => $booking->status,
+                                            'date' => $booking->created_at
+                                        ];
+                                    });
+
+        $recentBookings = $packageBookings->concat($eventBookings)
+                                         ->sortByDesc('date')
+                                         ->take(10);
+
+        return view('admin.accountant.dashboard', compact(
+            'totalRevenue',
+            'monthlyRevenue',
+            'totalBookings',
+            'confirmedBookings',
+            'packageRevenue',
+            'eventRevenue',
+            'monthlyRevenueData',
+            'recentBookings')
+        );
+    }
+
+    /**
+     * Display financial reports
+     */
     public function reports(Request $request)
     {
         $period = $request->get('period', 'month');

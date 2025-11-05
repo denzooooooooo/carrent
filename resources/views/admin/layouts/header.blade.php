@@ -113,6 +113,12 @@
                 Comptabilité
             </p>
 
+            <a href="{{ route('admin.accountant.dashboard') }}"
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.dashboard') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-chart-line w-5 text-lg"></i>
+                <span class="ml-3 font-medium">Dashboard</span>
+            </a>
+
             <a href="{{ route('admin.accountant.reports') }}"
                 class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.reports') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-file-alt w-5 text-lg"></i>

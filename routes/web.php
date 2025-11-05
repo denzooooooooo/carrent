@@ -150,6 +150,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Gestion comptable
         Route::prefix('accountant')->name('accountant.')->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\Admin\AccountantController::class, 'dashboard'])->name('dashboard');
+
             Route::get('/reports', [App\Http\Controllers\Admin\AccountantController::class, 'reports'])->name('reports');
             Route::get('/payment-gateways', [App\Http\Controllers\Admin\AccountantController::class, 'paymentGateways'])->name('payment-gateways');
         });
