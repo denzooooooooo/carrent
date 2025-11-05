@@ -69,7 +69,7 @@
             {{-- Logo --}}
             <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
                 <img
-                    src="{{ asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}"
+                    src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium Logo"
                     class="h-16 w-auto group-hover:scale-110 transition-transform duration-300"
                 />
