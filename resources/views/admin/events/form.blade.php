@@ -504,43 +504,6 @@
             </div>
         </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let zoneIndex = {{ $event->exists ? $event->seatZones->count() : 1 }};
-
-            // Ajouter une nouvelle zone
-            document.getElementById('add-zone-btn').addEventListener('click', function() {
-                addNewZone();
-            });
-
-            // Supprimer une zone
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('remove-zone-btn') || e.target.closest('.remove-zone-btn')) {
-                    e.target.closest('.seat-zone-item').remove();
-                    updateZoneNumbers();
-                }
-            });
-
-            function addNewZone() {
-                const template = document.getElementById('zone-template').innerHTML;
-                const newZone = template
-                    .replace(/__INDEX__/g, zoneIndex)
-                    .replace(/__NUM__/g, zoneIndex + 1);
-
-                document.getElementById('seat-zones-container').insertAdjacentHTML('beforeend', newZone);
-                zoneIndex++;
-                updateZoneNumbers();
-            }
-
-            function updateZoneNumbers() {
-                const zones = document.querySelectorAll('.seat-zone-item');
-                zones.forEach((zone, index) => {
-                    zone.querySelector('h3').textContent = `Zone ${index + 1}`;
-                });
-            }
-        });
-        </script>
-
         {{-- BOUTON DE SOUMISSION --}}
         <div class="mt-8 pt-4 border-t">
             <button type="submit"
@@ -549,6 +512,43 @@
             </button>
         </div>
     </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let zoneIndex = {{ $event->exists ? $event->seatZones->count() : 1 }};
+
+        // Ajouter une nouvelle zone
+        document.getElementById('add-zone-btn').addEventListener('click', function() {
+            addNewZone();
+        });
+
+        // Supprimer une zone
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-zone-btn') || e.target.closest('.remove-zone-btn')) {
+                e.target.closest('.seat-zone-item').remove();
+                updateZoneNumbers();
+            }
+        });
+
+        function addNewZone() {
+            const template = document.getElementById('zone-template').innerHTML;
+            const newZone = template
+                .replace(/__INDEX__/g, zoneIndex)
+                .replace(/__NUM__/g, zoneIndex + 1);
+
+            document.getElementById('seat-zones-container').insertAdjacentHTML('beforeend', newZone);
+            zoneIndex++;
+            updateZoneNumbers();
+        }
+
+        function updateZoneNumbers() {
+            const zones = document.querySelectorAll('.seat-zone-item');
+            zones.forEach((zone, index) => {
+                zone.querySelector('h3').textContent = `Zone ${index + 1}`;
+            });
+        }
+    });
+    </script>
 </div>
 
 
