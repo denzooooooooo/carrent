@@ -3,242 +3,194 @@
 @section('title', 'Gestion des Passerelles de Paiement - Comptable')
 
 @section('content')
-<div class="container-fluid">
+<div class="max-w-7xl mx-auto py-8">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-8 border-b pb-2">
         <div>
-            <h1 class="h3 mb-0 text-gray-800 font-weight-bold">
-                <i class="fas fa-credit-card text-primary mr-2"></i>
+            <h1 class="text-3xl font-bold text-dark gradient-text">
+                <i class="fas fa-credit-card mr-3"></i>
                 Gestion des Passerelles de Paiement
             </h1>
-            <p class="text-muted mt-1">Configurez et gérez vos méthodes de paiement</p>
+            <p class="text-gray-600 mt-2">Configurez et gérez vos méthodes de paiement</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.accountant.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left mr-2"></i>Retour au Dashboard
+        <div class="flex space-x-3">
+            <a href="{{ route('admin.accountant.dashboard') }}" class="py-2 px-4 rounded-lg text-white font-semibold bg-gray-600 hover:bg-gray-700 transition duration-300 shadow-md flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Retour au Dashboard
             </a>
         </div>
     </div>
 
     <!-- Payment Gateways Cards -->
-    <div class="row">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <!-- Stripe -->
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Stripe
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <i class="fab fa-stripe text-primary mr-2"></i>
-                                Passerelle de Paiement
-                            </div>
-                            <div class="mt-3">
-                                <span class="badge badge-success">Activé</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fab fa-stripe fa-2x text-primary"></i>
-                        </div>
+        <div class="bg-white rounded-xl shadow-xl p-6 border-l-4 border-primary hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <div class="text-sm font-bold text-primary uppercase mb-2">
+                        Stripe
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#stripeModal">
-                            <i class="fas fa-cog mr-1"></i>Configurer
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-eye mr-1"></i>Voir les Transactions
-                        </button>
+                    <div class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fab fa-stripe text-primary mr-2"></i>
+                        Passerelle de Paiement
+                    </div>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>Activé
+                        </span>
                     </div>
                 </div>
+                <div class="text-primary">
+                    <i class="fab fa-stripe text-4xl"></i>
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-4">
+                <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center" data-toggle="modal" data-target="#stripeModal">
+                    <i class="fas fa-cog mr-2"></i>Configurer
+                </button>
+                <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center">
+                    <i class="fas fa-eye mr-2"></i>Voir les Transactions
+                </button>
             </div>
         </div>
 
         <!-- PayPal -->
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                PayPal
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <i class="fab fa-paypal text-info mr-2"></i>
-                                Passerelle de Paiement
-                            </div>
-                            <div class="mt-3">
-                                <span class="badge badge-warning">Configuration Requise</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fab fa-paypal fa-2x text-info"></i>
-                        </div>
+        <div class="bg-white rounded-xl shadow-xl p-6 border-l-4 border-info hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <div class="text-sm font-bold text-info uppercase mb-2">
+                        PayPal
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-info btn-sm mr-2" data-toggle="modal" data-target="#paypalModal">
-                            <i class="fas fa-cog mr-1"></i>Configurer
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" disabled>
-                            <i class="fas fa-eye mr-1"></i>Voir les Transactions
-                        </button>
+                    <div class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fab fa-paypal text-info mr-2"></i>
+                        Passerelle de Paiement
+                    </div>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Configuration Requise
+                        </span>
                     </div>
                 </div>
+                <div class="text-info">
+                    <i class="fab fa-paypal text-4xl"></i>
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-4">
+                <button class="bg-info hover:bg-info/90 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center" data-toggle="modal" data-target="#paypalModal">
+                    <i class="fas fa-cog mr-2"></i>Configurer
+                </button>
+                <button class="bg-gray-200 hover:bg-gray-300 text-gray-400 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center cursor-not-allowed" disabled>
+                    <i class="fas fa-eye mr-2"></i>Voir les Transactions
+                </button>
             </div>
         </div>
 
         <!-- Bank Transfer -->
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Virement Bancaire
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <i class="fas fa-university text-success mr-2"></i>
-                                Paiement Manuel
-                            </div>
-                            <div class="mt-3">
-                                <span class="badge badge-success">Activé</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-university fa-2x text-success"></i>
-                        </div>
+        <div class="bg-white rounded-xl shadow-xl p-6 border-l-4 border-success hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <div class="text-sm font-bold text-success uppercase mb-2">
+                        Virement Bancaire
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#bankModal">
-                            <i class="fas fa-cog mr-1"></i>Configurer
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-eye mr-1"></i>Voir les Transactions
-                        </button>
+                    <div class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-university text-success mr-2"></i>
+                        Paiement Manuel
+                    </div>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>Activé
+                        </span>
                     </div>
                 </div>
+                <div class="text-success">
+                    <i class="fas fa-university text-4xl"></i>
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-4">
+                <button class="bg-success hover:bg-success/90 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center" data-toggle="modal" data-target="#bankModal">
+                    <i class="fas fa-cog mr-2"></i>Configurer
+                </button>
+                <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center">
+                    <i class="fas fa-eye mr-2"></i>Voir les Transactions
+                </button>
             </div>
         </div>
 
         <!-- Cash on Delivery -->
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Paiement à la Livraison
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <i class="fas fa-money-bill-wave text-warning mr-2"></i>
-                                Paiement sur Place
-                            </div>
-                            <div class="mt-3">
-                                <span class="badge badge-success">Activé</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-money-bill-wave fa-2x text-warning"></i>
-                        </div>
+        <div class="bg-white rounded-xl shadow-xl p-6 border-l-4 border-warning hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <div class="text-sm font-bold text-warning uppercase mb-2">
+                        Paiement à la Livraison
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-warning btn-sm mr-2" data-toggle="modal" data-target="#codModal">
-                            <i class="fas fa-cog mr-1"></i>Configurer
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-eye mr-1"></i>Voir les Transactions
-                        </button>
+                    <div class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-money-bill-wave text-warning mr-2"></i>
+                        Paiement sur Place
+                    </div>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>Activé
+                        </span>
                     </div>
                 </div>
+                <div class="text-warning">
+                    <i class="fas fa-money-bill-wave text-4xl"></i>
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-4">
+                <button class="bg-warning hover:bg-warning/90 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center" data-toggle="modal" data-target="#codModal">
+                    <i class="fas fa-cog mr-2"></i>Configurer
+                </button>
+                <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center">
+                    <i class="fas fa-eye mr-2"></i>Voir les Transactions
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Transaction Summary -->
-    <div class="row">
-        <div class="col-lg-12 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-chart-line mr-2"></i>
-                        Résumé des Transactions
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Transactions
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">1,234</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-credit-card fa-2x text-primary"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Transactions Réussies
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">1,189</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-success"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Transactions En Attente
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">23</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-clock fa-2x text-warning"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-left-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                                Transactions Échouées
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">22</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-times-circle fa-2x text-danger"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="bg-white rounded-xl shadow-xl p-8">
+        <div class="flex items-center mb-6">
+            <i class="fas fa-chart-line text-primary text-2xl mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Résumé des Transactions</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-primary/80 text-sm font-medium uppercase">Total Transactions</p>
+                        <p class="text-3xl font-bold">1,234</p>
                     </div>
+                    <i class="fas fa-credit-card text-3xl text-primary/60"></i>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-green-500 to-green-400 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium uppercase">Transactions Réussies</p>
+                        <p class="text-3xl font-bold">1,189</p>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-100 text-sm font-medium uppercase">Transactions En Attente</p>
+                        <p class="text-3xl font-bold">23</p>
+                    </div>
+                    <i class="fas fa-clock text-3xl text-yellow-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-red-500 to-red-400 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-red-100 text-sm font-medium uppercase">Transactions Échouées</p>
+                        <p class="text-3xl font-bold">22</p>
+                    </div>
+                    <i class="fas fa-times-circle text-3xl text-red-200"></i>
                 </div>
             </div>
         </div>
