@@ -154,6 +154,13 @@ class EventController extends Controller
      */
     protected function validateEvent(Request $request, Event $event = null)
     {
+        // Filter out empty seat zones before validation
+        $seatZones = $request->input('seat_zones', []);
+        $filteredZones = array_filter($seatZones, function($zone) {
+            return !empty($zone['zone_name_fr']) && !empty($zone['zone_name_en']);
+        });
+        $request->merge(['seat_zones' => $filteredZones]);
+
         $rules = [
             'category_id' => ['required', 'exists:event_categories,id'],
             'type_id' => ['nullable', 'exists:event_types,id'], // Ajouté 'type_id' si vous utilisez EventType
@@ -180,7 +187,7 @@ class EventController extends Controller
             'meta_title_en' => ['nullable', 'string', 'max:255'],
             'meta_description_fr' => ['nullable', 'string', 'max:500'],
             'meta_description_en' => ['nullable', 'string', 'max:500'],
-            'seat_zones' => ['nullable', 'array', 'min:1'],
+            'seat_zones' => ['nullable', 'array'],
             'seat_zones.*.zone_name_fr' => ['required', 'string', 'max:255'],
             'seat_zones.*.zone_name_en' => ['required', 'string', 'max:255'],
             'seat_zones.*.zone_code' => ['required', 'string', 'max:50'],
