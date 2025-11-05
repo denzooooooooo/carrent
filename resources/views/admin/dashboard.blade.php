@@ -284,56 +284,7 @@
                 </div>
             </div>
 
-            <!-- Top Produits -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Top Événements -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <h3 class="text-lg font-black text-gray-800 mb-6">
-                        <i class="fas fa-trophy text-amber-600 mr-2"></i>
-                        Top Événements
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach($topEvents as $event)
-                            <div
-                                class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-purple-50 transition-colors">
-                                <div
-                                    class="w-12 h-12 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl flex items-center justify-center text-white font-black">
-                                    {{ $loop->iteration }}
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 text-sm">{{ Str::limit($event->title, 30) }}
-                                    </h4>
-                                    <p class="text-xs text-gray-500">{{ $event->tickets_count ?? 0 }} billets vendus
-                                    </p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
 
-                <!-- Top Destinations -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <h3 class="text-lg font-black text-gray-800 mb-6">
-                        <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
-                        Top Destinations
-                    </h3>
-                    <div class="space-y-3">
-                        @foreach($topDestinations as $dest)
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div
-                                        class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-black text-sm">
-                                        {{ $dest->destination }}
-                                    </div>
-                                    <span class="font-semibold text-gray-700">{{ $dest->destination }}</span>
-                                </div>
-                                <span
-                                    class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">{{ $dest->count }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 </div>
