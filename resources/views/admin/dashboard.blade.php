@@ -249,7 +249,7 @@
             </div>
 
             <!-- Graphiques Circulaires -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Réservations par Type -->
                 <div class="glass rounded-2xl shadow-lg p-8">
                     <h3 class="text-lg font-black text-gray-800 mb-6">
@@ -269,6 +269,45 @@
                     </h3>
                     <div class="h-64">
                         <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques 7 Derniers Jours -->
+            <div class="glass rounded-2xl shadow-lg p-8" id="reports">
+                <h3 class="text-xl font-black text-gray-800 mb-6">
+                    <i class="fas fa-calendar-week text-purple-600 mr-2"></i>
+                    Activité des 7 Derniers Jours
+                </h3>
+                <div class="h-80">
+                    <canvas id="dailyStatsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Produits -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Top Événements -->
+                <div class="glass rounded-2xl shadow-lg p-8">
+                    <h3 class="text-lg font-black text-gray-800 mb-6">
+                        <i class="fas fa-trophy text-amber-600 mr-2"></i>
+                        Top Événements
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($topEvents as $event)
+                            <div
+                                class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-purple-50 transition-colors">
+                                <div
+                                    class="w-12 h-12 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl flex items-center justify-center text-white font-black">
+                                    {{ $loop->iteration }}
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 text-sm">{{ Str::limit($event->title, 30) }}
+                                    </h4>
+                                    <p class="text-xs text-gray-500">{{ $event->tickets_count ?? 0 }} billets vendus
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -293,44 +332,6 @@
                             </div>
                         @endforeach
                     </div>
-                </div>
-            </div>
-
-            <!-- Statistiques 7 Derniers Jours -->
-            <div class="glass rounded-2xl shadow-lg p-8" id="reports">
-                <h3 class="text-xl font-black text-gray-800 mb-6">
-                    <i class="fas fa-calendar-week text-purple-600 mr-2"></i>
-                    Activité des 7 Derniers Jours
-                </h3>
-                <div class="h-80">
-                    <canvas id="dailyStatsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Top Produits -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Top Événements -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <h3 class="text-lg font-black text-gray-800 mb-6">
-                        <i class="fas fa-trophy text-amber-600 mr-2"></i>
-                        Top Événements
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach($topEvents as $event)
-                            <div
-                                class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-purple-50 transition-colors">
-                                <div
-                                    class="w-12 h-12 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl flex items-center justify-center text-white font-black">
-                                    {{ $loop->iteration }}
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 text-sm">{{ Str::limit($event->title, 30) }}
-                                    </h4>
-                                    <p class="text-xs text-gray-500">{{ $event->tickets_count ?? 0 }} billets vendus
-                                    </p>
-                                </div>
-                            </div>
-                        @endforeach
                 </div>
             </div>
         </div>
