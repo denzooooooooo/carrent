@@ -48,7 +48,7 @@
 
         <div class="space-y-6">
             <!-- Statistiques Principales - Ligne 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="stats">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full" id="stats">
                 <!-- Réservations Aujourd'hui -->
                 <div
                     class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white transform hover:scale-105 transition-all">
@@ -130,7 +130,7 @@
             </div>
 
             <!-- Statistiques Secondaires - Ligne 2 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full">
                 <div class="glass rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
                     <div class="flex items-center justify-between">
                         <div>
@@ -218,7 +218,7 @@
             @endif
 
             <!-- Graphiques -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="charts">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full" id="charts">
                 <!-- Graphique Revenus -->
                 <div class="glass rounded-2xl shadow-lg p-8">
                     <div class="flex items-center justify-between mb-6">
@@ -274,7 +274,7 @@
             </div>
 
             <!-- Statistiques 7 Derniers Jours -->
-            <div class="glass rounded-2xl shadow-lg p-8" id="reports">
+            <div class="glass rounded-2xl shadow-lg p-8 w-full" id="reports">
                 <h3 class="text-xl font-black text-gray-800 mb-6">
                     <i class="fas fa-calendar-week text-purple-600 mr-2"></i>
                     Activité des 7 Derniers Jours
