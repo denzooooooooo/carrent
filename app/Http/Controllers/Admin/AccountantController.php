@@ -225,9 +225,8 @@ class AccountantController extends Controller
      */
     public function paymentGateways()
     {
-        // This would integrate with payment gateway management
-        // For now, just redirect to the existing payment gateway controller
-        return redirect()->route('admin.payment-gateways.index');
+        // Return the accountant payment gateways view
+        return view('admin.accountant.payment-gateways');
     }
 
 
