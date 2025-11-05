@@ -152,7 +152,7 @@ class EventController extends Controller
     /**
      * Valide les données de la requête pour la création ou la mise à jour d'un événement.
      */
-    protected function validateEvent(Request $request, Event $event = null)
+    protected function validateEvent(Request $request, ?Event $event = null)
     {
         // Filter out empty seat zones before validation
         $seatZones = $request->input('seat_zones', []);
