@@ -51,7 +51,7 @@ class AccountantController extends Controller
 
         $eventRevenue = EventBooking::where('status', 'confirmed')
                                    ->whereBetween('created_at', [$startDate, $endDate])
-                                   ->sum('total_amount');
+                                   ->sum('total_price');
 
         // Revenue by payment method (assuming payment_method field exists)
         $revenueByPaymentMethod = collect();
@@ -68,7 +68,7 @@ class AccountantController extends Controller
                              ->sum('total_amount') +
                       EventBooking::where('status', 'confirmed')
                                  ->whereBetween('created_at', [$monthStart, $monthEnd])
-                                 ->sum('total_amount');
+                                 ->sum('total_price');
 
             $monthlyRevenue->push([
                 'month' => $date->format('M Y'),
@@ -86,7 +86,7 @@ class AccountantController extends Controller
                              ->take(10)
                              ->get();
 
-        $topEvents = EventBooking::select('event_id', DB::raw('COUNT(*) as bookings_count'), DB::raw('SUM(total_amount) as total_revenue'))
+        $topEvents = EventBooking::select('event_id', DB::raw('COUNT(*) as bookings_count'), DB::raw('SUM(total_price) as total_revenue'))
                                 ->with('event')
                                 ->where('status', 'confirmed')
                                 ->whereBetween('created_at', [$startDate, $endDate])
