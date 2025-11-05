@@ -541,41 +541,6 @@
         });
         </script>
 
-        {{-- SECTION 7: SEO (OPTIONNEL) --}}
-        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">7. Optimisation SEO (Optionnel)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {{-- Méta Titre FR --}}
-            <div>
-                <label for="meta_title_fr" class="block text-sm font-medium text-gray-700 mb-1">Méta Titre (Français)</label>
-                <input type="text" name="meta_title_fr" id="meta_title_fr"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('meta_title_fr') border-red-500 @enderror"
-                    value="{{ old('meta_title_fr', $event->meta_title_fr) }}">
-                @error('meta_title_fr')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            {{-- Méta Titre EN --}}
-            <div>
-                <label for="meta_title_en" class="block text-sm font-medium text-gray-700 mb-1">Méta Titre (Anglais)</label>
-                <input type="text" name="meta_title_en" id="meta_title_en"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('meta_title_en') border-red-500 @enderror"
-                    value="{{ old('meta_title_en', $event->meta_title_en) }}">
-                @error('meta_title_en')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            {{-- Méta Description FR --}}
-            <div class="md:col-span-1">
-                <label for="meta_description_fr" class="block text-sm font-medium text-gray-700 mb-1">Méta Description (Français)</label>
-                <textarea name="meta_description_fr" id="meta_description_fr" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('meta_description_fr') border-red-500 @enderror">{{ old('meta_description_fr', $event->meta_description_fr) }}</textarea>
-                @error('meta_description_fr')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            {{-- Méta Description EN --}}
-            <div class="md:col-span-1">
-                <label for="meta_description_en" class="block text-sm font-medium text-gray-700 mb-1">Méta Description (Anglais)</label>
-                <textarea name="meta_description_en" id="meta_description_en" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('meta_description_en') border-red-500 @enderror">{{ old('meta_description_en', $event->meta_description_en) }}</textarea>
-                @error('meta_description_en')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-        </div>
-
         {{-- BOUTON DE SOUMISSION --}}
         <div class="mt-8 pt-4 border-t">
             <button type="submit"
