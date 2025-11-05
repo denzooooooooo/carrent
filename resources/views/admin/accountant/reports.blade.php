@@ -3,140 +3,115 @@
 @section('title', 'Rapports Financiers - Comptable')
 
 @section('content')
-<div class="container-fluid">
+<div class="max-w-7xl mx-auto py-8">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-8 border-b pb-4">
         <div>
-            <h1 class="h3 mb-0 text-gray-800">Rapports Financiers</h1>
-            <p class="text-muted">Analyse détaillée des revenus et performances</p>
+            <h1 class="text-3xl font-bold text-dark gradient-text">Rapports Financiers</h1>
+            <p class="text-gray-600 mt-2">Analyse détaillée des revenus et performances</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.accountant.dashboard') }}" class="btn btn-outline-secondary">
+        <div class="flex gap-3">
+            <a href="{{ route('admin.accountant.dashboard') }}" class="py-2 px-4 rounded-lg text-white font-semibold bg-gray-600 hover:bg-gray-700 transition duration-300 shadow-md flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>Retour au Dashboard
             </a>
-            <button onclick="window.print()" class="btn btn-outline-primary">
+            <button onclick="window.print()" class="py-2 px-4 rounded-lg text-white font-semibold bg-primary hover:bg-purple-700 transition duration-300 shadow-md flex items-center">
                 <i class="fas fa-print mr-2"></i>Imprimer
             </button>
         </div>
     </div>
 
     <!-- Period Selection -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-2">
-                    <label for="period" class="form-label">Période</label>
-                    <select name="period" id="period" class="form-control">
-                        <option value="week" {{ request('period', 'month') === 'week' ? 'selected' : '' }}>Cette semaine</option>
-                        <option value="month" {{ request('period', 'month') === 'month' ? 'selected' : '' }}>Ce mois</option>
-                        <option value="quarter" {{ request('period', 'month') === 'quarter' ? 'selected' : '' }}>Ce trimestre</option>
-                        <option value="year" {{ request('period', 'month') === 'year' ? 'selected' : '' }}>Cette année</option>
-                        <option value="custom" {{ request('period') === 'custom' ? 'selected' : '' }}>Personnalisé</option>
-                    </select>
-                </div>
-                <div class="col-md-2 custom-dates" style="display: {{ request('period') === 'custom' ? 'block' : 'none' }};">
-                    <label for="start_date" class="form-label">Date début</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control"
-                           value="{{ request('start_date') }}">
-                </div>
-                <div class="col-md-2 custom-dates" style="display: {{ request('period') === 'custom' ? 'block' : 'none' }};">
-                    <label for="end_date" class="form-label">Date fin</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control"
-                           value="{{ request('end_date') }}">
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary mr-2">
-                        <i class="fas fa-search mr-2"></i>Générer
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Sélection de la période</h3>
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <label for="period" class="block text-sm font-medium text-gray-700 mb-2">Période</label>
+                <select name="period" id="period" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">
+                    <option value="week" {{ request('period', 'month') === 'week' ? 'selected' : '' }}>Cette semaine</option>
+                    <option value="month" {{ request('period', 'month') === 'month' ? 'selected' : '' }}>Ce mois</option>
+                    <option value="quarter" {{ request('period', 'month') === 'quarter' ? 'selected' : '' }}>Ce trimestre</option>
+                    <option value="year" {{ request('period', 'month') === 'year' ? 'selected' : '' }}>Cette année</option>
+                    <option value="custom" {{ request('period') === 'custom' ? 'selected' : '' }}>Personnalisé</option>
+                </select>
+            </div>
+            <div class="custom-dates" style="display: {{ request('period') === 'custom' ? 'block' : 'none' }};">
+                <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Date début</label>
+                <input type="date" name="start_date" id="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
+                       value="{{ request('start_date') }}">
+            </div>
+            <div class="custom-dates" style="display: {{ request('period') === 'custom' ? 'block' : 'none' }};">
+                <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">Date fin</label>
+                <input type="date" name="end_date" id="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
+                       value="{{ request('end_date') }}">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full py-2 px-4 rounded-lg text-white font-semibold bg-primary hover:bg-purple-700 transition duration-300 shadow-md">
+                    <i class="fas fa-search mr-2"></i>Générer
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-6 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Revenus Packages
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($packageRevenue, 0, ',', ' ') }} FCFA
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-suitcase fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl shadow-xl border border-green-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-green-600 uppercase tracking-wide">Revenus Packages</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ number_format($packageRevenue, 0, ',', ' ') }} FCFA</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-suitcase text-2xl text-green-600"></i>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-6 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Revenus Événements
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($eventRevenue, 0, ',', ' ') }} FCFA
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl shadow-xl border border-blue-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-blue-600 uppercase tracking-wide">Revenus Événements</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ number_format($eventRevenue, 0, ',', ' ') }} FCFA</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-calendar-alt text-2xl text-blue-600"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Charts Row -->
-    <div class="row mb-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Revenue Trend -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Évolution des Revenus (12 derniers mois)</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueTrendChart" width="100%" height="50"></canvas>
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Évolution des Revenus (12 derniers mois)</h3>
+                <div class="h-80">
+                    <canvas id="revenueTrendChart" width="100%" height="100%"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Revenue Distribution -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Répartition des Revenus</h6>
+        <div>
+            <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Répartition des Revenus</h3>
+                <div class="h-48 mb-4">
+                    <canvas id="revenueDistributionChart" width="100%" height="100%"></canvas>
                 </div>
-                <div class="card-body">
-                    <canvas id="revenueDistributionChart" width="100%" height="200"></canvas>
-                    <div class="mt-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-sm">Packages</span>
-                            <span class="font-weight-bold">{{ number_format($packageRevenue, 0, ',', ' ') }} FCFA</span>
-                        </div>
-                        <div class="progress mb-3" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar"
-                                 style="width: {{ ($packageRevenue + $eventRevenue) > 0 ? ($packageRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}%"
-                                 aria-valuenow="{{ ($packageRevenue + $eventRevenue) > 0 ? ($packageRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-sm">Événements</span>
-                            <span class="font-weight-bold">{{ number_format($eventRevenue, 0, ',', ' ') }} FCFA</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar"
-                                 style="width: {{ ($packageRevenue + $eventRevenue) > 0 ? ($eventRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}%"
-                                 aria-valuenow="{{ ($packageRevenue + $eventRevenue) > 0 ? ($eventRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Packages</span>
+                        <span class="font-semibold text-gray-800">{{ number_format($packageRevenue, 0, ',', ' ') }} FCFA</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full" style="width: {{ ($packageRevenue + $eventRevenue) > 0 ? ($packageRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Événements</span>
+                        <span class="font-semibold text-gray-800">{{ number_format($eventRevenue, 0, ',', ' ') }} FCFA</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ ($packageRevenue + $eventRevenue) > 0 ? ($eventRevenue / ($packageRevenue + $eventRevenue)) * 100 : 0 }}%"></div>
                     </div>
                 </div>
             </div>
@@ -144,118 +119,116 @@
     </div>
 
     <!-- Top Performers -->
-    <div class="row mb-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Top Packages -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top 10 Packages</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-borderless">
-                            <thead>
-                                <tr>
-                                    <th>Package</th>
-                                    <th>Réservations</th>
-                                    <th>Revenus</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($topPackages as $package)
-                                <tr>
-                                    <td>
-                                        <div class="font-weight-bold">{{ $package->package->title_fr ?? 'N/A' }}</div>
-                                        <small class="text-muted">{{ $package->package->title_en ?? '' }}</small>
-                                    </td>
-                                    <td>{{ $package->bookings_count }}</td>
-                                    <td class="font-weight-bold text-success">
-                                        {{ number_format($package->total_revenue, 0, ',', ' ') }} FCFA
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">
-                                        Aucune donnée disponible
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-trophy text-yellow-500 mr-2"></i>Top 10 Packages
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-2 font-semibold text-gray-700">Package</th>
+                            <th class="text-center py-3 px-2 font-semibold text-gray-700">Réservations</th>
+                            <th class="text-right py-3 px-2 font-semibold text-gray-700">Revenus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($topPackages as $package)
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-2">
+                                <div class="font-semibold text-gray-800">{{ $package->package ? ($package->package->title_fr ?? 'N/A') : 'Package supprimé' }}</div>
+                                <small class="text-gray-500">{{ $package->package ? ($package->package->title_en ?? '') : '' }}</small>
+                            </td>
+                            <td class="text-center py-3 px-2">{{ $package->bookings_count ?? 0 }}</td>
+                            <td class="text-right py-3 px-2 font-semibold text-green-600">
+                                {{ number_format($package->total_revenue ?? 0, 0, ',', ' ') }} FCFA
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-gray-500 py-6">
+                                <i class="fas fa-inbox text-2xl mb-2"></i>
+                                <p>Aucune donnée disponible</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Top Events -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top 10 Événements</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-borderless">
-                            <thead>
-                                <tr>
-                                    <th>Événement</th>
-                                    <th>Réservations</th>
-                                    <th>Revenus</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($topEvents as $event)
-                                <tr>
-                                    <td>
-                                        <div class="font-weight-bold">{{ $event->event->title_fr ?? 'N/A' }}</div>
-                                        <small class="text-muted">{{ $event->event->title_en ?? '' }}</small>
-                                    </td>
-                                    <td>{{ $event->bookings_count }}</td>
-                                    <td class="font-weight-bold text-success">
-                                        {{ number_format($event->total_revenue, 0, ',', ' ') }} FCFA
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">
-                                        Aucune donnée disponible
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-star text-purple-500 mr-2"></i>Top 10 Événements
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-2 font-semibold text-gray-700">Événement</th>
+                            <th class="text-center py-3 px-2 font-semibold text-gray-700">Réservations</th>
+                            <th class="text-right py-3 px-2 font-semibold text-gray-700">Revenus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($topEvents as $event)
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-2">
+                                <div class="font-semibold text-gray-800">{{ $event->event ? ($event->event->title_fr ?? 'N/A') : 'Événement supprimé' }}</div>
+                                <small class="text-gray-500">{{ $event->event ? ($event->event->title_en ?? '') : '' }}</small>
+                            </td>
+                            <td class="text-center py-3 px-2">{{ $event->bookings_count ?? 0 }}</td>
+                            <td class="text-right py-3 px-2 font-semibold text-green-600">
+                                {{ number_format($event->total_revenue ?? 0, 0, ',', ' ') }} FCFA
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-gray-500 py-6">
+                                <i class="fas fa-inbox text-2xl mb-2"></i>
+                                <p>Aucune donnée disponible</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <!-- Detailed Report -->
-    <div class="card shadow">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Rapport Détaillé</h6>
-            <div class="d-flex gap-2">
-                <button onclick="exportToCSV()" class="btn btn-sm btn-outline-success">
+    <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-file-alt text-blue-500 mr-2"></i>Rapport Détaillé
+            </h3>
+            <div class="flex gap-3">
+                <button onclick="exportToCSV()" class="py-2 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition duration-300 shadow-md flex items-center">
                     <i class="fas fa-download mr-2"></i>Exporter CSV
                 </button>
-                <button onclick="exportToPDF()" class="btn btn-sm btn-outline-danger">
+                <button onclick="exportToPDF()" class="py-2 px-4 rounded-lg text-white font-semibold bg-red-600 hover:bg-red-700 transition duration-300 shadow-md flex items-center">
                     <i class="fas fa-file-pdf mr-2"></i>Exporter PDF
                 </button>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Période du rapport</h6>
-                    <p><strong>Début:</strong> {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}</p>
-                    <p><strong>Fin:</strong> {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</p>
-                    <p><strong>Total Revenus:</strong> {{ number_format($packageRevenue + $eventRevenue, 0, ',', ' ') }} FCFA</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">Période du rapport</h4>
+                <div class="space-y-2">
+                    <p class="text-gray-600"><strong>Début:</strong> {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}</p>
+                    <p class="text-gray-600"><strong>Fin:</strong> {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</p>
+                    <p class="text-gray-600"><strong>Total Revenus:</strong> <span class="font-semibold text-green-600">{{ number_format($packageRevenue + $eventRevenue, 0, ',', ' ') }} FCFA</span></p>
                 </div>
-                <div class="col-md-6">
-                    <h6>Résumé</h6>
-                    <p><strong>Packages:</strong> {{ $topPackages->count() }} produits actifs</p>
-                    <p><strong>Événements:</strong> {{ $topEvents->count() }} événements actifs</p>
-                    <p><strong>Généré le:</strong> {{ now()->format('d/m/Y H:i') }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">Résumé</h4>
+                <div class="space-y-2">
+                    <p class="text-gray-600"><strong>Packages:</strong> {{ $topPackages->count() }} produits actifs</p>
+                    <p class="text-gray-600"><strong>Événements:</strong> {{ $topEvents->count() }} événements actifs</p>
+                    <p class="text-gray-600"><strong>Généré le:</strong> {{ now()->format('d/m/Y H:i') }}</p>
                 </div>
             </div>
         </div>
