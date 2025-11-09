@@ -179,8 +179,8 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
 
-                {{-- Language Selector --}}
-                <div class="relative">
+                {{-- Language Selector (Hidden on mobile) --}}
+                <div class="relative hidden lg:block">
                     <button
                         x-on:click="languageMenuOpen = !languageMenuOpen"
                         class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
@@ -250,8 +250,8 @@
                     </div>
                 </div>
 
-                {{-- Currency Selector --}}
-                <div class="relative">
+                {{-- Currency Selector (Hidden on mobile) --}}
+                <div class="relative hidden lg:block">
                     <button
                         x-on:click="currencyMenuOpen = !currencyMenuOpen"
                         class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
@@ -306,7 +306,28 @@
 
                 {{-- Authentication Links / User Menu --}}
                 @if (!$isAuthenticated)
-                    <div class="hidden md:flex items-center space-x-3">
+                    {{-- Small icons for mobile, full buttons for desktop --}}
+                    <div class="flex items-center space-x-2">
+                        <a
+                            href="{{ route('login') }}"
+                            class="lg:hidden p-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
+                            title="{{ __('Login') }}"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                        </a>
+                        <a
+                            href="{{ route('register') }}"
+                            class="lg:hidden p-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-all"
+                            title="{{ __('Register') }}"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="hidden lg:flex items-center space-x-3">
                         <a
                             href="{{ route('login') }}"
                             class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -463,7 +484,80 @@
                 </a>
             @endforeach
 
-            <div class="pt-4 border-t border-gray-200 space-y-3">
+            {{-- Currency & Language Selectors in Mobile Menu --}}
+            <div class="px-4 py-3 border-t border-gray-200 space-y-3">
+                {{-- Currency Selector Mobile --}}
+                <div class="space-y-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('Currency') }}</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button
+                            x-on:click="changeCurrency('XOF'); mobileMenuOpen = false"
+                            class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('currency', 'XOF') }}' === 'XOF' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            XOF - FCFA
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('EUR'); mobileMenuOpen = false"
+                            class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('currency', 'XOF') }}' === 'EUR' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            EUR - €
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('USD'); mobileMenuOpen = false"
+                            class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('currency', 'XOF') }}' === 'USD' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            USD - $
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('GBP'); mobileMenuOpen = false"
+                            class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('currency', 'XOF') }}' === 'GBP' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            GBP - £
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Language Selector Mobile --}}
+                <div class="space-y-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('Language') }}</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button
+                            x-on:click="changeLanguage('fr'); mobileMenuOpen = false"
+                            class="flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('locale', config('app.locale')) }}' === 'fr' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H11V21H2V11Z" fill="#002395"/>
+                                <path d="M11 11H21V21H11V11Z" fill="white"/>
+                                <path d="M21 11H30V21H21V11Z" fill="#ED2939"/>
+                            </svg>
+                            <span>Français</span>
+                        </button>
+                        <button
+                            x-on:click="changeLanguage('en'); mobileMenuOpen = false"
+                            class="flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                            :class="'{{ session('locale', config('app.locale')) }}' === 'en' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H30V21H2V11Z" fill="#012169"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="white" stroke-width="3"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="#C8102E" stroke-width="2"/>
+                                <path d="M14 11H18V21H14V11ZM2 14H30V18H2V14Z" fill="white"/>
+                                <path d="M15 11H17V21H15V11ZM2 15H30V17H2V15Z" fill="#C8102E"/>
+                            </svg>
+                            <span>English</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-gray-200 space-y-3">
                 {{-- Authentication Links Mobile --}}
                 @if (!$isAuthenticated)
                     <div class="px-4 space-y-2">
