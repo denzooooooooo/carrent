@@ -557,26 +557,9 @@
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-gray-200 space-y-3">
-                {{-- Authentication Links Mobile --}}
-                @if (!$isAuthenticated)
-                    <div class="px-4 space-y-2">
-                        <a
-                            href="{{ route('login') }}"
-                            x-on:click="mobileMenuOpen = false"
-                            class="block w-full px-4 py-3 bg-purple-600 text-white rounded-lg font-semibold text-center hover:bg-purple-700 transition-colors"
-                        >
-                            {{ __('Login') }}
-                        </a>
-                        <a
-                            href="{{ route('register') }}"
-                            x-on:click="mobileMenuOpen = false"
-                            class="block w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold text-center hover:bg-gray-200 transition-colors"
-                        >
-                            {{ __('Register') }}
-                        </a>
-                    </div>
-                @else
+            {{-- User Menu for Authenticated Users Only --}}
+            @if ($isAuthenticated)
+                <div class="pt-3 border-t border-gray-200 space-y-3">
                     <div class="px-4 space-y-2">
                         <div class="bg-gray-50 rounded-lg p-3">
                             <p class="text-sm font-semibold text-gray-800">
@@ -609,11 +592,8 @@
                                 {{ __('Logout') }}
                             </button>
                         </form>
-                    </div>
-                @endif
-
-
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 </header>
