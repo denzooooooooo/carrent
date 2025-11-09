@@ -155,7 +155,7 @@
                         <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $zone->zone_code }}</p>
                       </div>
                       <div class="text-right ml-2">
-                        <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($zone->price)) }}</div>
+                        <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</div>
                         <div class="text-xs text-gray-500">par personne</div>
                       </div>
                     </div>
@@ -173,7 +173,7 @@
                       <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
                               data-zone-id="{{ $zone->id }}"
                               data-zone-name="{{ $zone->zone_name }}"
-                              data-price="{{ \App\Helpers\CurrencyHelper::convert($zone->price) }}"
+                              data-price="{{ $zone->price }}"
                               data-available="{{ $zone->available_seats }}">
                         Sélectionner
                       </button>

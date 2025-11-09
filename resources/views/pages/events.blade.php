@@ -99,7 +99,7 @@
                 </div>
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($event->min_price)) }}</span>
+                    <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</span>
                     <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
                   </div>
                   <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
