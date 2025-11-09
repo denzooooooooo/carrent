@@ -180,7 +180,7 @@
             <div class="flex items-center space-x-3">
 
                 {{-- Language Selector (Hidden on mobile) --}}
-                <div class="relative hidden lg:block">
+                <div class="relative hidden">
                     <button
                         x-on:click="languageMenuOpen = !languageMenuOpen"
                         class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
@@ -522,7 +522,7 @@
                 </div>
 
                 {{-- Language Selector Mobile --}}
-                <div class="space-y-2">
+                <div class="space-y-2 hidden">
                     <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('Language') }}</p>
                     <div class="grid grid-cols-2 gap-2">
                         <button
