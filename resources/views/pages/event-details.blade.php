@@ -173,7 +173,7 @@
                       <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
                               data-zone-id="{{ $zone->id }}"
                               data-zone-name="{{ $zone->zone_name }}"
-                              data-price="{{ $zone->price }}"
+                              data-price="{{ \App\Helpers\CurrencyHelper::convert($zone->price) }}"
                               data-available="{{ $zone->available_seats }}">
                         Sélectionner
                       </button>
@@ -299,6 +299,8 @@
 </div>
 
 <script>
+window.currentCurrency = '{{ session('currency', 'XOF') }}';
+
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('seatModal');
   const closeModal = document.getElementById('closeModal');
@@ -379,10 +381,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function formatPrice(price) {
-    return new Intl.NumberFormat('fr-FR', {
+    const currency = window.currentCurrency || 'XOF';
+    const locale = 'fr-FR';
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0
+      currency: currency,
+      minimumFractionDigits: currency === 'XOF' ? 0 : 2
     }).format(price);
   }
 });

@@ -1,369 +1,304 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('title', 'Détails de l\'utilisateur - ' . $user->name)
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header avec informations principales -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
+<div class="container mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Détails de l'utilisateur</h1>
+            <p class="text-gray-600 mt-2">Informations complètes sur {{ $user->name }}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ route('admin.users.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                Retour à la liste
+            </a>
+            <a href="{{ route('admin.users.edit', $user->id) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                <i class="fas fa-edit"></i>
+                Modifier
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages de succès/erreur -->
+    @if(session('success'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6" role="alert">
+        <span class="block sm:inline">{{ session('success') }}</span>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+        <span class="block sm:inline">{{ session('error') }}</span>
+    </div>
+    @endif
+
+    <!-- Informations principales -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Profil -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-center">
+                @if($user->avatar)
+                    <img src="{{ $user->getFirstMediaUrl('avatar', 'normal') }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200">
+                @else
+                    <div class="w-24 h-24 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-3xl text-purple-600"></i>
+                    </div>
+                @endif
+                <h3 class="text-xl font-bold text-gray-800">{{ $user->name }}</h3>
+                <p class="text-gray-600 mb-4">{{ $user->email }}</p>
+                <div class="flex justify-center gap-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        <i class="fas {{ $user->is_active ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                        {{ $user->is_active ? 'Actif' : 'Inactif' }}
+                    </span>
+                    @if($user->email_verified_at)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-envelope mr-1"></i>
+                            Vérifié
+                        </span>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="lg:col-span-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="card-title mb-0">
-                                <i class="fas fa-user mr-2"></i>Détails de l'utilisateur
-                            </h3>
-                            <small class="text-light">ID: {{ $user->id }}</small>
+                            <p class="text-purple-100 text-sm">Réservations</p>
+                            <p class="text-2xl font-bold">{{ $user->bookings->count() }}</p>
                         </div>
-                        <div>
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-light btn-sm">
-                                <i class="fas fa-arrow-left"></i> Retour à la liste
-                            </a>
-                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Modifier
-                            </a>
-                        </div>
+                        <i class="fas fa-shopping-cart text-2xl text-purple-200"></i>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Avatar et statut -->
-                        <div class="col-lg-4 text-center">
-                            <div class="mb-4">
-                                @if($user->avatar)
-                                    <img src="{{ $user->getFirstMediaUrl('avatar', 'normal') }}" alt="Avatar" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #fff;">
-                                @else
-                                    <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center text-white shadow" style="width: 120px; height: 120px; font-size: 3rem;">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            <h4 class="font-weight-bold text-dark mb-1">{{ $user->name }}</h4>
-                            <p class="text-muted mb-3">{{ $user->email }}</p>
-                            <div class="d-flex justify-content-center gap-2">
-                                <span class="badge badge-lg {{ $user->is_active ? 'badge-success' : 'badge-danger' }} px-3 py-2">
-                                    <i class="fas fa-circle mr-1"></i>{{ $user->is_active ? 'Actif' : 'Inactif' }}
-                                </span>
-                                @if($user->email_verified_at)
-                                    <span class="badge badge-info px-3 py-2">
-                                        <i class="fas fa-check-circle mr-1"></i>Email vérifié
-                                    </span>
-                                @endif
-                            </div>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100 text-sm">Confirmées</p>
+                            <p class="text-2xl font-bold">{{ $user->bookings->where('status', 'confirmed')->count() }}</p>
                         </div>
-
-                        <!-- Informations détaillées -->
-                        <div class="col-lg-8">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-primary text-white rounded mr-3">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Nom complet</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->name }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-info text-white rounded mr-3">
-                                                <i class="fas fa-envelope"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Email</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->email }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-success text-white rounded mr-3">
-                                                <i class="fas fa-phone"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Téléphone</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->phone ?? 'Non défini' }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-warning text-white rounded mr-3">
-                                                <i class="fas fa-calendar"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Date d'inscription</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->created_at->format('d/m/Y') }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-secondary text-white rounded mr-3">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Adresse</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->address ?? 'Non définie' }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box bg-light rounded p-3 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="info-box-icon bg-dark text-white rounded mr-3">
-                                                <i class="fas fa-city"></i>
-                                            </div>
-                                            <div>
-                                                <span class="info-box-text text-muted">Ville</span>
-                                                <span class="info-box-number font-weight-bold">{{ $user->city ?? 'Non définie' }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <i class="fas fa-check-circle text-2xl text-green-200"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-yellow-100 text-sm">Avis</p>
+                            <p class="text-2xl font-bold">{{ $user->reviews->count() }}</p>
                         </div>
+                        <i class="fas fa-star text-2xl text-yellow-200"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm">Total dépensé</p>
+                            <p class="text-lg font-bold">{{ $user->bookings->sum('total_price') ? \App\Helpers\CurrencyHelper::format($user->bookings->sum('total_price')) : '0 FCFA' }}</p>
+                        </div>
+                        <i class="fas fa-euro-sign text-2xl text-blue-200"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Statistiques -->
-    <div class="row mt-4">
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>{{ $user->bookings->count() }}</h3>
-                    <p>Réservations totales</p>
+    <!-- Informations détaillées -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Informations personnelles -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h4 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-user mr-2 text-purple-600"></i>Informations personnelles
+            </h4>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Nom complet:</span>
+                    <span class="font-medium">{{ $user->name }}</span>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-shopping-cart"></i>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="font-medium">{{ $user->email }}</span>
                 </div>
-                <a href="#bookings" class="small-box-footer">Voir détails <i class="fas fa-arrow-circle-right"></i></a>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Téléphone:</span>
+                    <span class="font-medium">{{ $user->phone ?? 'Non défini' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Adresse:</span>
+                    <span class="font-medium">{{ $user->address ?? 'Non définie' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Ville:</span>
+                    <span class="font-medium">{{ $user->city ?? 'Non définie' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Date d'inscription:</span>
+                    <span class="font-medium">{{ $user->created_at->format('d/m/Y') }}</span>
+                </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>{{ $user->bookings->where('status', 'confirmed')->count() }}</h3>
-                    <p>Réservations confirmées</p>
+
+        <!-- Activité récente -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h4 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-clock mr-2 text-green-600"></i>Activité récente
+            </h4>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Dernière connexion:</span>
+                    <span class="font-medium">{{ $user->last_login_at ? $user->last_login_at->format('d/m/Y H:i') : 'Jamais' }}</span>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-check-circle"></i>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Dernière réservation:</span>
+                    <span class="font-medium">{{ $user->bookings->sortByDesc('created_at')->first()?->created_at->format('d/m/Y') ?? 'Aucune' }}</span>
                 </div>
-                <a href="#bookings" class="small-box-footer">Voir détails <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ $user->reviews->count() }}</h3>
-                    <p>Avis postés</p>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Dernier avis:</span>
+                    <span class="font-medium">{{ $user->reviews->sortByDesc('created_at')->first()?->created_at->format('d/m/Y') ?? 'Aucun' }}</span>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <a href="#reviews" class="small-box-footer">Voir détails <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3>{{ $user->bookings->sum('total_price') ? \App\Helpers\CurrencyHelper::format($user->bookings->sum('total_price')) : '0 FCFA' }}</h3>
-                    <p>Total dépensé</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-euro-sign"></i>
-                </div>
-                <div class="small-box-footer">&nbsp;</div>
             </div>
         </div>
     </div>
 
     <!-- Réservations -->
-    <div class="row mt-4" id="bookings">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-gradient-primary">
-                    <h3 class="card-title text-white mb-0">
-                        <i class="fas fa-shopping-cart mr-2"></i>Réservations ({{ $user->bookings->count() }})
-                    </h3>
-                </div>
-                <div class="card-body table-responsive p-0">
-                    @if($user->bookings->count() > 0)
-                        <table class="table table-hover text-nowrap mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="border-0">ID</th>
-                                    <th class="border-0">Type</th>
-                                    <th class="border-0">Service</th>
-                                    <th class="border-0">Date</th>
-                                    <th class="border-0">Statut</th>
-                                    <th class="border-0">Prix</th>
-                                    <th class="border-0">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($user->bookings as $booking)
-                                    <tr>
-                                        <td>
-                                            <span class="badge badge-light border">#{{ $booking->id }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-info">{{ ucfirst($booking->booking_type) }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                @if($booking->booking_type === 'package')
-                                                    <div class="text-truncate" style="max-width: 200px;">
-                                                        <strong>{{ $booking->package->title ?? 'Package supprimé' }}</strong>
-                                                    </div>
-                                                @elseif($booking->booking_type === 'flight')
-                                                    <div>
-                                                        <i class="fas fa-plane text-primary mr-2"></i>
-                                                        {{ $booking->flight->departure_city ?? 'Vol supprimé' }} → {{ $booking->flight->arrival_city ?? '' }}
-                                                    </div>
-                                                @elseif($booking->booking_type === 'event')
-                                                    <div>
-                                                        <i class="fas fa-calendar-alt text-success mr-2"></i>
-                                                        {{ $booking->event->title ?? 'Événement supprimé' }}
-                                                    </div>
-                                                @endif
+    <div class="bg-white rounded-lg shadow-md mb-8">
+        <div class="p-6 border-b border-gray-200">
+            <h4 class="text-lg font-bold text-gray-800">
+                <i class="fas fa-shopping-cart mr-2 text-purple-600"></i>Réservations ({{ $user->bookings->count() }})
+            </h4>
+        </div>
+        <div class="p-6">
+            @if($user->bookings->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($user->bookings->sortByDesc('created_at') as $booking)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        #{{ $booking->id }}
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            {{ ucfirst($booking->booking_type) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        @if($booking->booking_type === 'package')
+                                            <div class="flex items-center">
+                                                <i class="fas fa-suitcase text-purple-500 mr-2"></i>
+                                                {{ $booking->package->title ?? 'Package supprimé' }}
                                             </div>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">{{ $booking->created_at->format('d/m/Y') }}</small>
-                                            <br>
-                                            <small class="text-muted">{{ $booking->created_at->format('H:i') }}</small>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-{{ $booking->status === 'confirmed' ? 'success' : ($booking->status === 'pending' ? 'warning' : 'danger') }} px-2 py-1">
-                                                <i class="fas fa-{{ $booking->status === 'confirmed' ? 'check' : ($booking->status === 'pending' ? 'clock' : 'times') }} mr-1"></i>
-                                                {{ ucfirst($booking->status) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <strong class="text-primary">{{ \App\Helpers\CurrencyHelper::format($booking->total_price) }}</strong>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" title="Voir détails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Aucune réservation trouvée</h5>
-                            <p class="text-muted">Cet utilisateur n'a pas encore effectué de réservation.</p>
-                        </div>
-                    @endif
+                                        @elseif($booking->booking_type === 'flight')
+                                            <div class="flex items-center">
+                                                <i class="fas fa-plane text-blue-500 mr-2"></i>
+                                                {{ $booking->flight->departure_city ?? 'Vol supprimé' }} → {{ $booking->flight->arrival_city ?? '' }}
+                                            </div>
+                                        @elseif($booking->booking_type === 'event')
+                                            <div class="flex items-center">
+                                                <i class="fas fa-calendar-alt text-green-500 mr-2"></i>
+                                                {{ $booking->event->title ?? 'Événement supprimé' }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $booking->created_at->format('d/m/Y') }}
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            @if($booking->status === 'confirmed') bg-green-100 text-green-800
+                                            @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
+                                            @else bg-red-100 text-red-800 @endif">
+                                            @if($booking->status === 'confirmed')
+                                                <i class="fas fa-check-circle mr-1"></i>Confirmé
+                                            @elseif($booking->status === 'pending')
+                                                <i class="fas fa-clock mr-1"></i>En attente
+                                            @else
+                                                <i class="fas fa-times-circle mr-1"></i>Annulé
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ \App\Helpers\CurrencyHelper::format($booking->total_price) }}
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900" title="Voir détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            @else
+                <div class="text-center py-8">
+                    <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">Aucune réservation trouvée</p>
+                    <p class="text-gray-400 text-sm">Cet utilisateur n'a pas encore effectué de réservation.</p>
+                </div>
+            @endif
         </div>
     </div>
 
     <!-- Avis -->
-    <div class="row mt-4" id="reviews">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-gradient-success">
-                    <h3 class="card-title text-white mb-0">
-                        <i class="fas fa-star mr-2"></i>Avis ({{ $user->reviews->count() }})
-                    </h3>
-                </div>
-                <div class="card-body">
-                    @if($user->reviews->count() > 0)
-                        <div class="row">
-                            @foreach($user->reviews as $review)
-                                <div class="col-lg-6 mb-4">
-                                    <div class="card border-left-primary shadow-sm h-100">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="font-weight-bold text-primary mb-2">
-                                                        @if($review->reviewable_type === 'App\\Models\\Package')
-                                                            <i class="fas fa-suitcase text-primary mr-2"></i>Package: {{ $review->reviewable->title ?? 'Supprimé' }}
-                                                        @elseif($review->reviewable_type === 'App\\Models\\Event')
-                                                            <i class="fas fa-calendar-alt text-success mr-2"></i>Événement: {{ $review->reviewable->title ?? 'Supprimé' }}
-                                                        @else
-                                                            <i class="fas fa-concierge-bell text-info mr-2"></i>Service
-                                                        @endif
-                                                    </h6>
-                                                    <div class="rating mb-2">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}"></i>
-                                                        @endfor
-                                                        <small class="text-muted ml-2">({{ $review->rating }}/5)</small>
-                                                    </div>
-                                                </div>
-                                                <small class="text-muted">{{ $review->created_at->format('d/m/Y') }}</small>
-                                            </div>
-                                            <p class="card-text text-dark mb-0">{{ $review->comment }}</p>
-                                        </div>
-                                        <div class="card-footer bg-light">
-                                            <small class="text-muted">
-                                                <i class="fas fa-clock mr-1"></i>Posté le {{ $review->created_at->format('d/m/Y à H:i') }}
-                                            </small>
-                                        </div>
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b border-gray-200">
+            <h4 class="text-lg font-bold text-gray-800">
+                <i class="fas fa-star mr-2 text-yellow-600"></i>Avis ({{ $user->reviews->count() }})
+            </h4>
+        </div>
+        <div class="p-6">
+            @if($user->reviews->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($user->reviews->sortByDesc('created_at') as $review)
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h5 class="font-semibold text-gray-800 mb-2">
+                                        @if($review->reviewable_type === 'App\\Models\\Package')
+                                            <i class="fas fa-suitcase text-purple-500 mr-2"></i>Package: {{ $review->reviewable->title ?? 'Supprimé' }}
+                                        @elseif($review->reviewable_type === 'App\\Models\\Event')
+                                            <i class="fas fa-calendar-alt text-green-500 mr-2"></i>Événement: {{ $review->reviewable->title ?? 'Supprimé' }}
+                                        @else
+                                            <i class="fas fa-concierge-bell text-blue-500 mr-2"></i>Service
+                                        @endif
+                                    </h5>
+                                    <div class="flex items-center mb-2">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                        @endfor
+                                        <span class="ml-2 text-sm text-gray-600">({{ $review->rating }}/5)</span>
                                     </div>
                                 </div>
-                            @endforeach
+                                <span class="text-sm text-gray-500">{{ $review->created_at->format('d/m/Y') }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ $review->comment }}</p>
                         </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-star-half-alt fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Aucun avis trouvé</h5>
-                            <p class="text-muted">Cet utilisateur n'a pas encore laissé d'avis.</p>
-                        </div>
-                    @endif
+                    @endforeach
                 </div>
-            </div>
+            @else
+                <div class="text-center py-8">
+                    <i class="fas fa-star-half-alt text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">Aucun avis trouvé</p>
+                    <p class="text-gray-400 text-sm">Cet utilisateur n'a pas encore laissé d'avis.</p>
+                </div>
+            @endif
         </div>
     </div>
 </div>
-
-<style>
-.bg-gradient-primary {
-    background: linear-gradient(45deg, #007bff, #0056b3);
-}
-.bg-gradient-success {
-    background: linear-gradient(45deg, #28a745, #1e7e34);
-}
-.info-box {
-    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-    transition: all 0.3s ease;
-}
-.info-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,.15);
-}
-.rating .fas {
-    font-size: 0.9rem;
-}
-.small-box {
-    transition: all 0.3s ease;
-}
-.small-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,.15);
-}
-</style>
 @endsection
