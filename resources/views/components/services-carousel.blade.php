@@ -12,34 +12,38 @@
   <div class="relative z-10 h-screen overflow-hidden">
     <div class="absolute inset-0">
       {{-- Carousel Images --}}
+      @php
+        $carouselSlides = [
+          [
+            'image' => 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=1080&fit=crop',
+            'title' => __('PRIVATE FLIGHTS'),
+            'subtitle' => __('Luxury Jets & Helicopters'),
+            'description' => __('Discover absolute comfort with our personalized private flights')
+          ],
+          [
+            'image' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&h=1080&fit=crop',
+            'title' => __('VIP EVENTS'),
+            'subtitle' => __('Exclusive Premium Access'),
+            'description' => __('Experience unique moments at the world\'s greatest events')
+          ],
+          [
+            'image' => 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1920&h=1080&fit=crop',
+            'title' => __('LUXURY PACKAGES'),
+            'subtitle' => __('Tailor-Made Experiences'),
+            'description' => __('Safari, yachting, exclusive tours - everything is possible')
+          ],
+          [
+            'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1920&h=1080&fit=crop',
+            'title' => __('PREMIUM RENTAL'),
+            'subtitle' => __('Exceptional Vehicles'),
+            'description' => __('Quads, motorcycles, sports cars - ultimate driving')
+          ]
+        ];
+      @endphp
+
       <div x-data="{
         currentSlide: 0,
-        slides: [
-          {
-            image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=1080&fit=crop',
-            title: 'VOLS PRIVÉS',
-            subtitle: 'Jets & Hélicoptères de Luxe',
-            description: 'Découvrez le confort absolu avec nos vols privés personnalisés'
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&h=1080&fit=crop',
-            title: 'ÉVÉNEMENTS VIP',
-            subtitle: 'Accès Exclusif Premium',
-            description: 'Vivez des moments uniques aux plus grands événements mondiaux'
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1920&h=1080&fit=crop',
-            title: 'PACKAGES LUXE',
-            subtitle: 'Expériences Sur Mesure',
-            description: 'Safari, yachting, circuits exclusifs - tout est possible'
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1920&h=1080&fit=crop',
-            title: 'LOCATION PREMIUM',
-            subtitle: 'Véhicules d\'Exception',
-            description: 'Quads, motos, voitures de sport - conduite ultime'
-          }
-        ],
+        slides: {{ Js::from($carouselSlides) }},
         nextSlide() { this.currentSlide = (this.currentSlide + 1) % this.slides.length },
         prevSlide() { this.currentSlide = this.currentSlide === 0 ? this.slides.length - 1 : this.currentSlide - 1 },
         goToSlide(index) { this.currentSlide = index }
@@ -74,7 +78,7 @@
                     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                     </svg>
-                    <span>EXPÉRIENCES DE LUXE SUR MESURE</span>
+                    <span>{{ __('TAILOR-MADE LUXURY EXPERIENCES') }}</span>
                   </div>
 
                   {{-- Main Title --}}
@@ -97,7 +101,7 @@
                       href="#services"
                       class="group inline-flex items-center space-x-2 md:space-x-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-lg md:text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
                     >
-                      <span>DÉCOUVRIR</span>
+                      <span>{{ __('DISCOVER') }}</span>
                       <svg class="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -110,7 +114,7 @@
                       <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span>CONTACTER</span>
+                      <span>{{ __('CONTACT') }}</span>
                     </a>
                   </div>
                 </div>

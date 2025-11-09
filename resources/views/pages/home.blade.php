@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Accueil - Carré Premium')
+@section('title', __('Home - Carré Premium'))
 
 @section('content')
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -20,13 +20,13 @@
           <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
-          <span>ÉVÉNEMENTS SPORTIFS & CULTURELS EXCLUSIFS</span>
+          <span>{{ __('EXCLUSIVE SPORTS & CULTURAL EVENTS') }}</span>
         </div>
         <h2 class="text-6xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
-          Événements à Ne Pas Manquer
+          {{ __('Events Not to Miss') }}
         </h2>
         <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          Accédez aux plus grands événements sportifs et culturels du monde
+          {{ __('Access the world\'s greatest sports and cultural events') }}
         </p>
       </div>
 
@@ -54,7 +54,7 @@
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
               <div class="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 rounded-full text-xs font-black uppercase text-white shadow-2xl">
-                VIP
+                {{ __('VIP') }}
               </div>
 
               @if($index < 2)
@@ -62,7 +62,7 @@
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   </svg>
-                  <span>HOT</span>
+                  <span>{{ __('HOT') }}</span>
                 </div>
               @endif
             </div>
@@ -77,13 +77,13 @@
                   <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span class="font-semibold">{{ $event->event_date ? $event->event_date->format('d/m/Y') : 'Date à venir' }}</span>
+                  <span class="font-semibold">{{ $event->event_date ? $event->event_date->format('d/m/Y') : __('Coming soon') }}</span>
                 </div>
               </div>
 
               <div class="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/30 to-pink-500/30 backdrop-blur-md rounded-2xl border border-amber-400/50">
                 <span class="text-lg font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
-                  {{ $event->min_price ? 'À partir de ' . \App\Helpers\CurrencyHelper::format($event->min_price) : 'Sur demande' }}
+                  {{ $event->min_price ? __('From') . ' ' . \App\Helpers\CurrencyHelper::format($event->min_price) : __('On request') }}
                 </span>
                 <svg class="w-5 h-5 text-amber-400 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -109,7 +109,7 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
                 <div class="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 rounded-full text-xs font-black uppercase text-white shadow-2xl">
-                  VIP
+                  {{ __('VIP') }}
                 </div>
 
                 @if($i < 2)
@@ -117,14 +117,14 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
-                    <span>HOT</span>
+                    <span>{{ __('HOT') }}</span>
                   </div>
                 @endif
               </div>
 
               <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h3 class="text-xl font-black mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
-                  Événement Exclusif {{ $i + 1 }}
+                  {{ __('Exclusive Event') }} {{ $i + 1 }}
                 </h3>
 
                 <div class="space-y-2 mb-4">
@@ -132,13 +132,13 @@
                     <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="font-semibold">Date à venir</span>
+                    <span class="font-semibold">{{ __('Coming soon') }}</span>
                   </div>
                 </div>
 
                 <div class="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/30 to-pink-500/30 backdrop-blur-md rounded-2xl border border-amber-400/50">
                   <span class="text-lg font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
-                    Sur demande
+                    {{ __('On request') }}
                   </span>
                   <svg class="w-5 h-5 text-amber-400 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -155,7 +155,7 @@
           href="{{ route('events') }}"
           class="inline-flex items-center space-x-3 px-12 py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
         >
-          <span>VOIR TOUS LES ÉVÉNEMENTS</span>
+          <span>{{ __('SEE ALL EVENTS') }}</span>
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
@@ -173,13 +173,13 @@
           <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
-          <span>NOS SERVICES PREMIUM</span>
+          <span>{{ __('OUR PREMIUM SERVICES') }}</span>
         </div>
         <h2 class="text-5xl md:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
-          L'Excellence à Votre Portée
+          {{ __('Excellence at Your Fingertips') }}
         </h2>
         <p class="text-xl text-white/90 max-w-3xl mx-auto">
-          Découvrez notre gamme complète de services premium pour des expériences inoubliables
+          {{ __('Discover our complete range of premium services for unforgettable experiences') }}
         </p>
       </div>
 
@@ -192,10 +192,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">Vols Privés</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">Jets privés et hélicoptères pour vos déplacements exclusifs</p>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Private Flights') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Private jets and helicopters for your exclusive travel') }}</p>
             <div class="flex items-center text-amber-400 font-semibold">
-              <span>Découvrir</span>
+              <span>{{ __('Discover') }}</span>
               <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -210,10 +210,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">Événements VIP</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">Accès exclusif aux événements sportifs et culturels mondiaux</p>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('VIP Events') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Exclusive access to world sports and cultural events') }}</p>
             <div class="flex items-center text-amber-400 font-semibold">
-              <span>Réserver</span>
+              <span>{{ __('Book') }}</span>
               <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -228,10 +228,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">Packages Luxe</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">Expériences sur mesure : safaris, yachting, circuits exclusifs</p>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Luxury Packages') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Tailor-made experiences: safaris, yachting, exclusive tours') }}</p>
             <div class="flex items-center text-amber-400 font-semibold">
-              <span>Explorer</span>
+              <span>{{ __('Explore') }}</span>
               <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -246,10 +246,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">Conciergerie</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">Service 24/7 pour organiser vos désirs les plus exclusifs</p>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Concierge') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('24/7 service to organize your most exclusive desires') }}</p>
             <div class="flex items-center text-amber-400 font-semibold">
-              <span>Contacter</span>
+              <span>{{ __('Contact') }}</span>
               <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -268,23 +268,23 @@
           <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <span>LOCATION DE VÉHICULES PREMIUM</span>
+          <span>{{ __('PREMIUM VEHICLE RENTAL') }}</span>
         </div>
         <h2 class="text-6xl md:text-7xl font-black text-white mb-4 md:mb-6 leading-tight">
-          Conduisez l'Excellence
+          {{ __('Drive Excellence') }}
         </h2>
         <p class="text-2xl text-white/90 max-w-3xl mx-auto">
-          Quads • Motos de Luxe • Voitures de Sport • 4x4 Premium
+          {{ __('Quads • Luxury Motorcycles • Sports Cars • Premium 4x4') }}
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
         @php
           $vehicles = [
-            ['icon' => 'motorcycle', 'title' => 'Quads Premium', 'desc' => 'Location avec ou sans guide', 'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop'],
-            ['icon' => 'car', 'title' => 'Voitures de Sport', 'desc' => 'Ferrari, Lamborghini, Porsche', 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
-            ['icon' => 'car', 'title' => '4x4 de Luxe', 'desc' => 'Range Rover, G-Wagon', 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
-            ['icon' => 'motorcycle', 'title' => 'Motos Premium', 'desc' => 'Harley, Ducati, BMW', 'image' => 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&h=300&fit=crop']
+            ['icon' => 'motorcycle', 'title' => __('Premium Quads'), 'desc' => __('Rental with or without guide'), 'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop'],
+            ['icon' => 'car', 'title' => __('Sports Cars'), 'desc' => __('Ferrari, Lamborghini, Porsche'), 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
+            ['icon' => 'car', 'title' => __('Luxury 4x4'), 'desc' => __('Range Rover, G-Wagon'), 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
+            ['icon' => 'motorcycle', 'title' => __('Premium Motorcycles'), 'desc' => __('Harley, Ducati, BMW'), 'image' => 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&h=300&fit=crop']
           ];
         @endphp
 
@@ -321,7 +321,7 @@
               <p class="text-white/80 text-sm mb-4">{{ $vehicle['desc'] }}</p>
 
               <div class="flex items-center justify-between p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                <span class="font-bold text-base">Disponible</span>
+                <span class="font-bold text-base">{{ __('Available') }}</span>
                 <svg class="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -343,16 +343,16 @@
           </svg>
         </div>
         <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6">
-          Besoin d'un Vol ?
+          {{ __('Need a Flight?') }}
         </h2>
         <p class="text-xl text-gray-600 mb-6 md:mb-8">
-          Nous proposons également la réservation de vols internationaux
+          {{ __('We also offer international flight bookings') }}
         </p>
         <a
           href="{{ route('flights') }}"
           class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl text-base"
         >
-          <span>Rechercher un Vol</span>
+          <span>{{ __('Search for a Flight') }}</span>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -365,10 +365,10 @@
   <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900">
     <div class="container mx-auto px-4 text-center">
       <h2 class="text-5xl md:text-6xl font-black text-white mb-6 md:mb-8">
-        Prêt pour une Expérience Inoubliable ?
+        {{ __('Ready for an Unforgettable Experience?') }}
       </h2>
       <p class="text-2xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto">
-        Contactez notre conciergerie pour créer votre expérience sur mesure
+        {{ __('Contact our concierge to create your tailor-made experience') }}
       </p>
       <div class="flex flex-wrap justify-center gap-4 md:gap-6">
         <a
@@ -378,7 +378,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
-          <span>ÉVÉNEMENTS VIP</span>
+          <span>{{ __('VIP EVENTS') }}</span>
         </a>
         <a
           href="{{ route('packages') }}"
@@ -387,7 +387,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
-          <span>PACKAGES LUXE</span>
+          <span>{{ __('LUXURY PACKAGES') }}</span>
         </a>
       </div>
     </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'À Propos - Carré Premium')
+@section('title', __('About') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-white">
@@ -8,8 +8,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">À Propos de Carré Premium</h1>
-      <p class="text-lg md:text-xl text-white/90">Votre partenaire de confiance pour tous vos voyages</p>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">{{ __('About Carré Premium') }}</h1>
+      <p class="text-lg md:text-xl text-white/90">{{ __('Your trusted partner for all your travels') }}</p>
     </div>
   </section>
 
@@ -18,15 +18,15 @@
     <div class="container mx-auto px-4">
       <div class="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
         <div>
-          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4 md:mb-6">Notre Histoire</h2>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4 md:mb-6">{{ __('Our Story') }}</h2>
           <p class="text-base md:text-lg text-gray-600 mb-3 md:mb-4">
-            Fondée en 2020, <span class="font-bold text-purple-600">Carré Premium</span> est née d'une passion pour le voyage et d'un désir de rendre l'expérience de réservation simple, rapide et accessible à tous.
+            {{ __('Founded in 2020,') }} <span class="font-bold text-purple-600">Carré Premium</span> {{ __('was born from a passion for travel and a desire to make the booking experience simple, fast and accessible to everyone.') }}
           </p>
           <p class="text-base md:text-lg text-gray-600 mb-3 md:mb-4">
-            Basée à Abidjan, en Côte d'Ivoire, nous sommes rapidement devenus l'un des leaders de la billetterie en ligne en Afrique de l'Ouest, offrant des services de réservation de vols, d'événements sportifs et culturels, ainsi que des packages touristiques exclusifs.
+            {{ __('Based in Abidjan, Ivory Coast, we quickly became one of the leaders in online ticketing in West Africa, offering flight booking services, sporting and cultural events, as well as exclusive tourist packages.') }}
           </p>
           <p class="text-base md:text-lg text-gray-600">
-            Aujourd'hui, nous servons des milliers de clients satisfaits chaque année et continuons d'innover pour offrir la meilleure expérience possible.
+            {{ __('Today, we serve thousands of satisfied customers every year and continue to innovate to offer the best possible experience.') }}
           </p>
         </div>
         <div class="relative h-64 md:h-80 lg:h-96 rounded-3xl overflow-hidden shadow-2xl">
@@ -43,39 +43,39 @@
   {{-- Nos Valeurs --}}
   <section class="py-8 md:py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">Nos Valeurs</h2>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">{{ __('Our Values') }}</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
         @php
           $values = [
             [
               'icon' => '🎯',
-              'title' => 'Excellence',
-              'description' => 'Nous nous engageons à fournir un service de qualité supérieure à chaque étape de votre voyage.'
+              'title' => __('Excellence'),
+              'description' => __('We are committed to providing superior quality service at every stage of your journey.')
             ],
             [
               'icon' => '🤝',
-              'title' => 'Confiance',
-              'description' => 'La transparence et l\'honnêteté sont au cœur de notre relation avec nos clients.'
+              'title' => __('Trust'),
+              'description' => __('Transparency and honesty are at the heart of our relationship with our customers.')
             ],
             [
               'icon' => '💡',
-              'title' => 'Innovation',
-              'description' => 'Nous adoptons les dernières technologies pour améliorer constamment votre expérience.'
+              'title' => __('Innovation'),
+              'description' => __('We adopt the latest technologies to constantly improve your experience.')
             ],
             [
               'icon' => '🌍',
-              'title' => 'Accessibilité',
-              'description' => 'Rendre le voyage accessible à tous, partout et à tout moment.'
+              'title' => __('Accessibility'),
+              'description' => __('Making travel accessible to everyone, everywhere and at any time.')
             ],
             [
               'icon' => '⚡',
-              'title' => 'Rapidité',
-              'description' => 'Des réservations instantanées et un service client réactif 24/7.'
+              'title' => __('Speed'),
+              'description' => __('Instant bookings and responsive 24/7 customer service.')
             ],
             [
               'icon' => '🔒',
-              'title' => 'Sécurité',
-              'description' => 'Vos données et paiements sont protégés par les meilleurs systèmes de sécurité.'
+              'title' => __('Security'),
+              'description' => __('Your data and payments are protected by the best security systems.')
             ]
           ];
         @endphp
@@ -94,14 +94,14 @@
   {{-- Nos Chiffres --}}
   <section class="py-8 md:py-16">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">Carré Premium en Chiffres</h2>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">{{ __('Carré Premium in Numbers') }}</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
         @php
           $stats = [
-            ['number' => '50K+', 'label' => 'Clients Satisfaits'],
-            ['number' => '200+', 'label' => 'Destinations'],
-            ['number' => '1000+', 'label' => 'Événements'],
-            ['number' => '24/7', 'label' => 'Support Client']
+            ['number' => '50K+', 'label' => __('Satisfied Customers')],
+            ['number' => '200+', 'label' => __('Destinations')],
+            ['number' => '1000+', 'label' => __('Events')],
+            ['number' => '24/7', 'label' => __('Customer Support')]
           ];
         @endphp
 
@@ -120,7 +120,7 @@
   {{-- Nos Partenaires --}}
   <section class="py-8 md:py-16">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">Nos Partenaires</h2>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">{{ __('Our Partners') }}</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
         @php
           $partners = [
@@ -141,14 +141,14 @@
   {{-- CTA --}}
   <section class="py-8 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 md:mb-6">Prêt à Voyager avec Nous ?</h2>
-      <p class="text-lg md:text-xl text-white/90 mb-6 md:mb-8">Rejoignez des milliers de voyageurs satisfaits</p>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 md:mb-6">{{ __('Ready to Travel with Us?') }}</h2>
+      <p class="text-lg md:text-xl text-white/90 mb-6 md:mb-8">{{ __('Join thousands of satisfied travelers') }}</p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a href="{{ route('flights') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all text-center">
-          Réserver un Vol
+          {{ __('Book a Flight') }}
         </a>
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all text-center">
-          Nous Contacter
+          {{ __('Contact Us') }}
         </a>
       </div>
     </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Connexion - Carré Premium')
+@section('title', __('Login') . ' - Carré Premium')
 
 @section('content')
   <div class="min-h-screen bg-gray-50 flex">
@@ -13,18 +13,18 @@
             </path>
           </svg>
         </div>
-        <h1 class="text-4xl font-black text-white mb-4">Bienvenue sur Carré Premium</h1>
+        <h1 class="text-4xl font-black text-white mb-4">{{ __('Welcome to Carré Premium') }}</h1>
         <p class="text-white/90 text-lg">
-          Votre plateforme de voyage premium pour des expériences uniques et inoubliables.
+          {{ __('Your premium travel platform for unique and unforgettable experiences.') }}
         </p>
         <div class="mt-8 grid grid-cols-2 gap-4 text-white/80">
           <div class="text-center">
             <div class="text-2xl font-bold">500+</div>
-            <div class="text-sm">Destinations</div>
+            <div class="text-sm">{{ __('Destinations') }}</div>
           </div>
           <div class="text-center">
             <div class="text-2xl font-bold">10k+</div>
-            <div class="text-sm">Clients satisfaits</div>
+            <div class="text-sm">{{ __('Satisfied Customers') }}</div>
           </div>
         </div>
       </div>
@@ -42,12 +42,12 @@
             </svg>
           </div>
           <h2 class="mt-6 text-center text-3xl font-black text-gray-900">
-            Se connecter à votre compte
+            {{ __('Sign in to your account') }}
           </h2>
           <p class="mt-2 text-center text-sm text-gray-600">
-            Ou
+            {{ __('Or') }}
             <a href="{{ route('register') }}" class="font-medium text-purple-600 hover:text-purple-500">
-              créer un nouveau compte
+              {{ __('create a new account') }}
             </a>
           </p>
         </div>
@@ -55,16 +55,16 @@
           @csrf
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
-              <label for="email" class="sr-only">Adresse email</label>
+              <label for="email" class="sr-only">{{ __('Email address') }}</label>
               <input id="email" name="email" type="email" autocomplete="email" required
                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                placeholder="Adresse email" value="{{ old('email') }}" />
+                placeholder="{{ __('Email address') }}" value="{{ old('email') }}" />
             </div>
             <div>
-              <label for="password" class="sr-only">Mot de passe</label>
+              <label for="password" class="sr-only">{{ __('Password') }}</label>
               <input id="password" name="password" type="password" autocomplete="current-password" required
                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                placeholder="Mot de passe" />
+                placeholder="{{ __('Password') }}" />
             </div>
           </div>
 
@@ -73,13 +73,13 @@
               <input id="remember-me" name="remember" type="checkbox"
                 class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" />
               <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-                Se souvenir de moi
+                {{ __('Remember me') }}
               </label>
             </div>
 
             <div class="text-sm">
               <a href="#" class="font-medium text-purple-600 hover:text-purple-500">
-                Mot de passe oublié ?
+                {{ __('Forgot password?') }}
               </a>
             </div>
           </div>
@@ -87,7 +87,7 @@
           <div>
             <button type="submit"
               class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-amber-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all">
-              Se connecter
+              {{ __('Sign in') }}
             </button>
           </div>
 
@@ -102,7 +102,7 @@
                 </div>
                 <div class="ml-3">
                   <h3 class="text-sm font-medium text-red-800">
-                    Erreur de connexion
+                    {{ __('Login error') }}
                   </h3>
                   <div class="mt-2 text-sm text-red-700">
                     <ul role="list" class="list-disc pl-5 space-y-1">
@@ -134,7 +134,7 @@
                 <path fill="#EA4335"
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
-              Se connecter avec Google
+              {{ __('Sign in with Google') }}
             </a>
 
             <a href="{{ route('auth.facebook') }}"
@@ -143,7 +143,7 @@
                 <path
                   d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
-              Se connecter avec Facebook
+              {{ __('Sign in with Facebook') }}
             </a>
           </div>
         </div>

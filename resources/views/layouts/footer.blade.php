@@ -8,17 +8,17 @@
             <div class="space-y-6">
                 <div class="flex items-center space-x-3">
                     <img
-                        src="{{ asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}"
+                        src="{{ asset('logos/logo.jpg') }}"
                         alt="Carré Premium Logo"
                         class="h-12 w-auto"
                     />
                     <div>
-                        <div class="text-xl font-black text-white">CARRÉ PREMIUM</div>
-                        <div class="text-xs text-purple-200">Voyages d'Exception</div>
+                        <div class="text-xl font-black text-white">{{ __('CARRÉ PREMIUM') }}</div>
+                        <div class="text-xs text-purple-200">{{ __('Exceptional Travel') }}</div>
                     </div>
                 </div>
                 <p class="text-purple-200 text-sm leading-relaxed">
-                    Votre partenaire de confiance pour des voyages inoubliables. Billets d'avion, événements sportifs et culturels, packages touristiques de luxe.
+                    {{ __('Your trusted partner for unforgettable trips. Flight tickets, sports and cultural events, luxury tour packages.') }}
                 </p>
                 <div class="flex space-x-4">
                     {{-- Liens Réseaux Sociaux (SVG intégrés) --}}
@@ -42,7 +42,7 @@
 
             {{-- Colonne 2: Services --}}
             <div>
-                <h3 class="text-lg font-black text-yellow-400 mb-6">Nos Services</h3>
+                <h3 class="text-lg font-black text-yellow-400 mb-6">{{ __('Our Services') }}</h3>
                 <ul class="space-y-3">
                     {{-- Utilisation de {{ url('/...') }} ou {{ route('...') }} si vos routes ont un nom --}}
                     <li>
@@ -50,7 +50,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Billets d'Avion</span>
+                            <span>{{ __('Flight Tickets') }}</span>
                         </a>
                     </li>
                     <li>
@@ -58,7 +58,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Événements Sportifs</span>
+                            <span>{{ __('Sports Events') }}</span>
                         </a>
                     </li>
                     <li>
@@ -66,7 +66,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Événements Culturels</span>
+                            <span>{{ __('Cultural Events') }}</span>
                         </a>
                     </li>
                     <li>
@@ -74,7 +74,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Packages Touristiques</span>
+                            <span>{{ __('Tour Packages') }}</span>
                         </a>
                     </li>
                     <li>
@@ -82,7 +82,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Hélicoptère & Jet Privé</span>
+                            <span>{{ __('Helicopter & Private Jet') }}</span>
                         </a>
                     </li>
                 </ul>
@@ -90,14 +90,14 @@
 
             {{-- Colonne 3: Support --}}
             <div>
-                <h3 class="text-lg font-black text-yellow-400 mb-6">Support</h3>
+                <h3 class="text-lg font-black text-yellow-400 mb-6">{{ __('Support') }}</h3>
                 <ul class="space-y-3">
                     <li>
                         <a href="{{ url('/about') }}" class="text-purple-200 hover:text-white transition-colors flex items-center space-x-2 group">
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>À Propos</span>
+                            <span>{{ __('About Us') }}</span>
                         </a>
                     </li>
                     <li>
@@ -105,7 +105,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Contact</span>
+                            <span>{{ __('Contact') }}</span>
                         </a>
                     </li>
                     <li>
@@ -113,7 +113,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>FAQ</span>
+                            <span>{{ __('FAQ') }}</span>
                         </a>
                     </li>
                     <li>
@@ -121,7 +121,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Conditions d'Utilisation</span>
+                            <span>{{ __('Terms of Use') }}</span>
                         </a>
                     </li>
                     <li>
@@ -129,7 +129,7 @@
                             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            <span>Politique de Confidentialité</span>
+                            <span>{{ __('Privacy Policy') }}</span>
                         </a>
                     </li>
                 </ul>
@@ -137,7 +137,7 @@
 
             {{-- Colonne 4: Contact --}}
             <div>
-                <h3 class="text-lg font-black text-yellow-400 mb-6">Contact</h3>
+                <h3 class="text-lg font-black text-yellow-400 mb-6">{{ __('Contact') }}</h3>
                 <ul class="space-y-4">
                     <li class="flex items-start space-x-3">
                         <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,8 +159,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                         <div class="text-purple-200 text-sm">
-                            <div><a href="tel:+2252721594258" class="hover:text-white transition-colors">Fixe: +225 27 21 59 42 58</a></div>
-                            <div><a href="tel:+2250101221515" class="hover:text-white transition-colors">Mobile: +225 01 01 22 15 15</a></div>
+                            <div><a href="tel:+2252721594258" class="hover:text-white transition-colors">{{ __('Fixed') }}: +225 27 21 59 42 58</a></div>
+                            <div><a href="tel:+2250101221515" class="hover:text-white transition-colors">{{ __('Mobile') }}: +225 01 01 22 15 15</a></div>
                         </div>
                     </li>
                     <li class="flex items-start space-x-3">
@@ -168,7 +168,7 @@
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                         </svg>
                         <a href="https://wa.me/2250000000000" target="_blank" rel="noopener noreferrer" class="text-purple-200 hover:text-white transition-colors text-sm">
-                            WhatsApp Support
+                            {{ __('WhatsApp Support') }}
                         </a>
                     </li>
                 </ul>
@@ -181,15 +181,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="text-center md:text-left">
-                    <h3 class="text-lg font-black text-yellow-400 mb-2">Restez Informé</h3>
-                    <p class="text-purple-200 text-sm">Inscrivez-vous à notre newsletter pour recevoir nos offres exclusives</p>
+                    <h3 class="text-lg font-black text-yellow-400 mb-2">{{ __('Stay Informed') }}</h3>
+                    <p class="text-purple-200 text-sm">{{ __('Subscribe to our newsletter to receive our exclusive offers') }}</p>
                 </div>
                 {{-- La soumission du formulaire devra être gérée par une route Laravel (ex: route('newsletter.subscribe')) --}}
                 <form class="flex w-full md:w-auto gap-2" method="POST" action="#">
                     @csrf {{-- J'ajoute le token CSRF requis par Laravel --}}
                     <input
                         type="email"
-                        placeholder="Votre email"
+                        placeholder="{{ __('Your email') }}"
                         name="email"
                         required
                         class="px-4 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full md:w-80"
@@ -198,7 +198,7 @@
                         type="submit"
                         class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-purple-900 font-bold rounded-full hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 hover:scale-105 shadow-lg whitespace-nowrap"
                     >
-                        S'inscrire
+                        {{ __('Subscribe') }}
                     </button>
                 </form>
             </div>
@@ -210,11 +210,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-purple-300">
                 {{-- Utilisation de la fonction Blade pour l'année --}}
-                <p>&copy; {{ date('Y') }} Carré Premium. Tous droits réservés.</p>
+                <p>&copy; {{ date('Y') }} {{ __('CARRÉ PREMIUM') }}. {{ __('All rights reserved') }}.</p>
                 <div class="flex items-center space-x-6">
-                    <a href="{{ url('/terms') }}" class="hover:text-white transition-colors">Conditions</a>
-                    <a href="{{ url('/privacy') }}" class="hover:text-white transition-colors">Confidentialité</a>
-                    <a href="{{ url('/cookies') }}" class="hover:text-white transition-colors">Cookies</a>
+                    <a href="{{ url('/terms') }}" class="hover:text-white transition-colors">{{ __('Terms') }}</a>
+                    <a href="{{ url('/privacy') }}" class="hover:text-white transition-colors">{{ __('Privacy') }}</a>
+                    <a href="{{ url('/cookies') }}" class="hover:text-white transition-colors">{{ __('Cookies') }}</a>
                 </div>
             </div>
         </div>

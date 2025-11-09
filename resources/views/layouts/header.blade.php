@@ -5,25 +5,25 @@
     // Définition des liens de navigation (similaire au tableau JS)
     $navLinks = [
         [
-            'name' => 'Accueil',
+            'name' => __('Accueil'),
             'path' => '/',
             'activeClass' => 'bg-purple-600 text-white shadow-lg shadow-purple-500/30',
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>'
         ],
         [
-            'name' => 'Vols',
+            'name' => __('Vols'),
             'path' => '/flights',
             'activeClass' => 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30',
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>'
         ],
         [
-            'name' => 'Événements',
+            'name' => __('Événements'),
             'path' => '/events',
             'activeClass' => 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/30',
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>'
         ],
         [
-            'name' => 'Packages',
+            'name' => __('Packages'),
             'path' => '/packages',
             'activeClass' => 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30',
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
@@ -33,12 +33,12 @@
     // Sous-pages pour le dropdown
     $subPages = [
         [
-            'name' => 'Location',
+            'name' => __('Location'),
             'path' => '/location',
             'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>'
         ],
         [
-            'name' => 'À propos',
+            'name' => __('À propos'),
             'path' => '/about',
             'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
         ],
@@ -59,6 +59,7 @@
         mobileMenuOpen: false,
         userMenuOpen: false,
         currencyMenuOpen: false,
+        languageMenuOpen: false,
         isScrolled: false,
         changeCurrency(currency) {
             fetch('/currency/change', {
@@ -76,10 +77,27 @@
                 }
             })
             .catch(error => console.error('Error:', error));
+        },
+        changeLanguage(language) {
+            fetch('/language/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                },
+                body: JSON.stringify({ language: language })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
     }"
     x-on:scroll.window="isScrolled = window.scrollY > 50"
-    @click.away="userMenuOpen = false; currencyMenuOpen = false"
+    @click.away="userMenuOpen = false; currencyMenuOpen = false; languageMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white"
 >
     <div class="container mx-auto px-4">
@@ -93,10 +111,10 @@
                 />
                 <div class="hidden md:block">
                     <div class="text-xl font-black text-black">
-                        CARRÉ PREMIUM
+                        {{ __('CARRÉ PREMIUM') }}
                     </div>
                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Notre limite, le reflet de votre imagination.
+                        {{ __('Notre limite, le reflet de votre imagination.') }}
                     </div>
                 </div>
             </a>
@@ -127,7 +145,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                         </svg>
-                        <span>Plus</span>
+                        <span>{{ __('More') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -161,12 +179,82 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
 
+                {{-- Language Selector --}}
+                <div class="relative">
+                    <button
+                        x-on:click="languageMenuOpen = !languageMenuOpen"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                    >
+                        @if(session('locale', config('app.locale')) === 'en')
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H30V21H2V11Z" fill="#012169"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="white" stroke-width="3"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="#C8102E" stroke-width="2"/>
+                                <path d="M14 11H18V21H14V11ZM2 14H30V18H2V14Z" fill="white"/>
+                                <path d="M15 11H17V21H15V11ZM2 15H30V17H2V15Z" fill="#C8102E"/>
+                            </svg>
+                            <span class="text-sm font-medium hidden md:inline">EN</span>
+                        @else
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H11V21H2V11Z" fill="#002395"/>
+                                <path d="M11 11H21V21H11V11Z" fill="white"/>
+                                <path d="M21 11H30V21H21V11Z" fill="#ED2939"/>
+                            </svg>
+                            <span class="text-sm font-medium hidden md:inline">FR</span>
+                        @endif
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    {{-- Language Menu Dropdown --}}
+                    <div
+                        x-show="languageMenuOpen"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        style="display: none;"
+                    >
+                        <button
+                            x-on:click="changeLanguage('fr')"
+                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H11V21H2V11Z" fill="#002395"/>
+                                <path d="M11 11H21V21H11V11Z" fill="white"/>
+                                <path d="M21 11H30V21H21V11Z" fill="#ED2939"/>
+                            </svg>
+                            <span>Français</span>
+                        </button>
+                        <button
+                            x-on:click="changeLanguage('en')"
+                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="white"/>
+                                <path d="M2 11H30V21H2V11Z" fill="#012169"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="white" stroke-width="3"/>
+                                <path d="M2 11L16 21M30 11L16 21M16 11V21" stroke="#C8102E" stroke-width="2"/>
+                                <path d="M14 11H18V21H14V11ZM2 14H30V18H2V14Z" fill="white"/>
+                                <path d="M15 11H17V21H15V11ZM2 15H30V17H2V15Z" fill="#C8102E"/>
+                            </svg>
+                            <span>English</span>
+                        </button>
+                    </div>
+                </div>
+
                 {{-- Currency Selector --}}
-                <div class="relative" x-data="{ currencyMenuOpen: false }">
+                <div class="relative">
                     <button
                         x-on:click="currencyMenuOpen = !currencyMenuOpen"
                         class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
-                        @click.away="currencyMenuOpen = false"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
@@ -223,13 +311,13 @@
                             href="{{ route('login') }}"
                             class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
                         >
-                            Connexion
+                            {{ __('Login') }}
                         </a>
                         <a
                             href="{{ route('register') }}"
                             class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-purple-600 text-white hover:bg-purple-700"
                         >
-                            Inscription
+                            {{ __('Register') }}
                         </a>
                     </div>
                 @else
@@ -282,7 +370,7 @@
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                                 <i class="fas fa-user mr-2"></i>
-                                Mon Profil
+                                {{ __('My Profile') }}
                             </a>
                             <a
                                 href="{{ route('bookings') }}"
@@ -290,13 +378,13 @@
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                                 <i class="fas fa-ticket-alt mr-2"></i>
-                                Mes Réservations
+                                {{ __('My Bookings') }}
                             </a>
                             <form method="POST" action="{{ route('logout') }}" x-on:submit="userMenuOpen = false">
                                 @csrf
                                 <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
                                     <i class="fas fa-sign-out-alt mr-2"></i>
-                                    Déconnexion
+                                    {{ __('Logout') }}
                                 </button>
                             </form>
                         </div>
@@ -384,14 +472,14 @@
                             x-on:click="mobileMenuOpen = false"
                             class="block w-full px-4 py-3 bg-purple-600 text-white rounded-lg font-semibold text-center hover:bg-purple-700 transition-colors"
                         >
-                            Connexion
+                            {{ __('Login') }}
                         </a>
                         <a
                             href="{{ route('register') }}"
                             x-on:click="mobileMenuOpen = false"
                             class="block w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold text-center hover:bg-gray-200 transition-colors"
                         >
-                            Inscription
+                            {{ __('Register') }}
                         </a>
                     </div>
                 @else
@@ -410,7 +498,7 @@
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             <i class="fas fa-user mr-2"></i>
-                            Mon Profil
+                            {{ __('My Profile') }}
                         </a>
                         <a
                             href="{{ route('bookings') }}"
@@ -418,13 +506,13 @@
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             <i class="fas fa-ticket-alt mr-2"></i>
-                            Mes Réservations
+                            {{ __('My Bookings') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}" x-on:submit="mobileMenuOpen = false">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-lg">
                                 <i class="fas fa-sign-out-alt mr-2"></i>
-                                Déconnexion
+                                {{ __('Logout') }}
                             </button>
                         </form>
                     </div>
