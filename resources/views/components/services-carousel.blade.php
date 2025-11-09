@@ -96,22 +96,22 @@
                   <p class="text-base sm:text-lg md:text-xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed" x-text="slide.description"></p>
 
                   {{-- CTA Buttons --}}
-                  <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
+                  <div class="flex flex-col sm:flex-row gap-3 md:gap-6 justify-center">
                     <a
                       href="#services"
-                      class="group inline-flex items-center space-x-2 md:space-x-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-lg md:text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
+                      class="group inline-flex items-center justify-center space-x-2 md:space-x-3 px-6 md:px-12 py-3 md:py-6 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-black text-sm md:text-xl rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
                     >
                       <span>{{ __('DISCOVER') }}</span>
-                      <svg class="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </a>
 
                     <a
                       href="{{ route('contact') }}"
-                      class="group inline-flex items-center space-x-2 md:space-x-3 px-8 md:px-12 py-4 md:py-6 bg-white/20 backdrop-blur-md text-white font-black text-lg md:text-xl rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300 shadow-2xl border-2 border-white/30"
+                      class="group inline-flex items-center justify-center space-x-2 md:space-x-3 px-6 md:px-12 py-3 md:py-6 bg-white/20 backdrop-blur-md text-white font-black text-sm md:text-xl rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300 shadow-2xl border-2 border-white/30"
                     >
-                      <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       <span>{{ __('CONTACT') }}</span>
@@ -123,21 +123,21 @@
           </div>
         </template>
 
-        {{-- Navigation Arrows --}}
+        {{-- Navigation Arrows (Hidden on mobile) --}}
         <button
           @click="prevSlide()"
-          class="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
+          class="hidden md:flex absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 items-center justify-center z-20"
         >
-          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
         <button
           @click="nextSlide()"
-          class="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 flex items-center justify-center z-20"
+          class="hidden md:flex absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/30 transition-all duration-300 shadow-2xl border border-white/30 items-center justify-center z-20"
         >
-          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </button>
