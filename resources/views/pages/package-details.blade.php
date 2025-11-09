@@ -82,13 +82,13 @@
               <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 @if($package->discount_price)
                   <div>
-                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->discount_price)) }}</span>
-                    <span class="text-sm sm:text-base text-gray-500 line-through ml-2">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                    <span class="text-sm sm:text-base text-gray-500 line-through ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                     <span class="text-xs sm:text-sm text-green-600 font-semibold ml-2">(-{{ round((1 - $package->discount_price / $package->price) * 100) }}%)</span>
                   </div>
                 @else
                   <div>
-                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                     <span class="text-xs sm:text-sm text-gray-500 ml-1">par personne</span>
                   </div>
                 @endif
@@ -221,14 +221,14 @@
               <div class="flex justify-between items-center mb-2">
                 <span class="text-gray-600 text-sm sm:text-base">Prix par personne</span>
                 @if($package->discount_price)
-                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->discount_price)) }}</span>
+                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
                 @else
-                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                 @endif
               </div>
               @if($package->discount_price)
                 <div class="flex justify-between items-center text-sm">
-                  <span class="text-gray-500 line-through">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                  <span class="text-gray-500 line-through">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                   <span class="text-green-600 font-semibold">(-{{ round((1 - $package->discount_price / $package->price) * 100) }}%)</span>
                 </div>
               @endif
@@ -286,10 +286,10 @@
               <div class="flex items-center justify-between">
                 <div>
                   @if($similarPackage->discount_price)
-                    <span class="text-lg sm:text-xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($similarPackage->discount_price)) }}</span>
-                    <span class="text-xs text-gray-500 line-through">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($similarPackage->price)) }}</span>
+                    <span class="text-lg sm:text-xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($similarPackage->discount_price) }}</span>
+                    <span class="text-xs text-gray-500 line-through">{{ \App\Helpers\CurrencyHelper::format($similarPackage->price) }}</span>
                   @else
-                    <span class="text-lg sm:text-xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($similarPackage->price)) }}</span>
+                    <span class="text-lg sm:text-xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($similarPackage->price) }}</span>
                   @endif
                 </div>
                 <a href="{{ route('packages.show', $similarPackage->slug) }}" class="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-all text-sm">

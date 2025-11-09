@@ -213,8 +213,7 @@ class EventController extends Controller
         // On s'assure que les booléens sont bien présents (même si la case n'est pas cochée)
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['event_type'] = $request->input('type_id'); // Mapping du champ type_id vers event_type dans le modèle
-        
+
         return $validated;
     }
 

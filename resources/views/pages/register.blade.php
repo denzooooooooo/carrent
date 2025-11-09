@@ -52,6 +52,20 @@
       @csrf
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
+          <label for="civility" class="sr-only">Civilité</label>
+          <select
+            id="civility"
+            name="civility"
+            required
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+          >
+            <option value="">Sélectionnez votre civilité</option>
+            <option value="Monsieur" {{ old('civility') == 'Monsieur' ? 'selected' : '' }}>Monsieur</option>
+            <option value="Madame" {{ old('civility') == 'Madame' ? 'selected' : '' }}>Madame</option>
+            <option value="Mademoiselle" {{ old('civility') == 'Mademoiselle' ? 'selected' : '' }}>Mademoiselle</option>
+          </select>
+        </div>
+        <div>
           <label for="first_name" class="sr-only">Prénom</label>
           <input
             id="first_name"
@@ -59,7 +73,7 @@
             type="text"
             autocomplete="given-name"
             required
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
             placeholder="Prénom"
             value="{{ old('first_name') }}"
           />

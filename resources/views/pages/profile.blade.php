@@ -176,7 +176,7 @@
         </div>
         <div class="bg-white rounded-2xl shadow-lg p-6">
           <i class="fas fa-wallet text-3xl text-amber-600 mb-2"></i>
-          <p class="text-3xl font-black text-gray-900">{{ number_format(Auth::user()->total_spent ?? 0, 0, ',', ' ') }} XOF</p>
+          <p class="text-3xl font-black text-gray-900">{{ \App\Helpers\CurrencyHelper::format(Auth::user()->total_spent ?? 0) }}</p>
           <p class="text-sm text-gray-600">Dépensé</p>
         </div>
         <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -207,7 +207,7 @@
                     <p class="text-sm text-gray-600">{{ $booking->created_at->format('d/m/Y') }}</p>
                   </div>
                   <div class="text-right">
-                    <p class="font-bold text-purple-600">{{ number_format($booking->final_amount, 0, ',', ' ') }} XOF</p>
+                    <p class="font-bold text-purple-600">{{ \App\Helpers\CurrencyHelper::format($booking->final_amount) }}</p>
                     <span class="text-xs px-2 py-1 rounded-full {{ $booking->status == 'confirmed' ? 'bg-green-100 text-green-700' : ($booking->status == 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700') }}">
                       {{ $booking->status }}
                     </span>

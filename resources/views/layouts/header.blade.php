@@ -58,10 +58,28 @@
     x-data="{
         mobileMenuOpen: false,
         userMenuOpen: false,
-        isScrolled: false
+        currencyMenuOpen: false,
+        isScrolled: false,
+        changeCurrency(currency) {
+            fetch('/currency/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                },
+                body: JSON.stringify({ currency: currency })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     }"
     x-on:scroll.window="isScrolled = window.scrollY > 50"
-    @click.away="userMenuOpen = false"
+    @click.away="userMenuOpen = false; currencyMenuOpen = false"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white"
 >
     <div class="container mx-auto px-4">
@@ -78,7 +96,7 @@
                         CARRÉ PREMIUM
                     </div>
                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Voyages d'Exception
+                        Notre limite, le reflet de votre imagination.
                     </div>
                 </div>
             </a>
@@ -143,7 +161,60 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
 
+                {{-- Currency Selector --}}
+                <div class="relative" x-data="{ currencyMenuOpen: false }">
+                    <button
+                        x-on:click="currencyMenuOpen = !currencyMenuOpen"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                        @click.away="currencyMenuOpen = false"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        <span class="text-sm font-medium">{{ session('currency', 'XOF') }}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
 
+                    {{-- Currency Menu Dropdown --}}
+                    <div
+                        x-show="currencyMenuOpen"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        style="display: none;"
+                    >
+                        <button
+                            x-on:click="changeCurrency('XOF')"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            XOF - FCFA
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('EUR')"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            EUR - €
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('USD')"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            USD - $
+                        </button>
+                        <button
+                            x-on:click="changeCurrency('GBP')"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            GBP - £
+                        </button>
+                    </div>
+                </div>
 
                 {{-- Authentication Links / User Menu --}}
                 @if (!$isAuthenticated)

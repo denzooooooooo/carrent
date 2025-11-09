@@ -144,7 +144,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span class="text-purple-200 text-sm">Abidjan, Côte d'Ivoire</span>
+                        <span class="text-purple-200 text-sm">Abidjan Marcory Biétry Boulevard de Marseille, Côte d'Ivoire</span>
                     </li>
                     <li class="flex items-start space-x-3">
                         <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

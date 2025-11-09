@@ -111,10 +111,10 @@
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       @if($package->discount_price)
-                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->discount_price)) }}</span>
-                        <span class="text-xs md:text-sm text-gray-500 line-through ml-1 md:ml-2">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                        <span class="text-xs md:text-sm text-gray-500 line-through ml-1 md:ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                       @else
-                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($package->price)) }}</span>
+                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                       @endif
                       <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
                     </div>

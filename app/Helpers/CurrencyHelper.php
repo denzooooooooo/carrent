@@ -57,6 +57,9 @@ class CurrencyHelper
             $currency = session('currency', 'XOF');
         }
 
+        // Convert amount if it's not already in the target currency
+        $convertedAmount = self::convert($amount, 'XOF', $currency);
+
         $symbols = [
             'XOF' => 'FCFA',
             'EUR' => '€',
@@ -67,10 +70,10 @@ class CurrencyHelper
         $symbol = $symbols[$currency] ?? $currency;
 
         if ($currency === 'XOF') {
-            return number_format($amount, 0, ',', ' ') . ' ' . $symbol;
+            return number_format($convertedAmount, 0, ',', ' ') . ' ' . $symbol;
         }
 
-        return $symbol . number_format($amount, 2, ',', ' ');
+        return $symbol . number_format($convertedAmount, 2, ',', ' ');
     }
 
     /**

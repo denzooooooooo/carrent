@@ -83,7 +83,7 @@
 
               <div class="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/30 to-pink-500/30 backdrop-blur-md rounded-2xl border border-amber-400/50">
                 <span class="text-lg font-black bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">
-                  {{ $event->min_price ? 'À partir de ' . number_format($event->min_price, 0, ',', ' ') . ' XOF' : 'Sur demande' }}
+                  {{ $event->min_price ? 'À partir de ' . \App\Helpers\CurrencyHelper::format($event->min_price) : 'Sur demande' }}
                 </span>
                 <svg class="w-5 h-5 text-amber-400 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

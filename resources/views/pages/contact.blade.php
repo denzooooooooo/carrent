@@ -34,7 +34,7 @@
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>',
               'title' => 'Adresse',
-              'info' => 'Abidjan, Côte d\'Ivoire',
+              'info' => 'Abidjan Marcory Biétry Boulevard de Marseille, Côte d\'Ivoire',
               'subinfo' => 'Côte d\'Ivoire'
             ],
             [
@@ -267,7 +267,7 @@
         <h2 class="text-3xl font-black mb-6">Notre Localisation</h2>
         <div class="aspect-video bg-gray-200 rounded-2xl overflow-hidden">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2!2d-4.0!3d5.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTgnMDAuMCJOIDTCsDAwJzAwLjAiVw!5e0!3m2!1sfr!2sci!4v1234567890"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2!2d-4.0!3d5.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTgnMDAuMCJOIDTCsDAwJzAwLjAiVw!5e0!3m2!1sfr!2sci!4v1234567890&q=Abidjan+Marcory+Biétry+Boulevard+de+Marseille,+Côte+d'Ivoire"
             width="100%"
             height="100%"
             style="border: 0"
