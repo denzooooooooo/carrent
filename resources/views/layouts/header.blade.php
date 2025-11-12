@@ -217,11 +217,11 @@
                     </svg>
                 </button>
 
-                {{-- Login/Register Icons (Mobile - always visible) --}}
+                {{-- Login/Register Icons (Always visible on navbar) --}}
                 @if (!$isAuthenticated)
                     <a
                         href="{{ route('login') }}"
-                        class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                        class="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:scale-110"
                         title="{{ __('Login') }}"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,7 +230,7 @@
                     </a>
                     <a
                         href="{{ route('register') }}"
-                        class="lg:hidden p-2.5 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-all"
+                        class="p-2.5 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-all hover:scale-110"
                         title="{{ __('Register') }}"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -469,14 +469,16 @@
 
                 {{-- Mobile Menu Button --}}
                 <button
-                    x-on:click="mobileMenuOpen = !mobileMenuOpen"
+                    @click="mobileMenuOpen = !mobileMenuOpen"
                     class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
                     aria-label="Toggle mobile menu"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
+                    {{-- Hamburger Icon --}}
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" style="display: none;">
+                    {{-- Close Icon --}}
+                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
