@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Packages Touristiques - Carré Premium')
+@section('title', __('Tour Packages') . ' - Carré Premium')
 
 @section('content')
 
@@ -10,8 +10,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">Packages Touristiques</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">Découvrez des expériences uniques avec nos packages exclusifs</p>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Tour Packages') }}</h1>
+      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Discover unique experiences with our exclusive packages') }}</p>
     </div>
   </section>
 
@@ -22,9 +22,9 @@
         <form method="GET" action="{{ route('packages') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Type de package</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Package type') }}</label>
               <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Tous les packages</option>
+                <option value="">{{ __('All packages') }}</option>
                 @foreach($packageTypes as $type)
                   <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
                     {{ $type }}
@@ -33,9 +33,9 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Destination</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Destination') }}</label>
               <select name="destination" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Toutes les destinations</option>
+                <option value="">{{ __('All destinations') }}</option>
                 @foreach($destinations as $destination)
                   <option value="{{ $destination }}" {{ request('destination') == $destination ? 'selected' : '' }}>
                     {{ $destination }}
@@ -44,18 +44,18 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Durée</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Duration') }}</label>
               <select name="duration" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Toutes les durées</option>
-                <option value="1-3" {{ request('duration') == '1-3' ? 'selected' : '' }}>1-3 jours</option>
-                <option value="4-7" {{ request('duration') == '4-7' ? 'selected' : '' }}>4-7 jours</option>
-                <option value="1-2-weeks" {{ request('duration') == '1-2-weeks' ? 'selected' : '' }}>1-2 semaines</option>
-                <option value="more-than-2-weeks" {{ request('duration') == 'more-than-2-weeks' ? 'selected' : '' }}>Plus de 2 semaines</option>
+                <option value="">{{ __('All durations') }}</option>
+                <option value="1-3" {{ request('duration') == '1-3' ? 'selected' : '' }}>{{ __('1-3 days') }}</option>
+                <option value="4-7" {{ request('duration') == '4-7' ? 'selected' : '' }}>{{ __('4-7 days') }}</option>
+                <option value="1-2-weeks" {{ request('duration') == '1-2-weeks' ? 'selected' : '' }}>{{ __('1-2 weeks') }}</option>
+                <option value="more-than-2-weeks" {{ request('duration') == 'more-than-2-weeks' ? 'selected' : '' }}>{{ __('More than 2 weeks') }}</option>
               </select>
             </div>
             <div class="flex items-end gap-2">
               <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
-                Rechercher
+                {{ __('Search') }}
               </button>
               @if(request()->hasAny(['type', 'destination', 'duration']))
                 <a href="{{ route('packages') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
@@ -85,7 +85,7 @@
                   <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $package->title }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
                   @if($package->is_featured)
                     <div class="absolute top-2 md:top-4 left-2 md:left-4">
-                      <span class="px-2 md:px-3 py-1 bg-red-500 text-white text-xs md:text-sm font-bold rounded-full">⭐ Featured</span>
+                      <span class="px-2 md:px-3 py-1 bg-red-500 text-white text-xs md:text-sm font-bold rounded-full">⭐ {{ __('Featured') }}</span>
                     </div>
                   @endif
                   <div class="absolute top-2 md:top-4 right-2 md:right-4">
@@ -119,7 +119,7 @@
                       <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
                     </div>
                     <a href="{{ route('packages.show', $package->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                      Voir détails
+                      {{ __('View details') }}
                     </a>
                   </div>
                 </div>
@@ -131,8 +131,8 @@
             <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">Aucun package disponible</h3>
-            <p class="text-gray-500">Revenez bientôt pour découvrir nos nouvelles offres touristiques.</p>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">{{ __('No packages available') }}</h3>
+            <p class="text-gray-500">{{ __('Come back soon to discover our new tour offers.') }}</p>
           </div>
         @endif
       </div>
@@ -142,14 +142,14 @@
   {{-- CTA Section --}}
   <section class="py-12 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">Un package sur mesure ?</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">Contactez notre équipe pour créer l'expérience de vos rêves</p>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('A tailor-made package?') }}</h2>
+      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact our team to create your dream experience') }}</p>
       <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
-          Demander un devis
+          {{ __('Request a quote') }}
         </a>
         <a href="tel:+225XXXXXXXXX" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg md:rounded-xl hover:bg-white hover:text-purple-600 transition-all text-sm md:text-base">
-          Appeler Maintenant
+          {{ __('Call Now') }}
         </a>
       </div>
     </div>
