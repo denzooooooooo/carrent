@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Location - Carré Premium')
+@section('title', __('Location') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-white">
@@ -8,8 +8,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-blue-600 to-cyan-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">Location de Véhicules & Équipements</h1>
-      <p class="text-lg md:text-xl text-white/90">Découvrez notre large gamme de locations : véhicules, quads, avions, bateaux et plus encore</p>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">{{ __('Vehicle & Equipment Rental') }}</h1>
+      <p class="text-lg md:text-xl text-white/90">{{ __('Discover our wide range of rentals: vehicles, quads, planes, boats and more') }}</p>
     </div>
   </section>
 
@@ -17,10 +17,9 @@
   <section class="py-8 md:py-16">
     <div class="container mx-auto px-4">
       <div class="text-center mb-8 md:mb-12">
-        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">Nos Services de Location</h2>
+        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">{{ __('Our Rental Services') }}</h2>
         <p class="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
-          Découvrez notre large gamme de services de location : véhicules terrestres, aériens et nautiques pour tous vos besoins.
-          Des voitures de luxe aux quads, en passant par les avions et bateaux, nous avons tout ce qu'il vous faut.
+          {{ __('Discover our wide range of rental services: land, air and sea vehicles for all your needs. From luxury cars to quads, planes and boats, we have everything you need.') }}
         </p>
       </div>
 
@@ -29,39 +28,39 @@
           $services = [
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>',
-              'title' => 'Location Terrestre',
-              'description' => 'Voitures, SUV, quads et véhicules tout-terrain pour tous vos déplacements terrestres.',
-              'features' => ['Flotte variée', 'Assurance complète', 'Maintenance incluse']
+              'title' => __('Land Rental'),
+              'description' => __('Cars, SUVs, quads and off-road vehicles for all your land travel.'),
+              'features' => [__('Varied fleet'), __('Full insurance'), __('Maintenance included')]
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>',
-              'title' => 'Location Aérienne',
-              'description' => 'Avions privés, hélicoptères et drones pour vos déplacements aériens.',
-              'features' => ['Pilotes certifiés', 'Maintenance rigoureuse', 'Service personnalisé']
+              'title' => __('Air Rental'),
+              'description' => __('Private planes, helicopters and drones for your air travel.'),
+              'features' => [__('Certified pilots'), __('Rigorous maintenance'), __('Personalized service')]
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" /></svg>',
-              'title' => 'Location Nautique',
-              'description' => 'Bateaux, yachts et équipements nautiques pour vos aventures marines.',
-              'features' => ['Équipages qualifiés', 'Équipements de sécurité', 'Navigation côtière']
+              'title' => __('Nautical Rental'),
+              'description' => __('Boats, yachts and nautical equipment for your marine adventures.'),
+              'features' => [__('Qualified crews'), __('Safety equipment'), __('Coastal navigation')]
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
-              'title' => 'Service avec Équipage',
-              'description' => 'Service premium avec pilotes, capitaines et guides professionnels.',
-              'features' => ['Personnel qualifié', 'Service 24/7', 'Accompagnement personnalisé']
+              'title' => __('Service with Crew'),
+              'description' => __('Premium service with pilots, captains and professional guides.'),
+              'features' => [__('Qualified staff'), __('24/7 service'), __('Personalized support')]
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m0 0l-2-2m2 2l2-2m4-6v6m0 0l2 2m-2-2l-2 2" /></svg>',
-              'title' => 'Location Longue Durée',
-              'description' => 'Tarifs préférentiels pour les locations prolongées et projets spéciaux.',
-              'features' => ['Réductions sur durée', 'Contrats flexibles', 'Support technique continu']
+              'title' => __('Long-term Rental'),
+              'description' => __('Preferential rates for extended rentals and special projects.'),
+              'features' => [__('Duration discounts'), __('Flexible contracts'), __('Continuous technical support')]
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
-              'title' => 'Location Express',
-              'description' => 'Service rapide pour vos besoins urgents et imprévus.',
-              'features' => ['Livraison rapide', 'Procédure simplifiée', 'Disponibilité immédiate']
+              'title' => __('Express Rental'),
+              'description' => __('Fast service for your urgent and unforeseen needs.'),
+              'features' => [__('Fast delivery'), __('Simplified procedure'), __('Immediate availability')]
             ]
           ];
         @endphp
@@ -93,9 +92,9 @@
   <section class="py-8 md:py-16 bg-gray-50">
     <div class="container mx-auto px-4">
       <div class="text-center mb-8 md:mb-12">
-        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">Notre Flotte & Équipements</h2>
+        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">{{ __('Our Fleet & Equipment') }}</h2>
         <p class="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
-          Découvrez notre sélection complète d'équipements modernes et bien entretenus : véhicules terrestres, aériens et nautiques adaptés à tous vos besoins.
+          {{ __('Discover our complete selection of modern and well-maintained equipment: land, air and sea vehicles adapted to all your needs.') }}
         </p>
       </div>
 
@@ -127,7 +126,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    {{ $location->capacity }} personne(s)
+                    {{ $location->capacity }} {{ __('person(s)') }}
                   </div>
                   <div class="flex items-center text-sm text-gray-600">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +147,7 @@
                     @endforeach
                     @if(count($location->features) > 3)
                       <div class="text-sm text-gray-500">
-                        +{{ count($location->features) - 3 }} autres caractéristiques
+                        +{{ count($location->features) - 3 }} {{ __('other features') }}
                       </div>
                     @endif
                   </div>
@@ -159,15 +158,15 @@
                   </span>
                 </div>
                 <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl hover:shadow-lg transition-all">
-                  Réserver Maintenant
+                  {{ __('Book Now') }}
                 </button>
               </div>
             </div>
           @endif
         @empty
           <div class="col-span-full bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center">
-            <p class="text-xl text-gray-500">Aucune location disponible pour le moment.</p>
-            <p class="text-gray-400 mt-2">Nos véhicules seront bientôt disponibles.</p>
+            <p class="text-xl text-gray-500">{{ __('No rental available at the moment.') }}</p>
+            <p class="text-gray-400 mt-2">{{ __('Our vehicles will be available soon.') }}</p>
           </div>
         @endforelse
       </div>
@@ -178,9 +177,9 @@
   <section class="py-8 md:py-16">
     <div class="container mx-auto px-4">
       <div class="text-center mb-8 md:mb-12">
-        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">Pourquoi Nous Choisir ?</h2>
+        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black mb-4">{{ __('Why Choose Us?') }}</h2>
         <p class="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
-          Nous nous engageons à vous offrir le meilleur service de location de véhicules en Côte d'Ivoire.
+          {{ __('We are committed to providing you with the best vehicle rental service in Ivory Coast.') }}
         </p>
       </div>
 
@@ -189,23 +188,23 @@
           $advantages = [
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-              'title' => 'Véhicules Certifiés',
-              'description' => 'Tous nos véhicules sont régulièrement entretenus et contrôlés.'
+              'title' => __('Certified Vehicles'),
+              'description' => __('All our vehicles are regularly maintained and inspected.')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>',
-              'title' => 'Prix Transparents',
-              'description' => 'Pas de frais cachés, tarifs clairs et compétitifs.'
+              'title' => __('Transparent Prices'),
+              'description' => __('No hidden fees, clear and competitive rates.')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>',
-              'title' => 'Support 24/7',
-              'description' => 'Notre équipe est disponible à tout moment pour vous aider.'
+              'title' => __('24/7 Support'),
+              'description' => __('Our team is available at any time to help you.')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
-              'title' => 'Livraison',
-              'description' => 'Service de livraison et récupération à votre convenance.'
+              'title' => __('Delivery'),
+              'description' => __('Delivery and pickup service at your convenience.')
             ]
           ];
         @endphp
@@ -226,16 +225,16 @@
   {{-- Contact --}}
   <section class="py-8 md:py-16 bg-gradient-to-r from-blue-600 to-cyan-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4">Prêt à Réserver Votre Véhicule ?</h2>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4">{{ __('Ready to Book Your Vehicle?') }}</h2>
       <p class="text-lg md:text-xl text-white/90 mb-6 md:mb-8">
-        Contactez-nous dès maintenant pour réserver votre véhicule idéal
+        {{ __('Contact us now to book your ideal vehicle') }}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a href="tel:+2252721594258" class="px-6 md:px-8 py-3 md:py-4 bg-white text-blue-600 font-bold rounded-xl hover:shadow-2xl transition-all text-center">
           📞 +225 27 21 59 42 58
         </a>
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-blue-600 transition-all text-center">
-          ✉️ Nous Contacter
+          ✉️ {{ __('Contact us') }}
         </a>
       </div>
     </div>
