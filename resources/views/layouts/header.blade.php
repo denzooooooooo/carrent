@@ -129,7 +129,7 @@
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium Logo"
-                    class="h-16 w-auto group-hover:scale-110 transition-transform duration-300"
+                    class="h-16 w-auto group-hover:scale-110 transition-transform duration-300 rounded-lg"
                 />
                 <div class="hidden md:block">
                     <div class="text-xl font-black text-black dark:text-white">
@@ -199,7 +199,7 @@
                 </div>
             </nav>
             {{-- Right Actions --}}
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
 
                 {{-- Theme Toggle Button --}}
                 <button
@@ -208,7 +208,7 @@
                     title="Toggle theme"
                 >
                     {{-- Sun Icon (shown in dark mode) --}}
-                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                     {{-- Moon Icon (shown in light mode) --}}
@@ -216,6 +216,28 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </button>
+
+                {{-- Login/Register Icons (Mobile - always visible) --}}
+                @if (!$isAuthenticated)
+                    <a
+                        href="{{ route('login') }}"
+                        class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                        title="{{ __('Login') }}"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </a>
+                    <a
+                        href="{{ route('register') }}"
+                        class="lg:hidden p-2.5 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-all"
+                        title="{{ __('Register') }}"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                    </a>
+                @endif
 
                 {{-- Language Selector (Hidden on mobile) --}}
                 <div class="relative hidden lg:block">
@@ -344,28 +366,8 @@
 
                 {{-- Authentication Links / User Menu --}}
                 @if (!$isAuthenticated)
-                    {{-- Small icons for mobile, full buttons for desktop --}}
-                    <div class="flex items-center space-x-2">
-                        <a
-                            href="{{ route('login') }}"
-                            class="lg:hidden p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                            title="{{ __('Login') }}"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </a>
-                        <a
-                            href="{{ route('register') }}"
-                            class="lg:hidden p-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-all"
-                            title="{{ __('Register') }}"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="hidden lg:flex items-center space-x-3">
+                    {{-- Full buttons for desktop only --}}
+                    <div class="hidden lg:flex items-center space-x-2">
                         <a
                             href="{{ route('login') }}"
                             class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -471,11 +473,11 @@
                     class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
                     aria-label="Toggle mobile menu"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>

@@ -332,6 +332,17 @@ footer {
   border-color: var(--theme-border) !important;
 }
 
+/* HEADER - Logo sans bordure blanche en mode sombre */
+[data-theme="dark"] header img {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] header a img {
+  border: none !important;
+  outline: none !important;
+}
+
 /* PRODUITS - Bordures blanches en mode sombre pour distinction */
 [data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) {
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
