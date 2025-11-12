@@ -61,6 +61,28 @@
         currencyMenuOpen: false,
         languageMenuOpen: false,
         isScrolled: false,
+        darkMode: localStorage.getItem('theme') === 'dark' || false,
+        toggleTheme() {
+            this.darkMode = !this.darkMode;
+            const theme = this.darkMode ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            
+            if (this.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // Save to server
+            fetch('/theme/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                },
+                body: JSON.stringify({ theme: theme })
+            });
+        },
         changeCurrency(currency) {
             fetch('/currency/change', {
                 method: 'POST',
@@ -98,7 +120,7 @@
     }"
     x-on:scroll.window="isScrolled = window.scrollY > 50"
     @click.away="userMenuOpen = false; currencyMenuOpen = false; languageMenuOpen = false"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white dark:bg-gray-900 shadow-md"
 >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
@@ -110,7 +132,7 @@
                     class="h-16 w-auto group-hover:scale-110 transition-transform duration-300"
                 />
                 <div class="hidden md:block">
-                    <div class="text-xl font-black text-black">
+                    <div class="text-xl font-black text-black dark:text-white">
                         {{ __('CARRÉ PREMIUM') }}
                     </div>
                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -127,7 +149,7 @@
                         class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2"
                         @class([
                             $link['activeClass'] => isActiveLink($link['path']),
-                            'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
+                            'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => !isActiveLink($link['path']),
                         ])
                     >
                         {!! $link['icon'] !!}
@@ -139,7 +161,7 @@
                 <div class="relative" x-data="{ subMenuOpen: false }">
                     <button
                         x-on:click="subMenuOpen = !subMenuOpen"
-                        class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2 text-gray-700 hover:bg-gray-100"
+                        class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         @click.away="subMenuOpen = false"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,14 +182,14 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
                         style="display: none;"
                     >
                         @foreach ($subPages as $subPage)
                             <a
                                 href="{{ url($subPage['path']) }}"
                                 x-on:click="subMenuOpen = false"
-                                class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
                                 {!! $subPage['icon'] !!}
                                 <span>{{ $subPage['name'] }}</span>
@@ -179,11 +201,27 @@
             {{-- Right Actions --}}
             <div class="flex items-center space-x-3">
 
+                {{-- Theme Toggle Button --}}
+                <button
+                    @click="toggleTheme()"
+                    class="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    title="Toggle theme"
+                >
+                    {{-- Sun Icon (shown in dark mode) --}}
+                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    {{-- Moon Icon (shown in light mode) --}}
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+
                 {{-- Language Selector (Hidden on mobile) --}}
                 <div class="relative hidden lg:block">
                     <button
                         x-on:click="languageMenuOpen = !languageMenuOpen"
-                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                     >
                         @if(session('locale', config('app.locale')) === 'en')
                             <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -218,12 +256,12 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
                         style="display: none;"
                     >
                         <button
                             x-on:click="changeLanguage('fr')"
-                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect width="32" height="32" rx="16" fill="white"/>
@@ -235,7 +273,7 @@
                         </button>
                         <button
                             x-on:click="changeLanguage('en')"
-                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="flex items-center space-x-3 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect width="32" height="32" rx="16" fill="white"/>
@@ -254,7 +292,7 @@
                 <div class="relative hidden lg:block">
                     <button
                         x-on:click="currencyMenuOpen = !currencyMenuOpen"
-                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                        class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
@@ -274,30 +312,30 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
                         style="display: none;"
                     >
                         <button
                             x-on:click="changeCurrency('XOF')"
-                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             XOF - FCFA
                         </button>
                         <button
                             x-on:click="changeCurrency('EUR')"
-                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             EUR - €
                         </button>
                         <button
                             x-on:click="changeCurrency('USD')"
-                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             USD - $
                         </button>
                         <button
                             x-on:click="changeCurrency('GBP')"
-                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             GBP - £
                         </button>
@@ -310,7 +348,7 @@
                     <div class="flex items-center space-x-2">
                         <a
                             href="{{ route('login') }}"
-                            class="lg:hidden p-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
+                            class="lg:hidden p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
                             title="{{ __('Login') }}"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +368,7 @@
                     <div class="hidden lg:flex items-center space-x-3">
                         <a
                             href="{{ route('login') }}"
-                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            class="px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                             {{ __('Login') }}
                         </a>
@@ -345,7 +383,7 @@
                     <div class="relative user-menu-container">
                         <button
                             x-on:click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110"
+                            class="flex items-center space-x-2 p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110"
                         >
                             @if($user->avatar_url || $user->avatar)
                                 <img 
@@ -374,21 +412,21 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 origin-top-right"
+                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 origin-top-right"
                             style="display: none;"
                         >
-                            <div class="px-4 py-2 border-b border-gray-200">
-                                <p class="text-sm font-semibold text-gray-800">
+                            <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                                     {{ $user->name ?? 'Utilisateur' }}
                                 </p>
-                                <p class="text-xs text-gray-600">
+                                <p class="text-xs text-gray-600 dark:text-gray-400">
                                     {{ $user->email ?? '' }}
                                 </p>
                             </div>
                             <a
                                 href="{{ route('profile') }}"
                                 x-on:click="userMenuOpen = false"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 <i class="fas fa-user mr-2"></i>
                                 {{ __('My Profile') }}
@@ -396,14 +434,14 @@
                             <a
                                 href="{{ route('bookings') }}"
                                 x-on:click="userMenuOpen = false"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 <i class="fas fa-ticket-alt mr-2"></i>
                                 {{ __('My Bookings') }}
                             </a>
                             <form method="POST" action="{{ route('logout') }}" x-on:submit="userMenuOpen = false">
                                 @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-sign-out-alt mr-2"></i>
                                     {{ __('Logout') }}
                                 </button>
@@ -430,7 +468,7 @@
                 {{-- Mobile Menu Button --}}
                 <button
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-full bg-gray-100 text-gray-700 transition-all duration-300 hover:scale-110 hover:bg-gray-200"
+                    class="lg:hidden p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-110 hover:bg-gray-200 dark:hover:bg-gray-700"
                     aria-label="Toggle mobile menu"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-150">
@@ -453,7 +491,7 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-1"
-        class="lg:hidden bg-white border-t border-gray-200 shadow-xl"
+        class="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-xl"
         style="display: none;"
     >
         <div class="container mx-auto px-4 py-4 space-y-2">
@@ -464,7 +502,7 @@
                     class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300"
                     @class([
                         $link['activeClass'] => isActiveLink($link['path']),
-                        'text-gray-700 hover:bg-gray-100' => !isActiveLink($link['path']),
+                        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' => !isActiveLink($link['path']),
                     ])
                 >
                     <span class="text-xl">{!! $link['icon'] !!}</span>
@@ -477,7 +515,7 @@
                 <a
                     href="{{ url($subPage['path']) }}"
                     x-on:click="mobileMenuOpen = false"
-                    class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300 text-gray-700 hover:bg-gray-100"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                     <span class="text-xl">{!! $subPage['icon'] !!}</span>
                     <span>{{ $subPage['name'] }}</span>
@@ -485,10 +523,10 @@
             @endforeach
 
             {{-- Currency & Language Selectors in Mobile Menu --}}
-            <div class="px-4 py-3 border-t border-gray-200 space-y-3">
+            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
                 {{-- Currency Selector Mobile --}}
                 <div class="space-y-2">
-                    <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('Currency') }}</p>
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{{ __('Currency') }}</p>
                     <div class="grid grid-cols-2 gap-2">
                         <button
                             x-on:click="changeCurrency('XOF'); mobileMenuOpen = false"
@@ -523,7 +561,7 @@
 
                 {{-- Language Selector Mobile --}}
                 <div class="space-y-2">
-                    <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('Language') }}</p>
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{{ __('Language') }}</p>
                     <div class="grid grid-cols-2 gap-2">
                         <button
                             x-on:click="changeLanguage('fr'); mobileMenuOpen = false"
@@ -559,20 +597,20 @@
 
             {{-- User Menu for Authenticated Users Only --}}
             @if ($isAuthenticated)
-                <div class="pt-3 border-t border-gray-200 space-y-3">
+                <div class="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
                     <div class="px-4 space-y-2">
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <p class="text-sm font-semibold text-gray-800">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                                 {{ $user->name ?? 'Utilisateur' }}
                             </p>
-                            <p class="text-xs text-gray-600">
+                            <p class="text-xs text-gray-600 dark:text-gray-400">
                                 {{ $user->email ?? '' }}
                             </p>
                         </div>
                         <a
                             href="{{ route('profile') }}"
                             x-on:click="mobileMenuOpen = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                         >
                             <i class="fas fa-user mr-2"></i>
                             {{ __('My Profile') }}
@@ -580,14 +618,14 @@
                         <a
                             href="{{ route('bookings') }}"
                             x-on:click="mobileMenuOpen = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                         >
                             <i class="fas fa-ticket-alt mr-2"></i>
                             {{ __('My Bookings') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}" x-on:submit="mobileMenuOpen = false">
                             @csrf
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-lg">
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                                 <i class="fas fa-sign-out-alt mr-2"></i>
                                 {{ __('Logout') }}
                             </button>

@@ -215,6 +215,10 @@ Route::get('/cookies', [HomeController::class, 'cookies'])->name('cookies');
 Route::post('/currency/change', [CurrencyController::class, 'change'])->name('currency.change');
 Route::get('/currency/current', [CurrencyController::class, 'current'])->name('currency.current');
 
+// --- Theme Routes ---
+Route::post('/theme/change', [\App\Http\Controllers\ThemeController::class, 'change'])->name('theme.change');
+Route::get('/theme/current', [\App\Http\Controllers\ThemeController::class, 'current'])->name('theme.current');
+
 // --- Language Routes ---
 Route::post('/language/change', [App\Http\Controllers\LanguageController::class, 'change'])->name('language.change');
 Route::get('/language/current', [App\Http\Controllers\LanguageController::class, 'current'])->name('language.current');
