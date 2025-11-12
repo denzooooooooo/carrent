@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Vols - Carré Premium')
+@section('title', __('Flights') . ' - Carré Premium')
 
 @section('content')
     <div class="min-h-screen bg-white">
@@ -9,10 +9,10 @@
             <div class="container mx-auto px-4">
                 <div class="max-w-4xl mx-auto text-center">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 md:mb-6 leading-tight">
-                        Réservez votre <span class="text-yellow-400">Vol</span>
+                        {{ __('Book your') }} <span class="text-yellow-400">{{ __('Flight') }}</span>
                     </h1>
                     <p class="text-lg sm:text-xl md:text-2xl opacity-90 max-w-2xl mx-auto px-2">
-                        Trouvez les meilleurs vols aux meilleurs prix
+                        {{ __('Find the best flights at the best prices') }}
                     </p>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
-                            <span>Aller-Retour</span>
+                            <span>{{ __('Round Trip') }}</span>
                         </div>
                     </button>
                     <button type="button" id="btn-oneway"
@@ -40,7 +40,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
-                            <span>Aller Simple</span>
+                            <span>{{ __('One Way') }}</span>
                         </div>
                     </button>
                     <button type="button" id="btn-multicity"
@@ -50,7 +50,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
-                            <span>Multi-Villes</span>
+                            <span>{{ __('Multi-City') }}</span>
                         </div>
                     </button>
                 </div>
@@ -93,9 +93,9 @@
                                     <svg class="w-4 h-4 md:w-5 md:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                     </svg>
-                                    <span>Aéroport de Départ *</span>
+                                    <span>{{ __('Departure Airport') }} *</span>
                                 </label>
-                                <input type="text" id="origin-input" placeholder="Ex: CDG, Paris..."
+                                <input type="text" id="origin-input" placeholder="{{ __('Ex: CDG, Paris...') }}"
                                     class="w-full pl-3 md:pl-4 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-base md:text-lg font-semibold"
                                     autocomplete="off">
                                 <input type="hidden" id="origin-code" name="departure_id">
@@ -107,9 +107,9 @@
                                     <svg class="w-4 h-4 md:w-5 md:h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     </svg>
-                                    <span>Aéroport d'Arrivée *</span>
+                                    <span>{{ __('Arrival Airport') }} *</span>
                                 </label>
-                                <input type="text" id="destination-input" placeholder="Ex: JFK, New York..."
+                                <input type="text" id="destination-input" placeholder="{{ __('Ex: JFK, New York...') }}"
                                     class="w-full pl-3 md:pl-4 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-base md:text-lg font-semibold"
                                     autocomplete="off">
                                 <input type="hidden" id="destination-code" name="arrival_id">
@@ -121,9 +121,9 @@
                             <div>
                                 <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
                                     <svg class="w-4 h-4 md:w-5 md:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 2 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>Date de Départ *</span>
+                                    <span>{{ __('Departure Date') }} *</span>
                                 </label>
                                 <input type="date" id="departure-date" name="outbound_date" min="{{ date('Y-m-d') }}"
                                     class="w-full px-3 md:px-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-purple-500/50 focus:border-purple-500 text-base md:text-lg font-semibold">
@@ -134,7 +134,7 @@
                                     <svg class="w-4 h-4 md:w-5 md:h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>Date de Retour *</span>
+                                    <span>{{ __('Return Date') }} *</span>
                                 </label>
                                 <input type="date" id="return-date" name="return_date" min="{{ date('Y-m-d') }}"
                                     class="w-full px-3 md:px-4 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:ring-4 focus:ring-amber-500/50 focus:border-amber-500 text-base md:text-lg font-semibold">
@@ -152,7 +152,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            <span>Ajouter un vol</span>
+                            <span>{{ __('Add a flight') }}</span>
                         </button>
                     </div>
 
@@ -162,12 +162,12 @@
                             <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <h3 class="text-base md:text-lg font-black text-gray-900">Passagers & Classe</h3>
+                            <h3 class="text-base md:text-lg font-black text-gray-900">{{ __('Passengers & Class') }}</h3>
                         </div>
 
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div>
-                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Adultes (12+)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">{{ __('Adults (12+)') }}</label>
                                 <select name="adults" id="adults"
                                     class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 1; $i <= 9; $i++)
@@ -177,7 +177,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Enfants (2-11)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">{{ __('Children (2-11)') }}</label>
                                 <select name="children" id="children"
                                     class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 0; $i <= 8; $i++)
@@ -187,7 +187,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Bébés (0-2)</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">{{ __('Infants (0-2)') }}</label>
                                 <select name="infants" id="infants"
                                     class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
                                     @for ($i = 0; $i <= 4; $i++)
@@ -197,13 +197,13 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">Classe</label>
+                                <label class="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">{{ __('Class') }}</label>
                                 <select name="travel_class" id="travel-class"
                                     class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
-                                    <option value="ECONOMY">Économique</option>
-                                    <option value="PREMIUM_ECONOMY">Éco Premium</option>
-                                    <option value="BUSINESS">Affaires</option>
-                                    <option value="FIRST">Première</option>
+                                    <option value="ECONOMY">{{ __('Economy') }}</option>
+                                    <option value="PREMIUM_ECONOMY">{{ __('Premium Economy') }}</option>
+                                    <option value="BUSINESS">{{ __('Business') }}</option>
+                                    <option value="FIRST">{{ __('First') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -215,7 +215,7 @@
                             <input type="checkbox" name="non_stop" id="non-stop"
                                 class="w-5 h-5 md:w-6 md:h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
                             <span class="text-gray-700 font-bold text-base md:text-lg group-hover:text-purple-600 transition-colors">
-                                Vols directs uniquement
+                                {{ __('Direct flights only') }}
                             </span>
                         </label>
 
@@ -223,22 +223,22 @@
                             <input type="checkbox" name="deep_search" id="deep-search"
                                 class="w-5 h-5 md:w-6 md:h-6 text-purple-600 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-purple-500/50">
                             <span class="text-gray-700 font-bold text-base md:text-lg group-hover:text-purple-600 transition-colors">
-                                Recherche approfondie (plus lent mais plus de résultats)
+                                {{ __('Deep search (slower but more results)') }}
                             </span>
                         </label>
                     </div>
 
                     {{-- Tri --}}
                     <div class="mb-6 md:mb-8">
-                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">Trier par</label>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">{{ __('Sort by') }}</label>
                         <select name="sort_by" id="sort-by"
                             class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-purple-500 font-semibold text-sm md:text-base">
-                            <option value="1">Meilleurs vols</option>
-                            <option value="2">Prix</option>
-                            <option value="3">Heure de départ</option>
-                            <option value="4">Heure d'arrivée</option>
-                            <option value="5">Durée</option>
-                            <option value="6">Émissions</option>
+                            <option value="1">{{ __('Best flights') }}</option>
+                            <option value="2">{{ __('Price') }}</option>
+                            <option value="3">{{ __('Departure time') }}</option>
+                            <option value="4">{{ __('Arrival time') }}</option>
+                            <option value="5">{{ __('Duration') }}</option>
+                            <option value="6">{{ __('Emissions') }}</option>
                         </select>
                     </div>
 
@@ -250,7 +250,7 @@
                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <span>RECHERCHER DES VOLS</span>
+                        <span>{{ __('SEARCH FLIGHTS') }}</span>
                     </button>
                 </form>
             </div>
@@ -265,26 +265,26 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-3 md:mb-4">Prêt à rechercher vos vols ?</h3>
-                    <p class="text-gray-600 text-base md:text-lg mb-6 md:mb-8 px-2">Remplissez le formulaire ci-dessus et découvrez les meilleurs vols aux meilleurs prix.</p>
+                    <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-3 md:mb-4">{{ __('Ready to search for your flights?') }}</h3>
+                    <p class="text-gray-600 text-base md:text-lg mb-6 md:mb-8 px-2">{{ __('Fill out the form above and discover the best flights at the best prices.') }}</p>
                     <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                         <div class="flex items-center space-x-2 text-purple-600">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold text-sm md:text-base">Prix compétitifs</span>
+                            <span class="font-semibold text-sm md:text-base">{{ __('Competitive prices') }}</span>
                         </div>
                         <div class="flex items-center space-x-2 text-purple-600">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold text-sm md:text-base">Réservation instantanée</span>
+                            <span class="font-semibold text-sm md:text-base">{{ __('Instant booking') }}</span>
                         </div>
                         <div class="flex items-center space-x-2 text-purple-600">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="font-semibold text-sm md:text-base">Support 24/7</span>
+                            <span class="font-semibold text-sm md:text-base">{{ __('24/7 Support') }}</span>
                         </div>
                     </div>
                 </div>
@@ -297,6 +297,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM chargé - initialisation');
+
+    // Translations
+    const translations = @json([
+        'flight' => __('Flight'),
+        'departure' => __('Departure'),
+        'arrival' => __('Arrival'),
+        'date' => __('Date'),
+        'exCdgParis' => __('Ex: CDG, Paris...'),
+        'exJfkNewYork' => __('Ex: JFK, New York...'),
+        'loading' => __('Loading...'),
+        'noAirportFound' => __('No airport found'),
+        'tryAnotherName' => __('Try another name or code'),
+        'connectionError' => __('Connection error')
+    ]);
 
     // Variables globales
     let multiCityFlights = [];
@@ -381,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
         flightDiv.id = flightId;
         flightDiv.innerHTML = `
             <div class="flex justify-between items-center mb-4">
-                <h4 class="text-lg font-bold text-gray-900">Vol ${flightCounter}</h4>
+                <h4 class="text-lg font-bold text-gray-900">${translations.flight} ${flightCounter}</h4>
                 ${flightCounter > 2 ? `
                     <button type="button" class="remove-flight text-red-600 hover:text-red-700 font-bold" data-flight-id="${flightId}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,23 +407,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="relative">
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Départ *</label>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">${translations.departure} *</label>
                     <input type="text" class="mc-origin-input w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500"
-                           placeholder="Ex: CDG, Paris..." autocomplete="off" required>
+                           placeholder="${translations.exCdgParis}" autocomplete="off" required>
                     <input type="hidden" class="mc-origin-code">
                     <div class="mc-origin-suggestions hidden absolute z-50 w-full mt-2 bg-white border-2 border-purple-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"></div>
                 </div>
 
                 <div class="relative">
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Arrivée *</label>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">${translations.arrival} *</label>
                     <input type="text" class="mc-destination-input w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500"
-                           placeholder="Ex: JFK, New York..." autocomplete="off" required>
+                           placeholder="${translations.exJfkNewYork}" autocomplete="off" required>
                     <input type="hidden" class="mc-destination-code">
                     <div class="mc-destination-suggestions hidden absolute z-50 w-full mt-2 bg-white border-2 border-amber-200 rounded-xl shadow-xl max-h-60 overflow-y-auto"></div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Date *</label>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">${translations.date} *</label>
                     <input type="date" class="mc-date w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500"
                            min="{{ date('Y-m-d') }}" required>
                 </div>
@@ -477,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        suggestionsEl.innerHTML = '<div class="p-4 text-center text-gray-500">Chargement...</div>';
+        suggestionsEl.innerHTML = `<div class="p-4 text-center text-gray-500">${translations.loading}</div>`;
         suggestionsEl.classList.remove('hidden');
 
         const url = `/api/locations/search?q=${encodeURIComponent(keyword)}`;
@@ -490,8 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.length === 0) {
                     suggestionsEl.innerHTML = `
                         <div class="p-4 text-center text-gray-500">
-                            <div>Aucun aéroport trouvé</div>
-                            <div class="text-xs mt-1">Essayez avec un autre nom ou code</div>
+                            <div>${translations.noAirportFound}</div>
+                            <div class="text-xs mt-1">${translations.tryAnotherName}</div>
                         </div>
                     `;
                     return;
@@ -526,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Erreur:', error);
                 suggestionsEl.innerHTML = `
                     <div class="p-4 text-center text-red-500">
-                        <div>Erreur de connexion</div>
+                        <div>${translations.connectionError}</div>
                     </div>
                 `;
             });
