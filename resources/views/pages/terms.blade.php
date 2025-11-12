@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Conditions d\'Utilisation - Carré Premium')
+@section('title', __('Terms of Use') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -8,8 +8,8 @@
   <section class="relative h-[30vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-5xl font-black text-white mb-2">Conditions d'Utilisation</h1>
-      <p class="text-white/90">Dernière mise à jour : 10 Janvier 2025</p>
+      <h1 class="text-5xl font-black text-white mb-2">{{ __('Terms of Use') }}</h1>
+      <p class="text-white/90">{{ __('Last updated: January 10, 2025') }}</p>
     </div>
   </section>
 
@@ -20,12 +20,12 @@
 
         <div class="prose prose-lg max-w-none text-gray-900">
 
-          <h2 class="text-3xl font-black mb-4 text-gray-900">1. Acceptation des Conditions</h2>
+          <h2 class="text-3xl font-black mb-4 text-gray-900">{{ __('1. Acceptance of Terms') }}</h2>
           <p class="mb-6 text-gray-700">
             En accédant et en utilisant le site web de Carré Premium (ci-après "le Site"), vous acceptez d'être lié par les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre Site.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">2. Services Proposés</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('2. Services Offered') }}</h2>
           <p class="mb-4 text-gray-700">Carré Premium propose les services suivants :</p>
           <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
             <li>Réservation de billets d'avion</li>
@@ -34,7 +34,7 @@
             <li>Services de conciergerie voyage</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">3. Inscription et Compte Utilisateur</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('3. Registration and User Account') }}</h2>
           <h3 class="text-2xl font-bold mb-3 text-gray-900">3.1 Création de Compte</h3>
           <p class="mb-4 text-gray-700">
             Pour effectuer une réservation, vous devez créer un compte en fournissant des informations exactes et à jour. Vous êtes responsable de la confidentialité de vos identifiants de connexion.
@@ -45,7 +45,7 @@
             Vous êtes entièrement responsable de toutes les activités effectuées sous votre compte. En cas d'utilisation non autorisée, vous devez nous en informer immédiatement.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">4. Réservations et Paiements</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('4. Bookings and Payments') }}</h2>
           <h3 class="text-2xl font-bold mb-3 text-gray-900">4.1 Processus de Réservation</h3>
           <p class="mb-4 text-gray-700">
             Toutes les réservations sont soumises à disponibilité. Une réservation n'est confirmée qu'après réception du paiement intégral et envoi d'un email de confirmation.
@@ -64,7 +64,7 @@
             Après paiement, vous recevrez un email de confirmation contenant votre e-ticket et les détails de votre réservation. Vérifiez attentivement toutes les informations.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">5. Modifications et Annulations</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('5. Modifications and Cancellations') }}</h2>
           <h3 class="text-2xl font-bold mb-3 text-gray-900">5.1 Modifications</h3>
           <p class="mb-4 text-gray-700">
             Les modifications de réservation sont possibles selon les conditions tarifaires de votre billet. Des frais peuvent s'appliquer. Contactez notre service client pour toute modification.
@@ -78,7 +78,7 @@
             <li><strong>Packages :</strong> Annulation gratuite jusqu'à 30 jours avant le départ, puis frais dégressifs</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">6. Responsabilités</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('6. Responsibilities') }}</h2>
           <h3 class="text-2xl font-bold mb-3 text-gray-900">6.1 Responsabilité de Carré Premium</h3>
           <p class="mb-4 text-gray-700">
             Carré Premium agit en tant qu'intermédiaire entre vous et les prestataires de services (compagnies aériennes, organisateurs d'événements, etc.). Nous ne sommes pas responsables des retards, annulations ou modifications effectués par ces prestataires.
@@ -93,37 +93,37 @@
             <li>Fournir des informations exactes lors de la réservation</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">7. Propriété Intellectuelle</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('7. Intellectual Property') }}</h2>
           <p class="mb-6 text-gray-700">
             Tous les contenus du Site (textes, images, logos, vidéos) sont la propriété de Carré Premium ou de ses partenaires. Toute reproduction sans autorisation est interdite.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">8. Protection des Données</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('8. Data Protection') }}</h2>
           <p class="mb-6 text-gray-700">
             Vos données personnelles sont traitées conformément à notre Politique de Confidentialité. Nous nous engageons à protéger vos informations et à ne les utiliser que dans le cadre de nos services.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">9. Limitation de Responsabilité</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('9. Limitation of Liability') }}</h2>
           <p class="mb-6 text-gray-700">
             Carré Premium ne peut être tenu responsable des dommages indirects, incidents ou consécutifs résultant de l'utilisation de nos services, sauf en cas de faute grave ou intentionnelle de notre part.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">10. Force Majeure</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('10. Force Majeure') }}</h2>
           <p class="mb-6 text-gray-700">
             Nous ne serons pas tenus responsables de tout manquement à nos obligations en cas de force majeure (catastrophes naturelles, guerres, pandémies, grèves, etc.).
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">11. Modifications des Conditions</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('11. Changes to Terms') }}</h2>
           <p class="mb-6 text-gray-700">
             Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications entreront en vigueur dès leur publication sur le Site. Votre utilisation continue du Site après modification constitue votre acceptation des nouvelles conditions.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">12. Droit Applicable et Juridiction</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('12. Applicable Law and Jurisdiction') }}</h2>
           <p class="mb-6 text-gray-700">
             Ces conditions sont régies par le droit ivoirien. Tout litige sera soumis à la juridiction exclusive des tribunaux d'Abidjan, Côte d'Ivoire.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">13. Contact</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('13. Contact') }}</h2>
           <p class="mb-2 text-gray-700">Pour toute question concernant ces conditions, contactez-nous :</p>
           <ul class="list-none space-y-2 mb-6 text-gray-700">
             <li><strong>Email :</strong> legal@carrepremium.com</li>

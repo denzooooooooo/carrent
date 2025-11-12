@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Politique de Confidentialité - Carré Premium')
+@section('title', __('Privacy Policy') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-white">
@@ -8,8 +8,8 @@
   <section class="relative h-[30vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container-custom h-full flex flex-col justify-center px-4">
-      <h1 class="text-5xl font-black text-white mb-2">Politique de Confidentialité</h1>
-      <p class="text-white/90">Dernière mise à jour : 10 Janvier 2025</p>
+      <h1 class="text-5xl font-black text-white mb-2">{{ __('Privacy Policy') }}</h1>
+      <p class="text-white/90">{{ __('Last updated: January 10, 2025') }}</p>
     </div>
   </section>
 
@@ -21,11 +21,11 @@
         <div class="prose prose-lg max-w-none">
           <div class="mb-8 p-6 bg-blue-50 rounded-2xl border-2 border-blue-200">
             <p class="text-sm mb-0">
-              Chez Carré Premium, nous prenons la protection de vos données personnelles très au sérieux. Cette politique explique comment nous collectons, utilisons, partageons et protégeons vos informations.
+              {{ __('At Carré Premium, we take the protection of your personal data very seriously. This policy explains how we collect, use, share and protect your information.') }}
             </p>
           </div>
 
-          <h2 class="text-3xl font-black mb-4">1. Informations que Nous Collectons</h2>
+          <h2 class="text-3xl font-black mb-4">{{ __('1. Information We Collect') }}</h2>
 
           <h3 class="text-2xl font-bold mb-3">1.1 Informations Fournies Directement</h3>
           <p class="mb-4">Lorsque vous utilisez nos services, nous collectons les informations que vous nous fournissez :</p>
@@ -45,7 +45,7 @@
             <li><strong>Données de localisation :</strong> localisation approximative basée sur l'IP</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">2. Utilisation de Vos Données</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('2. Use of Your Data') }}</h2>
           <p class="mb-4">Nous utilisons vos données personnelles pour :</p>
 
           <h3 class="text-2xl font-bold mb-3">2.1 Fourniture des Services</h3>
@@ -70,7 +70,7 @@
             <li>Répondre à vos questions et demandes</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">3. Partage de Vos Données</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('3. Sharing Your Data') }}</h2>
           <p class="mb-4">Nous ne vendons jamais vos données personnelles. Nous les partageons uniquement dans les cas suivants :</p>
 
           <h3 class="text-2xl font-bold mb-3">3.1 Prestataires de Services</h3>
@@ -87,7 +87,7 @@
             Nous pouvons divulguer vos informations si la loi l'exige ou pour protéger nos droits, votre sécurité ou celle d'autrui.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">4. Sécurité des Données</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('4. Data Security') }}</h2>
           <p class="mb-4">Nous mettons en œuvre des mesures de sécurité robustes :</p>
           <ul class="list-disc pl-6 mb-6 space-y-2">
             <li><strong>Cryptage SSL/TLS :</strong> toutes les données sensibles sont cryptées</li>
@@ -97,7 +97,7 @@
             <li><strong>Conformité PCI-DSS :</strong> pour les paiements par carte</li>
           </ul>
 
-          <h2 className="text-3xl font-black mb-4 mt-8">5. Vos Droits</h2>
+          <h2 className="text-3xl font-black mb-4 mt-8">{{ __('5. Your Rights') }}</h2>
           <p class="mb-4">Conformément au RGPD et aux lois locales, vous avez le droit de :</p>
 
           <h3 class="text-2xl font-bold mb-3">5.1 Accès et Rectification</h3>
@@ -120,7 +120,7 @@
             Vous pouvez demander une copie de vos données dans un format structuré et couramment utilisé.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">6. Cookies et Technologies Similaires</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('6. Cookies and Similar Technologies') }}</h2>
           <p class="mb-4">Nous utilisons des cookies pour :</p>
           <ul class="list-disc pl-6 mb-4 space-y-2">
             <li><strong>Cookies essentiels :</strong> nécessaires au fonctionnement du site</li>
@@ -132,27 +132,27 @@
             Vous pouvez gérer vos préférences de cookies via les paramètres de votre navigateur ou notre bannière de cookies.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">7. Conservation des Données</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('7. Data Retention') }}</h2>
           <p class="mb-6">
             Nous conservons vos données personnelles aussi longtemps que nécessaire pour fournir nos services et respecter nos obligations légales. Les données de réservation sont conservées pendant 10 ans conformément aux obligations comptables.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">8. Transferts Internationaux</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('8. International Transfers') }}</h2>
           <p class="mb-6">
             Vos données peuvent être transférées et traitées dans des pays autres que votre pays de résidence. Nous nous assurons que ces transferts respectent les normes de protection des données applicables.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">9. Protection des Mineurs</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('9. Protection of Minors') }}</h2>
           <p class="mb-6">
             Nos services ne sont pas destinés aux personnes de moins de 18 ans. Nous ne collectons pas sciemment de données personnelles auprès de mineurs sans le consentement parental.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">10. Modifications de Cette Politique</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('10. Changes to This Policy') }}</h2>
           <p class="mb-6">
             Nous pouvons mettre à jour cette politique de confidentialité périodiquement. Nous vous informerons de tout changement significatif par email ou via une notification sur notre site.
           </p>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">11. Contact</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('11. Contact') }}</h2>
           <p class="mb-2">Pour toute question concernant cette politique ou vos données personnelles :</p>
           <ul class="list-none space-y-2 mb-6">
             <li><strong>Délégué à la Protection des Données :</strong> dpo@carrepremium.com</li>
@@ -161,15 +161,15 @@
             <li><strong>Adresse :</strong> Abidjan, Plateau, Côte d'Ivoire</li>
           </ul>
 
-          <h2 class="text-3xl font-black mb-4 mt-8">12. Autorité de Contrôle</h2>
+          <h2 class="text-3xl font-black mb-4 mt-8">{{ __('12. Supervisory Authority') }}</h2>
           <p class="mb-6">
             Si vous estimez que vos droits ne sont pas respectés, vous pouvez déposer une plainte auprès de l'autorité de protection des données compétente en Côte d'Ivoire.
           </p>
 
           <div class="mt-12 p-6 bg-green-50 rounded-2xl border-2 border-green-200">
-            <h3 class="text-xl font-bold mb-3">🔒 Notre Engagement</h3>
+            <h3 class="text-xl font-bold mb-3">🔒 {{ __('Our Commitment') }}</h3>
             <p class="text-sm text-gray-600 mb-0">
-              Carré Premium s'engage à protéger votre vie privée et à traiter vos données personnelles de manière transparente, équitable et conforme à la législation applicable. Votre confiance est notre priorité.
+              {{ __('Carré Premium is committed to protecting your privacy and processing your personal data in a transparent, fair and compliant manner. Your trust is our priority.') }}
             </p>
           </div>
         </div>

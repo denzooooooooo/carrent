@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'FAQ - Carré Premium')
+@section('title', __('FAQ') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-white">
@@ -8,8 +8,8 @@
   <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-5xl font-black text-white mb-4">Questions Fréquentes</h1>
-      <p class="text-xl text-white/90">Trouvez rapidement les réponses à vos questions</p>
+      <h1 class="text-5xl font-black text-white mb-4">{{ __('Frequently Asked Questions') }}</h1>
+      <p class="text-xl text-white/90">{{ __('Quickly find answers to your questions') }}</p>
     </div>
   </section>
 
@@ -21,7 +21,7 @@
           <div class="relative">
             <input
               type="text"
-              placeholder="Rechercher une question..."
+              placeholder="{{ __('Search a question...') }}"
               class="w-full px-6 py-4 pl-12 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
             />
             <svg class="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
         @php
           $faqs = [
             [
-              'category' => 'Réservations',
+              'category' => __('Bookings'),
               'questions' => [
                 [
                   'q' => 'Comment réserver un vol sur Carré Premium ?',
@@ -61,7 +61,7 @@
               ]
             ],
             [
-              'category' => 'Paiements',
+              'category' => __('Payments'),
               'questions' => [
                 [
                   'q' => 'Quels moyens de paiement acceptez-vous ?',
@@ -82,7 +82,7 @@
               ]
             ],
             [
-              'category' => 'Billets & Documents',
+              'category' => __('Tickets & Documents'),
               'questions' => [
                 [
                   'q' => 'Comment recevoir mon billet ?',
@@ -103,7 +103,7 @@
               ]
             ],
             [
-              'category' => 'Bagages',
+              'category' => __('Luggage'),
               'questions' => [
                 [
                   'q' => 'Quelle est la franchise bagage ?',
@@ -124,7 +124,7 @@
               ]
             ],
             [
-              'category' => 'Événements & Packages',
+              'category' => __('Events & Packages'),
               'questions' => [
                 [
                   'q' => 'Comment réserver des billets pour un événement ?',
@@ -145,7 +145,7 @@
               ]
             ],
             [
-              'category' => 'Compte & Sécurité',
+              'category' => __('Account & Security'),
               'questions' => [
                 [
                   'q' => 'Comment créer un compte ?',
@@ -221,14 +221,14 @@
   {{-- Contact CTA --}}
   <section class="py-16 bg-gradient-to-r from-purple-600 to-amber-600">
     <div class="container mx-auto text-center">
-      <h2 class="text-4xl font-black text-white mb-4">Vous ne trouvez pas votre réponse ?</h2>
-      <p class="text-xl text-white/90 mb-8">Notre équipe est là pour vous aider 24h/24, 7j/7</p>
+      <h2 class="text-4xl font-black text-white mb-4">{{ __('Can\'t find your answer?') }}</h2>
+      <p class="text-xl text-white/90 mb-8">{{ __('Our team is here to help you 24/7') }}</p>
       <div class="flex flex-wrap gap-4 justify-center">
         <a href="{{ route('contact') }}" class="px-8 py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all">
-          Nous Contacter
+          {{ __('Contact us') }}
         </a>
         <a href="tel:+225XXXXXXXXX" class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all">
-          Appeler Maintenant
+          {{ __('Call now') }}
         </a>
       </div>
     </div>
