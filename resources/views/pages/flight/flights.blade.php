@@ -299,18 +299,18 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM chargé - initialisation');
 
     // Translations
-    const translations = @json([
-        'flight' => __('Flight'),
-        'departure' => __('Departure'),
-        'arrival' => __('Arrival'),
-        'date' => __('Date'),
-        'exCdgParis' => __('Ex: CDG, Paris...'),
-        'exJfkNewYork' => __('Ex: JFK, New York...'),
-        'loading' => __('Loading...'),
-        'noAirportFound' => __('No airport found'),
-        'tryAnotherName' => __('Try another name or code'),
-        'connectionError' => __('Connection error')
-    ]);
+    const translations = {
+        flight: @json(__('Flight')),
+        departure: @json(__('Departure')),
+        arrival: @json(__('Arrival')),
+        date: @json(__('Date')),
+        exCdgParis: @json(__('Ex: CDG, Paris...')),
+        exJfkNewYork: @json(__('Ex: JFK, New York...')),
+        loading: @json(__('Loading...')),
+        noAirportFound: @json(__('No airport found')),
+        tryAnotherName: @json(__('Try another name or code')),
+        connectionError: @json(__('Connection error'))
+    };
 
     // Variables globales
     let multiCityFlights = [];
