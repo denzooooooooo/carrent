@@ -77,10 +77,10 @@
             {{-- Action Buttons --}}
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button class="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 text-center text-sm sm:text-base">
-                Réserver maintenant
+                {{ __('Book now') }}
               </button>
               <button class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg sm:rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all duration-300 text-sm sm:text-base">
-                Partager
+                {{ __('Share') }}
               </button>
             </div>
           </div>
@@ -96,7 +96,7 @@
       <div class="lg:col-span-2 space-y-6 sm:space-y-8">
         {{-- About Section --}}
         <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">À propos de l'événement</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('About the event') }}</h2>
           <div class="prose prose-base sm:prose-lg max-w-none text-gray-700 leading-relaxed">
             {!! nl2br(e($event->description_fr)) !!}
           </div>
@@ -105,7 +105,7 @@
         {{-- Organizer Section --}}
         @if($event->organizer)
         <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Organisateur</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Organizer') }}</h2>
           <div class="flex items-center space-x-3 sm:space-x-4">
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
               <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@
             </div>
             <div>
               <p class="font-semibold text-gray-900">{{ $event->organizer }}</p>
-              <p class="text-gray-600 text-sm">Organisateur officiel</p>
+              <p class="text-gray-600 text-sm">{{ __('Official organizer') }}</p>
             </div>
           </div>
         </section>
@@ -122,7 +122,7 @@
 
         {{-- Venue Details --}}
         <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Lieu de l'événement</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Event venue') }}</h2>
           <div class="flex items-start space-x-3 sm:space-x-4">
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
               <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@
       <div class="lg:col-span-1">
         <div class="sticky top-6 sm:top-8">
           <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Choisir vos places</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Choose your seats') }}</h3>
 
             @if($event->seatZones->count() > 0)
               <div class="space-y-3 sm:space-y-4">
@@ -156,7 +156,7 @@
                       </div>
                       <div class="text-right ml-2">
                         <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</div>
-                        <div class="text-xs text-gray-500">par personne</div>
+                        <div class="text-xs text-gray-500">{{ __('per person') }}</div>
                       </div>
                     </div>
 
@@ -165,7 +165,7 @@
                     @endif
 
                     <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
-                      <span>{{ $zone->available_seats }} restantes</span>
+                      <span>{{ $zone->available_seats }} {{ __('remaining') }}</span>
                       <span class="text-xs">/ {{ $zone->total_seats }}</span>
                     </div>
 
@@ -175,11 +175,11 @@
                               data-zone-name="{{ $zone->zone_name }}"
                               data-price="{{ $zone->price }}"
                               data-available="{{ $zone->available_seats }}">
-                        Sélectionner
+                        {{ __('Select') }}
                       </button>
                     @else
                       <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
-                        Complet
+                        {{ __('Sold out') }}
                       </button>
                     @endif
                   </div>
@@ -190,8 +190,8 @@
                 <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <p class="text-gray-500 font-medium text-sm sm:text-base">Billets bientôt disponibles</p>
-                <p class="text-gray-400 text-xs sm:text-sm mt-1">Revenez plus tard</p>
+                <p class="text-gray-500 font-medium text-sm sm:text-base">{{ __('Tickets coming soon') }}</p>
+                <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ __('Come back later') }}</p>
               </div>
             @endif
           </div>
@@ -203,16 +203,16 @@
   {{-- CTA Section --}}
   <section class="bg-gradient-to-r from-purple-600 to-amber-600 py-12 sm:py-16">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">Vous avez des questions ?</h2>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">{{ __('Do you have questions?') }}</h2>
       <p class="text-lg sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
-        Notre équipe est là pour vous aider à choisir les meilleures places.
+        {{ __('Our team is here to help you choose the best seats.') }}
       </p>
       <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
         <a href="{{ route('contact') }}" class="bg-white text-purple-600 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 inline-block text-sm sm:text-base">
-          Nous contacter
+          {{ __('Contact us') }}
         </a>
         <a href="tel:+225XXXXXXXXX" class="border-2 border-white text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl hover:bg-white hover:text-purple-600 transition-all duration-300 inline-block text-sm sm:text-base">
-          Appeler maintenant
+          {{ __('Call now') }}
         </a>
       </div>
     </div>
@@ -225,7 +225,7 @@
     <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold text-gray-900">Sélectionner vos places</h3>
+          <h3 class="text-xl font-bold text-gray-900">{{ __('Select your seats') }}</h3>
           <button id="closeModal" class="text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -240,7 +240,7 @@
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de places</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Number of seats') }}</label>
             <div class="flex items-center space-x-3">
               <button id="decreaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,16 +254,16 @@
                 </svg>
               </button>
             </div>
-            <p class="text-xs text-gray-500 mt-2">Maximum: <span id="maxAvailable"></span> places disponibles</p>
+            <p class="text-xs text-gray-500 mt-2">{{ __('Maximum:') }} <span id="maxAvailable"></span> {{ __('seats available') }}</p>
           </div>
 
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-gray-600">Prix par place:</span>
+              <span class="text-gray-600">{{ __('Price per seat:') }}</span>
               <span id="unitPrice" class="font-semibold"></span>
             </div>
             <div class="flex justify-between items-center text-lg font-bold">
-              <span>Total:</span>
+              <span>{{ __('Total:') }}</span>
               <span id="totalPrice" class="text-purple-600"></span>
             </div>
           </div>
@@ -275,21 +275,21 @@
 
             <div class="space-y-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Full name') }}</label>
                 <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Email') }}</label>
                 <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Phone') }}</label>
                 <input type="tel" name="phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
               </div>
             </div>
 
             <button type="submit" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-              Confirmer la réservation
+              {{ __('Confirm booking') }}
             </button>
           </form>
         </div>
