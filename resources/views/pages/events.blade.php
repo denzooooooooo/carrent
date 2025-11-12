@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Événements - Carré Premium')
+@section('title', __('Events') . ' - Carré Premium')
 
 @section('content')
 <div class="min-h-screen bg-white">
@@ -8,8 +8,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">Événements Sportifs & Culturels</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">Vivez des expériences uniques avec Carré Premium</p>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Sports & Cultural Events') }}</h1>
+      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Experience unique moments with Carré Premium') }}</p>
     </div>
   </section>
 
@@ -20,9 +20,9 @@
         <form method="GET" action="{{ route('events') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Type d'événement</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Event type') }}</label>
               <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Tous les événements</option>
+                <option value="">{{ __('All events') }}</option>
                 @foreach($categories as $category)
                   <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                     {{ $category->name_fr }}
@@ -31,9 +31,9 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Lieu</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Venue') }}</label>
               <select name="venue" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Tous les lieux</option>
+                <option value="">{{ __('All venues') }}</option>
                 <option value="Stade Félix Houphouët-Boigny" {{ request('venue') == 'Stade Félix Houphouët-Boigny' ? 'selected' : '' }}>Stade Félix Houphouët-Boigny</option>
                 <option value="Palais de la Culture" {{ request('venue') == 'Palais de la Culture' ? 'selected' : '' }}>Palais de la Culture</option>
                 <option value="Parc des Sports" {{ request('venue') == 'Parc des Sports' ? 'selected' : '' }}>Parc des Sports</option>
@@ -41,12 +41,12 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Date</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Date') }}</label>
               <input type="date" name="date" value="{{ request('date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
             </div>
             <div class="flex items-end gap-2">
               <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
-                Rechercher
+                {{ __('Search') }}
               </button>
               @if(request()->hasAny(['category', 'venue', 'date']))
                 <a href="{{ route('events') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
@@ -76,7 +76,7 @@
                 @endphp
                 <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}" class="w-full h-32 md:h-40 lg:h-48 object-cover" onerror="this.onerror=null;this.src='{{ $placeholder }}';">
                 <div class="absolute top-2 md:top-4 left-2 md:left-4">
-                  <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">Disponible</span>
+                  <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">{{ __('Available') }}</span>
                 </div>
                 <div class="absolute top-2 md:top-4 right-2 md:right-4">
                   <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $event->category->name_fr ?? 'Événement' }}</span>
@@ -100,10 +100,10 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</span>
-                    <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
+                    <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per person') }}</span>
                   </div>
                   <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                    Réserver
+                    {{ __('Book') }}
                   </a>
                 </div>
               </div>
@@ -111,8 +111,8 @@
           @empty
             {{-- Fallback si aucun événement --}}
             <div class="col-span-full bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-              <p class="text-xl text-gray-500">Aucun événement n'a été trouvé.</p>
-              <p class="text-sm text-gray-400 mt-2">Revenez bientôt pour découvrir nos prochains événements exclusifs.</p>
+              <p class="text-xl text-gray-500">{{ __('No events found.') }}</p>
+              <p class="text-sm text-gray-400 mt-2">{{ __('Come back soon to discover our next exclusive events.') }}</p>
             </div>
           @endforelse
         </div>
@@ -123,14 +123,14 @@
   {{-- CTA Section --}}
   <section class="py-12 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">Vous ne trouvez pas l'événement de vos rêves ?</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">Contactez-nous pour organiser un événement sur mesure</p>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __("Can't find your dream event?") }}</h2>
+      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact us to organize a tailor-made event') }}</p>
       <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
-          Demander un devis
+          {{ __('Request a quote') }}
         </a>
         <a href="tel:+225XXXXXXXXX" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg md:rounded-xl hover:bg-white hover:text-purple-600 transition-all text-sm md:text-base">
-          Appeler Maintenant
+          {{ __('Call Now') }}
         </a>
       </div>
     </div>
