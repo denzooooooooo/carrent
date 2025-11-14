@@ -114,7 +114,7 @@
                     class="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
                 />
                 <div class="hidden md:block">
-                    <h1 class="text-xl font-black text-gray-900 dark:text-white">CARRÉ PREMIUM</h1>
+                    <h2 class="text-xl font-black text-gray-900 dark:text-white" style="margin-left: 14px;">CARRÉ PREMIUM</h2>
                     <p class="text-xs text-gray-600 dark:text-gray-400">{{ __('Notre limite, le reflet de votre imagination.') }}</p>
                 </div>
             </a>
