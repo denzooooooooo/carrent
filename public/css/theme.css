@@ -345,7 +345,7 @@ footer {
 
 /* PRODUITS - Bordures blanches en mode sombre pour distinction */
 [data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) {
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
 }
 
 /* Cards de produits/événements/packages */
