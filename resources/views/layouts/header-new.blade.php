@@ -101,12 +101,15 @@
             
             {{-- Logo --}}
             <a href="/" class="flex items-center space-x-3 group">
-                <img 
-                    src="{{ asset('logos/logo.jpg') }}" 
-                    alt="Carré Premium" 
-                    class="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
+                <img
+                    src="{{ asset('logos/logo.jpg') }}"
+                    alt="Carré Premium"
+                    class="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
                 />
-               
+                <div class="flex flex-col">
+                    <span class="text-lg font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
+                    <span class="text-xs text-gray-600 dark:text-gray-400 leading-tight">Conciergerie privée</span>
+                </div>
             </a>
 
             {{-- Desktop Navigation --}}
