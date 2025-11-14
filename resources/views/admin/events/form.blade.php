@@ -537,7 +537,7 @@
             <div class="flex items-center mt-4">
                 <input type="checkbox" name="seat_zones[3][is_active]" id="zone_active_3" value="1"
                     class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old('seat_zones.3.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->is_active ?? true) : true) ? 'checked' : '' }}
+                    {{ old('seat_zones.3.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->is_active ?? true) : true) ? 'checked' : '' }}>
                 <label for="zone_active_3" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
             </div>
         </div>
