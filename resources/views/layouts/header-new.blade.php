@@ -112,8 +112,9 @@
                     src="{{ asset('logos/logo.jpg') }}" 
                     alt="Carré Premium" 
                     class="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
+                    style="margin-left: -34px;"
                 />
-                <div class="hidden md:block" style="margin-left: -24px;">
+                <div class="hidden md:block" style="margin-left: -34px;">
                     <h2 class="text-xl font-black text-gray-900 dark:text-white" >CARRÉ PREMIUM</h2>
                     <p class="text-xs text-gray-600 dark:text-gray-400">{{ __('Notre limite, le reflet de votre imagination.') }}</p>
                 </div>
