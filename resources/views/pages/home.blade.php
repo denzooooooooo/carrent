@@ -68,7 +68,7 @@
             </div>
 
             <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <h3 class="text-xl font-black mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
+              <h3 class="text-xl font-black mb-3 text-white group-hover:text-amber-400 transition-colors line-clamp-2">
                 {{ $event->title }}
               </h3>
 
@@ -123,7 +123,7 @@
               </div>
 
               <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <h3 class="text-xl font-black mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
+                <h3 class="text-xl font-black mb-3 text-white group-hover:text-amber-400 transition-colors line-clamp-2">
                   {{ __('Exclusive Event') }} {{ $i + 1 }}
                 </h3>
 

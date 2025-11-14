@@ -23,21 +23,14 @@
             'color' => 'pink'
         ],
         [
-            'name' => __('Packages'),
-            'name_fr' => 'Packages',
-            'path' => '/packages',
-            'icon' => 'fa-suitcase-rolling',
-            'color' => 'green'
-        ],
-        [
             'name' => __('Services'),
             'name_fr' => 'Services',
             'path' => '#',
             'icon' => 'fa-concierge-bell',
             'color' => 'orange',
             'submenu' => [
+                ['name' => __('Packages'), 'name_fr' => 'Packages', 'path' => '/packages', 'icon' => 'fa-suitcase-rolling'],
                 ['name' => __('Car Rental'), 'name_fr' => 'Location de voiture', 'path' => '/location', 'icon' => 'fa-car'],
-                ['name' => __('Concierge'), 'name_fr' => 'Conciergerie', 'path' => '/concierge', 'icon' => 'fa-concierge-bell'],
                 ['name' => __('About Us'), 'name_fr' => 'À propos', 'path' => '/about', 'icon' => 'fa-info-circle'],
                 ['name' => __('Contact'), 'name_fr' => 'Contact', 'path' => '/contact', 'icon' => 'fa-envelope'],
             ]
@@ -113,10 +106,7 @@
                     alt="Carré Premium" 
                     class="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
                 />
-                <div class="hidden md:block" style="margin-left: -14px;">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white" >CARRÉ PREMIUM</h3>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ __('Notre limite, le reflet de votre imagination.') }}</p>
-                </div>
+               
             </a>
 
             {{-- Desktop Navigation --}}
@@ -191,8 +181,9 @@
             <div class="flex items-center space-x-2">
                 
                 {{-- Theme Toggle Button - Uses CSS Variables System --}}
-                <button id="theme-toggle">
-                    🌙 Mode sombre
+                <button id="theme-toggle" class="flex items-center space-x-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+                    <i class="fas fa-adjust"></i>
+                    <span class="text-sm font-medium">{{ __('Theme') }}</span>
                 </button>
 
                 {{-- Language Selector --}}
@@ -364,15 +355,15 @@
                 <p class="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Settings') }}</p>
                 
                 {{-- Theme Toggle --}}
-                <button 
+                <button
                     id="theme-toggle-mobile"
                     class="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium"
                 >
                     <div class="flex items-center space-x-3">
-                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-adjust"></i>
                         <span>{{ __('Theme') }}</span>
                     </div>
-                    <span class="text-sm">🌙</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
                 </button>
 
                 {{-- Language Selector --}}
