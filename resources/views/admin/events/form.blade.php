@@ -484,21 +484,21 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
                     <input type="text" name="seat_zones[3][zone_name_fr]" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old(seat_zones.3.zone_name_fr, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->zone_name_fr ?? Zone Premium) : Zone Premium) }}">
+                        value="{{ old('seat_zones.3.zone_name_fr', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_name_fr ?? 'Zone Premium') : 'Zone Premium') }}">
                 </div>
                 {{-- Nom de la zone EN --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Anglais)</label>
                     <input type="text" name="seat_zones[3][zone_name_en]" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old(seat_zones.3.zone_name_en, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->zone_name_en ?? Premium Zone) : Premium Zone) }}">
+                        value="{{ old('seat_zones.3.zone_name_en', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_name_en ?? 'Premium Zone') : 'Premium Zone') }}">
                 </div>
                 {{-- Code de la zone --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
                     <input type="text" name="seat_zones[3][zone_code]" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old(seat_zones.3.zone_code, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->zone_code ?? PREM) : PREM) }}">
+                        value="{{ old('seat_zones.3.zone_code', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_code ?? 'PREM') : 'PREM') }}">
                 </div>
                 {{-- Type de zone --}}
                 <div>
@@ -511,26 +511,26 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
                     <input type="number" name="seat_zones[3][price]" required min="0" step="0.01"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old(seat_zones.3.price, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->price ?? 0) : 0) }}">
+                        value="{{ old('seat_zones.3.price', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->price ?? 0) : 0) }}">
                 </div>
                 {{-- Nombre total de sièges --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Total de Sièges</label>
                     <input type="number" name="seat_zones[3][total_seats]" required min="1"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old(seat_zones.3.total_seats, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->total_seats ?? 0) : 0) }}">
+                        value="{{ old('seat_zones.3.total_seats', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->total_seats ?? 0) : 0) }}">
                 </div>
                 {{-- Description FR --}}
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
                     <textarea name="seat_zones[3][description_fr]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old(seat_zones.3.description_fr, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->description_fr ?? ) : ) }}</textarea>
+                        {{ old('seat_zones.3.description_fr', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->description_fr ?? '') : '') }}
                 </div>
                 {{-- Description EN --}}
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Description (Anglais)</label>
                     <textarea name="seat_zones[3][description_en]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old(seat_zones.3.description_en, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->description_en ?? ) : ) }}</textarea>
+                        {{ old('seat_zones.3.description_en', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->description_en ?? '') : '') }}
                 </div>
             </div>
 
@@ -538,7 +538,7 @@
             <div class="flex items-center mt-4">
                 <input type="checkbox" name="seat_zones[3][is_active]" id="zone_active_3" value="1"
                     class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old(seat_zones.3.is_active, $event->exists ? ($event->seatZones->where(zone_type, premium)->first()->is_active ?? true) : true) ? checked :  }}>
+                    {{ old('seat_zones.3.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->is_active ?? true) : true) ? 'checked' : '' }}
                 <label for="zone_active_3" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
             </div>
         </div>
@@ -547,7 +547,7 @@
         <div class="mt-8 pt-4 border-t">
             <button type="submit"
                 class="w-full py-3 px-4 rounded-lg text-white font-semibold bg-primary hover:bg-purple-700 transition duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-primary/50">
-                <i class="fas fa-{{ $isEdit ? save : plus-circle }} mr-2"></i> {{ $isEdit ? Enregistrer les Modifications : Créer l'Événement }}
+                <i class="fas fa-{{ $isEdit ? 'save' : 'plus-circle' }} mr-2"></i> {{ $isEdit ? 'Enregistrer les Modifications' : 'Créer l\'Événement' }}
             </button>
         </div>
     </form>
