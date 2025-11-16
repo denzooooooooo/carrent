@@ -15,6 +15,7 @@
 
     <!-- Theme CSS - MUST be loaded first -->
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/separate-tickets.css') }}">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
@@ -25,11 +26,13 @@
     <!-- Theme Initialization Script - Must be in head to prevent flash -->
     <script>
         // Initialize theme IMMEDIATELY to prevent flash
-        (function() {
+        (function () {
             const theme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
+
+    @stack('styles')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -53,18 +56,18 @@
     ])
 
     <main class="pt-20">
-        @yield('content')
-    </main>
+    @yield('content')
+</main>
 
-    @include('layouts.footer')
+     @include('layouts.footer')
 
-
-    @include('components.chatbot-widget')
+                @include('components.chatbot-widget')
     
     <!-- Theme JavaScript -->
     <script src="{{ asset('js/theme.js') }}"></script>
-            
-    <script src="//unpkg.com/alpinejs" defer></script>
+           <script src="//unpkg.com/alpinejs" defer></script>
+    @stack('scripts')   
+
     @yield('scripts')
 </body>
 </html> 

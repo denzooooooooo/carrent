@@ -185,7 +185,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
         {{-- Service Cards --}}
-        <a href="{{ route('flights') }}" class="group">
+        <a href="{{ route('flights.index') }}" class="group">
           <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
             <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,7 +349,7 @@
           {{ __('We also offer international flight bookings') }}
         </p>
         <a
-          href="{{ route('flights') }}"
+          href="{{ route('flights.index') }}"
           class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl text-base"
         >
           <span>{{ __('Search for a Flight') }}</span>

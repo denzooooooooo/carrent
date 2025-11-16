@@ -7,23 +7,23 @@ use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrencyController;
-use App\Http\Controllers\FlightSearchController;
-use App\Http\Controllers\FlightBookingController;
+use App\Http\Controllers\FlightController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
 
 Route::prefix('chatbot')->name('chatbot.')->group(function () {
     Route::get('/', [ChatbotController::class, 'index'])->name('index');
     Route::post('/process', [ChatbotController::class, 'processMessage'])->name('process');
 });
 
-/* // Test SerpAPI
+
+// Dans routes/web.php
 Route::get('/test-serpapi', function () {
     $apiKey = env('SERPAPI_KEY');
 
@@ -54,13 +54,18 @@ Route::get('/test-serpapi', function () {
             'error' => $e->getMessage()
         ]);
     }
-}); */
+});
 
 // Social Authentication Routes
 Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+// Facebook OAuth Routes
 Route::get('auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('auth/facebook/callback', [AuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
+
+Route::get('/flights/details', [FlightController::class, 'details'])->name('flight.details');
+Route::post('/flights/booking', [FlightController::class, 'storeBooking'])->name('flight.store-booking');
 
 // --- Authentification ---
 Route::middleware('guest')->group(function () {
@@ -77,9 +82,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
 
-    // Routes de réservation de vols (authentification requise)
-    /* Route::post('/flights/booking/store', [FlightBookingController::class, 'store'])->name('flights.booking.store');
-    Route::get('/flights/booking/{id}/confirmation', [FlightBookingController::class, 'confirmation'])->name('flights.booking.confirmation'); */
+    /* Route::get('/flights/details', [FlightController::class, 'details'])->name('flight.details');
+    Route::post('/flights/booking', [FlightController::class, 'storeBooking'])->name('flight.store-booking'); */
+    Route::get('/booking/confirmation/{bookingId}', [FlightController::class, 'bookingConfirmation'])->name('booking.confirmation');
+
+
 });
 
 // --- Administration ---
@@ -93,15 +100,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('members', MemberController::class);
 
+
         // Gestion des utilisateurs
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
         // Gestion des réservations
+        /* Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class); */
+        // Gestion des réservations avec actions supplémentaires
         Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class);
         Route::put('bookings/{id}/status', [App\Http\Controllers\Admin\BookingController::class, 'updateStatus'])
             ->name('bookings.update-status');
         Route::put('bookings/{id}/payment-status', [App\Http\Controllers\Admin\BookingController::class, 'updatePaymentStatus'])
             ->name('bookings.update-payment-status');
+        // Actions spécifiques pour les réservations
+        /* Route::put('bookings/{booking}/confirm', [App\Http\Controllers\Admin\BookingController::class, 'confirm'])
+            ->name('bookings.confirm');
+
+        Route::post('bookings/{booking}/cancel', [App\Http\Controllers\Admin\BookingController::class, 'cancel'])
+            ->name('bookings.cancel');
+
+        Route::put('bookings/{booking}/pay', [App\Http\Controllers\Admin\BookingController::class, 'markAsPaid'])
+            ->name('bookings.pay');
+
+        Route::put('bookings/{booking}/issue-ticket', [App\Http\Controllers\Admin\BookingController::class, 'issueTicket'])
+            ->name('bookings.issue-ticket'); */
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
@@ -112,9 +134,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('event-categories.quick-store');
         Route::post('/event-types/quick-store', [EventController::class, 'quickStoreType'])
             ->name('event-types.quick-store');
-
         // Gestion des packages
         Route::resource('packages', App\Http\Controllers\Admin\PackageController::class);
+        // Dans la section admin middleware
         Route::post('packages/{package}/toggle-status', [PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
         Route::post('packages/{package}/toggle-featured', [PackageController::class, 'toggleFeatured'])->name('packages.toggle-featured');
         Route::delete('packages/{package}/gallery/{mediaId}', [PackageController::class, 'deleteGalleryImage'])->name('packages.delete-gallery-image');
@@ -124,6 +146,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('categories/{id}/toggle-status', [App\Http\Controllers\Admin\CategoryController::class, 'toggleStatus'])
             ->name('categories.toggle-status');
 
+        /*         Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+
+                // Création
+                Route::get('/categories/{type}/create', [CategoryController::class, 'create'])->name('admin.categories.create');
+                Route::post('/categories/{type}', [CategoryController::class, 'store'])->name('admin.categories.store');
+
+                // Édition et Suppression
+                Route::get('/categories/{type}/{id}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+                Route::put('/categories/{type}/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
+                Route::delete('/categories/{type}/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+         */
         // Gestion des carrousels
         Route::resource('carousels', App\Http\Controllers\Admin\CarouselController::class);
 
@@ -151,6 +184,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Gestion comptable
         Route::prefix('accountant')->name('accountant.')->group(function () {
             Route::get('/dashboard', [App\Http\Controllers\Admin\AccountantController::class, 'dashboard'])->name('dashboard');
+
             Route::get('/reports', [App\Http\Controllers\Admin\AccountantController::class, 'reports'])->name('reports');
             Route::get('/payment-gateways', [App\Http\Controllers\Admin\AccountantController::class, 'paymentGateways'])->name('payment-gateways');
         });
@@ -159,9 +193,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile', [App\Http\Controllers\Admin\AdminController::class, 'profile'])->name('profile');
         Route::post('/profile', [App\Http\Controllers\Admin\AdminController::class, 'updateProfile'])->name('profile.update');
 
-        // Changement mot de passe
+        // FORMULAIRE CHANGEMENT MOT DE PASSE (GET)
         Route::get('/password', [App\Http\Controllers\Admin\AdminController::class, 'passwordForm'])->name('password.form');
+        // MISE À JOUR MOT DE PASSE (PUT)
         Route::put('/password', [App\Http\Controllers\Admin\AdminController::class, 'updatePassword'])->name('password.update');
+
 
         // Notifications
         Route::get('/notifications', [App\Http\Controllers\Admin\AuthController::class, 'notifications'])->name('notifications');
@@ -171,78 +207,31 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // --- Pages principales ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// --- Routes pour les vols ---
+Route::get('/flights', [FlightController::class, 'flights'])->name('flights');
+//Route::post('/flights/search', [FlightController::class, 'search'])->name('flights.search');
+Route::match(['GET', 'POST'], '/flights/search', [FlightController::class, 'search'])->name('flights.search');
+//Route::get('/api/locations/search', [FlightController::class, 'searchLocations'])->name('api.locations.search');
+Route::get('/flights/search-locations', [FlightController::class, 'searchLocations'])->name('flights.search-locations');
+//Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
 
-/* Route::prefix('flights')->name('flights.')->group(function () {
-    // Page de recherche
-    Route::get('/', [FlightSearchController::class, 'index'])->name('index');
+// Nouvelles routes pour les détails et la réservation
 
-    // Recherche de vols
-    Route::post('/search', [FlightSearchController::class, 'search'])->name('search');
+/* Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
+Route::post('/flights/details', [FlightController::class, 'details'])->name('flights.details'); */
+//Route::match(['GET', 'POST'], '/flights/details', [FlightController::class, 'details'])->name('flights.details');
+//Route::get('/flights/details/{booking_token}', [FlightController::class, 'details'])->name('flights.details');
+Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
 
-    // Autocomplétion des aéroports
-    Route::get('/search-locations', [FlightSearchController::class, 'searchLocations'])->name('search-locations');
+Route::post('/flights/booking-simple', [FlightController::class, 'booking'])->name('flights.booking');
 
-    Route::get('/return-flights', [FlightSearchController::class, 'returnFlights'])->name('return');
 
-    // Détails d'un vol
-    Route::get('/details', [FlightBookingController::class, 'details'])->name('details');
 
-    // Redirection vers booking externe
-    Route::post('/booking/redirect', [FlightBookingController::class, 'redirect'])->name('booking.redirect');
-}); */
-
-// --- Événements ---
+// --- Autres pages ---
 Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events');
-
-Route::prefix('flights')->name('flights.')->group(function () {
-    // Page de recherche
-    Route::get('/', [FlightSearchController::class, 'index'])->name('index');
-
-    // Recherche de vols (POST - utilise la méthode search() complète)
-    Route::post('/search', [FlightSearchController::class, 'search'])->name('search');
-
-    Route::get('/details/one-way', [FlightBookingController::class, 'detailsOneWay'])
-        ->name('details-one-way');
-
-    Route::get('/details/round-trip', [FlightBookingController::class, 'detailsRoundTrip'])
-        ->name('details-round-trip');
-
-    // Autocomplétion des aéroports
-    Route::get('/search-locations', [FlightSearchController::class, 'searchLocations'])->name('search-locations');
-
-    // ⭐ Vols retour (GET)
-    Route::get('/return-flights', [FlightSearchController::class, 'returnFlights'])->name('return');
-
-    // Détails d'un vol
-    Route::get('/details', [FlightBookingController::class, 'details'])->name('details');
-
-        // Multi-ville : segment suivant
-    Route::get('/multi-city/next-segment', [FlightSearchController::class, 'nextSegment'])
-        ->name('multi-city.next-segment');
-    
-    // Multi-ville : détails finaux
-    Route::get('/details/multi-city', [FlightBookingController::class, 'detailsMultiCity'])
-        ->name('details-multi-city');
-        
-    // Redirection vers booking externe
-    Route::post('/booking/redirect', [FlightBookingController::class, 'redirect'])->name('booking.redirect');
-
-
-    Route::post('/booking/store', [FlightBookingController::class, 'store'])->name('booking.store');
-    Route::get('/booking/{id}/confirmation', [FlightBookingController::class, 'confirmation'])->name('booking.confirmation');
-
-    Route::get('/booking/success/{booking}', [FlightBookingController::class, 'bookingSuccess'])->name('booking.success');
-
-    Route::get('/details/round-trip', [FlightBookingController::class, 'detailsRoundTrip'])->name('details-round-trip');
-});
-
-
-
 Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::class, 'book'])->name('event.book');
 Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
-
-// --- Packages ---
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
 Route::get('/packages/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
 Route::get('/location', [HomeController::class, 'location'])->name('location');
