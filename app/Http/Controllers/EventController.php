@@ -119,11 +119,11 @@ class EventController extends Controller
 
         // Envoyer l'email de confirmation
         try {
-            \Log::info('Tentative d\'envoi d\'email de confirmation pour la réservation: ' . $booking->id);
-            \Illuminate\Support\Facades\Mail::to($booking->user_email)->send(
-                new \App\Mail\EventBookingConfirmation($booking)
+            \Log::info('Tentative d\'envoi d\'email de confirmation pour la réservation: ' . $eventBooking->id);
+            \Illuminate\Support\Facades\Mail::to($eventBooking->user_email)->send(
+                new \App\Mail\EventBookingConfirmation($eventBooking)
             );
-            \Log::info('Email de confirmation envoyé avec succès pour la réservation: ' . $booking->id);
+            \Log::info('Email de confirmation envoyé avec succès pour la réservation: ' . $eventBooking->id);
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'envoi de l\'email de confirmation d\'événement: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
@@ -136,9 +136,9 @@ class EventController extends Controller
     /**
      * Afficher la page de confirmation de réservation.
      */
-    public function bookingConfirmation(\App\Models\EventBooking $booking)
+    public function bookingConfirmation(\App\Models\Booking $booking)
     {
-        $booking->load(['event', 'zone']);
+        $booking->load(['event', 'eventBooking.zone']);
         return view('pages.event-booking-confirmation', compact('booking'));
     }
 }
