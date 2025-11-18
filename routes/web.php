@@ -102,6 +102,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('bookings.update-status');
         Route::put('bookings/{id}/payment-status', [App\Http\Controllers\Admin\BookingController::class, 'updatePaymentStatus'])
             ->name('bookings.update-payment-status');
+        Route::post('bookings/{id}/resend-receipt', [App\Http\Controllers\Admin\BookingController::class, 'resendReceipt'])
+            ->name('bookings.resend-receipt');
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
