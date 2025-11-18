@@ -91,8 +91,17 @@ class EventController extends Controller
         // Mettre à jour les places disponibles
         $zone->decrement('available_seats', $request->quantity);
 
+        // Envoyer l'email de confirmation
+        try {
+            \Illuminate\Support\Facades\Mail::to($booking->user_email)->send(
+                new \App\Mail\EventBookingConfirmation($booking)
+            );
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de l\'envoi de l\'email de confirmation d\'événement: ' . $e->getMessage());
+        }
+
         return redirect()->route('event.booking.confirmation', $booking)
-            ->with('success', 'Votre réservation a été créée avec succès!');
+            ->with('success', 'Votre réservation a été créée avec succès! Un email de confirmation vous a été envoyé.');
     }
 
     /**

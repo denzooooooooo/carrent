@@ -152,6 +152,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('accountant')->name('accountant.')->group(function () {
             Route::get('/dashboard', [App\Http\Controllers\Admin\AccountantController::class, 'dashboard'])->name('dashboard');
             Route::get('/reports', [App\Http\Controllers\Admin\AccountantController::class, 'reports'])->name('reports');
+            Route::get('/bookings', [App\Http\Controllers\Admin\AccountantController::class, 'bookings'])->name('bookings');
+            Route::patch('/bookings/{type}/{id}/status', [App\Http\Controllers\Admin\AccountantController::class, 'updateBookingStatus'])->name('bookings.update-status');
             Route::get('/payment-gateways', [App\Http\Controllers\Admin\AccountantController::class, 'paymentGateways'])->name('payment-gateways');
         });
 
