@@ -93,11 +93,14 @@ class EventController extends Controller
 
         // Envoyer l'email de confirmation
         try {
+            \Log::info('Tentative d\'envoi d\'email de confirmation pour la réservation: ' . $booking->id);
             \Illuminate\Support\Facades\Mail::to($booking->user_email)->send(
                 new \App\Mail\EventBookingConfirmation($booking)
             );
+            \Log::info('Email de confirmation envoyé avec succès pour la réservation: ' . $booking->id);
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'envoi de l\'email de confirmation d\'événement: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
 
         return redirect()->route('event.booking.confirmation', $booking)
