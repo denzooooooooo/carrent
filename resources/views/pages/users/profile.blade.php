@@ -62,6 +62,16 @@
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white hover:border-purple-400"
                                     required
                                 >
+                                <input
+                                    type="hidden"
+                                    name="first_name"
+                                    value="{{ old('first_name', auth()->user()->first_name) }}"
+                                >
+                                <input
+                                    type="hidden"
+                                    name="last_name"
+                                    value="{{ old('last_name', auth()->user()->last_name) }}"
+                                >
                                 @error('name')
                                     <p class="mt-1 text-sm text-red-600 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
