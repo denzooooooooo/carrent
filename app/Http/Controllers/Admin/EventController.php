@@ -125,9 +125,15 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $validatedData = $this->validateEvent($request, $event);
-
         try {
+            // Debug: Afficher les données reçues
+            \Log::info('Event Update - Request Data:', $request->all());
+
+            $validatedData = $this->validateEvent($request, $event);
+
+            // Debug: Afficher les données validées
+            \Log::info('Event Update - Validated Data:', $validatedData);
+
             DB::beginTransaction();
 
             // Mise à jour de l'événement
@@ -155,9 +161,32 @@ class EventController extends Controller
 
             return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été mis à jour avec succès.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Event Update - Validation Error:', $e->errors());
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Erreur lors de la mise à jour de l\'événement : ' . $e->getMessage());
+            \Log::error('Event Update - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->with('error', 'Erreur lors de la mise à jour de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
         }
     }
 
