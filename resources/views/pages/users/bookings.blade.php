@@ -210,7 +210,7 @@
                                                     </button>
                                                 @endif
                                                 @if(in_array($booking->status, ['confirmed', 'pending']))
-                                                    <button class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                    <button onclick="cancelBooking({{ $booking->id }}, '{{ $booking->booking_number }}')" class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
@@ -300,5 +300,33 @@ document.addEventListener('DOMContentLoaded', function() {
     statusFilter.addEventListener('change', filterBookings);
     typeFilter.addEventListener('change', filterBookings);
 });
+
+function cancelBooking(bookingId, bookingNumber) {
+    if (confirm(`Êtes-vous sûr de vouloir annuler la réservation ${bookingNumber} ? Cette action est irréversible.`)) {
+        fetch(`/bookings/${bookingId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                reason: 'Annulé par l\'utilisateur'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Réservation annulée avec succès.');
+                location.reload();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur s\'est produite lors de l\'annulation.');
+        });
+    }
+}
 </script>
 @endsection

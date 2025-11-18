@@ -76,7 +76,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
-    Route::post('/bookings/{bookingId}/resend-receipt', [AuthController::class, 'resendReceipt'])->name('user.resend-receipt');
+    Route::get('/bookings/{booking}/details', [AuthController::class, 'showBooking'])->name('user.booking.details');
+    Route::post('/bookings/{booking}/cancel', [AuthController::class, 'cancelBooking'])->name('user.booking.cancel');
 
     // Routes de réservation de vols (authentification requise)
     /* Route::post('/flights/booking/store', [FlightBookingController::class, 'store'])->name('flights.booking.store');
