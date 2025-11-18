@@ -209,34 +209,7 @@
             </div>
         </div>
 
-        {{-- SECTION 4.1: COMPTABILITÉ --}}
-        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">4.1 Comptabilité</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {{-- Prix d'achat/coût --}}
-            <div>
-                <label for="cost_price" class="block text-sm font-medium text-gray-700 mb-1">Prix d'Achat/Coût (FCFA)</label>
-                <input type="number" name="cost_price" id="cost_price" min="0" step="0.01"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('cost_price') border-red-500 @enderror"
-                    value="{{ old('cost_price', $event->cost_price) }}">
-                @error('cost_price')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            {{-- Marge bénéficiaire --}}
-            <div>
-                <label for="profit_margin" class="block text-sm font-medium text-gray-700 mb-1">Marge Bénéficiaire (%)</label>
-                <input type="number" name="profit_margin" id="profit_margin" min="0" max="100" step="0.01"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('profit_margin') border-red-500 @enderror"
-                    value="{{ old('profit_margin', $event->profit_margin) }}">
-                @error('profit_margin')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            {{-- Taux de commission --}}
-            <div>
-                <label for="commission_rate" class="block text-sm font-medium text-gray-700 mb-1">Taux de Commission (%)</label>
-                <input type="number" name="commission_rate" id="commission_rate" min="0" max="100" step="0.01"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('commission_rate') border-red-500 @enderror"
-                    value="{{ old('commission_rate', $event->commission_rate ?? 15.00) }}">
-                @error('commission_rate')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-        </div>
+
 
         {{-- SECTION 5: IMAGE ET OPTIONS --}}
         <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">5. Média & Visibilité</h2>
