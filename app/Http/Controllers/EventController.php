@@ -74,8 +74,8 @@ class EventController extends Controller
             return back()->withErrors(['quantity' => 'Nombre de places demandé supérieur à la disponibilité.']);
         }
 
-        // Créer la réservation
-        $booking = \App\Models\EventBooking::create([
+        // Créer la réservation d'événement
+        $eventBooking = \App\Models\EventBooking::create([
             'event_id' => $event->id,
             'zone_id' => $zone->id,
             'user_name' => $request->name,
@@ -86,6 +86,32 @@ class EventController extends Controller
             'total_price' => $zone->price * $request->quantity,
             'status' => 'pending',
             'booking_reference' => 'EVT-' . strtoupper(uniqid()),
+        ]);
+
+        // Créer l'enregistrement général de réservation pour l'admin
+        $booking = \App\Models\Booking::create([
+            'booking_number' => $eventBooking->booking_reference,
+            'user_id' => null, // Pas d'utilisateur connecté pour les réservations d'événements
+            'booking_type' => 'event',
+            'event_id' => $event->id,
+            'event_booking_id' => $eventBooking->id,
+            'seat_zone_id' => $zone->id,
+            'booking_date' => now(),
+            'travel_date' => $event->event_date,
+            'number_of_passengers' => $request->quantity,
+            'passenger_details' => [
+                [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'type' => 'adult'
+                ]
+            ],
+            'total_amount' => $eventBooking->total_price,
+            'currency' => 'XAF', // Devise par défaut
+            'final_amount' => $eventBooking->total_price,
+            'status' => 'pending',
+            'payment_status' => 'pending',
         ]);
 
         // Mettre à jour les places disponibles

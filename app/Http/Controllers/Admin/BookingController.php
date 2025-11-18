@@ -164,6 +164,31 @@ class BookingController extends Controller
     }
 
     /**
+     * Renvoyer le reçu de réservation par email
+     */
+    public function resendReceipt($id)
+    {
+        $booking = Booking::with(['eventBooking'])->findOrFail($id);
+
+        if ($booking->booking_type === 'event' && $booking->eventBooking) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->eventBooking->user_email)->send(
+                    new \App\Mail\EventBookingConfirmation($booking->eventBooking)
+                );
+
+                return redirect()
+                    ->route('admin.bookings.show', $booking->id)
+                    ->with('success', 'Reçu envoyé avec succès à ' . $booking->eventBooking->user_email);
+
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
+            }
+        }
+
+        return back()->with('error', 'Type de réservation non supporté pour le renvoi de reçu.');
+    }
+
+    /**
      * Supprimer une réservation (soft delete recommandé)
      */
     public function destroy($id)
