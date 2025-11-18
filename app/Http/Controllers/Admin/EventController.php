@@ -205,7 +205,7 @@ class EventController extends Controller
             'event_time' => ['required', 'date_format:H:i'],
             'end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
             'end_time' => ['nullable', 'date_format:H:i', 'required_with:end_date'],
-            'image' => [($event ? 'nullable' : 'required'), 'image', 'max:2048'], // 2MB max
+            'image' => ['nullable', 'image', 'max:2048'], // 2MB max
             'min_price' => ['required', 'numeric', 'min:0'],
             'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
             'total_seats' => ['required', 'integer', 'min:1'],
