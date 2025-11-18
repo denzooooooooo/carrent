@@ -210,15 +210,12 @@
                                                     </button>
                                                 @endif
                                                 @if(in_array($booking->status, ['confirmed', 'pending']))
-                                                    <form method="POST" action="{{ route('user.resend-receipt', $booking->id) }}" class="w-full">
-                                                        @csrf
-                                                        <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                                            </svg>
-                                                            <span>Renvoyer le reçu</span>
-                                                        </button>
-                                                    </form>
+                                                    <button class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                        <span>Annuler la réservation</span>
+                                                    </button>
                                                 @endif
                                                 @if($booking->status === 'cancelled')
                                                     <button class="w-full px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2" disabled>
