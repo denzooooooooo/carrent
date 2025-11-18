@@ -67,7 +67,7 @@
             @if($bookings->count() > 0)
                 <div class="space-y-6">
                     @foreach($bookings as $booking)
-                        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1" data-booking data-status="{{ $booking->status }}" data-type="{{ $booking->type }}">
+                        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1" data-booking data-status="{{ $booking->status }}" data-type="{{ $booking->booking_type }}">
                             <!-- Booking Header -->
                             <div class="bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 p-6 text-white relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-12 -mt-12"></div>
@@ -90,7 +90,7 @@
                                         </div>
                                         <div>
                                             <h3 class="text-xl font-bold">{{ $booking->title }}</h3>
-                                            <p class="text-purple-100">Réservation #{{ $booking->id }}</p>
+                                            <p class="text-purple-100">Réservation #{{ $booking->booking_number }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -110,7 +110,7 @@
                                             <div class="space-y-2 text-sm">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-600">Type:</span>
-                                                    <span class="font-medium capitalize">{{ $booking->type }}</span>
+                                                    <span class="font-medium capitalize">{{ $booking->booking_type }}</span>
                                                 </div>
                                                 <div class="flex justify-between items-center">
                                                     <span class="text-gray-600 flex items-center">
