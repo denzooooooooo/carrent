@@ -76,7 +76,7 @@
 
             {{-- Action Buttons --}}
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button class="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 text-center text-sm sm:text-base">
+              <button onclick="scrollToTickets()" class="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 text-center text-sm sm:text-base">
                 {{ __('Book now') }}
               </button>
               <button class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg sm:rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all duration-300 text-sm sm:text-base">

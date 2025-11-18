@@ -91,7 +91,7 @@ class EventController extends Controller
         // Créer l'enregistrement général de réservation pour l'admin
         $booking = \App\Models\Booking::create([
             'booking_number' => $eventBooking->booking_reference,
-            'user_id' => null, // Pas d'utilisateur connecté pour les réservations d'événements
+            'user_id' => auth()->check() ? auth()->id() : null, // Utilisateur connecté si disponible
             'booking_type' => 'event',
             'event_id' => $event->id,
             'event_booking_id' => $eventBooking->id,
