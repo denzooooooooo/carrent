@@ -197,9 +197,6 @@ class EventController extends Controller
             'seat_zones.*.description_fr' => ['nullable', 'string'],
             'seat_zones.*.description_en' => ['nullable', 'string'],
             'seat_zones.*.is_active' => ['nullable', 'boolean'],
-            'cost_price' => ['nullable', 'numeric', 'min:0'],
-            'profit_margin' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
 
         $validated = $request->validate($rules);
