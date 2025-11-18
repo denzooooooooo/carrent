@@ -129,8 +129,8 @@ class EventController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
 
-        return redirect()->route('event.booking.confirmation', $booking)
-            ->with('success', 'Votre réservation a été créée avec succès! Un email de confirmation vous a été envoyé.');
+        return redirect()->route('payment.checkout', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez procéder au paiement pour la confirmer.');
     }
 
     /**

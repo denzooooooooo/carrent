@@ -246,6 +246,12 @@ Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'sho
 Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::class, 'book'])->name('event.book');
 Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
 
+// --- Payment Routes ---
+Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+Route::post('/payment/process/{booking}', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
+Route::get('/payment/success/{booking}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('payment.webhook');
+
 // --- Packages ---
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
 Route::get('/packages/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
