@@ -234,7 +234,7 @@ class AuthController extends Controller
     public function resendReceipt(Request $request, $bookingId)
     {
         $user = Auth::user();
-        $booking = \App\Models\Booking::with(['eventBooking'])->findOrFail($bookingId);
+        $booking = \App\Models\Booking::with(['eventBooking', 'flightBooking'])->findOrFail($bookingId);
 
         // Check if the booking belongs to the user
         if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
@@ -248,6 +248,31 @@ class AuthController extends Controller
                 );
 
                 return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $booking->eventBooking->user_email);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
+            }
+        }
+
+        if ($booking->booking_type === 'flight' && $booking->flightBooking) {
+            try {
+                // Get passenger name from booking details
+                $passengerDetails = $booking->passenger_details;
+                $passengerName = 'Client';
+
+                if (is_array($passengerDetails) && !empty($passengerDetails)) {
+                    $firstPassenger = $passengerDetails[0];
+                    if (isset($firstPassenger['name'])) {
+                        $passengerName = $firstPassenger['name'];
+                    } elseif (isset($firstPassenger['first_name']) && isset($firstPassenger['last_name'])) {
+                        $passengerName = $firstPassenger['first_name'] . ' ' . $firstPassenger['last_name'];
+                    }
+                }
+
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\FlightBookingConfirmation($booking, $booking->flightBooking, $passengerName)
+                );
+
+                return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $user->email);
             } catch (\Exception $e) {
                 return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
             }
