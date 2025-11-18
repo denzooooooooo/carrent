@@ -40,9 +40,15 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $this->validateEvent($request);
-
         try {
+            // Debug: Afficher les données reçues
+            \Log::info('Event Store - Request Data:', $request->all());
+
+            $validatedData = $this->validateEvent($request);
+
+            // Debug: Afficher les données validées
+            \Log::info('Event Store - Validated Data:', $validatedData);
+
             DB::beginTransaction();
 
             // Création de l'événement
@@ -63,9 +69,14 @@ class EventController extends Controller
 
             return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été créé avec succès.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Event Store - Validation Error:', $e->errors());
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $request->all());
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage());
+            \Log::error('Event Store - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $request->all());
         }
     }
 

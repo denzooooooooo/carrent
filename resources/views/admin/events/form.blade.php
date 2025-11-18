@@ -19,6 +19,26 @@
     </div>
 @endif
 
+{{-- Debug: Afficher les erreurs de validation --}}
+@if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Erreurs de validation:</strong>
+        <ul class="mt-2">
+            @foreach ($errors->all() as $error)
+                <li>• {{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+{{-- Debug: Afficher les données du formulaire soumis --}}
+@if (session('debug_data'))
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Données soumises (Debug):</strong>
+        <pre class="mt-2 text-xs">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT) }}</pre>
+    </div>
+@endif
+
 <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
 
     @php
