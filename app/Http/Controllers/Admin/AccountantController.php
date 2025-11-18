@@ -225,6 +225,11 @@ class AccountantController extends Controller
      */
     public function bookings(Request $request)
     {
+        \Log::info('AccountantController@bookings called', [
+            'request' => $request->all(),
+            'user' => auth('admin')->user()->name ?? 'unknown'
+        ]);
+
         $query = collect();
 
         // Get package bookings
@@ -244,6 +249,8 @@ class AccountantController extends Controller
                 ];
             });
 
+        \Log::info('Package bookings fetched', ['count' => $packageBookings->count()]);
+
         // Get event bookings
         $eventBookings = \App\Models\EventBooking::with(['event', 'zone'])
             ->latest()
@@ -261,18 +268,24 @@ class AccountantController extends Controller
                 ];
             });
 
+        \Log::info('Event bookings fetched', ['count' => $eventBookings->count()]);
+
         // Combine and sort bookings
         $allBookings = $packageBookings->concat($eventBookings)
             ->sortByDesc('created_at')
             ->values();
 
+        \Log::info('All bookings combined', ['total_count' => $allBookings->count()]);
+
         // Apply filters
         if ($request->filled('status') && $request->status !== 'all') {
             $allBookings = $allBookings->where('status', $request->status);
+            \Log::info('Applied status filter', ['status' => $request->status, 'filtered_count' => $allBookings->count()]);
         }
 
         if ($request->filled('type') && $request->type !== 'all') {
             $allBookings = $allBookings->where('type', $request->type);
+            \Log::info('Applied type filter', ['type' => $request->type, 'filtered_count' => $allBookings->count()]);
         }
 
         if ($request->filled('search')) {
@@ -282,6 +295,7 @@ class AccountantController extends Controller
                        str_contains(strtolower($booking['user']), $search) ||
                        str_contains(strtolower($booking['user_email']), $search);
             });
+            \Log::info('Applied search filter', ['search' => $request->search, 'filtered_count' => $allBookings->count()]);
         }
 
         // Paginate manually
@@ -289,6 +303,13 @@ class AccountantController extends Controller
         $currentPage = $request->get('page', 1);
         $total = $allBookings->count();
         $bookings = $allBookings->forPage($currentPage, $perPage);
+
+        \Log::info('Final bookings for page', [
+            'page' => $currentPage,
+            'per_page' => $perPage,
+            'total' => $total,
+            'bookings_count' => $bookings->count()
+        ]);
 
         return view('admin.accountant.bookings', compact('bookings', 'total', 'perPage', 'currentPage'));
     }
