@@ -33,17 +33,16 @@
 
 {{-- Debug: Afficher les données du formulaire soumis --}}
 @if (session('debug_data'))
-    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong class="font-bold">Données soumises (Debug):</strong>
-        <pre class="mt-2 text-xs">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT) }}</pre>
+    <div style="background: #eef; border: 1px solid #ccf; color: #33c; padding: 10px; margin-bottom: 10px;">
+        <strong>Debug Data:</strong>
+        <pre style="font-size: 12px;">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT) }}</pre>
     </div>
 @endif
 
-{{-- Debug: Afficher les logs Laravel --}}
 @if (session('debug_logs'))
-    <div class="bg-gray-100 border border-gray-400 text-gray-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong class="font-bold">Logs Laravel (Debug):</strong>
-        <pre class="mt-2 text-xs">{{ session('debug_logs') }}</pre>
+    <div style="background: #fef; border: 1px solid #fcf; color: #c3c; padding: 10px; margin-bottom: 10px;">
+        <strong>Debug Logs:</strong>
+        <pre style="font-size: 12px;">{{ session('debug_logs') }}</pre>
     </div>
 @endif
 
