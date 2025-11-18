@@ -72,11 +72,15 @@ class EventController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             \Log::error('Event Store - Validation Error:', $e->errors());
-            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $request->all());
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Event Store - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $request->all());
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData);
         }
     }
 
