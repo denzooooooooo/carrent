@@ -39,6 +39,14 @@
     </div>
 @endif
 
+{{-- Debug: Afficher les logs Laravel --}}
+@if (session('debug_logs'))
+    <div class="bg-gray-100 border border-gray-400 text-gray-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Logs Laravel (Debug):</strong>
+        <pre class="mt-2 text-xs">{{ session('debug_logs') }}</pre>
+    </div>
+@endif
+
 <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
 
     @php

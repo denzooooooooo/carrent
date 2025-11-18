@@ -74,13 +74,27 @@ class EventController extends Controller
             \Log::error('Event Store - Validation Error:', $e->errors());
             // Ne pas inclure les fichiers uploadés dans les données de debug
             $debugData = $request->except(['image']);
-            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Event Store - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             // Ne pas inclure les fichiers uploadés dans les données de debug
             $debugData = $request->except(['image']);
-            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
         }
     }
 
