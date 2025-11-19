@@ -229,6 +229,31 @@ class AuthController extends Controller
     }
 
     /**
+     * Cancel a booking
+     */
+    public function cancelBooking(Request $request, \App\Models\Booking $booking)
+    {
+        $user = Auth::user();
+
+        // Check if the booking belongs to the user
+        if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
+            return response()->json(['success' => false, 'error' => 'Vous n\'avez pas accès à cette réservation.'], 403);
+        }
+
+        // Check if booking can be cancelled
+        if (!in_array($booking->status, ['confirmed', 'pending'])) {
+            return response()->json(['success' => false, 'error' => 'Cette réservation ne peut pas être annulée.'], 400);
+        }
+
+        // Update booking status
+        $booking->update(['status' => 'cancelled']);
+
+        // TODO: Handle refund if payment was made
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Resend receipt for a booking
      */
     public function resendReceipt(Request $request, $bookingId)
