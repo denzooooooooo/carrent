@@ -34,10 +34,10 @@
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-blue-100 text-sm">Total Utilisateurs</p>
+                    <p class="text-blue-400 text-sm">Total Utilisateurs</p>
                     <p class="text-3xl font-bold mt-2">{{ $stats['total'] ?? 0 }}</p>
                 </div>
-                <i class="fas fa-users text-4xl text-blue-200"></i>
+                <i class="fas fa-users text-4xl text-blue-400"></i>
             </div>
         </div>
         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
