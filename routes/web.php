@@ -249,6 +249,7 @@ Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::clas
 Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
 
 // --- Payment Routes ---
+Route::get('/payment/instructions/{booking}', [App\Http\Controllers\PaymentController::class, 'instructions'])->name('payment.instructions');
 Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
 Route::post('/payment/process/{booking}', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/success/{booking}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');

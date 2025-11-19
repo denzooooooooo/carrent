@@ -82,8 +82,8 @@ class LocationController extends Controller
             'special_requests' => $request->special_requests,
         ]);
 
-        return redirect()->route('payment.checkout', $booking)
-            ->with('success', 'Votre réservation de location a été créée avec succès! Procédez au paiement pour la confirmer.');
+        return redirect()->route('payment.instructions', $booking)
+            ->with('success', 'Votre réservation de location a été créée avec succès! Veuillez suivre les instructions de paiement pour la confirmer.');
     }
 
     /**
