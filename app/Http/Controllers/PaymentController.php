@@ -32,6 +32,21 @@ class PaymentController extends Controller
     }
 
     /**
+     * Afficher les instructions de paiement
+     */
+    public function instructions(Booking $booking)
+    {
+        // Vérifier que la réservation appartient à l'utilisateur ou est admin
+        if (auth()->check() && $booking->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $booking->load(['event', 'eventBooking', 'flightBooking', 'package']);
+
+        return view('pages.payment.instructions', compact('booking'));
+    }
+
+    /**
      * Traiter le paiement
      */
     public function process(Request $request, Booking $booking)
