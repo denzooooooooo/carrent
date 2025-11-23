@@ -25,7 +25,7 @@
         <h2 class="text-6xl md:text-5xl font-black text-black mb-4 md:mb-6 leading-tight">
           {{ __('Events Not to Miss') }}
         </h2>
-        <p class="text-xl text-white/90 max-w-3xl mx-auto">
+        <p class="text-xl text-black/90 max-w-3xl mx-auto">
           {{ __('Access the world\'s greatest sports and cultural events') }}
         </p>
       </div>
