@@ -22,7 +22,7 @@
           </svg>
           <span>{{ __('EXCLUSIVE SPORTS & CULTURAL EVENTS') }}</span>
         </div>
-        <h2 class="text-6xl md:text-5xl font-black text-white mb-4 md:mb-6 leading-tight">
+        <h2 class="text-6xl md:text-5xl font-black text-black mb-4 md:mb-6 leading-tight">
           {{ __('Events Not to Miss') }}
         </h2>
         <p class="text-xl text-white/90 max-w-3xl mx-auto">
@@ -68,12 +68,12 @@
             </div>
 
             <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <h3 class="text-xl font-black mb-3 text-white group-hover:text-amber-400 transition-colors line-clamp-2">
+              <h3 class="text-xl font-black mb-3 text-white group-hover:text-amber-400 bg-amber-600 bg-opacity-40 backdrop-blur-md rounded-full px-3 py-2 transition-colors line-clamp-2">
                 {{ $event->title }}
               </h3>
 
               <div class="space-y-2 mb-4">
-                <div class="inline-flex items-center space-x-2 text-lg bg-white/10 backdrop-blur-md rounded-full px-3 py-2">
+                <div class="inline-flex items-center space-x-2 text-lg bg-amber-600 bg-opacity/10 backdrop-blur-md rounded-full px-3 py-2">
                   <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
