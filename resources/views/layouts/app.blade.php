@@ -6,7 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
+
+    {{-- SEO Meta Tags --}}
+    <meta name="description" content="{{ $meta_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
+    <meta name="keywords" content="{{ $meta_keywords ?? 'conciergerie privée, voyages luxe, événements VIP, vols privés, packages touristiques, Côte d\'Ivoire, Abidjan, sports, culture, hélicoptère, jet privé' }}">
+    <meta name="author" content="Carré Premium">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    {{-- Canonical URL --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph / Facebook --}}
+    <meta property="og:type" content="{{ $og_type ?? 'website' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $og_title ?? ($title ?? config('app.name', 'Laravel')) }}">
+    <meta property="og:description" content="{{ $og_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
+    <meta property="og:image" content="{{ $og_image ?? asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Carré Premium">
+    <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+    {{-- Twitter --}}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="{{ $og_title ?? ($title ?? config('app.name', 'Laravel')) }}">
+    <meta property="twitter:description" content="{{ $og_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
+    <meta property="twitter:image" content="{{ $og_image ?? asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}">
+
+    {{-- Additional SEO --}}
+    <meta name="theme-color" content="#7C3AED">
+    <meta name="msapplication-TileColor" content="#7C3AED">
+    <link rel="alternate" hreflang="fr" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="en" href="{{ url()->current() }}?lang=en">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

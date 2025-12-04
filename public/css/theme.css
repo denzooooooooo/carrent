@@ -236,7 +236,7 @@ footer {
   background-color: var(--theme-input-bg) !important;
   color: var(--theme-text) !important;
   border-color: var(--theme-border) !important;
-}
+}. 
 
 /* Placeholder text */
 .bg-white:not(.carousel-item):not([class*="carousel"]) input::placeholder,
@@ -280,6 +280,10 @@ section.bg-white.relative.overflow-hidden h3,
 section.bg-white.relative.overflow-hidden span,
 section.bg-white.relative.overflow-hidden div {
   color: #ffffff !important;
+}
+section.bg-white.relative.overflow-hidden h4
+ {
+  color: #ff7a0d !important;
 }
 
 /* PAGE HOME - Événements: Titres et dates blancs TOUJOURS (mode clair ET sombre) */

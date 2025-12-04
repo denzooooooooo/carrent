@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Contact') . ' - Carré Premium')
+@section('title', __('Contactez Carré Premium - Conciergerie privée') . ' - Carré Premium')
+@section('meta_description', 'Contactez Carré Premium, votre conciergerie privée en Côte d\'Ivoire. Réservations 24/7, service client premium pour vos voyages de luxe, événements VIP et packages touristiques.')
+@section('meta_keywords', 'contact, conciergerie privée, Côte d\'Ivoire, service client, réservations, voyages luxe, événements VIP, Carré Premium')
+@section('og_title', __('Contactez Carré Premium - Conciergerie privée') . ' - Carré Premium')
+@section('og_description', 'Notre équipe est disponible 24/7 pour vous accompagner dans vos projets de voyages de luxe et événements exclusifs en Côte d\'Ivoire.')
 
 @section('content')
 <div class="min-h-screen bg-white">

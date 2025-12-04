@@ -67,10 +67,10 @@
               @endif
             </div>
 
-            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <h3 class="text-xl font-black mb-3 text-white group-hover:text-amber-400 bg-amber-600 bg-opacity-40 backdrop-blur-md rounded-full px-3 py-2 transition-colors line-clamp-2">
+            <div class="absolute bottom-0 left-0 right-0 p-6 text-amber-400">
+              <h4 class="text-xl font-black mb-3 text-amber-400 group-hover:text-amber-400 bg-opacity-40 backdrop-blur-md rounded-full px-3 py-2 transition-colors line-clamp-2">
                 {{ $event->title }}
-              </h3>
+              </h4>
 
               <div class="space-y-2 mb-4">
                 <div class="inline-flex items-center space-x-2 text-lg bg-amber-600 bg-opacity/10 backdrop-blur-md rounded-full px-3 py-2">
