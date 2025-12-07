@@ -236,7 +236,7 @@ footer {
   background-color: var(--theme-input-bg) !important;
   color: var(--theme-text) !important;
   border-color: var(--theme-border) !important;
-}
+}. 
 
 /* Placeholder text */
 .bg-white:not(.carousel-item):not([class*="carousel"]) input::placeholder,
@@ -273,10 +273,32 @@ footer {
    CORRECTIONS SPÉCIFIQUES PAR PAGE
    ============================================ */
 
-/* PAGE HOME - Événements: Titres blancs en mode sombre */
-[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h1,
-[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h2,
-[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h3 {
+/* PAGE HOME - Section Événements: Forcer TOUS les textes en blanc */
+section.bg-white.relative.overflow-hidden h2,
+section.bg-white.relative.overflow-hidden p,
+section.bg-white.relative.overflow-hidden h3,
+section.bg-white.relative.overflow-hidden span,
+section.bg-white.relative.overflow-hidden div {
+  color: #ffffff !important;
+}
+section.bg-white.relative.overflow-hidden h4
+ {
+  color: #ff7a0d !important;
+}
+
+/* PAGE HOME - Événements: Titres et dates blancs TOUJOURS (mode clair ET sombre) */
+.bg-white:not(.carousel-item):not([class*="carousel"]) h2.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) p.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h3.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) span.font-semibold {
+  color: #ffffff !important;
+}
+
+/* PAGE HOME - Événements: Titres blancs en mode sombre pour les autres */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h1:not(.text-white),
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h2:not(.text-white),
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h3:not(.text-white) {
   color: #ffffff !important;
 }
 

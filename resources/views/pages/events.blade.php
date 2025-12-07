@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Events') . ' - Carré Premium')
+@section('title', __('Événements sportifs et culturels VIP') . ' - Carré Premium')
+@section('meta_description', 'Découvrez les événements sportifs et culturels VIP avec Carré Premium. Billets premium pour concerts, matchs de football, spectacles à Abidjan et Côte d\'Ivoire. Réservation exclusive.')
+@section('meta_keywords', 'événements VIP, sports, culture, concerts, football, Côte d\'Ivoire, Abidjan, billets premium, Carré Premium')
+@section('og_title', __('Événements sportifs et culturels VIP') . ' - Carré Premium')
+@section('og_description', 'Réservez vos places pour les meilleurs événements sportifs et culturels en Côte d\'Ivoire avec Carré Premium. Service VIP exclusif.')
 
 @section('content')
 <div class="min-h-screen bg-white">

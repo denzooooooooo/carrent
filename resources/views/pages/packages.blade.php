@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Tour Packages') . ' - Carré Premium')
+@section('title', __('Packages touristiques - Circuits et séjours VIP') . ' - Carré Premium')
+@section('meta_description', 'Découvrez nos packages touristiques exclusifs en Côte d\'Ivoire et Afrique. Circuits VIP, séjours de luxe, expériences uniques avec Carré Premium.')
+@section('meta_keywords', 'packages touristiques, circuits VIP, séjours luxe, Côte d\'Ivoire, Afrique, voyages exclusifs, Carré Premium')
+@section('og_title', __('Packages touristiques - Circuits et séjours VIP') . ' - Carré Premium')
+@section('og_description', 'Réservez vos packages touristiques de luxe en Côte d\'Ivoire. Circuits exclusifs, hébergements premium et expériences uniques avec notre service de conciergerie privée.')
 
 @section('content')
 

@@ -404,23 +404,25 @@
                 </div>
             </div>
 
-            <!-- <div class="bg-white rounded-xl shadow-lg">
+            <div class="bg-white rounded-xl shadow-lg">
                 <div class="p-5 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-blue-600">Actions</h3>
                 </div>
                 <div class="p-5 space-y-3">
-                    <a href="#" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-150">
-                        <i class="fas fa-print mr-2"></i> Imprimer la réservation
-                    </a>
-                    <a href="#" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-150">
-                        <i class="fas fa-envelope mr-2"></i> Envoyer par email
-                    </a>
+                    @if($booking->booking_type === 'event')
+                        <form action="{{ route('admin.bookings.resend-receipt', $booking->id) }}" method="POST" class="inline w-full">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-150">
+                                <i class="fas fa-envelope mr-2"></i> Renvoyer le reçu par email
+                            </button>
+                        </form>
+                    @endif
                     <a href="#" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition duration-150">
                         <i class="fas fa-file-pdf mr-2"></i> Télécharger PDF
                     </a>
                     @if($booking->status !== 'confirmed' && $booking->status !== 'completed')
-                        <form action="{{ route('admin.bookings.destroy', $booking->id) }}" 
-                              method="POST" 
+                        <form action="{{ route('admin.bookings.destroy', $booking->id) }}"
+                              method="POST"
                               onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
                             @csrf
                             @method('DELETE')
@@ -430,7 +432,7 @@
                         </form>
                     @endif
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 </div>

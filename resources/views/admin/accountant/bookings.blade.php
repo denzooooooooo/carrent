@@ -84,16 +84,16 @@
                     <tbody>
                         @forelse($bookings as $booking)
                         <tr>
-                            <td>#{{ $booking->id }}</td>
+                            <td>#{{ $booking['id'] }}</td>
                             <td>
-                                <span class="badge badge-{{ $booking->type === 'package' ? 'primary' : 'success' }}">
-                                    {{ ucfirst($booking->type) }}
+                                <span class="badge badge-{{ $booking['type'] === 'package' ? 'primary' : 'success' }}">
+                                    {{ ucfirst($booking['type']) }}
                                 </span>
                             </td>
                             <td>
-                                <div class="font-weight-bold">{{ $booking->title }}</div>
+                                <div class="font-weight-bold">{{ $booking['title'] }}</div>
                                 <small class="text-muted">
-                                    @if($booking->type === 'package')
+                                    @if($booking['type'] === 'package')
                                         Package touristique
                                     @else
                                         Événement
@@ -103,22 +103,22 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-primary text-white mr-2" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                                        {{ substr($booking->user->name ?? 'N/A', 0, 1) }}
+                                        {{ substr($booking['user'], 0, 1) }}
                                     </div>
                                     <div>
-                                        <div class="font-weight-bold">{{ $booking->user->name ?? 'N/A' }}</div>
-                                        <small class="text-muted">{{ $booking->user->email ?? '' }}</small>
+                                        <div class="font-weight-bold">{{ $booking['user'] }}</div>
+                                        <small class="text-muted">{{ $booking['user_email'] }}</small>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <span class="font-weight-bold text-success">
-                                    {{ number_format($booking->total_amount, 0, ',', ' ') }} FCFA
+                                    {{ number_format($booking['total_amount'], 0, ',', ' ') }} FCFA
                                 </span>
                             </td>
                             <td>
-                                <span class="badge badge-{{ $booking->status === 'confirmed' ? 'success' : ($booking->status === 'pending' ? 'warning' : ($booking->status === 'cancelled' ? 'danger' : 'secondary')) }}">
-                                    @switch($booking->status)
+                                <span class="badge badge-{{ $booking['status'] === 'confirmed' ? 'success' : ($booking['status'] === 'pending' ? 'warning' : ($booking['status'] === 'cancelled' ? 'danger' : 'secondary')) }}">
+                                    @switch($booking['status'])
                                         @case('pending')
                                             En attente
                                             @break
@@ -132,27 +132,27 @@
                                             Remboursé
                                             @break
                                         @default
-                                            {{ ucfirst($booking->status) }}
+                                            {{ ucfirst($booking['status']) }}
                                     @endswitch
                                 </span>
                             </td>
-                            <td>{{ $booking->created_at->format('d/m/Y H:i') }}</td>
+                            <td>{{ $booking['created_at']->format('d/m/Y H:i') }}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <!-- View Details -->
-                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#bookingModal{{ $booking->id }}">
+                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#bookingModal{{ $booking['id'] }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
 
                                     <!-- Update Status -->
-                                    @if($booking->status !== 'refunded')
+                                    @if($booking['status'] !== 'refunded')
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <div class="dropdown-menu">
-                                            @if($booking->status !== 'confirmed')
-                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking->type, $booking->id]) }}" class="d-inline">
+                                            @if($booking['status'] !== 'confirmed')
+                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking['type'], $booking['id']]) }}" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="confirmed">
@@ -162,8 +162,8 @@
                                             </form>
                                             @endif
 
-                                            @if($booking->status !== 'cancelled')
-                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking->type, $booking->id]) }}" class="d-inline">
+                                            @if($booking['status'] !== 'cancelled')
+                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking['type'], $booking['id']]) }}" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="cancelled">
@@ -173,8 +173,8 @@
                                             </form>
                                             @endif
 
-                                            @if($booking->status === 'confirmed')
-                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking->type, $booking->id]) }}" class="d-inline">
+                                            @if($booking['status'] === 'confirmed')
+                                            <form method="POST" action="{{ route('admin.accountant.bookings.update-status', [$booking['type'], $booking['id']]) }}" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="refunded">
@@ -191,11 +191,11 @@
                         </tr>
 
                         <!-- Booking Details Modal -->
-                        <div class="modal fade" id="bookingModal{{ $booking->id }}" tabindex="-1" role="dialog">
+                        <div class="modal fade" id="bookingModal{{ $booking['id'] }}" tabindex="-1" role="dialog">
                             <div class="modal-dialog modal-lg" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Détails de la Réservation #{{ $booking->id }}</h5>
+                                        <h5 class="modal-title">Détails de la Réservation #{{ $booking['id'] }}</h5>
                                         <button type="button" class="close" data-dismiss="modal">
                                             <span>&times;</span>
                                         </button>
@@ -204,50 +204,29 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <h6>Informations Client</h6>
-                                                <p><strong>Nom:</strong> {{ $booking->user->name ?? 'N/A' }}</p>
-                                                <p><strong>Email:</strong> {{ $booking->user->email ?? 'N/A' }}</p>
-                                                <p><strong>Téléphone:</strong> {{ $booking->user->phone ?? 'N/A' }}</p>
+                                                <p><strong>Nom:</strong> {{ $booking['user'] }}</p>
+                                                <p><strong>Email:</strong> {{ $booking['user_email'] }}</p>
+                                                <p><strong>Téléphone:</strong> N/A</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <h6>Détails de la Réservation</h6>
-                                                <p><strong>Type:</strong> {{ ucfirst($booking->type) }}</p>
-                                                <p><strong>Produit:</strong> {{ $booking->title }}</p>
-                                                <p><strong>Montant:</strong> {{ number_format($booking->total_amount, 0, ',', ' ') }} FCFA</p>
+                                                <p><strong>Type:</strong> {{ ucfirst($booking['type']) }}</p>
+                                                <p><strong>Produit:</strong> {{ $booking['title'] }}</p>
+                                                <p><strong>Montant:</strong> {{ number_format($booking['total_amount'], 0, ',', ' ') }} FCFA</p>
                                                 <p><strong>Statut:</strong>
-                                                    <span class="badge badge-{{ $booking->status === 'confirmed' ? 'success' : ($booking->status === 'pending' ? 'warning' : 'danger') }}">
-                                                        {{ ucfirst($booking->status) }}
+                                                    <span class="badge badge-{{ $booking['status'] === 'confirmed' ? 'success' : ($booking['status'] === 'pending' ? 'warning' : 'danger') }}">
+                                                        {{ ucfirst($booking['status']) }}
                                                     </span>
                                                 </p>
-                                                <p><strong>Date:</strong> {{ $booking->created_at->format('d/m/Y H:i') }}</p>
+                                                <p><strong>Date:</strong> {{ $booking['created_at']->format('d/m/Y H:i') }}</p>
                                             </div>
                                         </div>
 
-                                        @if($booking->type === 'event' && isset($booking->booking))
+                                        @if($booking['type'] === 'event')
                                         <div class="row mt-3">
                                             <div class="col-12">
                                                 <h6>Détails Événement</h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Zone</th>
-                                                                <th>Quantité</th>
-                                                                <th>Prix Unit.</th>
-                                                                <th>Total</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($booking->booking->eventBookingItems ?? [] as $item)
-                                                            <tr>
-                                                                <td>{{ $item->seatZone->zone_name_fr ?? 'N/A' }}</td>
-                                                                <td>{{ $item->quantity }}</td>
-                                                                <td>{{ number_format($item->price, 0, ',', ' ') }} FCFA</td>
-                                                                <td>{{ number_format($item->total_price, 0, ',', ' ') }} FCFA</td>
-                                                            </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                <p>Zone et quantité disponibles dans les détails de réservation d'événement.</p>
                                             </div>
                                         </div>
                                         @endif

@@ -221,6 +221,120 @@ class AccountantController extends Controller
 
 
     /**
+     * Display bookings management for accountant
+     */
+    public function bookings(Request $request)
+    {
+        \Log::info('AccountantController@bookings called', [
+            'request' => $request->all(),
+            'user' => auth('admin')->user()->name ?? 'unknown'
+        ]);
+
+        $query = collect();
+
+        // Get package bookings
+        $packageBookings = \App\Models\Booking::with(['package', 'user'])
+            ->latest()
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'id' => $booking->id,
+                    'type' => 'package',
+                    'title' => $booking->package->title_fr ?? 'Package touristique',
+                    'user' => $booking->user->name ?? 'Utilisateur',
+                    'user_email' => $booking->user->email ?? '',
+                    'total_amount' => $booking->total_amount,
+                    'status' => $booking->status,
+                    'created_at' => $booking->created_at,
+                ];
+            });
+
+        \Log::info('Package bookings fetched', ['count' => $packageBookings->count()]);
+
+        // Get event bookings
+        $eventBookings = \App\Models\EventBooking::with(['event', 'zone'])
+            ->latest()
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'id' => $booking->id,
+                    'type' => 'event',
+                    'title' => $booking->event->title_fr ?? 'Événement',
+                    'user' => $booking->user_name,
+                    'user_email' => $booking->user_email,
+                    'total_amount' => $booking->total_price,
+                    'status' => $booking->status,
+                    'created_at' => $booking->created_at,
+                ];
+            });
+
+        \Log::info('Event bookings fetched', ['count' => $eventBookings->count()]);
+
+        // Combine and sort bookings
+        $allBookings = $packageBookings->concat($eventBookings)
+            ->sortByDesc('created_at')
+            ->values();
+
+        \Log::info('All bookings combined', ['total_count' => $allBookings->count()]);
+
+        // Apply filters
+        if ($request->filled('status') && $request->status !== 'all') {
+            $allBookings = $allBookings->where('status', $request->status);
+            \Log::info('Applied status filter', ['status' => $request->status, 'filtered_count' => $allBookings->count()]);
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $allBookings = $allBookings->where('type', $request->type);
+            \Log::info('Applied type filter', ['type' => $request->type, 'filtered_count' => $allBookings->count()]);
+        }
+
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $allBookings = $allBookings->filter(function ($booking) use ($search) {
+                return str_contains(strtolower($booking['title']), $search) ||
+                       str_contains(strtolower($booking['user']), $search) ||
+                       str_contains(strtolower($booking['user_email']), $search);
+            });
+            \Log::info('Applied search filter', ['search' => $request->search, 'filtered_count' => $allBookings->count()]);
+        }
+
+        // Paginate manually
+        $perPage = 15;
+        $currentPage = $request->get('page', 1);
+        $total = $allBookings->count();
+        $bookings = $allBookings->forPage($currentPage, $perPage);
+
+        \Log::info('Final bookings for page', [
+            'page' => $currentPage,
+            'per_page' => $perPage,
+            'total' => $total,
+            'bookings_count' => $bookings->count()
+        ]);
+
+        return view('admin.accountant.bookings', compact('bookings', 'total', 'perPage', 'currentPage'));
+    }
+
+    /**
+     * Update booking status
+     */
+    public function updateBookingStatus(Request $request, $type, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled,refunded'
+        ]);
+
+        if ($type === 'package') {
+            $booking = \App\Models\Booking::findOrFail($id);
+            $booking->update(['status' => $request->status]);
+        } elseif ($type === 'event') {
+            $booking = \App\Models\EventBooking::findOrFail($id);
+            $booking->update(['status' => $request->status]);
+        }
+
+        return redirect()->back()->with('success', 'Statut de la réservation mis à jour avec succès.');
+    }
+
+    /**
      * Display payment gateways management
      */
     public function paymentGateways()

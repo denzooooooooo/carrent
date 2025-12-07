@@ -74,8 +74,8 @@ class EventController extends Controller
             return back()->withErrors(['quantity' => 'Nombre de places demandé supérieur à la disponibilité.']);
         }
 
-        // Créer la réservation
-        $booking = \App\Models\EventBooking::create([
+        // Créer la réservation d'événement
+        $eventBooking = \App\Models\EventBooking::create([
             'event_id' => $event->id,
             'zone_id' => $zone->id,
             'user_name' => $request->name,
@@ -88,19 +88,57 @@ class EventController extends Controller
             'booking_reference' => 'EVT-' . strtoupper(uniqid()),
         ]);
 
+        // Créer l'enregistrement général de réservation pour l'admin
+        $booking = \App\Models\Booking::create([
+            'booking_number' => $eventBooking->booking_reference,
+            'user_id' => auth()->check() ? auth()->id() : null, // Utilisateur connecté si disponible
+            'booking_type' => 'event',
+            'event_id' => $event->id,
+            'event_booking_id' => $eventBooking->id,
+            'seat_zone_id' => $zone->id,
+            'booking_date' => now(),
+            'travel_date' => $event->event_date,
+            'number_of_passengers' => $request->quantity,
+            'passenger_details' => [
+                [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'type' => 'adult'
+                ]
+            ],
+            'total_amount' => $eventBooking->total_price,
+            'currency' => 'XAF', // Devise par défaut
+            'final_amount' => $eventBooking->total_price,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+        ]);
+
         // Mettre à jour les places disponibles
         $zone->decrement('available_seats', $request->quantity);
 
-        return redirect()->route('event.booking.confirmation', $booking)
-            ->with('success', 'Votre réservation a été créée avec succès!');
+        // Envoyer l'email de confirmation
+        try {
+            \Log::info('Tentative d\'envoi d\'email de confirmation pour la réservation: ' . $eventBooking->id);
+            \Illuminate\Support\Facades\Mail::to($eventBooking->user_email)->send(
+                new \App\Mail\EventBookingConfirmation($eventBooking)
+            );
+            \Log::info('Email de confirmation envoyé avec succès pour la réservation: ' . $eventBooking->id);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de l\'envoi de l\'email de confirmation d\'événement: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+        }
+
+        return redirect()->route('payment.instructions', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez suivre les instructions de paiement pour la confirmer.');
     }
 
     /**
      * Afficher la page de confirmation de réservation.
      */
-    public function bookingConfirmation(\App\Models\EventBooking $booking)
+    public function bookingConfirmation(\App\Models\Booking $booking)
     {
-        $booking->load(['event', 'zone']);
+        $booking->load(['event', 'eventBooking.zone']);
         return view('pages.event-booking-confirmation', compact('booking'));
     }
 }

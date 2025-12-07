@@ -8,7 +8,7 @@
         </div>
         <div class="relative z-10 flex items-center">
             <i class="fas fa-crown text-secondary text-2xl mr-2"></i>
-            <h1 class="text-xl font-bold text-white font-montserrat">Carré Premium</h1>
+            <h1 class="text-xl font-bold text-black font-montserrat">Carré Premium</h1>
         </div>
     </div>
 

@@ -96,4 +96,32 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    /**
+     * Get the user's bookings count
+     */
+    public function getBookingsCountAttribute()
+    {
+        return $this->bookings()->count();
+    }
+
+    /**
+     * Get the user's recent bookings
+     */
+    public function getRecentBookingsAttribute()
+    {
+        return $this->bookings()
+            ->with(['event', 'eventBooking.zone', 'package', 'flight'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+    }
+
+    /**
+     * Get the user's confirmed bookings count
+     */
+    public function getConfirmedBookingsAttribute()
+    {
+        return $this->bookings()->where('status', 'confirmed')->count();
+    }
 }

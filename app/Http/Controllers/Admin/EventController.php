@@ -40,9 +40,15 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $this->validateEvent($request);
-
         try {
+            // Debug: Afficher les données reçues
+            \Log::info('Event Store - Request Data:', $request->all());
+
+            $validatedData = $this->validateEvent($request);
+
+            // Debug: Afficher les données validées
+            \Log::info('Event Store - Validated Data:', $validatedData);
+
             DB::beginTransaction();
 
             // Création de l'événement
@@ -63,9 +69,32 @@ class EventController extends Controller
 
             return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été créé avec succès.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Event Store - Validation Error:', $e->errors());
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage());
+            \Log::error('Event Store - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
         }
     }
 
@@ -96,9 +125,15 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $validatedData = $this->validateEvent($request, $event);
-
         try {
+            // Debug: Afficher les données reçues
+            \Log::info('Event Update - Request Data:', $request->all());
+
+            $validatedData = $this->validateEvent($request, $event);
+
+            // Debug: Afficher les données validées
+            \Log::info('Event Update - Validated Data:', $validatedData);
+
             DB::beginTransaction();
 
             // Mise à jour de l'événement
@@ -126,9 +161,32 @@ class EventController extends Controller
 
             return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été mis à jour avec succès.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Event Update - Validation Error:', $e->errors());
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Erreur lors de la mise à jour de l\'événement : ' . $e->getMessage());
+            \Log::error('Event Update - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // Ne pas inclure les fichiers uploadés dans les données de debug
+            $debugData = $request->except(['image']);
+            // Récupérer les logs récents pour debug
+            $logContent = '';
+            if (file_exists(storage_path('logs/laravel.log'))) {
+                $logContent = file_get_contents(storage_path('logs/laravel.log'));
+                $logLines = explode("\n", $logContent);
+                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
+            }
+            return back()->withInput()->with('error', 'Erreur lors de la mise à jour de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
         }
     }
 
@@ -173,10 +231,10 @@ class EventController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
             'event_date' => ['required', 'date'],
-            'event_time' => ['required', 'date_format:H:i'],
+            'event_time' => ['required', 'date_format:H:i:s'],
             'end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
-            'end_time' => ['nullable', 'date_format:H:i', 'required_with:end_date'],
-            'image' => [($event ? 'nullable' : 'required'), 'image', 'max:2048'], // 2MB max
+            'end_time' => ['nullable', 'date_format:H:i:s', 'required_with:end_date'],
+            'image' => ['nullable', 'image', 'max:2048'], // 2MB max
             'min_price' => ['required', 'numeric', 'min:0'],
             'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
             'total_seats' => ['required', 'integer', 'min:1'],
@@ -193,7 +251,7 @@ class EventController extends Controller
             'seat_zones.*.zone_code' => ['required', 'string', 'max:50'],
             'seat_zones.*.zone_type' => ['required', 'in:standard,vip,vvip,premium'],
             'seat_zones.*.price' => ['required', 'numeric', 'min:0'],
-            'seat_zones.*.total_seats' => ['required', 'integer', 'min:1'],
+            'seat_zones.*.total_seats' => ['required', 'numeric', 'min:1', 'integer'],
             'seat_zones.*.description_fr' => ['nullable', 'string'],
             'seat_zones.*.description_en' => ['nullable', 'string'],
             'seat_zones.*.is_active' => ['nullable', 'boolean'],

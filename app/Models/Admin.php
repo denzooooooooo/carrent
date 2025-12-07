@@ -81,7 +81,7 @@ class Admin extends Authenticatable implements HasMedia
             ->nonQueued();
 
         $this->addMediaConversion('normal')
-            ->width(800)
+            ->width(800) 
             ->nonQueued();
     }
 

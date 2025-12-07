@@ -76,6 +76,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
+    Route::get('/bookings/{booking}/details', [AuthController::class, 'showBooking'])->name('user.booking.details');
+    Route::post('/bookings/{booking}/cancel', [AuthController::class, 'cancelBooking'])->name('user.booking.cancel');
 
     // Routes de réservation de vols (authentification requise)
     /* Route::post('/flights/booking/store', [FlightBookingController::class, 'store'])->name('flights.booking.store');
@@ -102,6 +104,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('bookings.update-status');
         Route::put('bookings/{id}/payment-status', [App\Http\Controllers\Admin\BookingController::class, 'updatePaymentStatus'])
             ->name('bookings.update-payment-status');
+        Route::post('bookings/{id}/resend-receipt', [App\Http\Controllers\Admin\BookingController::class, 'resendReceipt'])
+            ->name('bookings.resend-receipt');
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
@@ -152,6 +156,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('accountant')->name('accountant.')->group(function () {
             Route::get('/dashboard', [App\Http\Controllers\Admin\AccountantController::class, 'dashboard'])->name('dashboard');
             Route::get('/reports', [App\Http\Controllers\Admin\AccountantController::class, 'reports'])->name('reports');
+            Route::get('/bookings', [App\Http\Controllers\Admin\AccountantController::class, 'bookings'])->name('bookings');
+            Route::patch('/bookings/{type}/{id}/status', [App\Http\Controllers\Admin\AccountantController::class, 'updateBookingStatus'])->name('bookings.update-status');
             Route::get('/payment-gateways', [App\Http\Controllers\Admin\AccountantController::class, 'paymentGateways'])->name('payment-gateways');
         });
 
@@ -241,6 +247,13 @@ Route::prefix('flights')->name('flights.')->group(function () {
 Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::class, 'book'])->name('event.book');
 Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
+
+// --- Payment Routes ---
+Route::get('/payment/instructions/{booking}', [App\Http\Controllers\PaymentController::class, 'instructions'])->name('payment.instructions');
+Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+Route::post('/payment/process/{booking}', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
+Route::get('/payment/success/{booking}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('payment.webhook');
 
 // --- Packages ---
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');

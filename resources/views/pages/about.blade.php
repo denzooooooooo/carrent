@@ -144,7 +144,7 @@
       <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 md:mb-6">{{ __('Ready to Travel with Us?') }}</h2>
       <p class="text-lg md:text-xl text-white/90 mb-6 md:mb-8">{{ __('Join thousands of satisfied travelers') }}</p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="{{ route('flights') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all text-center">
+        <a href="{{ route('flights.index') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all text-center">
           {{ __('Book a Flight') }}
         </a>
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all text-center">

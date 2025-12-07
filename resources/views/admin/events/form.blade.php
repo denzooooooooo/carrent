@@ -19,6 +19,33 @@
     </div>
 @endif
 
+{{-- Debug: Afficher les erreurs de validation --}}
+@if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Erreurs de validation:</strong>
+        <ul class="mt-2">
+            @foreach ($errors->all() as $error)
+                <li>• {{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+{{-- Debug: Afficher les données du formulaire soumis --}}
+@if (session('debug_data'))
+    <div style="background: #eef; border: 1px solid #ccf; color: #33c; padding: 10px; margin-bottom: 10px;">
+        <strong>Debug Data:</strong>
+        <pre style="font-size: 12px;">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT) }}</pre>
+    </div>
+@endif
+
+@if (session('debug_logs'))
+    <div style="background: #fef; border: 1px solid #fcf; color: #c3c; padding: 10px; margin-bottom: 10px;">
+        <strong>Debug Logs:</strong>
+        <pre style="font-size: 12px;">{{ session('debug_logs') }}</pre>
+    </div>
+@endif
+
 <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
 
     @php
@@ -208,6 +235,8 @@
                 @error('total_seats')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
+
+
 
         {{-- SECTION 5: IMAGE ET OPTIONS --}}
         <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">5. Média & Visibilité</h2>

@@ -88,4 +88,9 @@ class Booking extends Model
     {
         return $this->hasOne(FlightBooking::class);
     }
+
+    public function eventBooking()
+    {
+        return $this->belongsTo(EventBooking::class, 'event_booking_id');
+    }
 }

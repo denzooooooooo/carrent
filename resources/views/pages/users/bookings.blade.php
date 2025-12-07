@@ -67,18 +67,18 @@
             @if($bookings->count() > 0)
                 <div class="space-y-6">
                     @foreach($bookings as $booking)
-                        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1" data-booking data-status="{{ $booking->status }}" data-type="{{ $booking->type }}">
+                        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1" data-booking data-status="{{ $booking->status }}" data-type="{{ $booking->booking_type }}">
                             <!-- Booking Header -->
                             <div class="bg-gradient-to-r from-purple-600 via-purple-700 to-amber-600 p-6 text-white relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-12 -mt-12"></div>
                                 <div class="relative z-10 flex items-center justify-between">
                                     <div class="flex items-center space-x-4">
                                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                                            @if($booking->type === 'event')
+                                            @if($booking->booking_type === 'event')
                                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                 </svg>
-                                            @elseif($booking->type === 'package')
+                                            @elseif($booking->booking_type === 'package')
                                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                                 </svg>
@@ -90,7 +90,7 @@
                                         </div>
                                         <div>
                                             <h3 class="text-xl font-bold">{{ $booking->title }}</h3>
-                                            <p class="text-purple-100">Réservation #{{ $booking->id }}</p>
+                                            <p class="text-purple-100">Réservation #{{ $booking->booking_number }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -110,7 +110,7 @@
                                             <div class="space-y-2 text-sm">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-600">Type:</span>
-                                                    <span class="font-medium capitalize">{{ $booking->type }}</span>
+                                                    <span class="font-medium capitalize">{{ $booking->booking_type }}</span>
                                                 </div>
                                                 <div class="flex justify-between items-center">
                                                     <span class="text-gray-600 flex items-center">
@@ -153,7 +153,7 @@
                                         <div>
                                             <h4 class="font-semibold text-gray-900 mb-2">Détails</h4>
                                             <div class="space-y-2 text-sm">
-                                                @if($booking->type === 'event')
+                                                @if($booking->booking_type === 'event')
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Événement:</span>
                                                         <span class="font-medium">{{ $booking->event->title ?? 'N/A' }}</span>
@@ -166,7 +166,7 @@
                                                         <span class="text-gray-600">Lieu:</span>
                                                         <span class="font-medium">{{ $booking->event->location ?? 'N/A' }}</span>
                                                     </div>
-                                                @elseif($booking->type === 'package')
+                                                @elseif($booking->booking_type === 'package')
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Package:</span>
                                                         <span class="font-medium">{{ $booking->package->title ?? 'N/A' }}</span>
@@ -175,7 +175,7 @@
                                                         <span class="text-gray-600">Durée:</span>
                                                         <span class="font-medium">{{ $booking->package->duration ?? 'N/A' }} jours</span>
                                                     </div>
-                                                @elseif($booking->type === 'flight')
+                                                @elseif($booking->booking_type === 'flight')
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Vol:</span>
                                                         <span class="font-medium">{{ $booking->flight->flight_number ?? 'N/A' }}</span>
@@ -194,28 +194,54 @@
                                         <div>
                                             <h4 class="font-semibold text-gray-900 mb-2">Actions</h4>
                                         <div class="space-y-3">
-                                                <button class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                    </svg>
-                                                    <span>Voir les détails</span>
-                                                </button>
-                                                @if($booking->status === 'confirmed')
-                                                    <button class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                @if($booking->payment_status === 'pending')
+                                                    <a href="{{ route('payment.instructions', $booking) }}" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                                         </svg>
-                                                        <span>Télécharger le billet</span>
-                                                    </button>
+                                                        <span>Voir les instructions de paiement</span>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('user.booking.details', $booking) }}" class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
+                                                        <span>Voir les détails</span>
+                                                    </a>
+                                                @endif
+                                                @if($booking->status === 'confirmed' && $booking->payment_status === 'paid')
+                                                    @if(isset($booking->ticket_available) && $booking->ticket_available)
+                                                        <a href="{{ route('user.booking.download', $booking) }}" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                            </svg>
+                                                            <span>Télécharger le billet</span>
+                                                        </a>
+                                                    @else
+                                                        <div class="w-full px-4 py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white text-sm font-bold rounded-xl flex items-center justify-center space-x-2">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                            </svg>
+                                                            <span>En attente du billet</span>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                                 @if(in_array($booking->status, ['confirmed', 'pending']))
-                                                    <button class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                    <button onclick="cancelBooking({{ $booking->id }}, '{{ $booking->booking_number }}')" class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
                                                         <span>Annuler la réservation</span>
                                                     </button>
+                                                @endif
+                                                @if($booking->status === 'cancelled')
+                                                    <div class="w-full px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-bold rounded-xl flex items-center justify-center space-x-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                        <span>Réservation annulée</span>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
@@ -292,5 +318,33 @@ document.addEventListener('DOMContentLoaded', function() {
     statusFilter.addEventListener('change', filterBookings);
     typeFilter.addEventListener('change', filterBookings);
 });
+
+function cancelBooking(bookingId, bookingNumber) {
+    if (confirm(`Êtes-vous sûr de vouloir annuler la réservation ${bookingNumber} ? Cette action est irréversible.`)) {
+        fetch(`/bookings/${bookingId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                reason: 'Annulé par l\'utilisateur'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Réservation annulée avec succès.');
+                location.reload();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur s\'est produite lors de l\'annulation.');
+        });
+    }
+}
 </script>
 @endsection

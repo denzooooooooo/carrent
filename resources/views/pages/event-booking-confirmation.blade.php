@@ -28,7 +28,7 @@
         <div class="space-y-4">
           <div class="flex justify-between">
             <span class="text-gray-600">Référence:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->booking_reference }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->booking_number }}</span>
           </div>
 
           <div class="flex justify-between">
@@ -38,23 +38,23 @@
 
           <div class="flex justify-between">
             <span class="text-gray-600">Zone:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->zone->zone_name }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->seatZone->zone_name_fr ?? $booking->seatZone->zone_name_en }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-600">Nombre de places:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->quantity }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->number_of_passengers }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-600">Prix unitaire:</span>
-            <span class="font-semibold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($booking->unit_price) }}</span>
+            <span class="font-semibold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($booking->total_amount / $booking->number_of_passengers) }}</span>
           </div>
 
           <div class="border-t pt-4">
             <div class="flex justify-between text-lg font-bold">
               <span>Total:</span>
-              <span class="text-purple-600">{{ \App\Helpers\CurrencyHelper::format($booking->total_price) }}</span>
+              <span class="text-purple-600">{{ \App\Helpers\CurrencyHelper::format($booking->total_amount) }}</span>
             </div>
           </div>
         </div>
@@ -67,17 +67,17 @@
         <div class="space-y-3">
           <div class="flex justify-between">
             <span class="text-gray-600">Nom:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->user_name }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->passenger_details[0]['name'] ?? '' }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-600">Email:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->user_email }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->passenger_details[0]['email'] ?? '' }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-600">Téléphone:</span>
-            <span class="font-semibold text-gray-900">{{ $booking->user_phone }}</span>
+            <span class="font-semibold text-gray-900">{{ $booking->passenger_details[0]['phone'] ?? '' }}</span>
           </div>
 
           <div class="flex justify-between">

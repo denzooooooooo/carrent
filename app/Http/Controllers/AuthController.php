@@ -213,11 +213,97 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        // Get user bookings - assuming there's a Booking model with user relationship
-        // This will need to be adjusted based on your actual Booking model structure
-        $bookings = collect([]); // Placeholder - replace with actual query when Booking model exists
+        // Get user bookings - for event bookings, since user_id is null in bookings table
+        // We need to get bookings where the event_booking belongs to the user
+        $bookings = \App\Models\Booking::with(['event', 'eventBooking.zone', 'package', 'flight'])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                      ->orWhereHas('eventBooking', function ($q) use ($user) {
+                          $q->where('user_email', $user->email);
+                      });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('pages.users.bookings', compact('bookings'));
+    }
+
+    /**
+     * Cancel a booking
+     */
+    public function cancelBooking(Request $request, \App\Models\Booking $booking)
+    {
+        $user = Auth::user();
+
+        // Check if the booking belongs to the user
+        if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
+            return response()->json(['success' => false, 'error' => 'Vous n\'avez pas accès à cette réservation.'], 403);
+        }
+
+        // Check if booking can be cancelled
+        if (!in_array($booking->status, ['confirmed', 'pending'])) {
+            return response()->json(['success' => false, 'error' => 'Cette réservation ne peut pas être annulée.'], 400);
+        }
+
+        // Update booking status
+        $booking->update(['status' => 'cancelled']);
+
+        // TODO: Handle refund if payment was made
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Resend receipt for a booking
+     */
+    public function resendReceipt(Request $request, $bookingId)
+    {
+        $user = Auth::user();
+        $booking = \App\Models\Booking::with(['eventBooking', 'flightBooking'])->findOrFail($bookingId);
+
+        // Check if the booking belongs to the user
+        if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
+            return back()->with('error', 'Vous n\'avez pas accès à cette réservation.');
+        }
+
+        if ($booking->booking_type === 'event' && $booking->eventBooking) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->eventBooking->user_email)->send(
+                    new \App\Mail\EventBookingConfirmation($booking->eventBooking)
+                );
+
+                return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $booking->eventBooking->user_email);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
+            }
+        }
+
+        if ($booking->booking_type === 'flight' && $booking->flightBooking) {
+            try {
+                // Get passenger name from booking details
+                $passengerDetails = $booking->passenger_details;
+                $passengerName = 'Client';
+
+                if (is_array($passengerDetails) && !empty($passengerDetails)) {
+                    $firstPassenger = $passengerDetails[0];
+                    if (isset($firstPassenger['name'])) {
+                        $passengerName = $firstPassenger['name'];
+                    } elseif (isset($firstPassenger['first_name']) && isset($firstPassenger['last_name'])) {
+                        $passengerName = $firstPassenger['first_name'] . ' ' . $firstPassenger['last_name'];
+                    }
+                }
+
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\FlightBookingConfirmation($booking, $booking->flightBooking, $passengerName)
+                );
+
+                return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $user->email);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
+            }
+        }
+
+        return back()->with('error', 'Type de réservation non supporté pour le renvoi de reçu.');
     }
 
     /**

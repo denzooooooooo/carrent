@@ -230,7 +230,6 @@
                         @click="open = !open"
                         class="flex items-center space-x-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
                     >
-                        <i class="fas fa-dollar-sign"></i>
                         <span class="text-sm font-medium">{{ session('currency', 'XOF') }}</span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
@@ -255,10 +254,7 @@
                         <i class="fas fa-sign-in-alt"></i>
                         <span>{{ __('Login') }}</span>
                     </a>
-                    <a href="{{ route('register') }}" class="hidden md:flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 font-medium transition-all shadow-lg">
-                        <i class="fas fa-user-plus"></i>
-                        <span>{{ __('Register') }}</span>
-                    </a>
+                   
                 @else
                     {{-- User Menu --}}
                     <div class="relative" x-data="{ open: false }">

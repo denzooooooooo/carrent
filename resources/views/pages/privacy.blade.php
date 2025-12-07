@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Privacy Policy') . ' - Carré Premium')
+@section('title', __('Politique de confidentialité') . ' - Carré Premium')
+@section('meta_description', 'Découvrez notre politique de confidentialité et comment nous protégeons vos données personnelles lors de vos réservations de voyages de luxe et événements VIP en Côte d\'Ivoire.')
+@section('meta_keywords', 'politique confidentialité, données personnelles, RGPD, protection données, conciergerie privée, Côte d\'Ivoire, Carré Premium')
+@section('og_title', __('Politique de confidentialité') . ' - Carré Premium')
+@section('og_description', 'Consultez notre politique de confidentialité pour comprendre comment nous traitons vos données lors de vos réservations de services premium.')
 
 @section('content')
 <div class="min-h-screen bg-white">
