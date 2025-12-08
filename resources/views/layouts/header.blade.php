@@ -529,7 +529,7 @@
                     <span class="text-xl">{!! $subPage['icon'] !!}</span>
                     <span>{{ $subPage['name'] }}</span>
                 </a>
-            @endforeach
+            @endforeach 
 
             {{-- Currency & Language Selectors in Mobile Menu --}}
             <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
