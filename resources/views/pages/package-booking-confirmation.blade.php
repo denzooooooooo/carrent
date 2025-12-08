@@ -43,8 +43,7 @@
         </div>
 
         {{-- Package Details --}}
-        <div class="space-y-3 sm:space-y-4">
-          <div>
+        <div class="space-y-3 sm:space-y-4"> 
             <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $booking->package->title }}</h3>
             <p class="text-gray-600 text-sm sm:text-base">{{ $booking->package->destination }}</p>
           </div>
