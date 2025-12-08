@@ -11,12 +11,16 @@ This deployment fixes two critical booking errors:
 3. `app/Http/Controllers/PackageController.php` (MODIFIED)
 4. `TODO.md` (UPDATED)
 
+## 🚨 CRITICAL: Production Database Migration Required
+
+**The location_bookings table error indicates that the migration has NOT been run on production yet.**
+
 ## Deployment Steps
 
 ### Step 1: Deploy Code to Production Server
 Upload or pull the latest code to your production server at `public.monnkama.shop`
 
-### Step 2: Run Migrations on Production
+### Step 2: Run Migrations on Production (REQUIRED - Fixes the table error)
 SSH into your production server and run:
 
 ```bash
@@ -24,7 +28,7 @@ cd /path/to/your/laravel/project
 php artisan migrate --force
 ```
 
-The `--force` flag is required for production environments.
+**CRITICAL:** The `--force` flag is required for production environments. This command will create the missing `location_bookings` table.
 
 ### Step 3: Clear Caches
 After migration, clear all caches:
