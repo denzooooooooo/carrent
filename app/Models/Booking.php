@@ -16,6 +16,7 @@ class Booking extends Model
         'flight_id',
         'event_id',
         'package_id',
+        'location_id',
         'seat_zone_id',
         'booking_date',
         'travel_date',
@@ -69,14 +70,14 @@ class Booking extends Model
         return $this->belongsTo(TourPackage::class, 'package_id');
     }
 
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
     public function seatZone()
     {
         return $this->belongsTo(EventSeatZone::class, 'seat_zone_id');
-    }
-
-    public function location()
-    {
-        return $this->belongsTo(Location::class);
     }
 
     public function locationBooking()
