@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatCurrency(amount) {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
-            currency: '{{ \App\Helpers\CurrencyHelper::current() }}',
+            currency: '{{ \App\Helpers\CurrencyHelper::getCurrentCurrency() }}',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);

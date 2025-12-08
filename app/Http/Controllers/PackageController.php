@@ -96,7 +96,8 @@ class PackageController extends Controller
         $request->validate([
             'departure_date' => 'required|date|after:today',
             'participants' => 'required|integer|min:' . $package->min_participants . '|max:' . $package->max_participants,
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'special_requests' => 'nullable|string|max:1000',
@@ -108,18 +109,29 @@ class PackageController extends Controller
 
         // Create booking
         $booking = Booking::create([
-            'booking_reference' => 'PKG-' . strtoupper(Str::random(8)),
-            'package_id' => $package->id,
-            'user_name' => $request->name,
-            'user_email' => $request->email,
-            'user_phone' => $request->phone,
-            'departure_date' => $request->departure_date,
-            'participants' => $request->participants,
-            'special_requests' => $request->special_requests,
-            'unit_price' => $unitPrice,
-            'total_price' => $totalPrice,
-            'status' => 'confirmed',
+            'booking_number' => 'PKG-' . strtoupper(Str::random(8)),
+            'user_id' => auth()->check() ? auth()->id() : null,
             'booking_type' => 'package',
+            'package_id' => $package->id,
+            'booking_date' => now(),
+            'travel_date' => $request->departure_date,
+            'number_of_passengers' => $request->participants,
+            'passenger_details' => [
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'type' => 'adult'
+                ]
+            ],
+            'total_amount' => $totalPrice,
+            'currency' => 'XAF',
+            'final_amount' => $totalPrice,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'special_requests' => $request->special_requests,
         ]);
 
         // Send confirmation email
@@ -130,7 +142,8 @@ class PackageController extends Controller
             \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
         }
 
-        return redirect()->route('packages.booking.confirmation', $booking);
+        return redirect()->route('payment.instructions', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez suivre les instructions de paiement pour la confirmer.');
     }
 
     /**
