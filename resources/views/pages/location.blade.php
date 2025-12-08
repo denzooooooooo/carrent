@@ -70,7 +70,7 @@
               <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
                 <div class="relative">
                   @php
-                    $imageUrl = $location->getFirstMediaUrl('avatar', 'normal');
+                    $imageUrl = $location->image_url;
                     $placeholder = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500&h=300&fit=crop';
                   @endphp
                   <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $location->name }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
