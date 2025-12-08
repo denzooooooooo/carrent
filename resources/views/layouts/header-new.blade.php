@@ -31,6 +31,7 @@
             'submenu' => [
                 ['name' => __('Packages'), 'name_fr' => 'Packages', 'path' => '/packages', 'icon' => 'fa-suitcase-rolling'],
                 ['name' => __('Car Rental'), 'name_fr' => 'Location de voiture', 'path' => '/location', 'icon' => 'fa-car'],
+                ['name' => __('Partnership'), 'name_fr' => 'Partenariat', 'path' => '/partnership', 'icon' => 'fa-handshake'],
                 ['name' => __('About Us'), 'name_fr' => 'À propos', 'path' => '/about', 'icon' => 'fa-info-circle'],
                 ['name' => __('Contact'), 'name_fr' => 'Contact', 'path' => '/contact', 'icon' => 'fa-envelope'],
             ]

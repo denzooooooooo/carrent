@@ -74,6 +74,11 @@ class HomeController extends Controller
         return view('pages.cookies');
     }
 
+    public function partnership()
+    {
+        return view('pages.partnership');
+    }
+
     public function login()
     {
         return view('pages.login');
