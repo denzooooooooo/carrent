@@ -1,42 +1,40 @@
-# Implement Complete Booking Flow for Packages and Location
+# Booking Errors Fix - TODO List
 
-## Current Status
-- **Events**: Complete booking flow (selection → booking modal → payment → confirmation)
-- **Packages**: Complete booking flow implemented (form → booking → payment → confirmation)
-- **Location**: Complete booking flow implemented (form → booking → payment → confirmation)
+## Issue 1: Location Bookings Table Missing (500 Error)
+- [x] Create migration file for `location_bookings` table
+- [x] Run migration to create the table
 
-## Completed Implementation
+## Issue 2: Package Booking 404 Error
+- [x] Check TourPackage model for route key configuration
+- [x] Add `getRouteKeyName()` method to TourPackage model to use slug
 
-### 1. Package Booking Flow ✅
-- [x] Package booking routes exist (routes/web.php)
-- [x] Package booking form implemented in package-details.blade.php
-- [x] PackageController booking methods implemented
-- [x] Package booking confirmation page exists (package-booking-confirmation.blade.php)
-- [x] Integrated with payment system
+## Follow-up Steps
+- [ ] Test location booking form submission
+- [ ] Test package booking form submission
+- [ ] Verify both redirect to payment instructions correctly
 
-### 2. Location Booking Flow ✅
-- [x] Location booking routes exist (routes/web.php)
-- [x] Location booking form implemented in location-details.blade.php
-- [x] LocationController booking methods implemented
-- [x] Location booking confirmation page created (location-booking-confirmation.blade.php)
-- [x] Integrated with payment system
-- [x] Added missing relationships to Booking model (location, locationBooking)
+## Status
+- Started: 2025-12-08
+- Completed: 2025-12-08
+- Current Step: Ready for testing
 
-### 3. Database & Models
-- [ ] Check if PackageBooking model exists (seems to exist based on migrations)
-- [ ] Check if LocationBooking model exists (seems to exist based on migrations)
-- [ ] Ensure proper relationships and fields
+## Changes Made:
+1. Created migration `2025_12_08_193000_create_location_bookings_table.php`
+   - Added all required fields from LocationBooking model
+   - Added foreign keys for location_id and booking_id
+   - Added indexes for performance
+   
+2. Updated `app/Models/TourPackage.php`
+   - Added `getRouteKeyName()` method to return 'slug'
+   - This allows Laravel to use slug instead of id for route model binding
 
-### 4. Payment Integration
-- [ ] Ensure package/location bookings integrate with existing payment flow
-- [ ] Update payment routes to handle different booking types
-
-### 5. Email Notifications
-- [ ] Add email confirmations for package bookings
-- [ ] Add email confirmations for location bookings
-
-## Technical Details
-- Follow the same pattern as event booking (modal → form submission → payment → confirmation)
-- Use existing payment infrastructure (Flutterwave integration)
-- Maintain consistent UI/UX across all booking types
-- Ensure proper validation and error handling
+## Testing Instructions:
+1. Test Location Booking:
+   - Go to a location details page
+   - Fill out the booking form
+   - Submit and verify it redirects to payment instructions
+   
+2. Test Package Booking:
+   - Go to a package details page
+   - Fill out the booking form
+   - Submit and verify it redirects to payment instructions
