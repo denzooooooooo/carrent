@@ -41,7 +41,7 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $booking->load(['event', 'eventBooking', 'flightBooking', 'package']);
+        $booking->load(['event', 'eventBooking', 'flightBooking', 'package', 'location', 'locationBooking']);
 
         return view('pages.payment.instructions', compact('booking'));
     }
@@ -109,8 +109,21 @@ class PaymentController extends Controller
                     // Envoyer l'email de confirmation selon le type de réservation
                     $this->sendConfirmationEmail($booking);
 
-                    return redirect()->route('booking.confirmation', $booking)
-                        ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
+                    // Rediriger vers la page de confirmation appropriée selon le type de réservation
+                    switch ($booking->booking_type) {
+                        case 'event':
+                            return redirect()->route('event.booking.confirmation', $booking)
+                                ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
+                        case 'package':
+                            return redirect()->route('packages.booking.confirmation', $booking)
+                                ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
+                        case 'location':
+                            return redirect()->route('location.booking.confirmation', $booking)
+                                ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
+                        default:
+                            return redirect()->route('booking.confirmation', $booking->id)
+                                ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error('Erreur lors de la vérification du paiement: ' . $e->getMessage());

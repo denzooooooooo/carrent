@@ -44,6 +44,29 @@
                 <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->event->event_date)->format('d/m/Y') }}</span>
               </div>
             </div>
+          @elseif($booking->booking_type === 'package')
+            <div class="space-y-4">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Package:</span>
+                <span class="font-semibold text-gray-900">{{ $booking->package->title_fr }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Destination:</span>
+                <span class="font-semibold text-gray-900">{{ $booking->package->destination }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Participants:</span>
+                <span class="font-semibold text-gray-900">{{ $booking->number_of_passengers }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Date de départ:</span>
+                <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->travel_date)->format('d/m/Y') }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Durée:</span>
+                <span class="font-semibold text-gray-900">{{ $booking->package->duration }} jours</span>
+              </div>
+            </div>
           @elseif($booking->booking_type === 'location')
             <div class="space-y-4">
               <div class="flex justify-between">
