@@ -263,6 +263,7 @@ Route::get('/packages/booking/confirmation/{booking}', [\App\Http\Controllers\Pa
 
 // --- Location ---
 Route::get('/location', [HomeController::class, 'location'])->name('location');
+Route::get('/location/{location}', [\App\Http\Controllers\LocationController::class, 'show'])->name('location.show');
 Route::post('/location/{location}/book', [\App\Http\Controllers\LocationController::class, 'book'])->name('location.book');
 Route::get('/location/booking/confirmation/{booking}', [\App\Http\Controllers\LocationController::class, 'bookingConfirmation'])->name('location.booking.confirmation');
 
