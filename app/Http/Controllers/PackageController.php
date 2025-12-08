@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\TourPackage;
+use App\Models\Booking;
+use App\Mail\PackageBookingConfirmation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class PackageController extends Controller
 {
@@ -82,5 +86,63 @@ class PackageController extends Controller
             ->get();
 
         return view('pages.package-details', compact('package', 'similarPackages'));
+    }
+
+    /**
+     * Handle package booking submission.
+     */
+    public function book(Request $request, TourPackage $package)
+    {
+        $request->validate([
+            'departure_date' => 'required|date|after:today',
+            'participants' => 'required|integer|min:' . $package->min_participants . '|max:' . $package->max_participants,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'special_requests' => 'nullable|string|max:1000',
+        ]);
+
+        // Calculate total price
+        $unitPrice = $package->discount_price ?? $package->price;
+        $totalPrice = $unitPrice * $request->participants;
+
+        // Create booking
+        $booking = Booking::create([
+            'booking_reference' => 'PKG-' . strtoupper(Str::random(8)),
+            'package_id' => $package->id,
+            'user_name' => $request->name,
+            'user_email' => $request->email,
+            'user_phone' => $request->phone,
+            'departure_date' => $request->departure_date,
+            'participants' => $request->participants,
+            'special_requests' => $request->special_requests,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'status' => 'confirmed',
+            'booking_type' => 'package',
+        ]);
+
+        // Send confirmation email
+        try {
+            Mail::to($request->email)->send(new PackageBookingConfirmation($booking));
+        } catch (\Exception $e) {
+            // Log email error but don't fail the booking
+            \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
+        }
+
+        return redirect()->route('packages.booking.confirmation', $booking);
+    }
+
+    /**
+     * Display booking confirmation page.
+     */
+    public function bookingConfirmation(Booking $booking)
+    {
+        // Ensure this is a package booking
+        if ($booking->booking_type !== 'package' || !$booking->package) {
+            abort(404);
+        }
+
+        return view('pages.package-booking-confirmation', compact('booking'));
     }
 }

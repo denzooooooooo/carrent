@@ -3,8 +3,8 @@
 namespace App\Traits;
 
 trait HasImageUrl
-{
-    /**
+{  
+    /** 
      * Get the full URL for the image
      */
     public function getImageUrlAttribute()

@@ -258,12 +258,19 @@ Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 
 // --- Packages ---
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
 Route::get('/packages/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
+Route::post('/packages/{package}/book', [\App\Http\Controllers\PackageController::class, 'book'])->name('packages.book');
+Route::get('/packages/booking/confirmation/{booking}', [\App\Http\Controllers\PackageController::class, 'bookingConfirmation'])->name('packages.booking.confirmation');
+
+// --- Location ---
 Route::get('/location', [HomeController::class, 'location'])->name('location');
+Route::post('/location/{location}/book', [\App\Http\Controllers\LocationController::class, 'book'])->name('location.book');
+Route::get('/location/booking/confirmation/{booking}', [\App\Http\Controllers\LocationController::class, 'bookingConfirmation'])->name('location.booking.confirmation');
 
 // --- Pages de support ---
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'storeContact'])->name('contact.store');
+Route::get('/partnership', [HomeController::class, 'partnership'])->name('partnership');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
