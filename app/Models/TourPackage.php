@@ -121,4 +121,14 @@ class TourPackage extends Model implements HasMedia
     {
         return $this->hasMany(Review::class, 'item_id')->where('item_type', 'package');
     }
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }
