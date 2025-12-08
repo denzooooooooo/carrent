@@ -101,16 +101,9 @@
               <div class="space-y-2 text-sm text-gray-600">
                 <div class="flex justify-between">
                   <span>Orange Money:</span>
-                  <span class="font-mono font-semibold">+225 XX XX XX XX</span>
+                  <span class="font-mono font-semibold">+225 07 79 28 49 25</span>
                 </div>
-                <div class="flex justify-between">
-                  <span>MTN Mobile Money:</span>
-                  <span class="font-mono font-semibold">+225 XX XX XX XX</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Moov Money:</span>
-                  <span class="font-mono font-semibold">+225 XX XX XX XX</span>
-                </div>
+               
               </div>
             </div>
 
@@ -128,12 +121,8 @@
                   <span class="font-semibold">NSIA Banque</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Numéro de compte:</span>
-                  <span class="font-mono font-semibold">XXXX XXXX XXXX XXXX</span>
-                </div>
-                <div class="flex justify-between">
                   <span>IBAN:</span>
-                  <span class="font-mono font-semibold">CIXX XXXX XXXX XXXX XXXX XXXX XXX</span>
+                  <span class="font-mono font-semibold">CI042 0121 2033 0249 02001 </span>
                 </div>
                 <div class="flex justify-between">
                   <span>Nom du bénéficiaire:</span>
@@ -153,7 +142,7 @@
               <div class="space-y-2 text-sm text-gray-600">
                 <div class="flex justify-between">
                   <span>Numéro Wave:</span>
-                  <span class="font-mono font-semibold">+225 XX XX XX XX</span>
+                  <span class="font-mono font-semibold">+225 01 01 22 15 15</span>
                 </div>
                 <div class="flex justify-between">
                   <span>Nom:</span>

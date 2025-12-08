@@ -37,16 +37,19 @@ jobs:
             git reset --hard origin/prod
 
             echo "📦 Installation des dépendances..."
-            composer install --no-interaction
+            composer update 
+
+            composer install 
 
             echo "⚙️ Optimisation Laravel..."
             php artisan optimize:clear
 
             npm install
+
             npm run build
             
             php artisan optimize
-            php artisan migrate --force
+            php artisan migrate
 
             echo "✅ Déploiement VPS terminé !"
           EOF

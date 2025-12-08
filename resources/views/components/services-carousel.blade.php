@@ -16,9 +16,9 @@
         $carouselSlides = [
           [
             'image' => 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=1080&fit=crop',
-            'title' => __('PRIVATE FLIGHTS'),
+            'title' => __('Votre conciergerie de luxe multi-service '),
             'subtitle' => __('Luxury Jets & Helicopters'),
-            'description' => __('Discover absolute comfort with our personalized private flights')
+            'description' => __('Bienvenue chez Carré Premium, votre passerelle vers des expériences de voyage inégalées.')
           ],
           [
             'image' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&h=1080&fit=crop',
