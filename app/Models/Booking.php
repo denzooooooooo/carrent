@@ -74,6 +74,16 @@ class Booking extends Model
         return $this->belongsTo(EventSeatZone::class, 'seat_zone_id');
     }
 
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function locationBooking()
+    {
+        return $this->hasOne(LocationBooking::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class);
