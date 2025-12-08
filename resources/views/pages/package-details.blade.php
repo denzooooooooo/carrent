@@ -94,12 +94,12 @@
                 @endif
               </div>
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button class="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 px-4 sm:py-4 sm:px-6 rounded-xl hover:shadow-lg transition-all text-sm sm:text-base text-center">
+                <a href="#booking-form" class="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 px-4 sm:py-4 sm:px-6 rounded-xl hover:shadow-lg transition-all text-sm sm:text-base text-center text-decoration-none">
                   Réserver maintenant
-                </button>
-                <button class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all text-sm sm:text-base">
+                </a>
+                <a href="{{ route('contact') }}?subject=Demande de devis pour {{ urlencode($package->title) }}" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all text-sm sm:text-base text-decoration-none text-center">
                   Demander un devis
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -110,6 +110,117 @@
 
   {{-- Main Content --}}
   <div class="container mx-auto px-4 py-6 sm:py-8">
+    {{-- Booking Form Section --}}
+    <div id="booking-form" class="mb-8 sm:mb-12">
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">Réserver ce package</h2>
+
+          <form action="{{ route('packages.book', $package->slug) }}" method="POST" class="space-y-6 sm:space-y-8">
+            @csrf
+
+            {{-- Personal Information --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                <input type="text" id="first_name" name="first_name" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                <input type="text" id="last_name" name="last_name" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" id="email" name="email" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                <input type="tel" id="phone" name="phone" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+            </div>
+
+            {{-- Booking Details --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label for="departure_date" class="block text-sm font-medium text-gray-700 mb-2">Date de départ *</label>
+                <input type="date" id="departure_date" name="departure_date" required
+                       min="{{ date('Y-m-d') }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label for="participants" class="block text-sm font-medium text-gray-700 mb-2">Nombre de participants *</label>
+                <select id="participants" name="participants" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  @for($i = $package->min_participants; $i <= $package->max_participants; $i++)
+                    <option value="{{ $i }}">{{ $i }} personne{{ $i > 1 ? 's' : '' }}</option>
+                  @endfor
+                </select>
+              </div>
+            </div>
+
+            {{-- Special Requests --}}
+            <div>
+              <label for="special_requests" class="block text-sm font-medium text-gray-700 mb-2">Demandes spéciales (optionnel)</label>
+              <textarea id="special_requests" name="special_requests" rows="4"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Régime alimentaire, accessibilité, etc."></textarea>
+            </div>
+
+            {{-- Price Summary --}}
+            <div class="bg-purple-50 rounded-lg p-4 sm:p-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">Récapitulatif du prix</h3>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span>Prix par personne</span>
+                  @if($package->discount_price)
+                    <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                  @else
+                    <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                  @endif
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Nombre de participants</span>
+                  <span id="participant-count" class="font-semibold">1</span>
+                </div>
+                <hr class="my-2">
+                <div class="flex justify-between text-lg font-bold">
+                  <span>Total estimé</span>
+                  <span id="total-price" class="text-purple-600">
+                    @if($package->discount_price)
+                      {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}
+                    @else
+                      {{ \App\Helpers\CurrencyHelper::format($package->price) }}
+                    @endif
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {{-- Terms and Submit --}}
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input type="checkbox" id="terms" name="terms" required
+                       class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                <label for="terms" class="ml-2 text-sm text-gray-700">
+                  J'accepte les <a href="{{ route('privacy') }}" class="text-purple-600 hover:text-purple-700">conditions générales</a> *
+                </label>
+              </div>
+              <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 px-8 rounded-lg hover:shadow-lg transition-all">
+                Confirmer la réservation
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
       {{-- Left Column --}}
       <div class="lg:col-span-2 space-y-6 sm:space-y-8">
@@ -236,12 +347,12 @@
 
             {{-- Action Buttons --}}
             <div class="space-y-3">
-              <button class="w-full bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 px-4 rounded-lg hover:shadow-lg transition-all text-sm sm:text-base">
+              <a href="#booking-form" class="w-full bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 px-4 rounded-lg hover:shadow-lg transition-all text-sm sm:text-base text-center text-decoration-none block">
                 Réserver maintenant
-              </button>
-              <button class="w-full border-2 border-purple-300 text-purple-600 font-semibold py-3 px-4 rounded-lg hover:bg-purple-50 transition-all text-sm sm:text-base">
+              </a>
+              <a href="{{ route('contact') }}?subject=Demande de devis pour {{ urlencode($package->title) }}" class="w-full border-2 border-purple-300 text-purple-600 font-semibold py-3 px-4 rounded-lg hover:bg-purple-50 transition-all text-sm sm:text-base text-center text-decoration-none block">
                 Demander un devis personnalisé
-              </button>
+              </a>
             </div>
 
             {{-- Contact Info --}}
@@ -322,4 +433,39 @@
     </div>
   </section>
 </div>
+
+{{-- JavaScript for dynamic price calculation --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const participantsSelect = document.getElementById('participants');
+    const participantCount = document.getElementById('participant-count');
+    const totalPrice = document.getElementById('total-price');
+
+    if (participantsSelect && participantCount && totalPrice) {
+        const unitPrice = {{ $package->discount_price ?? $package->price }};
+
+        function updatePrice() {
+            const participants = parseInt(participantsSelect.value) || 1;
+            const total = unitPrice * participants;
+
+            participantCount.textContent = participants;
+            totalPrice.textContent = formatCurrency(total);
+        }
+
+        participantsSelect.addEventListener('change', updatePrice);
+
+        // Initial calculation
+        updatePrice();
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: '{{ \App\Helpers\CurrencyHelper::getCurrentCurrency() }}',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+});
+</script>
 @endsection
