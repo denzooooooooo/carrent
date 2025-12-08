@@ -15,17 +15,33 @@ This deployment fixes two critical booking errors:
 
 **The location_bookings table error indicates that the migration has NOT been run on production yet.**
 
+**ERROR:** `SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u608034730_carrepremim.location_bookings' doesn't exist`
+
+**LOCATION:** `PaymentController.php:44` - `$booking->load(['event', 'eventBooking', 'flightBooking', 'package', 'location', 'locationBooking']);`
+
+**SOLUTION:** Run the migration on production server immediately.
+
 ## Deployment Steps
 
 ### Step 1: Deploy Code to Production Server
 Upload or pull the latest code to your production server at `public.monnkama.shop`
 
 ### Step 2: Run Migrations on Production (REQUIRED - Fixes the table error)
+
+**Option 1: Manual Commands**
 SSH into your production server and run:
 
 ```bash
 cd /path/to/your/laravel/project
 php artisan migrate --force
+```
+
+**Option 2: Automated Script (Recommended)**
+Upload the `migration_script.sh` file to your production server and run:
+
+```bash
+chmod +x migration_script.sh
+./migration_script.sh
 ```
 
 **CRITICAL:** The `--force` flag is required for production environments. This command will create the missing `location_bookings` table.
