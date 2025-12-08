@@ -136,7 +136,8 @@ class PackageController extends Controller
 
         // Send confirmation email
         try {
-            Mail::to($request->email)->send(new PackageBookingConfirmation($booking));
+            $passengerName = $request->first_name . ' ' . $request->last_name;
+            Mail::to($request->email)->send(new PackageBookingConfirmation($booking, $passengerName));
         } catch (\Exception $e) {
             // Log email error but don't fail the booking
             \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
