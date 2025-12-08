@@ -7,17 +7,7 @@ use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-    /**
-     * Afficher la liste des locations.
-     */
-    public function index()
-    {
-        $locations = Location::where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->get();
 
-        return view('pages.location', compact('locations'));
-    }
 
     /**
      * Traiter la réservation d'une location.
@@ -84,6 +74,18 @@ class LocationController extends Controller
 
         return redirect()->route('payment.instructions', $booking)
             ->with('success', 'Votre réservation de location a été créée avec succès! Veuillez suivre les instructions de paiement pour la confirmer.');
+    }
+
+    /**
+     * Afficher les détails d'une location.
+     */
+    public function show(Location $location)
+    {
+        if (!$location->is_active) {
+            abort(404);
+        }
+
+        return view('pages.location-details', compact('location'));
     }
 
     /**

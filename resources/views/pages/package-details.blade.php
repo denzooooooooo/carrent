@@ -178,7 +178,7 @@
               <h3 class="text-lg font-bold text-gray-900 mb-4">Récapitulatif du prix</h3>
               <div class="space-y-2">
                 <div class="flex justify-between">
-                  <span>Prix par personne</span>
+                  <span>Prix par personne</span> 
                   @if($package->discount_price)
                     <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
                   @else
