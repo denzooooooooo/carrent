@@ -22,26 +22,26 @@
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h2 class="text-4xl font-black mb-4">{{ __('Why Partner with Us?') }}</h2>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">{{ __('Become part of our premium concierge network and benefit from attractive commissions on luxury travel bookings and exclusive events in Ivory Coast.') }}</p>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">{{ __('Join our exclusive network of hotels, restaurants, and travel agencies. Benefit from our extensive client base to promote your premium services.') }}</p>
       </div>
 
       <div class="grid md:grid-cols-3 gap-8 mb-12">
         @php
           $benefits = [
             [
-              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" /></svg>',
-              'title' => __('Attractive Commissions'),
-              'description' => __('Earn competitive commissions on every booking made through your referrals.')
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>',
+              'title' => __('Access to Our Network'),
+              'description' => __('Benefit from our extensive client base of VIP travelers and luxury seekers to promote your services.')
+            ],
+            [
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" /></svg>',
+              'title' => __('Increased Visibility'),
+              'description' => __('Your establishment featured on our premium platform and recommended to our exclusive clientele.')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>',
-              'title' => __('Premium Services'),
-              'description' => __('Access to our complete range of luxury concierge services and VIP experiences.')
-            ],
-            [
-              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-              'title' => __('Dedicated Support'),
-              'description' => __('Personal account manager and 24/7 support for all your partnership needs.')
+              'title' => __('Quality Partnerships'),
+              'description' => __('Join a select network of premium establishments and benefit from collaborative marketing opportunities.')
             ]
           ];
         @endphp
@@ -59,27 +59,36 @@
 
       {{-- Partnership Types --}}
       <div class="bg-gradient-to-r from-purple-600 to-amber-600 rounded-3xl p-8 shadow-xl text-white mb-12">
-        <h2 class="text-3xl font-black mb-8 text-center">{{ __('Partnership Types') }}</h2>
-        <div class="grid md:grid-cols-2 gap-8">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-            <h3 class="text-2xl font-bold mb-4">{{ __('Business Partners') }}</h3>
-            <ul class="space-y-2 text-sm">
-              <li>• Hotels & Resorts</li>
-              <li>• Travel Agencies</li>
-              <li>• Event Planners</li>
-              <li>• Corporate Companies</li>
-              <li>• Luxury Brands</li>
-            </ul>
+        <h2 class="text-3xl font-black mb-8 text-center">{{ __('Who Can Partner With Us?') }}</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">{{ __('Hotels & Resorts') }}</h3>
+            <p class="text-sm text-white/90">{{ __('Luxury hotels, boutique resorts, and premium accommodations') }}</p>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-            <h3 class="text-2xl font-bold mb-4">{{ __('Individual Partners') }}</h3>
-            <ul class="space-y-2 text-sm">
-              <li>• Travel Influencers</li>
-              <li>• Event Coordinators</li>
-              <li>• Luxury Consultants</li>
-              <li>• VIP Concierge Services</li>
-              <li>• Personal Shoppers</li>
-            </ul>
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">{{ __('Restaurants') }}</h3>
+            <p class="text-sm text-white/90">{{ __('Fine dining, gourmet restaurants, and exclusive culinary experiences') }}</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">{{ __('Travel Agencies') }}</h3>
+            <p class="text-sm text-white/90">{{ __('Tour operators, travel agencies, and destination management companies') }}</p>
           </div>
         </div>
       </div>
@@ -175,11 +184,10 @@
             >
               <option value="" {{ old('partnership_type') == '' ? 'selected' : '' }}>{{ __('Select partnership type') }}</option>
               <option value="hotel" {{ old('partnership_type') == 'hotel' ? 'selected' : '' }}>{{ __('Hotel & Resort') }}</option>
+              <option value="restaurant" {{ old('partnership_type') == 'restaurant' ? 'selected' : '' }}>{{ __('Restaurant') }}</option>
               <option value="travel_agency" {{ old('partnership_type') == 'travel_agency' ? 'selected' : '' }}>{{ __('Travel Agency') }}</option>
-              <option value="event_planner" {{ old('partnership_type') == 'event_planner' ? 'selected' : '' }}>{{ __('Event Planner') }}</option>
-              <option value="corporate" {{ old('partnership_type') == 'corporate' ? 'selected' : '' }}>{{ __('Corporate Company') }}</option>
-              <option value="luxury_brand" {{ old('partnership_type') == 'luxury_brand' ? 'selected' : '' }}>{{ __('Luxury Brand') }}</option>
-              <option value="influencer" {{ old('partnership_type') == 'influencer' ? 'selected' : '' }}>{{ __('Travel Influencer') }}</option>
+              <option value="tour_operator" {{ old('partnership_type') == 'tour_operator' ? 'selected' : '' }}>{{ __('Tour Operator') }}</option>
+              <option value="event_venue" {{ old('partnership_type') == 'event_venue' ? 'selected' : '' }}>{{ __('Event Venue') }}</option>
               <option value="other" {{ old('partnership_type') == 'other' ? 'selected' : '' }}>{{ __('Other') }}</option>
             </select>
             @error('partnership_type')
