@@ -117,26 +117,7 @@
 
 
 
-  {{-- Nos Partenaires --}}
-  <section class="py-8 md:py-16">
-    <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12">{{ __('Our Partners') }}</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-        @php
-          $partners = [
-            'Air France', 'Emirates', 'Turkish Airlines', 'Ethiopian Airlines',
-            'Visa', 'Mastercard', 'Orange Money', 'MTN Mobile Money'
-          ];
-        @endphp
-
-        @foreach($partners as $partner)
-          <div class="bg-white rounded-2xl p-4 md:p-6 flex items-center justify-center shadow-lg hover:shadow-xl transition-all">
-            <span class="text-sm md:text-base lg:text-lg font-bold text-gray-600">{{ $partner }}</span>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
+  
 
   {{-- CTA --}}
   <section class="py-8 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
