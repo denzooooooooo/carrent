@@ -4,36 +4,46 @@
         [
             'name' => __('Home'),
             'name_fr' => 'Accueil',
-            'path' => '/',
+            'path' => '#',
             'icon' => 'fa-home',
-            'color' => 'purple'
+            'color' => 'purple',
+            'submenu' => [
+                ['name' => __('About Us'), 'name_fr' => 'À propos', 'path' => '/about', 'icon' => 'fa-info-circle'],
+                ['name' => __('Contact Us'), 'name_fr' => 'Nous contacter', 'path' => '/contact', 'icon' => 'fa-envelope'],
+            ]
         ],
         [
-            'name' => __('Flights'),
-            'name_fr' => 'Vols',
-            'path' => '/flights',
-            'icon' => 'fa-plane',
-            'color' => 'blue'
+            'name' => __('Ticketing'),
+            'name_fr' => 'Billeterie',
+            'path' => '#',
+            'icon' => 'fa-ticket-alt',
+            'color' => 'blue',
+            'submenu' => [
+                ['name' => __('Travel'), 'name_fr' => 'Voyage', 'path' => '/flights', 'icon' => 'fa-plane'],
+                ['name' => __('Visa Service'), 'name_fr' => 'Service visa', 'path' => '/visa-service', 'icon' => 'fa-passport'],
+            ]
         ],
         [
-            'name' => __('Events'),
-            'name_fr' => 'Événements',
-            'path' => '/events',
-            'icon' => 'fa-calendar-alt',
-            'color' => 'pink'
+            'name' => __('Event Ticketing'),
+            'name_fr' => 'Billeterie Event',
+            'path' => '#',
+            'icon' => 'fa-calendar-star',
+            'color' => 'pink',
+            'submenu' => [
+                ['name' => __('Cultural'), 'name_fr' => 'Culturel', 'path' => '/events?type=culturel', 'icon' => 'fa-theater-masks'],
+                ['name' => __('Sports'), 'name_fr' => 'Sportif', 'path' => '/events?type=sportif', 'icon' => 'fa-futbol'],
+            ]
         ],
         [
-            'name' => __('Services'),
-            'name_fr' => 'Services',
+            'name' => __('Concierge'),
+            'name_fr' => 'Conciergerie',
             'path' => '#',
             'icon' => 'fa-concierge-bell',
             'color' => 'orange',
             'submenu' => [
-                ['name' => __('Packages'), 'name_fr' => 'Packages', 'path' => '/packages', 'icon' => 'fa-suitcase-rolling'],
-                ['name' => __('Car Rental'), 'name_fr' => 'Location de voiture', 'path' => '/location', 'icon' => 'fa-car'],
-                ['name' => __('Partnership'), 'name_fr' => 'Partenariat', 'path' => '/partnership', 'icon' => 'fa-handshake'],
-                ['name' => __('About Us'), 'name_fr' => 'À propos', 'path' => '/about', 'icon' => 'fa-info-circle'],
-                ['name' => __('Contact'), 'name_fr' => 'Contact', 'path' => '/contact', 'icon' => 'fa-envelope'],
+                ['name' => __('Luxury'), 'name_fr' => 'Luxe', 'path' => '/concierge/luxury', 'icon' => 'fa-gem'],
+                ['name' => __('Vehicle Rental'), 'name_fr' => 'Location de véhicule', 'path' => '/location', 'icon' => 'fa-car'],
+                ['name' => __('Personal Shopper'), 'name_fr' => 'Personal Shopper', 'path' => '/concierge/personal-shopper', 'icon' => 'fa-shopping-bag'],
             ]
         ],
     ];
@@ -46,59 +56,78 @@
     }
 @endphp
 
-<header 
-    x-data="{
-        mobileMenuOpen: false,
-        activeDropdown: null,
-        darkMode: false,
-        init() {
-            // Initialize dark mode from localStorage - DEFAULT IS FALSE (light mode)
-            const savedTheme = localStorage.getItem('theme');
-            this.darkMode = (savedTheme === 'dark');
-            
-            // Ensure light mode by default
-            if (!savedTheme || savedTheme === 'light') {
-                this.darkMode = false;
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else if (savedTheme === 'dark') {
-                this.darkMode = true;
-                document.documentElement.classList.add('dark');
+<div class="fixed top-0 left-0 right-0 z-50">
+    {{-- Top Bar with Register and B2B Partnership Buttons --}}
+    <div class="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-end h-8 space-x-3">
+                <a href="{{ route('register') }}" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    <i class="fas fa-user-plus"></i>
+                    <span>{{ __('Register') }}</span>
+                </a>
+                <span class="text-gray-300 dark:text-gray-600">|</span>
+                <a href="{{ route('partnership') }}" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    <i class="fas fa-handshake"></i>
+                    <span>{{ __('B2B Partnership') }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Main Header --}}
+    <header 
+        x-data="{
+            mobileMenuOpen: false,
+            activeDropdown: null,
+            darkMode: false,
+            init() {
+                // Initialize dark mode from localStorage - DEFAULT IS FALSE (light mode)
+                const savedTheme = localStorage.getItem('theme');
+                this.darkMode = (savedTheme === 'dark');
+                
+                // Ensure light mode by default
+                if (!savedTheme || savedTheme === 'light') {
+                    this.darkMode = false;
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else if (savedTheme === 'dark') {
+                    this.darkMode = true;
+                    document.documentElement.classList.add('dark');
+                }
+            },
+            toggleTheme() {
+                this.darkMode = !this.darkMode;
+                const theme = this.darkMode ? 'dark' : 'light';
+                localStorage.setItem('theme', theme);
+                
+                if (this.darkMode) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                
+                // Save to server
+                fetch('/theme/change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({ theme })
+                });
+            },
+            toggleDropdown(index) {
+                this.activeDropdown = this.activeDropdown === index ? null : index;
+            },
+            closeDropdowns() {
+                this.activeDropdown = null;
             }
-        },
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            const theme = this.darkMode ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-            
-            if (this.darkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            
-            // Save to server
-            fetch('/theme/change', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                },
-                body: JSON.stringify({ theme })
-            });
-        },
-        toggleDropdown(index) {
-            this.activeDropdown = this.activeDropdown === index ? null : index;
-        },
-        closeDropdowns() {
-            this.activeDropdown = null;
-        }
-    }"
-    @click.away="closeDropdowns()"
-    class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-md transition-colors duration-300"
->
+        }"
+        @click.away="closeDropdowns()"
+        class="bg-white dark:bg-gray-900 shadow-md transition-colors duration-300"
+    >
     <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between h-20">
+        <div class="flex items-center justify-between h-16">
             
             {{-- Logo --}}
             <a href="/" class="flex items-center space-x-3 group">
@@ -461,7 +490,8 @@
             @endif
         </div>
     </div>
-</header>
+    </header>
+</div>
 
 <script>
 function changeLanguage(lang) {

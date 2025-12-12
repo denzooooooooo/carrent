@@ -88,7 +88,7 @@
         'currentCurrency' => $currentCurrency
     ])
 
-    <main class="pt-20">
+    <main class="pt-24">
     @yield('content')
 </main>
 

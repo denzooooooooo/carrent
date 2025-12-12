@@ -7,6 +7,8 @@
   {{-- Hero Carrousel avec icônes SVG professionnelles --}}
   @include('components.services-carousel')
 
+  
+
   {{-- Événements à la Une --}}
   <section class="py-24 bg-white relative overflow-hidden">
     <div class="absolute inset-0 opacity-20">

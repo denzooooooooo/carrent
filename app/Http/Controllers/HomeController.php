@@ -111,4 +111,19 @@ class HomeController extends Controller
 
         return redirect()->back();
     }
+
+    public function visaService()
+    {
+        return view('pages.visa-service');
+    }
+
+    public function conciergeLuxury()
+    {
+        return view('pages.concierge.luxury');
+    }
+
+    public function personalShopper()
+    {
+        return view('pages.concierge.personal-shopper');
+    }
 }

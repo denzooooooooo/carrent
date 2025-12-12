@@ -277,6 +277,11 @@ Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
 Route::get('/cookies', [HomeController::class, 'cookies'])->name('cookies');
 
+// --- Services de Conciergerie ---
+Route::get('/visa-service', [HomeController::class, 'visaService'])->name('visa.service');
+Route::get('/concierge/luxury', [HomeController::class, 'conciergeLuxury'])->name('concierge.luxury');
+Route::get('/concierge/personal-shopper', [HomeController::class, 'personalShopper'])->name('concierge.personal-shopper');
+
 // --- Currency Routes ---
 Route::post('/currency/change', [CurrencyController::class, 'change'])->name('currency.change');
 Route::get('/currency/current', [CurrencyController::class, 'current'])->name('currency.current');
