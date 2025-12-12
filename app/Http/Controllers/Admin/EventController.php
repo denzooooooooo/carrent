@@ -231,9 +231,9 @@ class EventController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
             'event_date' => ['required', 'date'],
-            'event_time' => ['required', 'date_format:H:i:s'],
+            'event_time' => ['required', 'date_format:H:i'],
             'end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
-            'end_time' => ['nullable', 'date_format:H:i:s', 'required_with:end_date'],
+            'end_time' => ['nullable', 'date_format:H:i', 'required_with:end_date'],
             'image' => ['nullable', 'image', 'max:2048'], // 2MB max
             'min_price' => ['required', 'numeric', 'min:0'],
             'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
