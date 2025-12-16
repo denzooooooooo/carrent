@@ -240,7 +240,7 @@ class EventController extends Controller
             'total_seats' => ['required', 'integer', 'min:1'],
             'organizer' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
-            'is_active' => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'], 
             'meta_title_fr' => ['nullable', 'string', 'max:255'],
             'meta_title_en' => ['nullable', 'string', 'max:255'],
             'meta_description_fr' => ['nullable', 'string', 'max:500'],
