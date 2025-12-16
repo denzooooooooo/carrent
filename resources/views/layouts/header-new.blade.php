@@ -44,10 +44,12 @@
                 ['name' => __('Luxury'), 'name_fr' => 'Luxe', 'path' => '/concierge/luxury', 'icon' => 'fa-gem'],
                 ['name' => __('Vehicle Rental'), 'name_fr' => 'Location de véhicule', 'path' => '/location', 'icon' => 'fa-car'],
                 ['name' => __('Personal Shopper'), 'name_fr' => 'Personal Shopper', 'path' => '/concierge/personal-shopper', 'icon' => 'fa-shopping-bag'],
+                ['name' => __('packages'), 'name_fr' => 'Packages', 'path' => '/packages', 'icon' => 'fa-shopping-bag'],
+
             ]
         ],
     ];
-
+&@@
     function isActive($path) {
         if ($path === '/') {
             return request()->is('/');
