@@ -49,7 +49,7 @@
             ]
         ],
     ];
-&@@
+    // Function to check if a navigation item is active
     function isActive($path) {
         if ($path === '/') {
             return request()->is('/');
