@@ -134,7 +134,7 @@
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium Logo"
-                    class="h-6 w-auto rounded-lg max-h-6"
+                    class="h-12 w-auto rounded-lg max-h-12"
                 />
                 <div class="hidden md:block">
                     <div class="text-xl font-black text-black dark:text-white">
@@ -145,6 +145,69 @@
                     </div>
                 </div>
             </a>
+
+            {{-- Desktop Search Bar --}}
+            <div
+                x-data="{
+                    searchQuery: '',
+                    suggestions: [],
+                    showSuggestions: false,
+                    fetchSuggestions() {
+                        if (this.searchQuery.length < 1) {
+                            this.suggestions = [];
+                            this.showSuggestions = false;
+                            return;
+                        }
+                        fetch('/search/suggestions?q=' + encodeURIComponent(this.searchQuery), {
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content') }
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                this.suggestions = data;
+                                this.showSuggestions = data.length > 0;
+                            });
+                    },
+                    selectSuggestion(suggestion) {
+                        this.searchQuery = suggestion;
+                        this.showSuggestions = false;
+                        window.location.href = '/search?q=' + encodeURIComponent(suggestion);
+                    }
+                }"
+                class="hidden lg:flex flex-1 justify-center mx-6"
+            >
+                <div class="relative w-full max-w-md">
+                    <input
+                        type="text"
+                        x-model="searchQuery"
+                        @input.debounce.250ms="fetchSuggestions"
+                        @focus="showSuggestions = suggestions.length > 0"
+                        @keydown.escape="showSuggestions = false"
+                        @keydown.arrow-down.prevent="$refs.suggestionsList && $refs.suggestionsList.children.length && $refs.suggestionsList.children[0].focus()"
+                        @keydown.enter.prevent="window.location.href='/search?q='+encodeURIComponent(searchQuery)"
+                        placeholder="{{ __('Rechercher...') }}"
+                        class="w-full px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                        autocomplete="off"
+                    />
+                    <template x-if="showSuggestions">
+                        <ul
+                            x-ref="suggestionsList"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                        >
+                            <template x-for="(suggestion, i) in suggestions" :key="i">
+                                <li
+                                    :tabindex="0"
+                                    @click="selectSuggestion(suggestion)"
+                                    @keydown.enter.prevent="selectSuggestion(suggestion)"
+                                    @keydown.arrow-down.prevent="if ($el.nextElementSibling) $el.nextElementSibling.focus()"
+                                    @keydown.arrow-up.prevent="if ($el.previousElementSibling) $el.previousElementSibling.focus()"
+                                    class="px-4 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                    x-text="suggestion"
+                                ></li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+            </div>
 
             {{-- Desktop Navigation --}}
             <nav class="hidden lg:flex items-center space-x-2">
@@ -504,6 +567,68 @@
         style="display: none;"
     >
         <div class="container mx-auto px-4 py-4 space-y-2">
+            {{-- Mobile Search Bar --}}
+            <div
+                x-data="{
+                    searchQuery: '',
+                    suggestions: [],
+                    showSuggestions: false,
+                    fetchSuggestions() {
+                        if (this.searchQuery.length < 1) {
+                            this.suggestions = [];
+                            this.showSuggestions = false;
+                            return;
+                        }
+                        fetch('/search/suggestions?q=' + encodeURIComponent(this.searchQuery), {
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content') }
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                this.suggestions = data;
+                                this.showSuggestions = data.length > 0;
+                            });
+                    },
+                    selectSuggestion(suggestion) {
+                        this.searchQuery = suggestion;
+                        this.showSuggestions = false;
+                        window.location.href = '/search?q=' + encodeURIComponent(suggestion);
+                    }
+                }"
+                class="w-full mb-2"
+            >
+                <div class="relative">
+                    <input
+                        type="text"
+                        x-model="searchQuery"
+                        @input.debounce.250ms="fetchSuggestions"
+                        @focus="showSuggestions = suggestions.length > 0"
+                        @keydown.escape="showSuggestions = false"
+                        @keydown.arrow-down.prevent="$refs.suggestionsList && $refs.suggestionsList.children.length && $refs.suggestionsList.children[0].focus()"
+                        @keydown.enter.prevent="window.location.href='/search?q='+encodeURIComponent(searchQuery)"
+                        placeholder="{{ __('Rechercher...') }}"
+                        class="w-full px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                        autocomplete="off"
+                    />
+                    <template x-if="showSuggestions">
+                        <ul
+                            x-ref="suggestionsList"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                        >
+                            <template x-for="(suggestion, i) in suggestions" :key="i">
+                                <li
+                                    :tabindex="0"
+                                    @click="selectSuggestion(suggestion)"
+                                    @keydown.enter.prevent="selectSuggestion(suggestion)"
+                                    @keydown.arrow-down.prevent="if ($el.nextElementSibling) $el.nextElementSibling.focus()"
+                                    @keydown.arrow-up.prevent="if ($el.previousElementSibling) $el.previousElementSibling.focus()"
+                                    class="px-4 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                    x-text="suggestion"
+                                ></li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+            </div>
             @foreach ($navLinks as $link)
                 <a
                     href="{{ url($link['path']) }}"

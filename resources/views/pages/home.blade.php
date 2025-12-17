@@ -15,7 +15,7 @@
   </section>
 
   {{-- Événements à la Une --}}
-  <section class="py-24 bg-white relative overflow-hidden">
+  <section class="pt-12 pb-24  bg-white relative overflow-hidden" >
     <div class="absolute inset-0 opacity-20">
       <div class="absolute top-20 left-20 w-96 h-96 bg-amber-500 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl animate-pulse" style="animation-delay: 2s"></div>
@@ -29,10 +29,10 @@
           </svg>
           <span>{{ __('EXCLUSIVE SPORTS & CULTURAL EVENTS') }}</span>
         </div> 
-        <h2 class="text-4xl md:text-3xlxl font-black text-black mb-4 md:mb-6 leading-tight">
+        <h2 class="text-4xl md:text-3xlxl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
           {{ __('Events Not to Miss') }}
         </h2>
-        <p class="text-xl text-black/90 max-w-3xl mx-auto">
+        <p class="text-xl text-gray-800 max-w-3xl mx-auto">
           {{ __('Access the world\'s greatest sports and cultural events') }}
         </p>
       </div>

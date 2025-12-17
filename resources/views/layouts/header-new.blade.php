@@ -136,7 +136,7 @@
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium"
-                    class="h-6 w-auto max-h-6"
+                    class="h-12 w-auto max-h-12"
                 />
                 <div class="flex flex-col">
                     <span class="text-base font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
@@ -223,6 +223,7 @@
                             name="q" 
                             type="search" 
                             placeholder="Rechercher..." 
+                            @keydown.enter.prevent="window.location.href='{{ url('/search') }}?q='+encodeURIComponent(this.value)"
                             class="bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 pr-10 pl-10 outline-none text-gray-700 dark:text-gray-300 w-64 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all" 
                             aria-label="Recherche"
                             autocomplete="off"
@@ -596,7 +597,7 @@
 
             function fetchSuggestions(q){
                 if(!q || q.length < 2){ hide(); return; }
-                fetch('/search/suggest?q=' + encodeURIComponent(q))
+                fetch("{{ url('/search/suggest') }}?q=" + encodeURIComponent(q))
                     .then(r => r.json())
                     .then(data => {
                         show(data.results || []);
