@@ -37,7 +37,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
         {{-- Événements réels depuis la base de données --}}
         @forelse ($latestEvents as $index => $event)
           <a
@@ -190,7 +190,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
         {{-- Service Cards --}}
         <a href="{{ route('flights.index') }}" class="group">
           <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
@@ -285,7 +285,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         @php
           $vehicles = [
             ['icon' => 'motorcycle', 'title' => __('Premium Quads'), 'desc' => __('Rental with or without guide'), 'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop'],
