@@ -132,7 +132,7 @@
         <div class="flex items-center justify-between h-16">
             
             {{-- Logo --}}
-            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap">
+            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap" style="margin-left: -70px;">
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium"
@@ -145,7 +145,7 @@
             </a>
 
             {{-- Desktop Navigation --}}
-            <nav class="hidden lg:flex items-center space-x-4 flex-nowrap text-sm">
+            <nav class="hidden lg:flex items-center space-x-0 flex-nowrap text-sm">
                 @foreach($navigation as $index => $item)
                     <div class="relative" x-data="{ open: false }">
                         @if(isset($item['submenu']))

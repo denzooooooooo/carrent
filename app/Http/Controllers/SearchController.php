@@ -79,19 +79,22 @@ class SearchController extends Controller
         }
 
         // Pages search
+
         $pages = collect();
         if (Schema::hasTable('pages')) {
             $pageColumns = ['title', 'content', 'slug'];
             $existingCols = array_filter($pageColumns, fn($col) => Schema::hasColumn('pages', $col));
 
-            $pages = Page::query()
-                ->where(function($query) use ($like, $existingCols) {
-                    foreach ($existingCols as $col) {
-                        $query->orWhere($col, 'like', $like);
-                    }
-                })
-                ->take(6)
-                ->get();
+            if (!empty($existingCols)) {
+                $pages = Page::query()
+                    ->where(function($query) use ($like, $existingCols) {
+                        foreach ($existingCols as $col) {
+                            $query->orWhere($col, 'like', $like);
+                        }
+                    })
+                    ->take(6)
+                    ->get();
+            }
         } else {
             $staticPages = [
                 (object)['title' => 'À propos', 'slug' => 'about', 'type' => 'page'],
@@ -172,32 +175,22 @@ class SearchController extends Controller
             }
         }
 
-        $pages = collect();
-        if (Schema::hasTable('pages')) {
-            $pageColumns = ['title', 'slug'];
-            $existingCols = array_filter($pageColumns, fn($col) => Schema::hasColumn('pages', $col));
 
-            if (!empty($existingCols)) {
-                $pages = Page::query()
-                    ->where(function($query) use ($like, $existingCols) {
-                        foreach ($existingCols as $col) {
-                            $query->orWhere($col, 'like', $like);
-                        }
-                    })
-                    ->select('title', 'slug', DB::raw("'page' as type"))
-                    ->take(4)
-                    ->get();
-            }
-        } else {
-            $staticPages = [
-                (object)['title' => 'Accueil', 'slug' => '', 'type' => 'page'],
-                (object)['title' => 'À propos', 'slug' => 'about', 'type' => 'page'],
-                (object)['title' => 'Contact', 'slug' => 'contact', 'type' => 'page'],
-                (object)['title' => 'FAQ', 'slug' => 'faq', 'type' => 'page'],
-            ];
 
-            $pages = collect($staticPages)->filter(fn($page) => stripos($page->title, $q) !== false)->take(4);
-        }
+
+        // Use static pages instead of database table for now
+        $staticPages = [
+            (object)['title' => 'Accueil', 'slug' => '', 'type' => 'page'],
+            (object)['title' => 'À propos', 'slug' => 'about', 'type' => 'page'],
+            (object)['title' => 'Contact', 'slug' => 'contact', 'type' => 'page'],
+            (object)['title' => 'FAQ', 'slug' => 'faq', 'type' => 'page'],
+            (object)['title' => 'Conditions d\'utilisation', 'slug' => 'terms', 'type' => 'page'],
+            (object)['title' => 'Politique de confidentialité', 'slug' => 'privacy', 'type' => 'page'],
+        ];
+
+        $pages = collect($staticPages)
+            ->filter(fn($page) => stripos($page->title, $q) !== false)
+            ->take(4);
 
         $locations = collect();
         if (Schema::hasTable('locations')) {

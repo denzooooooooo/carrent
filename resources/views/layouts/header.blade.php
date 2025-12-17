@@ -146,6 +146,7 @@
                 </div>
             </a>
 
+
             {{-- Desktop Search Bar --}}
             <div
                 x-data="{
@@ -158,23 +159,28 @@
                             this.showSuggestions = false;
                             return;
                         }
-                        fetch('/search/suggestions?q=' + encodeURIComponent(this.searchQuery), {
+                        fetch('/search/suggest?q=' + encodeURIComponent(this.searchQuery), {
                             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content') }
                         })
                             .then(res => res.json())
                             .then(data => {
-                                this.suggestions = data;
-                                this.showSuggestions = data.length > 0;
+                                this.suggestions = data.results || [];
+                                this.showSuggestions = this.suggestions.length > 0;
                             });
+
                     },
                     selectSuggestion(suggestion) {
-                        this.searchQuery = suggestion;
+                        const searchTerm = suggestion.original_title || suggestion.title || suggestion;
+                        this.searchQuery = searchTerm;
                         this.showSuggestions = false;
-                        window.location.href = '/search?q=' + encodeURIComponent(suggestion);
+                        
+                        // Navigate to search results
+                        window.location.href = '/search?q=' + encodeURIComponent(searchTerm);
                     }
                 }"
                 class="hidden lg:flex flex-1 justify-center mx-6"
             >
+
                 <div class="relative w-full max-w-md">
                     <input
                         type="text"
@@ -191,18 +197,25 @@
                     <template x-if="showSuggestions">
                         <ul
                             x-ref="suggestionsList"
-                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
                         >
                             <template x-for="(suggestion, i) in suggestions" :key="i">
                                 <li
                                     :tabindex="0"
-                                    @click="selectSuggestion(suggestion)"
-                                    @keydown.enter.prevent="selectSuggestion(suggestion)"
+                                    @click="selectSuggestion(suggestion.original_title || suggestion.title)"
+                                    @keydown.enter.prevent="selectSuggestion(suggestion.original_title || suggestion.title)"
                                     @keydown.arrow-down.prevent="if ($el.nextElementSibling) $el.nextElementSibling.focus()"
                                     @keydown.arrow-up.prevent="if ($el.previousElementSibling) $el.previousElementSibling.focus()"
-                                    class="px-4 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                    x-text="suggestion"
-                                ></li>
+                                    class="px-4 py-3 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                >
+                                    <div class="flex items-center space-x-3">
+                                        <i :class="suggestion.icon || 'fas fa-search'" class="w-4 h-4 text-purple-500"></i>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium truncate" x-html="suggestion.title || suggestion.original_title"></div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="suggestion.subtitle || suggestion.type"></div>
+                                        </div>
+                                    </div>
+                                </li>
                             </template>
                         </ul>
                     </template>
@@ -567,6 +580,7 @@
         style="display: none;"
     >
         <div class="container mx-auto px-4 py-4 space-y-2">
+
             {{-- Mobile Search Bar --}}
             <div
                 x-data="{
@@ -579,23 +593,28 @@
                             this.showSuggestions = false;
                             return;
                         }
-                        fetch('/search/suggestions?q=' + encodeURIComponent(this.searchQuery), {
+                        fetch('/search/suggest?q=' + encodeURIComponent(this.searchQuery), {
                             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content') }
                         })
                             .then(res => res.json())
                             .then(data => {
-                                this.suggestions = data;
-                                this.showSuggestions = data.length > 0;
+                                this.suggestions = data.results || [];
+                                this.showSuggestions = this.suggestions.length > 0;
                             });
+
                     },
                     selectSuggestion(suggestion) {
-                        this.searchQuery = suggestion;
+                        const searchTerm = suggestion.original_title || suggestion.title || suggestion;
+                        this.searchQuery = searchTerm;
                         this.showSuggestions = false;
-                        window.location.href = '/search?q=' + encodeURIComponent(suggestion);
+                        
+                        // Navigate to search results
+                        window.location.href = '/search?q=' + encodeURIComponent(searchTerm);
                     }
                 }"
                 class="w-full mb-2"
             >
+
                 <div class="relative">
                     <input
                         type="text"
@@ -612,18 +631,25 @@
                     <template x-if="showSuggestions">
                         <ul
                             x-ref="suggestionsList"
-                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
                         >
                             <template x-for="(suggestion, i) in suggestions" :key="i">
                                 <li
                                     :tabindex="0"
-                                    @click="selectSuggestion(suggestion)"
-                                    @keydown.enter.prevent="selectSuggestion(suggestion)"
+                                    @click="selectSuggestion(suggestion.original_title || suggestion.title)"
+                                    @keydown.enter.prevent="selectSuggestion(suggestion.original_title || suggestion.title)"
                                     @keydown.arrow-down.prevent="if ($el.nextElementSibling) $el.nextElementSibling.focus()"
                                     @keydown.arrow-up.prevent="if ($el.previousElementSibling) $el.previousElementSibling.focus()"
-                                    class="px-4 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                    x-text="suggestion"
-                                ></li>
+                                    class="px-4 py-3 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                >
+                                    <div class="flex items-center space-x-3">
+                                        <i :class="suggestion.icon || 'fas fa-search'" class="w-4 h-4 text-purple-500"></i>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium truncate" x-html="suggestion.title || suggestion.original_title"></div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="suggestion.subtitle || suggestion.type"></div>
+                                        </div>
+                                    </div>
+                                </li>
                             </template>
                         </ul>
                     </template>
