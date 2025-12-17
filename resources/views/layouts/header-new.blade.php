@@ -218,13 +218,12 @@
                 {{-- Enhanced Search form (site-wide) --}}
                 <div class="hidden md:flex items-center relative">
                     <div class="relative">
-                        <input 
-                            id="site-search" 
-                            name="q" 
-                            type="search" 
-                            placeholder="Rechercher..." 
-                            @keydown.enter.prevent="window.location.href='{{ url('/search') }}?q='+encodeURIComponent(this.value)"
-                            class="bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 pr-10 pl-10 outline-none text-gray-700 dark:text-gray-300 w-64 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all" 
+                        <input
+                            id="site-search"
+                            name="q"
+                            type="search"
+                            placeholder="Rechercher..."
+                            class="bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 pr-10 pl-10 outline-none text-gray-700 dark:text-gray-300 w-48 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all"
                             aria-label="Recherche"
                             autocomplete="off"
                         />
@@ -234,9 +233,7 @@
                                 <div class="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full"></div>
                             </div>
                         </div>
-
-                        {{-- Enhanced Suggestions dropdown (AJAX) --}}
-                        <div id="search-suggestions" class="absolute left-0 mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden hidden z-50 max-h-96 overflow-y-auto">
+                        <div id="search-suggestions" class="absolute left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden hidden z-50 max-h-96 overflow-y-auto">
                             <div id="search-suggestions-header" class="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                                 <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Suggestions</p>
                             </div>
@@ -254,15 +251,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    {{-- Advanced Search Toggle --}}
-                    <button 
-                        id="advanced-search-toggle"
-                        class="ml-2 p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-                        title="Recherche avancée"
-                    >
-                        <i class="fas fa-sliders-h text-sm"></i>
-                    </button>
                 </div>
 
                 {{-- Mobile Search Button --}}
@@ -341,11 +329,9 @@
 
                 {{-- Auth Buttons --}}
                 @if(!$isAuthenticated)
-                    <a href="{{ route('login') }}" class="hidden md:flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium transition-all">
+                    <a href="{{ route('login') }}" class="hidden md:flex items-center px-4 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium transition-all">
                         <i class="fas fa-sign-in-alt"></i>
-                        <span>{{ __('Login') }}</span>
                     </a>
-                   
                 @else
                     {{-- User Menu --}}
                     <div class="relative" x-data="{ open: false }">
@@ -555,86 +541,156 @@
 </div>
 
     <script>
-        // Autocomplete for header search input
-        (function(){
-            const input = document.getElementById('site-search');
-            const container = document.getElementById('search-suggestions');
-            const list = document.getElementById('search-suggestions-list');
-            let timer = null;
+    // Enhanced autocomplete for header search input with keyboard navigation and footer
+    (function () {
+        const input = document.getElementById('site-search');
+        const container = document.getElementById('search-suggestions');
+        const list = document.getElementById('search-suggestions-list');
+        const footer = document.getElementById('search-suggestions-footer');
+        const queryDisplay = document.getElementById('search-query-display');
+        const queryHidden = document.getElementById('search-full-query');
+        let timer = null;
+        let suggestions = [];
+        let selectedIndex = -1;
+        let lastQuery = '';
 
-            function hide() {
-                container.classList.add('hidden');
-                list.innerHTML = '';
+        function hide() {
+            container.classList.add('hidden');
+            list.innerHTML = '';
+            suggestions = [];
+            selectedIndex = -1;
+            if (footer) footer.classList.add('hidden');
+        }
+
+        function show(items, q) {
+            list.innerHTML = '';
+            suggestions = items || [];
+            selectedIndex = -1;
+            if (!items || items.length === 0) {
+                hide();
+                return;
             }
-
-            function show(items) {
-                list.innerHTML = '';
-                if(!items || items.length === 0){ hide(); return; }
-                items.forEach(it => {
-                    const li = document.createElement('li');
-                    li.className = 'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer';
-                    li.innerHTML = `<div class="flex items-center justify-between"><div><span class=\"font-medium\">${escapeHtml(it.title)}</span><div class=\"text-xs text-gray-500 dark:text-gray-400\">${escapeHtml(it.type)}</div></div><div class=\"ml-3 text-sm text-indigo-600\">→</div></div>`;
-                    li.addEventListener('click', ()=>{
-                        if(it.slug){
-                            let path = '/';
-                            if(it.type === 'package') path = '/packages/' + it.slug;
-                            else if(it.type === 'event') path = '/events/' + it.slug;
-                            else if(it.type === 'page') path = '/' + it.slug;
-                            else path = '/search?q=' + encodeURIComponent(it.title);
-                            window.location.href = path;
-                        } else {
-                            window.location.href = '/search?q=' + encodeURIComponent(it.title);
-                        }
-                    });
-                    list.appendChild(li);
+            items.forEach((it, idx) => {
+                const li = document.createElement('li');
+                li.className = 'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer';
+                li.tabIndex = -1;
+                li.setAttribute('data-index', idx);
+                li.innerHTML =
+                    `<div class="flex items-center justify-between"><div><span class="font-medium">${escapeHtml(it.title)}</span><div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(it.type)}</div></div><div class="ml-3 text-sm text-indigo-600">→</div></div>`;
+                li.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    goToSuggestion(idx);
                 });
-                container.classList.remove('hidden');
+                list.appendChild(li);
+            });
+            container.classList.remove('hidden');
+            if (footer) {
+                footer.classList.remove('hidden');
+                if (queryDisplay) queryDisplay.textContent = q;
+                if (queryHidden) queryHidden.value = q;
             }
+        }
 
-            function escapeHtml(unsafe) {
-                return (unsafe || '').toString().replace(/[&<>\"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m]; });
+        function escapeHtml(unsafe) {
+            return (unsafe || '').toString().replace(/[&<>\"']/g, function (m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#039;" }[m];
+            });
+        }
+
+        function fetchSuggestions(q) {
+            lastQuery = q;
+            if (!q || q.length < 2) { hide(); return; }
+            fetch("{{ url('/search/suggest') }}?q=" + encodeURIComponent(q))
+                .then(r => r.json())
+                .then(data => {
+                    show(data.results || [], q);
+                })
+                .catch(() => hide());
+        }
+
+        function goToSuggestion(idx) {
+            if (!suggestions[idx]) return;
+            const it = suggestions[idx];
+            if (it.slug) {
+                let path = '/';
+                if (it.type === 'package') path = '/packages/' + it.slug;
+                else if (it.type === 'event') path = '/events/' + it.slug;
+                else if (it.type === 'page') path = '/' + it.slug;
+                else path = '/search?q=' + encodeURIComponent(it.title);
+                window.location.href = path;
+            } else {
+                window.location.href = '/search?q=' + encodeURIComponent(it.title);
             }
+        }
 
-            function fetchSuggestions(q){
-                if(!q || q.length < 2){ hide(); return; }
-                fetch("{{ url('/search/suggest') }}?q=" + encodeURIComponent(q))
-                    .then(r => r.json())
-                    .then(data => {
-                        show(data.results || []);
-                    })
-                    .catch(()=> hide());
-            }
+        function updateActiveItem() {
+            Array.from(list.children).forEach((li, idx) => {
+                if (idx === selectedIndex) {
+                    li.classList.add('bg-gray-100', 'dark:bg-gray-700');
+                    li.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                    li.scrollIntoView({ block: 'nearest' });
+                } else {
+                    li.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+                    li.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                }
+            });
+        }
 
-            input && input.addEventListener('input', function(e){
+        if (input) {
+            input.addEventListener('input', function (e) {
                 clearTimeout(timer);
                 const v = this.value.trim();
-                timer = setTimeout(()=> fetchSuggestions(v), 220);
+                timer = setTimeout(() => fetchSuggestions(v), 220);
             });
-
-            document.addEventListener('click', function(e){
-                if(!input.contains(e.target) && !container.contains(e.target)) hide();
+            input.addEventListener('keydown', function (e) {
+                if (container.classList.contains('hidden')) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (suggestions.length === 0) return;
+                    selectedIndex = (selectedIndex + 1) % suggestions.length;
+                    updateActiveItem();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (suggestions.length === 0) return;
+                    selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
+                    updateActiveItem();
+                } else if (e.key === 'Enter') {
+                    if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+                        e.preventDefault();
+                        goToSuggestion(selectedIndex);
+                    } else if (lastQuery.length > 0) {
+                        // Submit the "Voir tous les résultats"
+                        window.location.href = '/search?q=' + encodeURIComponent(lastQuery);
+                    }
+                } else if (e.key === 'Escape') {
+                    hide();
+                }
             });
-        })();
+        }
+        document.addEventListener('click', function (e) {
+            if (!input.contains(e.target) && !container.contains(e.target)) hide();
+        });
+    })();
 
-function changeLanguage(lang) {
-    fetch('/language/change', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-        },
-        body: JSON.stringify({ language: lang })
-    }).then(() => location.reload());
-}
+    function changeLanguage(lang) {
+        fetch('/language/change', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+            },
+            body: JSON.stringify({ language: lang })
+        }).then(() => location.reload());
+    }
 
-function changeCurrency(currency) {
-    fetch('/currency/change', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-        },
-        body: JSON.stringify({ currency })
-    }).then(() => location.reload());
-}
-</script>
+    function changeCurrency(currency) {
+        fetch('/currency/change', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+            },
+            body: JSON.stringify({ currency })
+        }).then(() => location.reload());
+    }
+    </script>

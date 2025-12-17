@@ -29,8 +29,6 @@
               <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
                 <option value="">{{ __('All categories') }}</option>
                 <option value="terrestre" {{ request('category') == 'terrestre' ? 'selected' : '' }}>{{ __('Terrestrial') }}</option>
-                <option value="nautique" {{ request('category') == 'nautique' ? 'selected' : '' }}>{{ __('Nautical') }}</option>
-                <option value="aérien" {{ request('category') == 'aérien' ? 'selected' : '' }}>{{ __('Aerial') }}</option>
               </select>
             </div>
             <div>
@@ -38,10 +36,7 @@
               <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
                 <option value="">{{ __('All types') }}</option>
                 <option value="voiture" {{ request('type') == 'voiture' ? 'selected' : '' }}>{{ __('Car') }}</option>
-                <option value="quad" {{ request('type') == 'quad' ? 'selected' : '' }}>{{ __('Quad') }}</option>
                 <option value="avion" {{ request('type') == 'avion' ? 'selected' : '' }}>{{ __('Plane') }}</option>
-                <option value="bateau" {{ request('type') == 'bateau' ? 'selected' : '' }}>{{ __('Boat') }}</option>
-                <option value="moto" {{ request('type') == 'moto' ? 'selected' : '' }}>{{ __('Motorcycle') }}</option>
               </select>
             </div>
             <div class="flex items-end gap-2">
