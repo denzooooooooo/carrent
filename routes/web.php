@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -176,6 +177,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // --- Pages principales ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+
+// Site-wide search
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
+Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
 
 
 /* Route::prefix('flights')->name('flights.')->group(function () {

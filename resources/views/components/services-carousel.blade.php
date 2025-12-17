@@ -1,6 +1,6 @@
 @props(['services' => []])
 
-<section class="relative h-screen md:min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 overflow-hidden">
+<section class="relative h-[520px] md:h-[680px] bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 overflow-hidden">
 
     {{-- Background Effects --}}
     <div class="absolute inset-0 pointer-events-none">
@@ -10,7 +10,7 @@
     </div>
 
     {{-- HERO + CAROUSEL --}}
-    <div class="relative z-10 h-screen overflow-hidden">
+    <div class="relative z-10 h-full overflow-hidden">
 
         @php
             $carouselSlides = [
@@ -43,12 +43,36 @@
 
         <div x-data="{
             current: 0,
-            slides: {{ Js::from($carouselSlides) }},
+            slides: {!! json_encode($carouselSlides, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!},
             next() { this.current = (this.current + 1) % this.slides.length },
             prev() { this.current = this.current === 0 ? this.slides.length - 1 : this.current - 1 },
             goTo(i) { this.current = i }
         }"
         class="relative h-full">
+
+            {{-- Fallback: server-rendered first slide so a hero appears even if Alpine fails to initialize --}}
+            @if(!empty($carouselSlides) && isset($carouselSlides[0]))
+                @php $first = $carouselSlides[0]; @endphp
+                <div class="absolute inset-0">
+                    <img src="{{ $first['image'] }}" class="w-full h-full object-cover" alt="{{ $first['title'] }}" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="container mx-auto px-6 text-center">
+                            <div class="max-w-4xl mx-auto">
+                                <div class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-md text-white text-sm rounded-full font-bold mb-8 border border-white/30 shadow-xl">
+                                    ✦ TAILOR-MADE LUXURY EXPERIENCES ✦
+                                </div>
+                                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-4">
+                                    {{ $first['title'] }}
+                                    <span class="block bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">CARRÉ PREMIUM</span>
+                                </h1>
+                                <h2 class="text-xl md:text-3xl font-bold text-amber-400 mb-6">{{ $first['subtitle'] }}</h2>
+                                <p class="text-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-8">{{ $first['description'] }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             {{-- Slides --}}
             <template x-for="(slide, index) in slides" :key="index">

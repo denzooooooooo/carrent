@@ -30,23 +30,32 @@
         <div class="max-w-4xl">
           <div class="bg-white rounded-t-2xl sm:rounded-t-3xl shadow-2xl p-4 sm:p-6 md:p-8">
             {{-- Categories --}}
+            @php
+              // Map internal package_type keys to user-facing labels (French)
+              $packageTypeMap = [
+                'helicopter' => 'Hélicoptère',
+                'helicoptère' => 'Hélicoptère',
+                'private_jet' => 'Jet privé',
+                'jet' => 'Jet privé',
+                'cruise' => 'Croisière',
+                'safari' => 'Safari',
+                'city_tour' => 'Visite',
+              ];
+              $packageTypeLabel = $packageTypeMap[$package->package_type] ?? ($package->package_type ? ucfirst($package->package_type) : 'Touristique');
+            @endphp
+
             <div class="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
               <span class="px-3 py-1 sm:px-4 sm:py-2 bg-purple-100 text-purple-800 text-xs sm:text-sm font-semibold rounded-full">
                 {{ $package->category->name_fr ?? 'Package' }}
               </span>
               <span class="px-3 py-1 sm:px-4 sm:py-2 bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold rounded-full">
-                {{ $package->package_type ?? 'Touristique' }}
+                {{ $packageTypeLabel }}
               </span>
-              @if($package->is_featured)
-                <span class="px-3 py-1 sm:px-4 sm:py-2 bg-red-100 text-red-800 text-xs sm:text-sm font-semibold rounded-full">
-                  ⭐ Featured
-                </span>
-              @endif
             </div>
 
             {{-- Title --}}
             <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-3 sm:mb-4 leading-tight mt-2 sm:mt-0">
-              {{ $package->title }}
+              {{ $package->title_fr ?? $package->title_en ?? $package->title ?? 'Titre indisponible' }}
             </h1>
 
             {{-- Duration & Destination --}}
@@ -82,14 +91,14 @@
               <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 @if($package->discount_price)
                   <div>
-                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                    <span class="text-2xl sm:text-3xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
                     <span class="text-sm sm:text-base text-gray-500 line-through ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                     <span class="text-xs sm:text-sm text-green-600 font-semibold ml-2">(-{{ round((1 - $package->discount_price / $package->price) * 100) }}%)</span>
                   </div>
                 @else
                   <div>
-                    <span class="text-2xl sm:text-3xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
-                    <span class="text-xs sm:text-sm text-gray-500 ml-1">par personne</span>
+                    <span class="text-2xl sm:text-3xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                    <span class="text-xs sm:text-sm text-gray-500 ml-1">Prix / personne</span>
                   </div>
                 @endif
               </div>
@@ -122,7 +131,7 @@
             {{-- Personal Information --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Prénoms *</label>
                 <input type="text" id="first_name" name="first_name" required
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
               </div>
@@ -178,11 +187,11 @@
               <h3 class="text-lg font-bold text-gray-900 mb-4">Récapitulatif du prix</h3>
               <div class="space-y-2">
                 <div class="flex justify-between">
-                  <span>Prix par personne</span> 
+                  <span>Prix / personne</span>
                   @if($package->discount_price)
-                    <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                    <span class="font-semibold">À partir de {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
                   @else
-                    <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                    <span class="font-semibold">À partir de {{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                   @endif
                 </div>
                 <div class="flex justify-between items-center">
@@ -258,14 +267,16 @@
           <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Services inclus</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             @foreach($package->included_services_fr as $service)
-              <div class="flex items-center space-x-3">
-                <div class="w-5 h-5 sm:w-6 sm:h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg class="w-3 h-3 sm:w-4 sm:h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+              @if(stripos($service, 'billet') === false)
+                <div class="flex items-center space-x-3">
+                  <div class="w-5 h-5 sm:w-6 sm:h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-700 text-sm sm:text-base">{{ $service }}</span>
                 </div>
-                <span class="text-gray-700 text-sm sm:text-base">{{ $service }}</span>
-              </div>
+              @endif
             @endforeach
           </div>
         </section>
@@ -330,11 +341,11 @@
             {{-- Price Summary --}}
             <div class="bg-purple-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div class="flex justify-between items-center mb-2">
-                <span class="text-gray-600 text-sm sm:text-base">Prix par personne</span>
+                <span class="text-gray-600 text-sm sm:text-base">Prix / personne</span>
                 @if($package->discount_price)
-                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                  <span class="font-bold text-purple-600 text-base sm:text-lg">À partir de {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
                 @else
-                  <span class="font-bold text-purple-600 text-base sm:text-lg">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                  <span class="font-bold text-purple-600 text-base sm:text-lg">À partir de {{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
                 @endif
               </div>
               @if($package->discount_price)
@@ -356,13 +367,24 @@
             </div>
 
             {{-- Contact Info --}}
-            <div class="mt-4 sm:mt-6 pt-4 border-t border-gray-100">
+              <div class="mt-4 sm:mt-6 pt-4 border-t border-gray-100">
               <p class="text-xs sm:text-sm text-gray-600 mb-2">Besoin d'aide ?</p>
-              <div class="flex items-center space-x-2 text-sm">
-                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <a href="tel:+225XXXXXXXXX" class="text-purple-600 hover:text-purple-700 font-medium">+225 XX XX XX XX</a>
+              <div class="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-sm">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <div class="text-purple-600 hover:text-purple-700 font-medium">
+                    <div><a href="tel:+2252721594258" class="hover:text-purple-700">+225 27 21 59 42 58</a></div>
+                    <div><a href="tel:+2250101221515" class="hover:text-purple-700">+225 01 01 22 15 15</a></div>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <a href="mailto:infos@carrepremium.com" class="text-purple-600 hover:text-purple-700 font-medium">infos@carrepremium.com</a>
+                </div>
               </div>
             </div>
           </div>
@@ -378,21 +400,17 @@
       <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 sm:mb-12 text-center">Packages similaires</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         @foreach($similarPackages as $similarPackage)
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
             <div class="relative">
               @php
                 $similarImageUrl = $similarPackage->getFirstMediaUrl('avatar', 'small');
                 $similarPlaceholder = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop';
               @endphp
               <img src="{{ $similarImageUrl ?: $similarPlaceholder }}" alt="{{ $similarPackage->title }}" class="w-full h-40 sm:h-48 object-cover">
-              @if($similarPackage->is_featured)
-                <div class="absolute top-2 left-2">
-                  <span class="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">⭐ Featured</span>
-                </div>
-              @endif
+              {{-- Do not show admin flags like 'Featured' to public users --}}
             </div>
             <div class="p-4 sm:p-6">
-              <h3 class="text-lg sm:text-xl font-black mb-2 line-clamp-2">{{ $similarPackage->title }}</h3>
+              <h3 class="text-lg sm:text-xl font-black mb-2 line-clamp-2">{{ $similarPackage->title_fr ?? $similarPackage->title_en ?? $similarPackage->title ?? 'Titre' }}</h3>
               <p class="text-gray-600 mb-3 sm:mb-4 text-sm line-clamp-3">{{ Str::limit($similarPackage->description_fr, 100) }}</p>
               <div class="flex items-center justify-between">
                 <div>

@@ -106,16 +106,25 @@
         </div>
         <div>
           <label for="phone" class="sr-only">{{ __('Phone') }}</label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            autocomplete="tel"
-            required
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-            placeholder="{{ __('Phone') }}"
-            value="{{ old('phone') }}"
-          />
+          <div class="flex gap-2">
+            <select name="phone_country_code" id="phone_country_code" class="w-1/3 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900">
+              <option value="+225" selected>+225 (CI)</option>
+              <option value="+33">+33 (FR)</option>
+              <option value="+254">+254 (KE)</option>
+              <option value="+27">+27 (ZA)</option>
+              <option value="+1">+1 (US)</option>
+            </select>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+              required
+              class="appearance-none rounded-none relative block w-2/3 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+              placeholder="Téléphone"
+              value="{{ old('phone') }}"
+            />
+          </div>
         </div>
         <div>
           <label for="password" class="sr-only">{{ __('Password') }}</label>

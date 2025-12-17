@@ -1,16 +1,17 @@
 <!-- Widget Chatbot Flottant -->
 <div id="chatbotWidget" class="fixed bottom-6 right-6 z-50 hidden">
     <!-- Bouton d'ouverture -->
-    <button id="chatbotToggle"
+        <button id="chatbotToggle"
         class="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transform hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
         aria-label="Ouvrir le chat">
-        <svg id="chatIcon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
-            </path>
+        <!-- Chat SVG icon (more friendly) -->
+        <svg id="chatIcon" class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H8l-5 3V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" fill="white" opacity="0.95"/>
+            <path d="M7 9h10M7 12h7" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <svg id="closeIcon" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        <!-- Close SVG icon -->
+        <svg id="closeIcon" class="w-8 h-8 hidden" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
 

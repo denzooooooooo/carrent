@@ -14,13 +14,14 @@
         ],
         [
             'name' => __('Ticketing'),
-            'name_fr' => 'Billeterie',
+            'name_fr' => 'Billetterie Voyages',
             'path' => '#',
             'icon' => 'fa-ticket-alt',
             'color' => 'blue',
             'submenu' => [
                 ['name' => __('Travel'), 'name_fr' => 'Voyage', 'path' => '/flights', 'icon' => 'fa-plane'],
-                ['name' => __('Visa Service'), 'name_fr' => 'Service visa', 'path' => '/visa-service', 'icon' => 'fa-passport'],
+                ['name' => __('packages'), 'name_fr' => 'Packages touristiques', 'path' => '/packages', 'icon' => 'fa-shopping-bag'],
+
             ]
         ],
         [
@@ -44,7 +45,6 @@
                 ['name' => __('Luxury'), 'name_fr' => 'Luxe', 'path' => '/concierge/luxury', 'icon' => 'fa-gem'],
                 ['name' => __('Vehicle Rental'), 'name_fr' => 'Location de véhicule', 'path' => '/location', 'icon' => 'fa-car'],
                 ['name' => __('Personal Shopper'), 'name_fr' => 'Personal Shopper', 'path' => '/concierge/personal-shopper', 'icon' => 'fa-shopping-bag'],
-                ['name' => __('packages'), 'name_fr' => 'Packages', 'path' => '/packages', 'icon' => 'fa-shopping-bag'],
 
             ]
         ],
@@ -62,15 +62,15 @@
     {{-- Top Bar with Register and B2B Partnership Buttons --}}
     <div class="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="container mx-auto px-4">
-            <div class="flex items-center justify-end h-8 space-x-3">
-                <a href="{{ route('register') }}" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            <div class="flex items-center justify-end h-8 space-x-2">
+                <a href="{{ route('register') }}" class="flex items-center space-x-2 px-2 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors whitespace-nowrap">
                     <i class="fas fa-user-plus"></i>
-                    <span>{{ __('Register') }}</span>
+                    <span>Inscription</span>
                 </a>
                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                <a href="{{ route('partnership') }}" class="flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                <a href="{{ route('partnership') }}" class="flex items-center space-x-2 px-2 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors whitespace-nowrap">
                     <i class="fas fa-handshake"></i>
-                    <span>{{ __('B2B Partnership') }}</span>
+                    <span>Partenariat</span>
                 </a>
             </div>
         </div>
@@ -132,20 +132,20 @@
         <div class="flex items-center justify-between h-16">
             
             {{-- Logo --}}
-            <a href="/" class="flex items-center space-x-3 group">
+            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap">
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium"
-                    class="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
+                    class="h-6 w-auto max-h-6"
                 />
                 <div class="flex flex-col">
-                    <span class="text-lg font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
-                    <span class="text-xs text-gray-600 dark:text-gray-400 leading-tight">Conciergerie privée</span>
+                    <span class="text-base font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 leading-tight">Conciergerie</span>
                 </div>
             </a>
 
             {{-- Desktop Navigation --}}
-            <nav class="hidden lg:flex items-center space-x-6">
+            <nav class="hidden lg:flex items-center space-x-4 flex-nowrap text-sm">
                 @foreach($navigation as $index => $item)
                     <div class="relative" x-data="{ open: false }">
                         @if(isset($item['submenu']))
@@ -153,13 +153,13 @@
                             <button
                                 @click="toggleDropdown({{ $index }})"
                                 @class([
-                                    'flex items-center space-x-2 px-2 py-1 font-medium text-sm transition-all duration-200 relative group',
+                                    'flex items-center space-x-2 px-2 py-1 font-medium transition-all duration-200 relative group whitespace-nowrap',
                                     'text-'.$item['color'].'-600 dark:text-'.$item['color'].'-400' => isActive($item['path']),
                                     'text-gray-700 dark:text-gray-300' => !isActive($item['path'])
                                 ])
                             >
                                 <i class="fas {{ $item['icon'] }} text-xs"></i>
-                                <span>{{ $item['name'] }}</span>
+                                <span>{{ $item['name_fr'] ?? $item['name'] }}</span>
                                 <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': activeDropdown === {{ $index }} }"></i>
                                 {{-- Underline on hover --}}
                                 <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-{{ $item['color'] }}-600 transition-all duration-300 group-hover:w-full"></span>
@@ -181,10 +181,10 @@
                                     <a 
                                         href="{{ $subitem['path'] }}"
                                         @click="closeDropdowns()"
-                                        class="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 hover:pl-6"
+                                        class="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 hover:pl-6 whitespace-nowrap"
                                     >
                                         <i class="fas {{ $subitem['icon'] }} w-5"></i>
-                                        <span>{{ $subitem['name'] }}</span>
+                                        <span>{{ $subitem['name_fr'] ?? $subitem['name'] }}</span>
                                     </a>
                                 @endforeach
                             </div>
@@ -193,13 +193,13 @@
                             <a
                                 href="{{ $item['path'] }}"
                                 @class([
-                                    'flex items-center space-x-2 px-2 py-1 font-medium text-sm transition-all duration-200 relative group',
+                                    'flex items-center space-x-2 px-2 py-1 font-medium transition-all duration-200 relative group whitespace-nowrap',
                                     'text-'.$item['color'].'-600 dark:text-'.$item['color'].'-400' => isActive($item['path']),
                                     'text-gray-700 dark:text-gray-300' => !isActive($item['path'])
                                 ])
                             >
                                 <i class="fas {{ $item['icon'] }} text-xs"></i>
-                                <span>{{ $item['name'] }}</span>
+                                <span>{{ $item['name_fr'] ?? $item['name'] }}</span>
                                 {{-- Underline on hover --}}
                                 <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-{{ $item['color'] }}-600 transition-all duration-300 group-hover:w-full"></span>
                                 {{-- Active indicator --}}
@@ -214,11 +214,69 @@
 
             {{-- Right Actions --}}
             <div class="flex items-center space-x-2">
+
+                {{-- Enhanced Search form (site-wide) --}}
+                <div class="hidden md:flex items-center relative">
+                    <div class="relative">
+                        <input 
+                            id="site-search" 
+                            name="q" 
+                            type="search" 
+                            placeholder="Rechercher..." 
+                            class="bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 pr-10 pl-10 outline-none text-gray-700 dark:text-gray-300 w-64 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all" 
+                            aria-label="Recherche"
+                            autocomplete="off"
+                        />
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <div id="search-loading" class="hidden">
+                                <div class="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full"></div>
+                            </div>
+                        </div>
+
+                        {{-- Enhanced Suggestions dropdown (AJAX) --}}
+                        <div id="search-suggestions" class="absolute left-0 mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden hidden z-50 max-h-96 overflow-y-auto">
+                            <div id="search-suggestions-header" class="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Suggestions</p>
+                            </div>
+                            <ul id="search-suggestions-list" class="divide-y divide-gray-100 dark:divide-gray-700">
+                                {{-- Suggestions will be populated here --}}
+                            </ul>
+                            <div id="search-suggestions-footer" class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 hidden">
+                                <form action="/search" method="GET" class="flex items-center justify-between">
+                                    <input type="hidden" name="q" id="search-full-query">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Voir tous les résultats pour "<span id="search-query-display"></span>"</span>
+                                    <button type="submit" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium text-sm">
+                                        Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Advanced Search Toggle --}}
+                    <button 
+                        id="advanced-search-toggle"
+                        class="ml-2 p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                        title="Recherche avancée"
+                    >
+                        <i class="fas fa-sliders-h text-sm"></i>
+                    </button>
+                </div>
+
+                {{-- Mobile Search Button --}}
+                <button 
+                    id="mobile-search-toggle"
+                    class="md:hidden p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title="Rechercher"
+                >
+                    <i class="fas fa-search"></i>
+                </button>
                 
                 {{-- Theme Toggle Button - Uses CSS Variables System --}}
-                <button id="theme-toggle" class="flex items-center space-x-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+                <button id="theme-toggle" class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
                     <i class="fas fa-adjust"></i>
-                    <span class="text-sm font-medium">{{ __('Theme') }}</span>
+                    <span class="text-xs font-medium hidden md:inline">Thème</span>
                 </button>
 
                 {{-- Language Selector --}}
@@ -495,7 +553,68 @@
     </header>
 </div>
 
-<script>
+    <script>
+        // Autocomplete for header search input
+        (function(){
+            const input = document.getElementById('site-search');
+            const container = document.getElementById('search-suggestions');
+            const list = document.getElementById('search-suggestions-list');
+            let timer = null;
+
+            function hide() {
+                container.classList.add('hidden');
+                list.innerHTML = '';
+            }
+
+            function show(items) {
+                list.innerHTML = '';
+                if(!items || items.length === 0){ hide(); return; }
+                items.forEach(it => {
+                    const li = document.createElement('li');
+                    li.className = 'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer';
+                    li.innerHTML = `<div class="flex items-center justify-between"><div><span class=\"font-medium\">${escapeHtml(it.title)}</span><div class=\"text-xs text-gray-500 dark:text-gray-400\">${escapeHtml(it.type)}</div></div><div class=\"ml-3 text-sm text-indigo-600\">→</div></div>`;
+                    li.addEventListener('click', ()=>{
+                        if(it.slug){
+                            let path = '/';
+                            if(it.type === 'package') path = '/packages/' + it.slug;
+                            else if(it.type === 'event') path = '/events/' + it.slug;
+                            else if(it.type === 'page') path = '/' + it.slug;
+                            else path = '/search?q=' + encodeURIComponent(it.title);
+                            window.location.href = path;
+                        } else {
+                            window.location.href = '/search?q=' + encodeURIComponent(it.title);
+                        }
+                    });
+                    list.appendChild(li);
+                });
+                container.classList.remove('hidden');
+            }
+
+            function escapeHtml(unsafe) {
+                return (unsafe || '').toString().replace(/[&<>\"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m]; });
+            }
+
+            function fetchSuggestions(q){
+                if(!q || q.length < 2){ hide(); return; }
+                fetch('/search/suggest?q=' + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        show(data.results || []);
+                    })
+                    .catch(()=> hide());
+            }
+
+            input && input.addEventListener('input', function(e){
+                clearTimeout(timer);
+                const v = this.value.trim();
+                timer = setTimeout(()=> fetchSuggestions(v), 220);
+            });
+
+            document.addEventListener('click', function(e){
+                if(!input.contains(e.target) && !container.contains(e.target)) hide();
+            });
+        })();
+
 function changeLanguage(lang) {
     fetch('/language/change', {
         method: 'POST',

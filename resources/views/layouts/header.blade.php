@@ -134,7 +134,7 @@
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium Logo"
-                    class="h-16 w-auto group-hover:scale-110 transition-transform duration-300 rounded-lg"
+                    class="h-6 w-auto rounded-lg max-h-6"
                 />
                 <div class="hidden md:block">
                     <div class="text-xl font-black text-black dark:text-white">

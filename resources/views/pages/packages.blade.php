@@ -14,8 +14,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Tour Packages') }}</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Discover unique experiences with our exclusive packages') }}</p>
+  <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">Packages touristiques</h1>
+  <p class="text-base sm:text-lg md:text-xl text-white/90">Découvrez des expériences uniques avec nos packages touristiques exclusifs</p>
     </div>
   </section>
 
@@ -26,9 +26,9 @@
         <form method="GET" action="{{ route('packages') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Package type') }}</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Type de packages touristiques</label>
               <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All packages') }}</option>
+                <option value="">Tous les packages touristiques</option>
                 @foreach($packageTypes as $type)
                   <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
                     {{ $type }}
@@ -86,18 +86,26 @@
                     $imageUrl = $package->getFirstMediaUrl('avatar', 'normal');
                     $placeholder = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=300&fit=crop';
                   @endphp
-                  <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $package->title }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
-                  @if($package->is_featured)
-                    <div class="absolute top-2 md:top-4 left-2 md:left-4">
-                      <span class="px-2 md:px-3 py-1 bg-red-500 text-white text-xs md:text-sm font-bold rounded-full">⭐ {{ __('Featured') }}</span>
-                    </div>
-                  @endif
+                  <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $package->title_fr ?? $package->title_en ?? $package->title }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
+                  {{-- Hide admin flags like Featured from public listing and show friendly package type label --}}
+                  @php
+                    $packageTypeMap = [
+                      'helicopter' => 'Hélicoptère',
+                      'helicoptère' => 'Hélicoptère',
+                      'private_jet' => 'Jet privé',
+                      'jet' => 'Jet privé',
+                      'cruise' => 'Croisière',
+                      'safari' => 'Safari',
+                      'city_tour' => 'Visite',
+                    ];
+                    $packageTypeLabel = $packageTypeMap[$package->package_type] ?? ($package->package_type ? ucfirst($package->package_type) : 'Tour');
+                  @endphp
                   <div class="absolute top-2 md:top-4 right-2 md:right-4">
-                    <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $package->package_type ?? 'Tour' }}</span>
+                    <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $packageTypeLabel }}</span>
                   </div>
                 </div>
                 <div class="p-4 md:p-6">
-                  <h3 class="text-lg md:text-xl font-black mb-4 line-clamp-2">{{ $package->title }}</h3>
+                  <h3 class="text-lg md:text-xl font-black mb-4 line-clamp-2">{{ $package->title_fr ?? $package->title_en ?? $package->title }}</h3>
                   <div class="flex items-center text-gray-600 mb-2 md:mb-3">
                     <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -113,13 +121,13 @@
                   </div>
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      @if($package->discount_price)
-                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
-                        <span class="text-xs md:text-sm text-gray-500 line-through ml-1 md:ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
-                      @else
-                        <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
-                      @endif
-                      <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par personne</span>
+                          @if($package->discount_price)
+                            <span class="text-xl md:text-2xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                            <span class="text-xs md:text-sm text-gray-500 line-through ml-1 md:ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                          @else
+                            <span class="text-xl md:text-2xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                          @endif
+                          <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">Prix / personne</span>
                     </div>
                     <a href="{{ route('packages.show', $package->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
                       {{ __('View details') }}

@@ -71,7 +71,7 @@
           @method('PUT')
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Prénom</label>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Prénoms</label>
               <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 focus:border-purple-600 focus:ring-0" />
             </div>
             <div>
