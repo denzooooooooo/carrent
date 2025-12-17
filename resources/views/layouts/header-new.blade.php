@@ -589,7 +589,7 @@
                     list.appendChild(li);
                 });
                 container.classList.remove('hidden');
-            }
+            } 
 
             function escapeHtml(unsafe) {
                 return (unsafe || '').toString().replace(/[&<>\"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m]; });
