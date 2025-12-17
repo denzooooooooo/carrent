@@ -461,7 +461,7 @@
 
                                 @if($totalPassengers > 1)
                                     <div class="mt-3 pt-3 border-t border-purple-200 text-xs text-gray-600">
-                                        Prix par personne : {{ number_format($totalPrice / $totalPassengers) }} {{ $searchParams['currency'] }}
+                                        Prix / personne : {{ number_format($totalPrice / $totalPassengers) }} {{ $searchParams['currency'] }}
                                     </div>
                                 @endif
                             </div>

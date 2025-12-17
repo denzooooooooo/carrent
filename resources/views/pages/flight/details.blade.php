@@ -66,7 +66,7 @@
                                         <div class="text-2xl md:text-3xl font-black text-green-600 mb-1">
                                             {{ number_format($selectedFlight['price'] ?? 0, 0, ',', ' ') }} €
                                         </div>
-                                        <div class="text-xs text-green-700 font-semibold">Prix par personne</div>
+                                        <div class="text-xs text-green-700 font-semibold">Prix / personne</div>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +297,7 @@
                             <div class="space-y-4 text-gray-700">
                                 <div class="bg-white rounded-lg p-3 shadow-sm border border-purple-100">
                                     <div class="flex justify-between items-center">
-                                        <span class="font-medium">Prix par personne</span>
+                                        <span class="font-medium">Prix / personne</span>
                                         <span class="font-bold text-purple-700">{{ number_format($selectedFlight['price'] ?? 0, 0, ',', ' ') }} €</span>
                                     </div>
                                 </div>

@@ -33,6 +33,83 @@ class ChatbotController extends Controller
         $history = $request->input('conversation_history', []);
 
         try {
+            // If OPENAI_API_KEY is set, use OpenAI Chat Completions to generate the response.
+            $openaiKey = env('OPENAI_API_KEY') ?: config('services.openai.key');
+            if ($openaiKey) {
+                Log::info('Using OpenAI for chatbot response');
+
+                $systemPrompt = "Vous êtes l'assistant virtuel de Carré Premium, un service de conciergerie et billetterie.\n" .
+                    "Répondez en français, de manière professionnelle et concise.\n" .
+                    "Vous devez renvoyer uniquement un objet JSON valide (aucun texte additionnel) avec les champs :\n" .
+                    "- message: chaîne (le texte à afficher),\n" .
+                    "- type: 'text'|'event_list'|'package_list'|'flight_results'|'greeting'|'error'|'info',\n" .
+                    "- action: null ou action string (ex: 'redirect_to_search','connect_to_agent'),\n" .
+                    "- data: null ou objet additionnel (par ex. { search_url: '...' })\n" .
+                    "Si vous proposez des listes (events/packages), placez-les dans data en tableau.\n" .
+                    "Si vous ne connaissez pas la réponse, proposez des options de clarification.\n" .
+                    "Respectez le format JSON strict.";
+
+                $messages = [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $message]
+                ];
+
+                try {
+                    $resp = Http::withToken($openaiKey)
+                        ->timeout(30)
+                        ->post('https://api.openai.com/v1/chat/completions', [
+                            'model' => 'gpt-3.5-turbo',
+                            'messages' => $messages,
+                            'temperature' => 0.2,
+                            'max_tokens' => 500,
+                            'top_p' => 1,
+                        ]);
+
+                    if ($resp->successful()) {
+                        $content = $resp->json('choices.0.message.content');
+
+                        // Try to decode JSON the assistant returned
+                        $decoded = null;
+                        if ($content) {
+                            // Clean BOM or stray markers
+                            $contentTrim = trim($content);
+                            // Attempt to find first '{' to mitigate extra text
+                            $firstBrace = strpos($contentTrim, '{');
+                            if ($firstBrace !== false) {
+                                $possible = substr($contentTrim, $firstBrace);
+                            } else {
+                                $possible = $contentTrim;
+                            }
+
+                            $decoded = json_decode($possible, true);
+                        }
+
+                        if (is_array($decoded) && isset($decoded['message'])) {
+                            // Ensure default fields
+                            $decoded['success'] = $decoded['success'] ?? true;
+                            $decoded['type'] = $decoded['type'] ?? 'text';
+                            $decoded['action'] = $decoded['action'] ?? null;
+                            $decoded['data'] = $decoded['data'] ?? null;
+
+                            return response()->json($decoded);
+                        }
+
+                        // If not valid JSON, return the raw assistant text as message
+                        return response()->json([
+                            'success' => true,
+                            'message' => $content ?? 'Désolé, je n’ai pas pu générer de réponse.',
+                            'type' => 'text'
+                        ]);
+                    }
+
+                    Log::error('OpenAI API error', ['status' => $resp->status(), 'body' => $resp->body()]);
+                    // fallthrough to local handling on failure
+                } catch (\Exception $e) {
+                    Log::error('OpenAI request failed', ['error' => $e->getMessage()]);
+                    // fallthrough to local handling
+                }
+            }
+
             // Analyser l'intention de l'utilisateur
             $analysis = $this->analyzeIntent($message, $history);
 
@@ -81,53 +158,91 @@ class ChatbotController extends Controller
      */
     private function analyzeIntent($message, $history = [])
     {
-        $message_lower = mb_strtolower($message);
-        
-        // Détection de vol
-        if (preg_match('/\b(vol|vols|avion|flight|voler|rechercher un vol)\b/i', $message) ||
-            preg_match('/\b(partir|aller|départ|retour|destination|rentrer)\b/i', $message)) {
-            return [
-                'intent' => 'flight_search',
-                'entities' => $this->extractFlightEntities($message)
-            ];
-        }
+        // Analyse d'intention améliorée : scoring par mots-clés + matching fuzzy.
+        $text = mb_strtolower($message);
 
-        // Détection d'événement/concert
-        if (preg_match('/\b(concert|événement|event|spectacle|show|billet)\b/i', $message)) {
-            return [
-                'intent' => 'event_booking',
-                'entities' => $this->extractEventEntities($message)
-            ];
-        }
-
-        // Détection de package touristique
-        if (preg_match('/\b(package|tour|visite|safari|croisière|excursion|hélicoptère)\b/i', $message)) {
-            return [
-                'intent' => 'package_booking',
-                'entities' => $this->extractPackageEntities($message)
-            ];
-        }
-
-        // Détection de demande de support
-        if (preg_match('/\b(aide|help|conseiller|assistance|problème|question|parler)\b/i', $message)) {
-            return [
-                'intent' => 'customer_support',
-                'entities' => []
-            ];
-        }
-
-        // Salutations
-        if (preg_match('/\b(bonjour|salut|hello|hi|bonsoir)\b/i', $message)) {
-            return [
-                'intent' => 'greeting',
-                'entities' => []
-            ];
-        }
-
-        return [
-            'intent' => 'unknown',
-            'entities' => []
+        // Mots-clés par intent
+        $intentKeywords = [
+            'flight_search' => ['vol', 'vols', 'avion', 'flight', 'départ', 'arrivée', 'billet', 'réserver un vol', 'aller', 'retour', 'iata', 'aéroport'],
+            'event_booking' => ['concert', 'événement', 'event', 'spectacle', 'billet', 'ticket', 'réserver un événement', 'reservation', 'réserver'],
+            'package_booking' => ['package', 'packages', 'tour', 'visite', 'safari', 'croisière', 'hélicoptère', 'jet', 'package touristique'],
+            'customer_support' => ['aide', 'help', 'assistance', 'conseiller', 'contact', 'numéro', 'téléphone', 'support', 'problème', 'question', 'email'],
+            'greeting' => ['bonjour', 'salut', 'hello', 'hi', 'bonsoir']
         ];
+
+        // FAQ / intents simples override
+        $faqKeywords = [
+            'pricing' => ['prix', 'tarif', 'coût', 'combien', 'tarifs'],
+            'hours' => ['horaire', 'horaires', 'ouvert', 'fermé', 'heure'],
+            'contact' => ['contact', 'téléphone', 'numéro', 'email', 'mail']
+        ];
+
+        // Vérifier FAQ first (directe)
+        foreach ($faqKeywords as $fIntent => $keys) {
+            foreach ($keys as $k) {
+                if (mb_stripos($text, $k) !== false) {
+                    // map FAQ to intents
+                    if ($fIntent === 'pricing') {
+                        return ['intent' => 'package_booking', 'entities' => []];
+                    }
+                    if ($fIntent === 'contact' || $fIntent === 'hours') {
+                        return ['intent' => 'customer_support', 'entities' => []];
+                    }
+                }
+            }
+        }
+
+        // Score calculation
+        $scores = [];
+        $words = preg_split('/[\s,;.?!]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($intentKeywords as $intent => $keys) {
+            $scores[$intent] = 0;
+            foreach ($keys as $k) {
+                if (mb_stripos($text, $k) !== false) {
+                    $scores[$intent] += 2; // exact substring match
+                    continue;
+                }
+
+                // fuzzy match against words (levenshtein when words length >=4)
+                foreach ($words as $w) {
+                    if (mb_strlen($w) >= 4 && mb_strlen($k) >= 4) {
+                        $dist = levenshtein(mb_substr($w, 0, 50), mb_substr($k, 0, 50));
+                        if ($dist <= 2) {
+                            $scores[$intent] += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Choisir l'intent avec le meilleur score
+        arsort($scores);
+        $bestIntent = key($scores);
+
+        // Seuil minimal pour considérer un match
+        if ($scores[$bestIntent] >= 2) {
+            switch ($bestIntent) {
+                case 'flight_search':
+                    return ['intent' => 'flight_search', 'entities' => $this->extractFlightEntities($message)];
+                case 'event_booking':
+                    return ['intent' => 'event_booking', 'entities' => $this->extractEventEntities($message)];
+                case 'package_booking':
+                    return ['intent' => 'package_booking', 'entities' => $this->extractPackageEntities($message)];
+                case 'customer_support':
+                    return ['intent' => 'customer_support', 'entities' => []];
+                case 'greeting':
+                    return ['intent' => 'greeting', 'entities' => []];
+            }
+        }
+
+        // Fallback: essayer des heuristiques simples (dates, chiffres, presence d'IATA)
+        if (preg_match('/\b([A-Z]{3})\b/', $message)) {
+            return ['intent' => 'flight_search', 'entities' => $this->extractFlightEntities($message)];
+        }
+
+        // Aucun intent trouvé : demander une clarification
+        return ['intent' => 'unknown', 'entities' => []];
     }
 
     /**

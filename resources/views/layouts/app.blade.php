@@ -94,7 +94,9 @@
 
      @include('layouts.footer')
 
-                @include('components.chatbot-widget')
+                @if(env('OPENAI_API_KEY'))
+                    @include('components.chatbot-widget')
+                @endif
     
     <!-- Theme JavaScript -->
     <script src="{{ asset('js/theme.js') }}"></script>

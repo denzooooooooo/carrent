@@ -117,7 +117,7 @@
             <h3 class="font-semibold text-gray-900 mb-3">Récapitulatif des prix</h3>
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span class="text-gray-600">Prix par personne</span>
+                <span class="text-gray-600">Prix / personne</span>
                 <span class="font-semibold">{{ \App\Helpers\CurrencyHelper::format($booking->unit_price) }}</span>
               </div>
               <div class="flex justify-between">

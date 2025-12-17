@@ -42,7 +42,7 @@
 
         <div class="text-right">
             <div class="text-xs text-gray-500 font-semibold uppercase mb-1">
-                {{ $totalPassengers > 1 ? "Prix pour {$totalPassengers} passagers" : 'Prix par personne' }}
+                {{ $totalPassengers > 1 ? "Prix pour {$totalPassengers} passagers" : 'Prix / personne' }}
             </div>
             <div class="text-3xl font-black {{ $isBest ? 'text-green-600' : 'text-purple-700' }}">
                 {{ number_format($totalPassengers > 1 ? $totalPrice : $pricePerPerson) }}

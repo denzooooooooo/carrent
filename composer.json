@@ -11,9 +11,11 @@
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
+        "laravel/scout": "^10.23",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "league/csv": "^9.27",
+        "meilisearch/meilisearch-php": "^1.16",
         "mews/captcha": "^3.4",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-medialibrary": "^11.17"
@@ -87,6 +89,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.3.28"
         }
     },
     "minimum-stability": "stable",
