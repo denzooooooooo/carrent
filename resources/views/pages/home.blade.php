@@ -28,8 +28,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
           <span>{{ __('EXCLUSIVE SPORTS & CULTURAL EVENTS') }}</span>
-        </div>
-        <h2 class="text-6xl md:text-5xl font-black text-black mb-4 md:mb-6 leading-tight">
+        </div> 
+        <h2 class="text-4xl md:text-3xlxl font-black text-black mb-4 md:mb-6 leading-tight">
           {{ __('Events Not to Miss') }}
         </h2>
         <p class="text-xl text-black/90 max-w-3xl mx-auto">
