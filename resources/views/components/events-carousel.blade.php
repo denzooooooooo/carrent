@@ -4,7 +4,7 @@
 @endphp
 
 @if($hasEvents)
-<section class="relative w-full overflow-hidden bg-gradient-to-r from-black via-red-900 to-black" id="eventsHeroCarousel" style="height: 550px; min-height: 550px;">
+<section class="relative w-full overflow-hidden bg-gradient-to-r from-black via-red-900 to-black" id="eventsHeroCarousel" style="height: 550px;">
     <!-- TRACK -->
     <div id="eventsHeroTrack" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)" style="padding-top: -200px;">
         @foreach($events as $event)
@@ -12,7 +12,6 @@
                 $image = $event->getFirstMediaUrl('avatar', 'normal') ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600';
                 $locale = app()->getLocale();
                 $title = $locale === 'fr' ? $event->title_fr : ($event->title_en ?? $event->title_fr);
-                $description = $locale === 'fr' ? $event->description_fr : ($event->description_en ?? $event->description_fr);
                 
                 // Calculer le pourcentage de places disponibles
                 $availabilityPercent = $event->total_seats > 0 
@@ -29,15 +28,15 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-black via-red-900/90 to-black"></div>
 
                 <!-- CONTENT -->
-                <div class="relative z-10 h-full flex items-start pt-6 md:pt-8">
+                <div class="relative z-10 h-[550px] flex items-start pt-6 overflow-hidden">
                     <div class="container mx-auto px-6 lg:px-12 max-w-7xl">
-                        <div class="grid lg:grid-cols-2 gap-12 items-start">
+                        <div class="grid lg:grid-cols-2 gap-12 items-start h-[420px] overflow-hidden">
                             
                             <!-- LEFT: Event Details -->
-                            <div class="text-white space-y-5 animate-fade-in -mt-16 lg:-mt-24">
+                            <div class="text-white space-y-5 animate-fade-in relative h-[380px] overflow-hidden pointer-events-auto">
                                 
                                 <!-- BADGES ROW -->
-                                <div class="flex flex-wrap items-center gap-3">
+                                <div class="flex flex-wrap items-center gap-3 max-h-[56px] overflow-hidden">
                                     <span class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-pink-500 text-black text-sm font-black rounded-full shadow-lg transform hover:scale-105 transition-transform">
                                         ⭐ {{ __('VIP EVENT') }}
                                     </span>
@@ -56,17 +55,19 @@
                                 </div>
 
                                 <!-- TITLE -->
-                                <h2 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight bg-gradient-to-r from-white via-amber-100 to-white bg-clip-text text-transparent drop-shadow-2xl">
+                                <h2 
+                                    class="title-clamp font-black leading-tight max-h-[160px] overflow-hidden
+                                           bg-gradient-to-r from-white via-amber-100 to-white 
+                                           bg-clip-text text-transparent drop-shadow-2xl
+                                           text-[clamp(1.6rem,4vw,4.5rem)] md:text-[clamp(2rem,5vw,5.5rem)]">
                                     {{ $title }}
                                 </h2>
-
-                                <!-- DESCRIPTION -->
-                                <p class="text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed line-clamp-3">
-                                    {{ $description ?? __('An exclusive premium event experience.') }}
+                                <p class="text-sm uppercase tracking-widest text-amber-400 font-semibold">
+                                    {{ __('VIP Event') }}
                                 </p>
 
                                 <!-- EVENT INFO GRID -->
-                                <div class="grid grid-cols-2 gap-4 pt-4">
+                                <div class="grid grid-cols-2 gap-4 pt-4 max-h-[260px] overflow-hidden">
                                     <!-- DATE & TIME -->
                                     @if($event->event_date)
                                     <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition-all">
@@ -157,7 +158,7 @@
                                 </div>
 
                                 <!-- CTA BUTTONS -->
-                                <div class="flex flex-wrap items-center gap-4 pt-6">
+                                <div class="flex flex-wrap items-center gap-4 pt-6 max-h-[72px] overflow-hidden">
                                     <a href="{{ route('events.show', $event->slug ?? $event->id) }}" 
                                        class="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-black font-black text-lg rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300">
                                         <span>{{ __('Book Now') }}</span>
@@ -182,7 +183,7 @@
                                     <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity"></div>
                                     <div class="relative bg-black/40 backdrop-blur-xl border border-white/20 rounded-3xl p-6 transform group-hover:scale-105 transition-transform duration-500">
                                         <img src="{{ $image }}" alt="{{ $title }}" 
-                                             class="w-full h-96 object-cover rounded-2xl shadow-2xl">
+                                             class="w-full h-[384px] object-cover rounded-2xl shadow-2xl">
                                         
                                         @if($event->is_featured)
                                         <div class="absolute top-10 right-10 px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-black text-xs font-black rounded-full shadow-lg animate-pulse">
@@ -399,9 +400,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 .animate-fade-in {
     animation: fade-in 0.8s ease-out;
+    will-change: transform, opacity;
 }
 
 .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.title-clamp {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
