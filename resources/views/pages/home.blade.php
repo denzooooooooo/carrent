@@ -10,7 +10,7 @@
   <section class="py-12 bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 text-center">
       <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Bienvenue chez Carré Premium</h2>
-      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">Découvrez nos packages touristiques sur-mesure, nos vols privés, et notre conciergerie 24/7 pour organiser vos expériences les plus exclusives. Nos conseillers sont à votre disposition pour personnaliser chaque détail.
+      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">Découvrez nos packages touristiques sur-mesure, nos vols privés, et notre conciergerie 24/7 pour organiser vos expériences les plus exclusives. Nos conseillers sont à votre disposition pour personnaliser chaque détail.</br>
       <blockqote class="italic text-amber-600">"{{ __('Carré Premium notre limite, le reflet de notre imagination.') }}"</blockquote
       </p>
     </div>
