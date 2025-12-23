@@ -11,6 +11,7 @@ use App\Models\Location;
 
 class HomeController extends Controller
 {
+
     public function index()
     {
         $latestEvents = Event::where('is_active', true)
@@ -18,7 +19,23 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('pages.home', compact('latestEvents'));
+        // Mélanger les événements pour un affichage aléatoire
+        $shuffledEvents = $latestEvents->shuffle();
+
+        // Générer les dots pour la pagination (en fonction du nombre d'événements)
+        $totalSlides = max($latestEvents->count(), 8); // Minimum 8 pour les fallbacks
+        $visibleSlides = 4; // Par défaut pour desktop
+        $totalPages = ceil($totalSlides / $visibleSlides);
+        
+        $dots = [];
+        for ($i = 0; $i < $totalPages; $i++) {
+            $dots[] = [
+                'index' => $i,
+                'active' => $i === 0 // Premier dot actif par défaut
+            ];
+        }
+
+        return view('pages.home', compact('latestEvents', 'shuffledEvents', 'dots'));
     }
 
     public function events()
