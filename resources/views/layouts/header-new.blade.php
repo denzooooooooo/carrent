@@ -130,7 +130,7 @@
     >
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16 gap-4">
-            
+             
             {{-- Logo --}}
             <a href="/" class="flex items-center space-x-3 group whitespace-nowrap flex-shrink-0 min-w-fit">
                 <img

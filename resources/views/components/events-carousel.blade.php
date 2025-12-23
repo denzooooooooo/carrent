@@ -4,9 +4,9 @@
 @endphp
 
 @if($hasEvents)
-<section class="relative w-full overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900" id="eventsHeroCarousel">
+<section class="relative w-full overflow-hidden bg-gradient-to-r from-black via-red-900 to-black" id="eventsHeroCarousel" style="height: 550px; min-height: 550px;">
     <!-- TRACK -->
-    <div id="eventsHeroTrack" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)">
+    <div id="eventsHeroTrack" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)" style="padding-top: -200px;">
         @foreach($events as $event)
             @php
                 $image = $event->getFirstMediaUrl('avatar', 'normal') ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600';
@@ -24,23 +24,17 @@
             @endphp
 
             <!-- SLIDE -->
-            <div class="w-full flex-shrink-0 relative min-h-[75vh] md:min-h-[80vh]">
-                <!-- IMAGE avec effet parallax et flou -->
-                <div class="absolute inset-0 overflow-hidden">
-                    <img src="{{ $image }}" alt="{{ $title }}" 
-                         class="absolute inset-0 w-full h-full object-cover transform scale-110 blur-sm brightness-75 transition-transform duration-[10s] hover:scale-115">
-                </div>
-
+                <div class="w-full flex-shrink-0 relative h-full">
                 <!-- OVERLAY GRADIENT avec effet sombre -->
-                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/50"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-black via-red-900/90 to-black"></div>
 
                 <!-- CONTENT -->
-                <div class="relative z-10 h-full flex items-center">
+                <div class="relative z-10 h-full flex items-start pt-6 md:pt-8">
                     <div class="container mx-auto px-6 lg:px-12 max-w-7xl">
-                        <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <div class="grid lg:grid-cols-2 gap-12 items-start">
                             
                             <!-- LEFT: Event Details -->
-                            <div class="text-white space-y-6 animate-fade-in">
+                            <div class="text-white space-y-5 animate-fade-in -mt-16 lg:-mt-24">
                                 
                                 <!-- BADGES ROW -->
                                 <div class="flex flex-wrap items-center gap-3">
