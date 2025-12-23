@@ -129,14 +129,14 @@
         class="bg-white dark:bg-gray-900 shadow-md transition-colors duration-300"
     >
     <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex items-center justify-between h-16 gap-4">
             
             {{-- Logo --}}
-            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap" style="margin-left: -70px;">
+            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap flex-shrink-0 min-w-fit">
                 <img
                     src="{{ asset('logos/logo.jpg') }}"
                     alt="Carré Premium"
-                    class="h-12 w-auto max-h-12"
+                    class="h-12 w-auto max-h-12 flex-shrink-0"
                 />
                 <div class="flex flex-col">
                     <span class="text-base font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
@@ -145,7 +145,7 @@
             </a>
 
             {{-- Desktop Navigation --}}
-            <nav class="hidden lg:flex items-center space-x-0 flex-nowrap text-sm">
+            <nav class="hidden lg:flex items-center space-x-1 flex-nowrap text-sm flex-1 justify-center">
                 @foreach($navigation as $index => $item)
                     <div class="relative" x-data="{ open: false }">
                         @if(isset($item['submenu']))

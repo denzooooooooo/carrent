@@ -14,28 +14,14 @@ class HomeController extends Controller
 
     public function index()
     {
-        $latestEvents = Event::where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->take(8)
+        // Charger les événements actifs avec leurs relations pour le carrousel
+        $events = Event::where('is_active', true)
+            ->with(['category', 'type', 'seatZones'])
+            ->orderBy('event_date', 'asc')
+            ->take(6)
             ->get();
 
-        // Mélanger les événements pour un affichage aléatoire
-        $shuffledEvents = $latestEvents->shuffle();
-
-        // Générer les dots pour la pagination (en fonction du nombre d'événements)
-        $totalSlides = max($latestEvents->count(), 8); // Minimum 8 pour les fallbacks
-        $visibleSlides = 4; // Par défaut pour desktop
-        $totalPages = ceil($totalSlides / $visibleSlides);
-        
-        $dots = [];
-        for ($i = 0; $i < $totalPages; $i++) {
-            $dots[] = [
-                'index' => $i,
-                'active' => $i === 0 // Premier dot actif par défaut
-            ];
-        }
-
-        return view('pages.home', compact('latestEvents', 'shuffledEvents', 'dots'));
+        return view('pages.home', compact('events'));
     }
 
     public function events()
