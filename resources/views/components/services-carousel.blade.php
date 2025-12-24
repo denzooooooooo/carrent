@@ -57,12 +57,15 @@
                     <img src="{{ $first['image'] }}" class="w-full h-full object-cover" alt="{{ $first['title'] }}" />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 flex items-center">
-                        <div class="container mx-auto px-6 text-center">
-                            <div class="max-w-4xl mx-auto">
+                        <div class="container mx-auto px-6 max-w-4xl text-center">
+                            <div>
                                 <div class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-md text-white text-sm rounded-full font-bold mb-8 border border-white/30 shadow-xl">
                                     ✦ TAILOR-MADE LUXURY EXPERIENCES ✦
                                 </div>
-                                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-4">
+                                <h1 
+                                    class="font-extrabold text-white leading-tight mb-4
+                                           text-[clamp(1.5rem,4vw,4rem)] md:text-[clamp(2rem,5vw,5.5rem)] lg:text-[clamp(2.5rem,4vw,6rem)]
+                                           max-h-[200px] overflow-hidden">
                                     {{ $first['title'] }}
                                     <span class="block bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">CARRÉ PREMIUM</span>
                                 </h1>
@@ -92,8 +95,8 @@
 
                     {{-- CONTENT --}}
                     <div class="absolute inset-0 flex items-center">
-                        <div class="container mx-auto px-6 text-center">
-                            <div class="max-w-4xl mx-auto">
+                        <div class="container mx-auto px-6 max-w-4xl text-center">
+                            <div>
 
                                 {{-- Badge --}}
                                 <div class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-md text-white text-sm rounded-full font-bold mb-8 border border-white/30 shadow-xl">
@@ -101,14 +104,17 @@
                                 </div>
 
                                 {{-- Title --}}
-                                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-4">
+                                <h1 
+                                    class="font-extrabold text-white leading-tight mb-4
+                                           text-[clamp(1.5rem,4vw,4rem)] md:text-[clamp(2rem,5vw,5.5rem)] lg:text-[clamp(2.5rem,4vw,6rem)]
+                                           max-h-[200px] overflow-hidden">
                                     <span x-text="slide.title"></span>
                                     <span class="block bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                                         CARRÉ PREMIUM
                                     </span>
                                 </h1>
 
-                                {{-- Subtitle --}}
+                                {{-- S ubtitle --}}
                                 <h2 class="text-xl md:text-3xl font-bold text-amber-400 mb-6" x-text="slide.subtitle"></h2>
 
                                 {{-- Description --}}

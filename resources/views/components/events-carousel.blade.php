@@ -4,7 +4,7 @@
 @endphp
 
 @if($hasEvents)
-<section class="relative w-full overflow-hidden bg-gradient-to-r from-black via-red-900 to-black" id="eventsHeroCarousel" style="height: 550px;">
+<section class="relative w-full overflow-hidden bg-gradient-to-r from-black via-red-900 to-black" id="eventsHeroCarousel" style="height: auto; min-height: 550px;">
     <!-- TRACK -->
     <div id="eventsHeroTrack" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)" style="padding-top: -200px;">
         @foreach($events as $event)
@@ -28,12 +28,12 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-black via-red-900/90 to-black"></div>
 
                 <!-- CONTENT -->
-                <div class="relative z-10 h-[550px] flex items-start pt-6 overflow-hidden">
+                <div class="relative z-10 lg:h-[550px] h-auto flex items-start pt-6 overflow-hidden">
                     <div class="container mx-auto px-6 lg:px-12 max-w-7xl">
-                        <div class="grid lg:grid-cols-2 gap-12 items-start h-[420px] overflow-hidden">
+                        <div class="grid lg:grid-cols-2 gap-12 items-start lg:h-[420px] h-auto overflow-visible">
                             
                             <!-- LEFT: Event Details -->
-                            <div class="text-white space-y-5 animate-fade-in relative h-[380px] overflow-hidden pointer-events-auto">
+                            <div class="text-white space-y-5 animate-fade-in relative lg:h-[380px] h-auto overflow-visible pointer-events-auto">
                                 
                                 <!-- BADGES ROW -->
                                 <div class="flex flex-wrap items-center gap-3 max-h-[56px] overflow-hidden">
@@ -56,10 +56,10 @@
 
                                 <!-- TITLE -->
                                 <h2 
-                                    class="title-clamp font-black leading-tight max-h-[160px] overflow-hidden
+                                    class="title-clamp font-black leading-tight lg:max-h-[160px] max-h-none overflow-visible
                                            bg-gradient-to-r from-white via-amber-100 to-white 
                                            bg-clip-text text-transparent drop-shadow-2xl
-                                           text-[clamp(1.6rem,4vw,4.5rem)] md:text-[clamp(2rem,5vw,5.5rem)]">
+                                           text-[clamp(1.05rem,3.2vw,3.4rem)] md:text-[clamp(1.6rem,3.8vw,4rem)]">
                                     {{ $title }}
                                 </h2>
                                 <p class="text-sm uppercase tracking-widest text-amber-400 font-semibold">
@@ -67,7 +67,7 @@
                                 </p>
 
                                 <!-- EVENT INFO GRID -->
-                                <div class="grid grid-cols-2 gap-4 pt-4 max-h-[260px] overflow-hidden">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 max-h-none">
                                     <!-- DATE & TIME -->
                                     @if($event->event_date)
                                     <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition-all">
