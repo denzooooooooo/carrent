@@ -8,12 +8,12 @@
       @php
         $default = [
           [
-            'image' => 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1920&q=80',
+            'image' => asset('images/PHOTO-2025-12-24-09-40-42.jpg'),
             'title' => 'Voyagez autrement',
             'caption' => 'Des expériences uniques, pensées pour l’exceptionnel.'
           ],
           [
-            'image' => 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1920&q=80',
+            'image' => asset('images/IMG_0989.jpg'),
             'title' => 'Luxe & Liberté',
             'caption' => 'Explorez les plus belles villes du monde avec élégance.'
           ],
