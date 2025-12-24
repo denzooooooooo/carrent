@@ -28,31 +28,14 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-black via-red-900/90 to-black"></div>
 
                 <!-- CONTENT -->
-                <div class="relative z-10 lg:h-[550px] h-auto flex items-start pt-6 overflow-hidden">
+                <div class="relative z-10 lg:h-[550px] h-auto flex items-start pt-6 overflow-visible touch-pan-y">
                     <div class="container mx-auto px-6 lg:px-12 max-w-7xl">
                         <div class="grid lg:grid-cols-2 gap-12 items-start lg:h-[420px] h-auto overflow-visible">
                             
                             <!-- LEFT: Event Details -->
                             <div class="text-white space-y-5 animate-fade-in relative lg:h-[380px] h-auto overflow-visible pointer-events-auto">
                                 
-                                <!-- BADGES ROW -->
-                                <div class="flex flex-wrap items-center gap-3 max-h-[56px] overflow-hidden">
-                                    <span class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-pink-500 text-black text-sm font-black rounded-full shadow-lg transform hover:scale-105 transition-transform">
-                                        ⭐ {{ __('VIP EVENT') }}
-                                    </span>
-                                    
-                                    @if($event->category)
-                                        <span class="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-semibold rounded-full hover:bg-white/20 transition-colors">
-                                            {{ $event->category->name ?? '' }}
-                                        </span>
-                                    @endif
-                                    
-                                    @if($event->type)
-                                        <span class="px-4 py-2 bg-purple-500/20 backdrop-blur-md border border-purple-400/30 text-purple-200 text-sm font-semibold rounded-full hover:bg-purple-500/30 transition-colors">
-                                            {{ $event->type->name ?? '' }}
-                                        </span>
-                                    @endif
-                                </div>
+                                
 
                                 <!-- TITLE -->
                                 <h2 
@@ -352,24 +335,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Touch/Swipe support
     let startX = 0;
+    let startY = 0;
     let isDragging = false;
+    let isHorizontalSwipe = false;
 
     track.addEventListener('touchstart', e => {
         startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
         isDragging = true;
+        isHorizontalSwipe = false;
     });
 
     track.addEventListener('touchmove', e => {
         if (!isDragging) return;
-        e.preventDefault();
     });
 
     track.addEventListener('touchend', e => {
         if (!isDragging) return;
         isDragging = false;
-        const diff = startX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) {
-            diff > 0 ? nextSlide() : prevSlide();
+
+        const diffX = startX - e.changedTouches[0].clientX;
+        const diffY = startY - e.changedTouches[0].clientY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            diffX > 0 ? nextSlide() : prevSlide();
             reset();
         }
     });
