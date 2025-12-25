@@ -39,10 +39,12 @@
 
                                 <!-- TITLE -->
                                 <h2 
-                                    class="title-clamp font-black leading-tight lg:max-h-[160px] max-h-none overflow-visible
+                                    class="title-clamp font-black leading-tight lg:max-h-[140px] max-h-none overflow-visible
                                            bg-gradient-to-r from-white via-amber-100 to-white 
                                            bg-clip-text text-transparent drop-shadow-2xl
-                                           text-[clamp(1.05rem,3.2vw,3.4rem)] md:text-[clamp(1.6rem,3.8vw,4rem)]">
+                                           text-[clamp(1.1rem,4vw,1.9rem)]
+                                           md:text-[clamp(1.6rem,3vw,2.2rem)]
+                                           lg:text-[clamp(1.8rem,1.8vw,2.2rem)]">
                                     {{ $title }}
                                 </h2>
                                 <p class="text-sm uppercase tracking-widest text-amber-400 font-semibold">
@@ -150,9 +152,9 @@
                                 </div>
 
                                 <!-- CTA BUTTONS -->
-                                <div class="flex flex-wrap items-center gap-3 pt-5">
+                                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
                                     <a href="{{ route('events.show', $event->slug ?? $event->id) }}" 
-                                       class="group inline-flex items-center gap-2 px-5 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-black font-black text-base lg:text-lg rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300">
+                                       class="group inline-flex justify-center items-center gap-2 px-4 py-2.5 lg:px-8 lg:py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-black font-black text-sm lg:text-lg rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300">
                                         <span>{{ __('Book Now') }}</span>
                                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -160,7 +162,7 @@
                                     </a>
                                     
                                     <a href="{{ route('events.show', $event->slug ?? $event->id) }}" 
-                                       class="inline-flex items-center gap-2 px-4 py-3 lg:px-6 lg:py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-bold text-sm lg:text-base rounded-full hover:bg-white/20 hover:border-white/50 transition-all">
+                                       class="inline-flex justify-center items-center gap-2 px-4 py-2.5 lg:px-6 lg:py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-bold text-xs lg:text-base rounded-full hover:bg-white/20 hover:border-white/50 transition-all">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
