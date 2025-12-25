@@ -50,7 +50,10 @@
                                 </p>
 
                                 <!-- EVENT INFO GRID -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 max-h-none">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 lg:pt-4
+                                            [&>div]:p-3 lg:[&>div]:p-4
+                                            [&_p.text-sm]:text-xs lg:[&_p.text-sm]:text-sm
+                                            [&_p.text-xs]:text-[10px] lg:[&_p.text-xs]:text-xs">
                                     <!-- DATE & TIME -->
                                     @if($event->event_date)
                                     <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition-all">
@@ -140,10 +143,16 @@
                                     </div>
                                 </div>
 
+                                <!-- MOBILE EVENT IMAGE (COMPACT & CENTERED) -->
+                                <div class="block lg:hidden py-4 flex justify-center">
+                                    <img src="{{ $image }}" alt="{{ $title }}"
+                                         class="w-3/4 max-w-xs h-36 object-cover rounded-xl shadow-lg">
+                                </div>
+
                                 <!-- CTA BUTTONS -->
-                                <div class="flex flex-wrap items-center gap-4 pt-6 max-h-[72px] overflow-hidden">
+                                <div class="flex flex-wrap items-center gap-3 pt-5">
                                     <a href="{{ route('events.show', $event->slug ?? $event->id) }}" 
-                                       class="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-black font-black text-lg rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300">
+                                       class="group inline-flex items-center gap-2 px-5 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-black font-black text-base lg:text-lg rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300">
                                         <span>{{ __('Book Now') }}</span>
                                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -151,7 +160,7 @@
                                     </a>
                                     
                                     <a href="{{ route('events.show', $event->slug ?? $event->id) }}" 
-                                       class="inline-flex items-center gap-2 px-6 py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-bold rounded-full hover:bg-white/20 hover:border-white/50 transition-all">
+                                       class="inline-flex items-center gap-2 px-4 py-3 lg:px-6 lg:py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-bold text-sm lg:text-base rounded-full hover:bg-white/20 hover:border-white/50 transition-all">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
@@ -348,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     track.addEventListener('touchmove', e => {
         if (!isDragging) return;
-    });
+    }); 
 
     track.addEventListener('touchend', e => {
         if (!isDragging) return;
