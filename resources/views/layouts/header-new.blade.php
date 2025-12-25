@@ -134,7 +134,7 @@
             {{-- Logo --}}
             <a href="/" class="flex items-center space-x-3 group whitespace-nowrap flex-shrink-0 min-w-fit">
                 <img
-                    src="{{ asset('logos/logo.jpg') }}"
+                    src="{{ asset('logos/logo2.jpg') }}"
                     alt="Carré Premium"
                     class="h-12 w-auto max-h-12 flex-shrink-0"
                 />
