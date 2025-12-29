@@ -13,8 +13,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-blue-600 to-cyan-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Vehicle Rentals') }}</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Discover our premium vehicle fleet for your adventures') }}</p>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Vehicule de location') }}</h1>
+      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Decouvrez nos offres de vehicule premium') }}</p>
     </div>
   </section>
 
@@ -25,18 +25,17 @@
         <form method="GET" action="{{ route('location') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Category') }}</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Categories') }}</label>
               <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All categories') }}</option>
+                <option value="">{{ __('toutes les categories') }}</option>
                 <option value="terrestre" {{ request('category') == 'terrestre' ? 'selected' : '' }}>{{ __('Terrestrial') }}</option>
               </select>
             </div>
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Vehicle Type') }}</label>
               <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All types') }}</option>
+                <option value="">{{ __('Tout type') }}</option>
                 <option value="voiture" {{ request('type') == 'voiture' ? 'selected' : '' }}>{{ __('Car') }}</option>
-                <option value="avion" {{ request('type') == 'avion' ? 'selected' : '' }}>{{ __('Plane') }}</option>
               </select>
             </div>
             <div class="flex items-end gap-2">
@@ -130,8 +129,8 @@
   {{-- CTA Section --}}
   <section class="py-12 md:py-16 bg-gradient-to-r from-green-600 to-teal-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('A custom location?') }}</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact our team to find your ideal accommodation') }}</p>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('Besoin de vehicule personnalisé ?') }}</h2>
+      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contactez notre équipe pour plus de details') }}</p>
       <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-green-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
           {{ __('Request a quote') }}
