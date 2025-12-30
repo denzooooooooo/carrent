@@ -130,17 +130,17 @@
           {{ __('Drive Excellence') }}
         </h2>
         <p class="text-2xl text-white/90 max-w-3xl mx-auto">
-          {{ __('Quads • Luxury Motorcycles • Sports Cars • Premium 4x4') }}
+          {{ __('jet privés • voiture de luxe • Sports Cars • Premium 4x4') }}
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
         @php
           $vehicles = [
-            ['icon' => 'motorcycle', 'title' => __('Premium Quads'), 'desc' => __('Rental with or without guide'), 'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop'],
+            ['icon' => 'motorcycle', 'title' => __('Vehicule premium'), 'desc' => __('Rental with or without guide'), 'image' => 'https://i.pinimg.com/736x/c0/7a/ca/c07acad260e24f8cd0868d5d9c6169b5.jpg'],
             ['icon' => 'car', 'title' => __('Sports Cars'), 'desc' => __('Ferrari, Lamborghini, Porsche'), 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
             ['icon' => 'car', 'title' => __('Luxury 4x4'), 'desc' => __('Range Rover, G-Wagon'), 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
-            ['icon' => 'motorcycle', 'title' => __('Premium Motorcycles'), 'desc' => __('Harley, Ducati, BMW'), 'image' => 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&h=300&fit=crop']
+            ['icon' => 'motorcycle', 'title' => __('Vol premium'), 'desc' => __('location de jet pour vos voyages'), 'image' => 'https://i.pinimg.com/1200x/22/5f/4d/225f4d17aa8a81f488d0794c0e4fdb80.jpg']
           ];
         @endphp
 
@@ -249,4 +249,23 @@
     </div>
   </section>
 </div>
+
+{{-- WhatsApp Floating Chat Button --}}
+<a
+  href="https://wa.me/33612345678"
+  target="_blank"
+  class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-transform transform hover:scale-110"
+  aria-label="Contact WhatsApp"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 32"
+    fill="white"
+    class="w-12 h-12"
+  >
+    <path d="M19.11 17.47c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.66.15-.2.3-.76.97-.93 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.77-1.64-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.51.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.9-2.2-.24-.57-.48-.5-.66-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.02-1.05 2.5 1.08 2.9 1.23 3.1c.15.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.28-.2-.58-.35z"/>
+    <path d="M16.04 2.003c-7.732 0-14.037 6.305-14.037 14.037 0 2.48.66 4.9 1.9 7.03L2 30l7.1-1.86c2.07 1.13 4.4 1.72 6.94 1.72h.01c7.73 0 14.04-6.31 14.04-14.04 0-3.75-1.46-7.27-4.11-9.92-2.65-2.65-6.17-4.1-9.94-4.1zm0 25.66c-2.11 0-4.17-.56-5.96-1.62l-.43-.26-4.22 1.11 1.13-4.11-.28-.44c-1.13-1.83-1.73-3.94-1.73-6.12 0-6.35 5.17-11.52 11.52-11.52 3.08 0 5.97 1.2 8.15 3.37 2.18 2.18 3.38 5.07 3.38 8.15 0 6.35-5.17 11.52-11.52 11.52z"/>
+  </svg>
+</a>
+
 @endsection
