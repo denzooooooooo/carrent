@@ -252,7 +252,7 @@
 
 {{-- WhatsApp Floating Chat Button --}}
 <a
-  href="https://wa.me/+2250101221515"
+  href="https://wa.me/+2250101221515" 
   target="_blank"
   class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-transform transform hover:scale-110"
   aria-label="Contact WhatsApp"
