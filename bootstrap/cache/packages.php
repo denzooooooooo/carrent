@@ -1,4 +1,15 @@
 <?php return array (
+  'asciisd/cybersource-hosted-checkout-laravel' => 
+  array (
+    'aliases' => 
+    array (
+      'Cybersource' => 'Asciisd\\Cybersource\\Facades\\Cybersource',
+    ),
+    'providers' => 
+    array (
+      0 => 'Asciisd\\Cybersource\\CybersourceServiceProvider',
+    ),
+  ),
   'dedoc/scramble' => 
   array (
     'providers' => 

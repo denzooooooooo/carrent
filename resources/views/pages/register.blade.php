@@ -2,6 +2,25 @@
 
 @section('title', __('Register') . ' - Carré Premium')
 
+@push('styles')
+<!-- intl-tel-input CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
+<style>
+  .iti {
+    width: 100%;
+  }
+  .iti__flag-container {
+    padding: 0;
+  }
+  .iti__selected-flag {
+    padding: 0 8px 0 12px;
+  }
+  #phone {
+    padding-left: 52px !important;
+  }
+</style>
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-gray-50 flex">
   <!-- Image Section -->
@@ -106,25 +125,17 @@
         </div>
         <div>
           <label for="phone" class="sr-only">{{ __('Phone') }}</label>
-          <div class="flex gap-2">
-            <select name="phone_country_code" id="phone_country_code" class="w-1/3 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900">
-              <option value="+225" selected>+225 (CI)</option>
-              <option value="+33">+33 (FR)</option>
-              <option value="+254">+254 (KE)</option>
-              <option value="+27">+27 (ZA)</option>
-              <option value="+1">+1 (US)</option>
-            </select>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              autocomplete="tel"
-              required
-              class="appearance-none rounded-none relative block w-2/3 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-              placeholder="Téléphone"
-              value="{{ old('phone') }}"
-            />
-          </div>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            required
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+            placeholder="{{ __('Phone number') }}"
+            value="{{ old('phone') }}"
+          />
+          <input type="hidden" name="phone_country_code" id="phone_country_code" value="+225">
         </div>
         <div>
           <label for="password" class="sr-only">{{ __('Password') }}</label>
@@ -231,4 +242,68 @@
     </div>
   </div>
 </div>
+
+@push('scripts')
+<!-- intl-tel-input JS -->
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const phoneInput = document.querySelector("#phone");
+  const phoneCountryCodeInput = document.querySelector("#phone_country_code");
+  
+  // Initialize intl-tel-input
+  const iti = window.intlTelInput(phoneInput, {
+    // Options
+    initialCountry: "ci", // Côte d'Ivoire par défaut
+    preferredCountries: ["ci", "fr", "sn", "ml", "bf", "ne", "tg", "bj", "gn"], // Pays africains francophones en priorité
+    separateDialCode: true,
+    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js",
+    autoPlaceholder: "aggressive",
+    formatOnDisplay: true,
+    nationalMode: false,
+    customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+      return "ex: " + selectedCountryPlaceholder;
+    }
+  });
+
+  // Update hidden input when country changes
+  phoneInput.addEventListener('countrychange', function() {
+    const countryData = iti.getSelectedCountryData();
+    phoneCountryCodeInput.value = '+' + countryData.dialCode;
+  });
+
+  // Set initial country code
+  const initialCountryData = iti.getSelectedCountryData();
+  phoneCountryCodeInput.value = '+' + initialCountryData.dialCode;
+
+  // Validation on form submit
+  const form = phoneInput.closest('form');
+  form.addEventListener('submit', function(e) {
+    // Get the full international number
+    const fullNumber = iti.getNumber();
+    
+    // Validate the number
+    if (!iti.isValidNumber()) {
+      e.preventDefault();
+      alert('{{ __("Please enter a valid phone number") }}');
+      phoneInput.focus();
+      return false;
+    }
+    
+    // Update the phone input with the full international number
+    phoneInput.value = fullNumber;
+  });
+
+  // Format as user types
+  phoneInput.addEventListener('blur', function() {
+    if (phoneInput.value.trim()) {
+      const fullNumber = iti.getNumber();
+      if (iti.isValidNumber()) {
+        phoneInput.value = fullNumber;
+      }
+    }
+  });
+});
+</script>
+@endpush
 @endsection

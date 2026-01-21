@@ -1,50 +1,27 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\AmadeusService;
+use App\Services\AviationEdgeService;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class FlightController extends Controller
 {
-    protected $amadeusService;
+    protected $aviationEdgeService;
 
-    public function __construct(AmadeusService $amadeusService)
+    public function __construct(AviationEdgeService $aviationEdgeService)
     {
-        $this->amadeusService = $amadeusService;
+        $this->aviationEdgeService = $aviationEdgeService;
     }
 
     /**
      * 1️⃣ Rechercher des vols
      * Route: GET /api/flights/search
-     *//* 
-public function searchFlights(Request $request)
-{
-    $request->validate([
-        'origin' => 'required|string|size:3',
-        'destination' => 'required|string|size:3',
-        'departureDate' => 'required|date_format:Y-m-d',
-        'adults' => 'sometimes|integer|min:1',
-    ]);
-
-    $offers = $this->amadeusService->searchFlights(
-        $request->origin,
-        $request->destination,
-        $request->departureDate,
-        $request->adults ?? 1
-    );
-
-    if (!$offers) {
-        return response()->json(['message' => 'Erreur lors de la recherche de vols.'], 503);
-    }
-
-    // Vous pouvez aussi stocker les offres en cache ou en base de données pour référence
-    return response()->json($offers);
-} */
-
+     */
     public function searchFlights(Request $request)
     {
         try {
@@ -63,50 +40,55 @@ public function searchFlights(Request $request)
                 ], 422);
             }
 
-            // ✅ Recherche des vols via ton service
-            $offers = $this->amadeusService->searchFlights(
+            // ✅ Recherche des vols via Aviation Edge
+            $flights = $this->aviationEdgeService->searchFlights(
                 $request->origin,
                 $request->destination,
-                $request->departureDate,
-                $request->adults ?? 1
+                $request->departureDate
             );
 
             // ✅ Gestion des erreurs API
-            if (isset($offers['error'])) {
+            if ($flights === null) {
                 return response()->json([
                     'status' => 'api_error',
-                    'message' => $offers['error']['message'] ?? 'Erreur inconnue de l’API Aviasales',
-                    'code' => $offers['error']['code'] ?? 500,
-                    'details' => $offers['error']['details'] ?? null,
+                    'message' => 'Erreur lors de la communication avec l\'API Aviation Edge.',
                 ], 503);
             }
 
-            if (!$offers || empty($offers['body'])) {
+            if (empty($flights)) {
                 return response()->json([
                     'status' => 'no_results',
                     'message' => 'Aucun vol trouvé pour cette recherche.',
-                    'amadeus_request_id' => $offers['headers']['Ama-request-id'] ?? null,
-                    'timestamp' => $offers['headers']['Date'] ?? null,
+                    'params' => [
+                        'origin' => $request->origin,
+                        'destination' => $request->destination,
+                        'date' => $request->departureDate,
+                    ]
                 ], 404);
             }
 
-
-            // ✅ Retour clair et structuré
+            // ✅ Retour structuré
             return response()->json([
                 'status' => 'success',
-                'results' => $offers,
+                'results' => $flights,
+                'count' => count($flights),
+                'search_params' => [
+                    'origin' => $request->origin,
+                    'destination' => $request->destination,
+                    'date' => $request->departureDate,
+                    'adults' => $request->adults ?? 1,
+                ]
             ]);
 
         } catch (\Illuminate\Http\Client\RequestException $e) {
-            // ✅ Erreur HTTP (timeout, 403, etc.)
+            // ✅ Erreur HTTP (timeout, etc.)
             return response()->json([
                 'status' => 'http_error',
-                'message' => 'Erreur lors de la communication avec l’API Aviasales.',
+                'message' => 'Erreur lors de la communication avec l’API Aviation Edge.',
                 'error' => $e->getMessage(),
-                'response' => $e->response ? $e->response->body() : null,
             ], 502);
         } catch (\Exception $e) {
-            // ✅ Erreur interne Laravel ou PHP
+            // ✅ Erreur interne
             return response()->json([
                 'status' => 'server_error',
                 'message' => 'Erreur interne du serveur.',
@@ -115,139 +97,236 @@ public function searchFlights(Request $request)
             ], 500);
         }
     }
+
     /**
-     * 5️⃣ Rechercher des aéroports
+     * 2️⃣ Rechercher des aéroports
      * Route: GET /api/flights/airports/search
      */
     public function searchAirports(Request $request)
     {
-        $request->validate(['keyword' => 'required|string|min:3']);
+        try {
+            $validator = \Validator::make($request->all(), [
+                'keyword' => 'required|string|min:2',
+            ]);
 
-        $locations = $this->amadeusService->searchLocations($request->keyword, 'AIRPORT');
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'validation_error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        if (!$locations) {
-            return response()->json(['message' => 'Erreur lors de la recherche des aéroports.'], 503);
+            $airports = $this->aviationEdgeService->searchAirports($request->keyword);
+
+            return response()->json([
+                'status' => 'success',
+                'results' => $airports,
+                'count' => count($airports),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Airport search error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la recherche d’aéroports.',
+            ], 500);
         }
-
-        return response()->json($locations);
     }
 
-
     /**
-     * 7️⃣ Obtenir les détails d'une offre de vol spécifique (Détail de la commande Amadeus)
-     * Route: GET /api/flights/booking-details/{amadeusOrderId}
+     * 3️⃣ Obtenir les détails d'un vol spécifique
+     * Route: GET /api/flights/details
      */
-    public function getFlightOrderDetails($amadeusOrderId)
+    public function getFlightDetails(Request $request)
     {
-        // Vérifiez l'existence et l'appartenance de la réservation locale (facultatif mais recommandé)
-        $booking = Booking::where('booking_number', $amadeusOrderId)
-            ->where('user_id', Auth::id()) // Assurez-vous que l'utilisateur est le propriétaire
-            ->first();
+        try {
+            $validator = \Validator::make($request->all(), [
+                'flight_number' => 'required|string',
+                'date' => 'required|date_format:Y-m-d',
+            ]);
 
-        if (!$booking) {
-            return response()->json(['message' => 'Réservation Amadeus introuvable ou non autorisée.'], 404);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'validation_error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $details = $this->aviationEdgeService->getFlightDetails(
+                $request->flight_number,
+                $request->date
+            );
+
+            if (!$details) {
+                return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'Vol non trouvé.',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'result' => $details,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Flight details error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la récupération des détails du vol.',
+            ], 500);
         }
-
-        $details = $this->amadeusService->getFlightOrderDetails($amadeusOrderId);
-
-        if (!$details) {
-            return response()->json(['message' => 'Impossible de récupérer les détails de la commande Amadeus.'], 503);
-        }
-
-        return response()->json($details);
     }
 
-
-
     /**
-     * 2️⃣ Confirmer le prix d'une offre de vol
-     * Route: POST /api/flights/confirm-price
+     * 4️⃣ Rechercher des villes
+     * Route: GET /api/flights/cities/search
      */
-    public function confirmPrice(Request $request)
+    public function searchCities(Request $request)
     {
-        $request->validate([
-            'flightOffer' => 'required|array', // L'offre de vol complète retournée par searchFlights
-        ]);
+        try {
+            $validator = \Validator::make($request->all(), [
+                'keyword' => 'required|string|min:2',
+            ]);
 
-        $confirmedOffer = $this->amadeusService->confirmFlightPrice(
-            $request->flightOffer
-        );
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'validation_error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        if (!$confirmedOffer) {
-            return response()->json(['message' => 'Erreur lors de la confirmation du prix. L\'offre a peut-être expiré.'], 503);
+            $cities = $this->aviationEdgeService->searchCities($request->keyword);
+
+            return response()->json([
+                'status' => 'success',
+                'results' => $cities,
+                'count' => count($cities),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('City search error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la recherche de villes.',
+            ], 500);
         }
-
-        return response()->json($confirmedOffer);
     }
 
     /**
-     * 3️⃣ Créer une réservation de vol (Enregistrement de la commande Amadeus et dans la base de données locale)
+     * 5️⃣ Obtenir le calendrier des prix
+     * Route: GET /api/flights/calendar
+     */
+    public function getPriceCalendar(Request $request)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'origin' => 'required|string|size:3',
+                'destination' => 'required|string|size:3',
+                'month' => 'required|string|size:7', // format: YYYY-MM
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'validation_error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $calendar = $this->aviationEdgeService->getPriceCalendar(
+                $request->origin,
+                $request->destination,
+                $request->month
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'results' => $calendar,
+                'month' => $request->month,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Price calendar error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la récupération du calendrier.',
+            ], 500);
+        }
+    }
+
+    /**
+     * 6️⃣ Créer une réservation de vol
      * Route: POST /api/flights/book
      */
     public function createBooking(Request $request)
     {
-        // Nécessite une authentification utilisateur pour associer la réservation
         if (!Auth::check()) {
             return response()->json(['message' => 'Non autorisé. Veuillez vous connecter.'], 401);
         }
 
-        $request->validate([
-            'flightOffer' => 'required|array', // L'offre de vol confirmée
-            'travelers' => 'required|array', // Détails des voyageurs (format Amadeus)
+        $validator = \Validator::make($request->all(), [
+            'flight_number' => 'required|string',
+            'origin' => 'required|string|size:3',
+            'destination' => 'required|string|size:3',
+            'departure_date' => 'required|date',
+            'price' => 'required|numeric|min:0',
+            'passengers' => 'required|array|min:1',
         ]);
 
-        // 1. Créer la commande chez Amadeus
-        $amadeusOrder = $this->amadeusService->createFlightBooking(
-            $request->flightOffer,
-            $request->travelers
-        );
-
-        if (!$amadeusOrder || !isset($amadeusOrder['data']['id'])) {
-            // Gérer les erreurs (e.g. offre non valide, problème de disponibilité)
-            return response()->json(['message' => 'Échec de la réservation chez Amadeus.'], 500);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'validation_error',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
-        $flightOrderId = $amadeusOrder['data']['id'];
-        $totalAmount = $amadeusOrder['data']['flightOffers'][0]['price']['total'] ?? 0;
-        $currency = $amadeusOrder['data']['flightOffers'][0]['price']['currency'] ?? 'EUR';
-
-        // 2. Enregistrer la réservation dans la base de données locale
         try {
+            $bookingNumber = 'FL' . strtoupper(uniqid());
+            
+            // Créer la réservation
             $booking = Booking::create([
-                'booking_number' => $flightOrderId, // Utiliser l'ID de la commande Amadeus comme numéro de réservation
+                'booking_number' => $bookingNumber,
                 'user_id' => Auth::id(),
-                'booking_type' => 'FLIGHT',
+                'booking_type' => 'flight',
                 'booking_date' => now(),
-                'travel_date' => $request->flightOffer['itineraries'][0]['segments'][0]['departure']['at'] ?? now(), // Première date de départ
-                'number_of_passengers' => count($request->travelers),
-                'passenger_details' => $request->travelers,
-                'total_amount' => $totalAmount,
-                'currency' => $currency,
-                'final_amount' => $totalAmount,
-                'status' => 'CONFIRMED', // ou 'PENDING' selon la réponse Amadeus
-                'payment_status' => 'PENDING', // Le statut de paiement doit être mis à jour après le traitement du paiement
-                // Stockez les autres données Amadeus nécessaires dans une colonne JSON si vous en avez une (e.g. 'flight_details')
+                'travel_date' => $request->departure_date,
+                'number_of_passengers' => count($request->passengers),
+                'passenger_details' => $request->passengers,
+                'total_amount' => $request->price,
+                'currency' => $request->currency ?? 'EUR',
+                'final_amount' => $request->price,
+                'status' => 'pending',
+                'payment_status' => 'pending',
             ]);
 
             return response()->json([
+                'status' => 'success',
                 'message' => 'Réservation créée avec succès.',
                 'booking' => $booking,
-                'amadeus_order' => $amadeusOrder,
+                'booking_number' => $bookingNumber,
             ], 201);
+
         } catch (\Exception $e) {
-            // Si l'enregistrement local échoue, vous devriez idéalement ANNULER la réservation Amadeus.
-            // $this->amadeusService->cancelFlightBooking($flightOrderId);
-            return response()->json(['message' => 'Réservation Amadeus réussie, mais échec de l\'enregistrement local.', 'error' => $e->getMessage()], 500);
+            Log::error('Booking creation error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la création de la réservation.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * 4️⃣ Annuler une réservation
+     * 7️⃣ Annuler une réservation
      * Route: DELETE /api/flights/booking/{bookingId}
      */
     public function cancelBooking($bookingId)
     {
-        // Nécessite une authentification pour l'annulation
         if (!Auth::check()) {
             return response()->json(['message' => 'Non autorisé. Veuillez vous connecter.'], 401);
         }
@@ -256,33 +335,40 @@ public function searchFlights(Request $request)
             ->where('user_id', Auth::id())
             ->first();
 
-        if (!$booking || $booking->status === 'CANCELLED') {
-            return response()->json(['message' => 'Réservation introuvable ou déjà annulée.'], 404);
+        if (!$booking) {
+            return response()->json(['message' => 'Réservation introuvable.'], 404);
         }
 
-        $flightOrderId = $booking->booking_number; // L'ID Amadeus est stocké ici
-
-        // 1. Annuler chez Amadeus
-        $success = $this->amadeusService->cancelFlightBooking($flightOrderId);
-
-        if (!$success) {
-            return response()->json(['message' => 'Échec de l\'annulation chez Amadeus. Contactez le support.'], 500);
+        if ($booking->status === 'cancelled') {
+            return response()->json(['message' => 'Réservation déjà annulée.'], 400);
         }
 
-        // 2. Mettre à jour le statut local
-        $booking->update([
-            'status' => 'CANCELLED',
-            'cancellation_reason' => 'User requested cancellation',
-            'cancelled_at' => now(),
-        ]);
+        try {
+            $booking->update([
+                'status' => 'cancelled',
+                'cancellation_reason' => 'User requested cancellation',
+                'cancelled_at' => now(),
+                'payment_status' => 'refunded'
+            ]);
 
-        return response()->json(['message' => 'Réservation annulée avec succès.', 'booking' => $booking]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Réservation annulée avec succès.',
+                'booking' => $booking,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Booking cancellation error', ['message' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de l\'annulation.',
+            ], 500);
+        }
     }
 
-
-
     /**
-     * 6️⃣ Obtenir les réservations de l'utilisateur connecté
+     * 8️⃣ Obtenir les réservations de l'utilisateur
      * Route: GET /api/flights/user-bookings
      */
     public function getUserBookings()
@@ -291,45 +377,33 @@ public function searchFlights(Request $request)
             return response()->json(['message' => 'Non autorisé. Veuillez vous connecter.'], 401);
         }
 
-        $bookings = Auth::user()->bookings()->where('booking_type', 'FLIGHT')->get();
+        $bookings = Auth::user()->bookings()
+            ->where('booking_type', 'flight')
+            ->orderBy('booking_date', 'desc')
+            ->get();
 
-        return response()->json($bookings);
+        return response()->json([
+            'status' => 'success',
+            'results' => $bookings,
+            'count' => $bookings->count(),
+        ]);
     }
-
 
     /**
-     * 8️⃣ Obtenir les statistiques de vols pour l'admin (Exemple: prédiction de retard)
-     * Route: GET /api/admin/flights/delay-prediction
+     * 9️⃣ Tester la connexion à l'API
+     * Route: GET /api/flights/test
      */
-    public function getAdminFlightStats(Request $request)
+    public function testConnection()
     {
-        // Vérification de l'administrateur
-        if (!Auth::guard('admin')->check()) {
-            return response()->json(['message' => 'Accès refusé. Nécessite un compte administrateur.'], 403);
-        }
+        $connection = $this->aviationEdgeService->testConnection();
 
-        $request->validate([
-            'origin' => 'required|string|size:3',
-            'destination' => 'required|string|size:3',
-            'date' => 'required|date_format:Y-m-d',
-            'time' => 'required|date_format:H:i:s',
-            'carrierCode' => 'required|string|size:2',
-            'flightNumber' => 'required|string',
+        return response()->json([
+            'status' => 'success',
+            'api_connection' => $connection,
+            'message' => $connection 
+                ? 'Connexion à Aviation Edge établie avec succès.' 
+                : 'Impossible de se connecter à Aviation Edge.',
         ]);
-
-        $stats = $this->amadeusService->getFlightDelayPrediction(
-            $request->origin,
-            $request->destination,
-            $request->date,
-            $request->time,
-            $request->carrierCode,
-            $request->flightNumber
-        );
-
-        if (!$stats) {
-            return response()->json(['message' => 'Erreur lors de la récupération des statistiques de vols.'], 503);
-        }
-
-        return response()->json($stats);
     }
 }
+

@@ -67,7 +67,7 @@
                   Nous contacter
                 </a>
 
-                <a href="{{ url('/services') }}"
+                <a href="{{ url('/packages') }}"
                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-md
                           bg-white/10 backdrop-blur
                           text-white font-medium text-sm

@@ -9,9 +9,9 @@
   {{-- Texte de bienvenue --}}
   <section class="py-12 bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Bienvenue chez Carré Premium</h2>
-      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">Découvrez nos packages touristiques sur-mesure, nos vols privés, et notre conciergerie 24/7 pour organiser vos expériences les plus exclusives. Nos conseillers sont à votre disposition pour personnaliser chaque détail.</br>
-      <blockqote class="italic text-amber-600">"{{ __('Carré Premium notre limite, le reflet de notre imagination.') }}"</blockquote
+      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{{ __('Welcome to Carré Premium') }}</h2>
+      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{{ __('Discover our tailor-made tourist packages, private flights, and 24/7 concierge service to organize your most exclusive experiences. Our advisors are at your disposal to personalize every detail.') }}</br>
+      <blockquote class="italic text-amber-600">"{{ __('Carré Premium, our limit is the reflection of our imagination.') }}"</blockquote>
       </p>
     </div>
   </section>
@@ -130,17 +130,17 @@
           {{ __('Drive Excellence') }}
         </h2>
         <p class="text-2xl text-white/90 max-w-3xl mx-auto">
-          {{ __('jet privés • voiture de luxe • Sports Cars • Premium 4x4') }}
+          {{ __('Private Jets • Luxury Cars • Sports Cars • Premium 4x4') }}
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
         @php
           $vehicles = [
-            ['icon' => 'motorcycle', 'title' => __('Vehicule premium'), 'desc' => __('Rental with or without guide'), 'image' => 'https://i.pinimg.com/736x/c0/7a/ca/c07acad260e24f8cd0868d5d9c6169b5.jpg'],
+            ['icon' => 'motorcycle', 'title' => __('Premium Vehicles'), 'desc' => __('Rental with or without guide'), 'image' => 'https://i.pinimg.com/736x/c0/7a/ca/c07acad260e24f8cd0868d5d9c6169b5.jpg'],
             ['icon' => 'car', 'title' => __('Sports Cars'), 'desc' => __('Ferrari, Lamborghini, Porsche'), 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
             ['icon' => 'car', 'title' => __('Luxury 4x4'), 'desc' => __('Range Rover, G-Wagon'), 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
-            ['icon' => 'motorcycle', 'title' => __('Vol premium'), 'desc' => __('location de jet pour vos voyages'), 'image' => 'https://i.pinimg.com/1200x/22/5f/4d/225f4d17aa8a81f488d0794c0e4fdb80.jpg']
+            ['icon' => 'motorcycle', 'title' => __('Premium Flights'), 'desc' => __('Private jet rental for your travels'), 'image' => 'https://i.pinimg.com/1200x/22/5f/4d/225f4d17aa8a81f488d0794c0e4fdb80.jpg']
           ];
         @endphp
 

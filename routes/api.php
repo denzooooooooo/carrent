@@ -38,15 +38,17 @@ Route::prefix('services/flights')->controller(ServiceFlightController::class)->g
 // Routes publiques ou pour les utilisateurs authentifiés
 Route::prefix('flights')->controller(FlightController::class)->group(function () {
     Route::get('search', 'searchFlights'); // 1️⃣ Rechercher des vols
-    Route::get('airports/search', 'searchAirports'); // 5️⃣ Rechercher des aéroports
-    Route::post('confirm-price', 'confirmPrice'); // 2️⃣ Confirmer le prix
+    Route::get('airports/search', 'searchAirports'); // 2️⃣ Rechercher des aéroports
+    Route::get('cities/search', 'searchCities'); // 3️⃣ Rechercher des villes
+    Route::get('details', 'getFlightDetails'); // 4️⃣ Détails d'un vol spécifique
+    Route::get('calendar', 'getPriceCalendar'); // 5️⃣ Calendrier des prix
+    Route::get('test', 'testConnection'); // 6️⃣ Tester la connexion API
 
     // Routes nécessitant une authentification utilisateur (User model)
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('book', 'createBooking'); // 3️⃣ Créer une réservation
-        Route::delete('booking/{bookingId}', 'cancelBooking'); // 4️⃣ Annuler une réservation (ID local de la table Booking)
-        Route::get('user-bookings', 'getUserBookings'); // 6️⃣ Obtenir les réservations de l'utilisateur
-        Route::get('booking-details/{amadeusOrderId}', 'getFlightOrderDetails'); // 7️⃣ Détails d'une commande Amadeus (ID Amadeus)
+        Route::post('book', 'createBooking'); // 7️⃣ Créer une réservation
+        Route::delete('booking/{bookingId}', 'cancelBooking'); // 8️⃣ Annuler une réservation
+        Route::get('user-bookings', 'getUserBookings'); // 9️⃣ Obtenir les réservations de l'utilisateur
     });
 });
 

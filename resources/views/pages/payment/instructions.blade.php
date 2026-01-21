@@ -204,13 +204,25 @@
       </div>
 
       {{-- Action Buttons --}}
-      <div class="flex flex-col sm:flex-row gap-4 mt-6">
-        <a href="{{ route('home') }}" class="flex-1 bg-gray-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors text-center">
-          Retour à l'accueil
+      <div class="flex flex-col gap-4 mt-6">
+        {{-- Bouton CinetPay (Principal) --}}
+        <a href="{{ route('payment.checkout', $booking) }}" class="w-full bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-4 px-6 rounded-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Payer en ligne avec CinetPay</span>
+          <span class="px-2 py-1 bg-white/20 rounded-full text-xs">Recommandé</span>
         </a>
-        <a href="mailto:payments@carrepremium.ci?subject=Preuve de paiement - {{ $booking->booking_number }}" class="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors text-center">
-          Envoyer la preuve de paiement
-        </a>
+
+        {{-- Boutons secondaires --}}
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="{{ route('home') }}" class="flex-1 bg-gray-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors text-center">
+            Retour à l'accueil
+          </a>
+          <a href="mailto:payments@carrepremium.ci?subject=Preuve de paiement - {{ $booking->booking_number }}" class="flex-1 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors text-center">
+            Envoyer la preuve de paiement
+          </a>
+        </div>
       </div>
     </div>
   </div>
