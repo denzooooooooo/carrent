@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrencyController;
-use App\Http\Controllers\FlightSearchController;
+use App\Http\Controllers\FlightController;
 use App\Http\Controllers\FlightBookingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChatbotController;
@@ -207,47 +207,45 @@ Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.qu
 // --- Événements ---
 Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events');
 
+// ==================== DUFFEL FLIGHT BOOKING SYSTEM - PRODUCTION ====================
+// Système complet de réservation de vols avec Duffel API
+// Flux: Search → Results → Details → Passengers → Review → Payment → Confirmation
+
 Route::prefix('flights')->name('flights.')->group(function () {
-    // Page de recherche
-    Route::get('/', [FlightSearchController::class, 'index'])->name('index');
+    // 1. Page d'accueil / Recherche
+    Route::get('/', [FlightController::class, 'index'])->name('index');
 
-    // Recherche de vols (POST - utilise la méthode search() complète)
-    Route::post('/search', [FlightSearchController::class, 'search'])->name('search');
+    // 2. Recherche de vols (POST) - Crée un offer_request Duffel
+    Route::post('/search', [FlightController::class, 'search'])->name('search');
 
-    Route::get('/details/one-way', [FlightBookingController::class, 'detailsOneWay'])
-        ->name('details-one-way');
+    // 3. Affichage des résultats - Liste toutes les offres Duffel
+    Route::get('/results', [FlightController::class, 'results'])->name('results');
 
-    Route::get('/details/round-trip', [FlightBookingController::class, 'detailsRoundTrip'])
-        ->name('details-round-trip');
+    // 4. Détails d'une offre spécifique
+    Route::get('/details/{offer_id}', [FlightController::class, 'details'])->name('details');
 
-    // Autocomplétion des aéroports
-    Route::get('/search-locations', [FlightSearchController::class, 'searchLocations'])->name('search-locations');
+    // 5. Formulaire passagers complet (champs Duffel requis)
+    Route::get('/passengers/{offer_id}', [FlightController::class, 'passengers'])->name('passengers');
 
-    // ⭐ Vols retour (GET)
-    Route::get('/return-flights', [FlightSearchController::class, 'returnFlights'])->name('return');
+    // 6. Page de révision avant paiement
+    Route::post('/review', [FlightController::class, 'review'])->name('review');
 
-    // Détails d'un vol
-    Route::get('/details', [FlightBookingController::class, 'details'])->name('details');
+    // 7. Traitement du paiement - Crée booking et redirige vers CinetPay
+    Route::post('/process-payment', [FlightController::class, 'processPayment'])->name('process-payment');
 
-        // Multi-ville : segment suivant
-    Route::get('/multi-city/next-segment', [FlightSearchController::class, 'nextSegment'])
-        ->name('multi-city.next-segment');
-    
-    // Multi-ville : détails finaux
-    Route::get('/details/multi-city', [FlightBookingController::class, 'detailsMultiCity'])
-        ->name('details-multi-city');
-        
-    // Redirection vers booking externe
-    Route::post('/booking/redirect', [FlightBookingController::class, 'redirect'])->name('booking.redirect');
+    // 8. Confirmation de réservation - Affiche booking_reference Duffel
+    Route::get('/confirmation/{booking}', [FlightController::class, 'confirmation'])->name('confirmation');
 
+    // API - Recherche d'aéroports (autocomplete Duffel)
+    Route::get('/airports/search', [FlightController::class, 'searchAirports'])->name('airports.search');
+    Route::get('/search-locations', [FlightController::class, 'searchAirports'])->name('search-locations');
 
-    Route::post('/booking/store', [FlightBookingController::class, 'store'])->name('booking.store');
-    Route::get('/booking/{id}/confirmation', [FlightBookingController::class, 'confirmation'])->name('booking.confirmation');
-
-    Route::get('/booking/success/{booking}', [FlightBookingController::class, 'bookingSuccess'])->name('booking.success');
-
-    Route::get('/details/round-trip', [FlightBookingController::class, 'detailsRoundTrip'])->name('details-round-trip');
+    // Test de connexion Duffel
+    Route::get('/test', [FlightController::class, 'testDuffel'])->name('test');
 });
+
+// Routes alias pour compatibilité
+Route::get('/flight/booking/confirmation/{booking}', [FlightController::class, 'confirmation'])->name('flight.booking.confirmation');
 
 
 
@@ -255,12 +253,25 @@ Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'sho
 Route::post('/events/{event}/book', [\App\Http\Controllers\EventController::class, 'book'])->name('event.book');
 Route::get('/events/booking/confirmation/{booking}', [\App\Http\Controllers\EventController::class, 'bookingConfirmation'])->name('event.booking.confirmation');
 
+// --- Verification Routes ---
+Route::middleware('auth')->group(function () {
+    Route::get('/verify-account', [App\Http\Controllers\VerificationController::class, 'show'])->name('verify.show');
+    Route::post('/verify-code', [App\Http\Controllers\VerificationController::class, 'verify'])->name('verify.code');
+    Route::post('/resend-verification', [App\Http\Controllers\VerificationController::class, 'resend'])->name('verify.resend');
+    Route::post('/change-verification-method', [App\Http\Controllers\VerificationController::class, 'changeMethod'])->name('verify.change-method');
+    Route::post('/send-email-verification', [App\Http\Controllers\VerificationController::class, 'sendEmailVerification'])->name('verify.send-email');
+    Route::post('/send-sms-verification', [App\Http\Controllers\VerificationController::class, 'sendSMSVerification'])->name('verify.send-sms');
+});
+
 // --- Payment Routes ---
+Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/instructions/{booking}', [App\Http\Controllers\PaymentController::class, 'instructions'])->name('payment.instructions');
 Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
-Route::post('/payment/process/{booking}', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
-Route::get('/payment/success/{booking}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
-Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('payment.webhook');
+
+// CinetPay Routes
+Route::post('/payment/cinetpay/process/{booking}', [App\Http\Controllers\PaymentController::class, 'processCinetPay'])->name('payment.cinetpay.process');
+Route::get('/payment/cinetpay/return/{booking}', [App\Http\Controllers\PaymentController::class, 'cinetpayReturn'])->name('payment.cinetpay.return');
+Route::post('/payment/cinetpay/notify', [App\Http\Controllers\PaymentController::class, 'cinetpayNotify'])->name('payment.cinetpay.notify');
 
 // --- Packages ---
 Route::get('/packages', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages');
@@ -300,3 +311,9 @@ Route::get('/theme/current', [\App\Http\Controllers\ThemeController::class, 'cur
 // --- Language Routes ---
 Route::post('/language/change', [App\Http\Controllers\LanguageController::class, 'change'])->name('language.change');
 Route::get('/language/current', [App\Http\Controllers\LanguageController::class, 'current'])->name('language.current');
+
+// --- Webhook Routes (Duffel) ---
+Route::post('/webhooks/duffel', [App\Http\Controllers\WebhookController::class, 'handleDuffelWebhook'])->name('webhooks.duffel');
+
+// --- Dev/Test only ---
+Route::get('/webhooks/test', [App\Http\Controllers\WebhookController::class, 'testWebhook'])->name('webhooks.test')->middleware('debug');

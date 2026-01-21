@@ -1,455 +1,290 @@
 @extends('layouts.app')
 
-@section('title', 'Résultats de recherche - Carré Premium')
+@section('title', __('Résultats de recherche') . ' - Vols')
 
 @section('content')
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-br from-purple-600 to-purple-700 text-white py-8">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl lg:text-4xl font-black mb-2">Résultats de recherche</h1>
-            <p class="text-lg opacity-90">Découvrez les meilleurs vols pour votre voyage</p>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        {{ $search['departure_id'] }} → {{ $search['arrival_id'] }}
+                    </h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {{ \Carbon\Carbon::parse($search['outbound_date'])->format('d M Y') }}
+                        @if($search['return_date'])
+                            - {{ \Carbon\Carbon::parse($search['return_date'])->format('d M Y') }}
+                        @endif
+                        • {{ $search['adults'] }} {{ $search['adults'] > 1 ? 'adultes' : 'adulte' }}
+                        @if($search['children'] > 0)
+                            , {{ $search['children'] }} {{ $search['children'] > 1 ? 'enfants' : 'enfant' }}
+                        @endif
+                    </p>
+                </div>
+                <a href="{{ route('flights.index') }}" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Nouvelle recherche
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="min-h-screen bg-gradient-to-br from-purple-50 to-amber-50">
-        <div class="container mx-auto px-4 py-6">
-
-            {{-- FORMULAIRE DE RECHERCHE --}}
-            <div class="bg-white rounded-2xl shadow-xl p-4 mb-6 border-2 border-purple-100 sticky top-0 z-40">
-                @if(isset($searchParams['type']) && $searchParams['type'] == 3)
-                    {{-- FORMULAIRE MULTI-VILLES --}}
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-orange-700">🛫 Recherche Multi-villes</h3>
-                            <a href="{{ route('flights.index') }}"
-                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-bold hover:bg-gray-300 transition-all text-sm">
-                                ↺ Nouvelle recherche
-                            </a>
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Filtres (Sidebar) -->
+            <div class="lg:w-64 flex-shrink-0">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sticky top-4">
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Filtres</h3>
+                    
+                    <!-- Prix -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Prix maximum</label>
+                        <input type="range" id="priceFilter" min="0" max="1000000" step="10000" value="1000000" 
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                        <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            <span>0 XOF</span>
+                            <span id="priceValue">1 000 000 XOF</span>
                         </div>
+                    </div>
 
-                        @if(!empty($searchParams['multi_city_json']))
-                            @php
-                                $multiCityFlights = json_decode($searchParams['multi_city_json'], true);
-                            @endphp
+                    <!-- Escales -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Escales</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="stops-filter rounded text-blue-600" value="0" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Direct</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="stops-filter rounded text-blue-600" value="1" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">1 escale</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="stops-filter rounded text-blue-600" value="2" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">2+ escales</span>
+                            </label>
+                        </div>
+                    </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                @foreach($multiCityFlights as $index => $cityFlight)
-                                    <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-xl border-2 border-orange-200">
-                                        <div class="text-xs font-bold text-orange-800 mb-2">Segment {{ $index + 1 }}</div>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-center">
-                                                <div class="text-lg font-black text-orange-900">{{ $cityFlight['departure_id'] }}</div>
-                                                <div class="text-xs text-gray-600">
-                                                    {{ \Carbon\Carbon::parse($cityFlight['date'])->format('d/m') }}
-                                                </div>
-                                            </div>
-                                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <!-- Tri -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trier par</label>
+                        <select id="sortBy" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="price">Prix (croissant)</option>
+                            <option value="duration">Durée (croissant)</option>
+                            <option value="departure">Heure de départ</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des vols -->
+            <div class="flex-1">
+                <div class="mb-4 flex items-center justify-between">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <span id="resultsCount">{{ count($flights) }}</span> vols trouvés
+                    </p>
+                </div>
+
+                <div id="flightsList" class="space-y-4">
+                    @forelse($flights as $flight)
+                    <div class="flight-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+                         data-price="{{ $flight['price'] * $exchange_rate }}"
+                         data-stops="{{ $flight['stops'] }}"
+                         data-duration="{{ $flight['duration'] }}"
+                         data-departure="{{ $flight['departure']['time'] }}">
+                        
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <!-- Compagnie -->
+                                <div class="flex items-center gap-3">
+                                    @if($flight['airline_logo'])
+                                    <img src="{{ $flight['airline_logo'] }}" alt="{{ $flight['airline_name'] }}" class="w-10 h-10 object-contain">
+                                    @else
+                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                                        <span class="text-xs font-bold text-gray-600 dark:text-gray-400">{{ $flight['airline_code'] }}</span>
+                                    </div>
+                                    @endif
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $flight['airline_name'] }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $flight['flight_number'] }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Prix -->
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {{ number_format($flight['price'] * $exchange_rate, 0, ',', ' ') }} <span class="text-sm">XOF</span>
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ number_format($flight['price'], 2) }} EUR
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Itinéraire -->
+                            <div class="flex items-center justify-between mb-4">
+                                <!-- Départ -->
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $flight['departure']['formatted_time'] }}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $flight['departure']['airport'] }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">{{ $flight['departure']['formatted_date'] }}</p>
+                                </div>
+
+                                <!-- Durée et escales -->
+                                <div class="flex-1 px-4">
+                                    <div class="relative">
+                                        <div class="h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-2">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                             </svg>
-                                            <div class="text-center">
-                                                <div class="text-lg font-black text-orange-900">{{ $cityFlight['arrival_id'] }}</div>
-                                                <div class="text-xs text-gray-600">Départ</div>
-                                            </div>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-
-                            <div class="flex gap-3 pt-3">
-                                <div class="flex-1 grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="text-xs font-bold text-gray-700 mb-1 block">Adultes</label>
-                                        <div class="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold bg-gray-50">
-                                            {{ $searchParams['adults'] ?? 1 }}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs font-bold text-gray-700 mb-1 block">Classe</label>
-                                        <div class="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold bg-gray-50 truncate">
-                                            {{ $searchParams['travel_class'] ?? 'ECONOMY' }}
-                                        </div>
+                                    <div class="text-center mt-2">
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ $flight['duration_formatted'] }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-500">
+                                            @if($flight['stops'] == 0)
+                                                Direct
+                                            @elseif($flight['stops'] == 1)
+                                                1 escale
+                                            @else
+                                                {{ $flight['stops'] }} escales
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                        @endif
-                    </div>
 
-                @else
-                    {{-- FORMULAIRE ALLER SIMPLE / ALLER-RETOUR --}}
-                    <form method="POST" action="{{ route('flights.search') }}" class="flex flex-wrap items-end gap-3">
-                        @csrf
-                        <input type="hidden" name="type" value="{{ $searchParams['type'] ?? 1 }}">
-
-                        {{-- Départ --}}
-                        <div class="flex-1 min-w-[150px]">
-                            <label class="text-xs font-bold text-gray-700 mb-1 block">Départ</label>
-                            <input type="text" name="departure_display" value="{{ $searchParams['departure_id'] ?? '' }}"
-                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold"
-                                placeholder="ABJ" readonly>
-                            <input type="hidden" name="departure_id" value="{{ $searchParams['departure_id'] ?? '' }}">
-                        </div>
-
-                        {{-- Arrivée --}}
-                        <div class="flex-1 min-w-[150px]">
-                            <label class="text-xs font-bold text-gray-700 mb-1 block">Arrivée</label>
-                            <input type="text" name="arrival_display" value="{{ $searchParams['arrival_id'] ?? '' }}"
-                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold"
-                                placeholder="CDG" readonly>
-                            <input type="hidden" name="arrival_id" value="{{ $searchParams['arrival_id'] ?? '' }}">
-                        </div>
-
-                        {{-- Date départ --}}
-                        <div class="flex-1 min-w-[130px]">
-                            <label class="text-xs font-bold text-gray-700 mb-1 block">Départ</label>
-                            <input type="date" name="outbound_date" value="{{ $searchParams['outbound_date'] ?? '' }}"
-                                min="{{ date('Y-m-d') }}"
-                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold">
-                        </div>
-
-                        {{-- Date retour --}}
-                        @if(!empty($searchParams['return_date']))
-                            <div class="flex-1 min-w-[130px]">
-                                <label class="text-xs font-bold text-gray-700 mb-1 block">Retour</label>
-                                <input type="date" name="return_date" value="{{ $searchParams['return_date'] ?? '' }}"
-                                    min="{{ $searchParams['outbound_date'] ?? date('Y-m-d') }}"
-                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold">
-                            </div>
-                        @endif
-
-                        {{-- Passagers --}}
-                        <div class="flex-1 min-w-[100px]">
-                            <label class="text-xs font-bold text-gray-700 mb-1 block">Adultes</label>
-                            <select name="adults" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold">
-                                @for($i = 1; $i <= 9; $i++)
-                                    <option value="{{ $i }}" {{ ($searchParams['adults'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}</option>
-                                @endfor
-                            </select>
-                        </div>
-
-                        {{-- Classe --}}
-                        <div class="flex-1 min-w-[130px]">
-                            <label class="text-xs font-bold text-gray-700 mb-1 block">Classe</label>
-                            <select name="travel_class" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold">
-                                <option value="ECONOMY" {{ ($searchParams['travel_class'] ?? 'ECONOMY') == 'ECONOMY' ? 'selected' : '' }}>Économique</option>
-                                <option value="PREMIUM_ECONOMY" {{ ($searchParams['travel_class'] ?? '') == 'PREMIUM_ECONOMY' ? 'selected' : '' }}>Premium</option>
-                                <option value="BUSINESS" {{ ($searchParams['travel_class'] ?? '') == 'BUSINESS' ? 'selected' : '' }}>Affaires</option>
-                                <option value="FIRST" {{ ($searchParams['travel_class'] ?? '') == 'FIRST' ? 'selected' : '' }}>Première</option>
-                            </select>
-                        </div>
-
-                        {{-- Boutons --}}
-                        <div class="flex gap-2">
-                            <button type="submit"
-                                class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg text-sm">
-                                🔍 Modifier
-                            </button>
-                            <a href="{{ route('flights.index') }}"
-                                class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-300 transition-all text-sm">
-                                ↺ Nouveau
-                            </a>
-                        </div>
-                    </form>
-                @endif
-            </div>
-
-            {{-- AFFICHAGE BILLETS SÉPARÉS --}}
-            @if(isset($separateTickets) && isset($searchParams['type']) && $searchParams['type'] == 3)
-                <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl shadow-2xl p-6 mb-6 border-2 border-orange-300">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg">
-                                <span class="text-2xl">💰</span>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-black text-orange-900">Option Économique</h3>
-                                <p class="text-sm text-orange-700 font-semibold">Billets séparés - Non protégés</p>
-                            </div>
-                        </div>
-
-                        @if(isset($savings))
-                            <div class="text-right">
-                                <div class="text-sm font-bold text-orange-700 mb-1">ÉCONOMIE</div>
-                                <div class="text-3xl font-black text-green-600">
-                                    -{{ number_format($savings['amount']) }} {{ $savings['currency'] }}
-                                </div>
-                                <div class="text-sm font-bold text-green-600">
-                                    ({{ $savings['percentage'] }}%)
+                                <!-- Arrivée -->
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $flight['arrival']['formatted_time'] }}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $flight['arrival']['airport'] }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">{{ $flight['arrival']['formatted_date'] }}</p>
                                 </div>
                             </div>
-                        @endif
-                    </div>
 
-                    {{-- Prix Total --}}
-                    <div class="bg-white rounded-xl p-4 mb-4 border-2 border-orange-200">
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-gray-700">Prix Total</span>
-                            <div class="text-right">
-                                <div class="text-4xl font-black text-orange-600">
-                                    {{ $separateTickets['formatted_total_price'] }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Segments --}}
-                    <div class="space-y-3 mb-4">
-                        @foreach($separateTickets['legs'] as $leg)
-                            <div class="bg-white rounded-xl p-4 border-2 border-orange-200">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center gap-3">
-                                        <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm">
-                                            {{ $leg['leg_number'] }}
-                                        </span>
-                                        <div>
-                                            <div class="font-bold text-gray-900">
-                                                {{ $leg['departure'] }} → {{ $leg['arrival'] }}
-                                            </div>
-                                            <div class="text-xs text-gray-600">
-                                                {{ \Carbon\Carbon::parse($leg['date'])->format('D d M Y') }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-black text-orange-600">
-                                            {{ $leg['formatted_price'] }}
-                                        </div>
-                                        <div class="text-xs text-gray-600">{{ $leg['airline'] }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    {{-- Avertissements --}}
-                    <div class="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <div>
-                                <h4 class="font-black text-red-900 mb-2 text-lg">⚠️ RISQUES IMPORTANTS</h4>
-                                <ul class="space-y-2 text-sm text-red-800">
-                                    @foreach($separateTickets['warnings'] as $warning)
-                                        <li class="flex items-start gap-2">
-                                            <span class="text-red-600 font-bold">•</span>
-                                            <span class="font-semibold">{{ $warning }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Recommandation --}}
-                    @if(isset($recommendation))
-                        <div class="bg-gradient-to-r from-purple-100 to-blue-100 border-2 border-purple-300 rounded-xl p-4">
-                            <div class="flex items-start gap-3">
-                                <span class="text-3xl">💡</span>
-                                <div>
-                                    <h4 class="font-black text-purple-900 mb-2">Notre Recommandation</h4>
-                                    <p class="text-sm text-purple-800 font-semibold">{{ $recommendation }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-            <div class="flex flex-col lg:flex-row gap-6">
-                {{-- Sidebar Filtres --}}
-                <div class="lg:w-1/4">
-                    <div class="bg-white rounded-2xl shadow-2xl p-6 sticky top-24 border border-purple-100">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-black text-gray-900">🎯 Filtres</h3>
-                            <button id="resetFilters"
-                                class="text-sm bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 py-1 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-bold shadow-lg">
-                                Réinitialiser
-                            </button>
-                        </div>
-
-                        {{-- Compteur --}}
-                        <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl border border-purple-200">
-                            <span class="text-sm font-black text-purple-700" id="resultsCount">
-                                {{ count($results['best_flights'] ?? []) + count($results['other_flights'] ?? []) }} vols trouvés
-                            </span>
-                        </div>
-
-                        {{-- Filtre Escales --}}
-                        <div class="mb-6">
-                            <h4 class="font-bold text-gray-900 mb-3">✈️ Escales</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-                                    <input type="checkbox" value="0" class="filter-stops w-4 h-4 text-purple-600 rounded">
-                                    <span class="text-gray-700 font-medium text-sm">Vol direct</span>
-                                </label>
-                                <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-                                    <input type="checkbox" value="1" class="filter-stops w-4 h-4 text-purple-600 rounded">
-                                    <span class="text-gray-700 font-medium text-sm">1 escale</span>
-                                </label>
-                                <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-                                    <input type="checkbox" value="2+" class="filter-stops w-4 h-4 text-purple-600 rounded">
-                                    <span class="text-gray-700 font-medium text-sm">2+ escales</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- Filtre Compagnies --}}
-                        <div class="mb-6">
-                            <h4 class="font-bold text-gray-900 mb-3">🛫 Compagnies</h4>
-                            <div class="space-y-2 max-h-48 overflow-y-auto" id="airlinesList">
-                                @php
-                                    $airlines = collect();
-                                    if (!empty($results['best_flights'])) {
-                                        foreach ($results['best_flights'] as $flight) {
-                                            $airlines->push($flight['airline']);
-                                        }
-                                    }
-                                    if (!empty($results['other_flights'])) {
-                                        foreach ($results['other_flights'] as $flight) {
-                                            $airlines->push($flight['airline']);
-                                        }
-                                    }
-                                    $uniqueAirlines = $airlines->unique()->filter()->sort()->values();
-                                @endphp
-
-                                @foreach($uniqueAirlines as $airline)
-                                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-                                        <input type="checkbox" value="{{ Str::slug($airline) }}"
-                                            class="filter-airline w-4 h-4 text-purple-600 rounded">
-                                        <span class="text-gray-700 font-medium text-sm">{{ $airline }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        {{-- Filtre Prix --}}
-                        <div class="mb-6">
-                            <h4 class="font-bold text-gray-900 mb-3">💰 Prix maximum</h4>
-                            <div class="p-4 bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl border border-purple-200">
-                                @php
-                                    $allPrices = collect($results['best_flights'] ?? [])->pluck('price')
-                                        ->merge(collect($results['other_flights'] ?? [])->pluck('price'))
-                                        ->filter(fn($p) => is_numeric($p))
-                                        ->map(fn($p) => (float) $p);
-
-                                    $minPrice = $allPrices->min() ?? 0;
-                                    $maxPrice = $allPrices->max() ?? 1000000;
-                                @endphp
-
-                                <div class="flex justify-between text-sm font-bold text-purple-700 mb-2">
-                                    <span>{{ number_format($minPrice) }} XOF</span>
-                                    <span id="priceValue">{{ number_format($maxPrice) }} XOF</span>
-                                </div>
-                                <input type="range" id="priceSlider" min="{{ $minPrice }}" max="{{ $maxPrice }}"
-                                    value="{{ $maxPrice }}" step="1000"
-                                    class="w-full h-3 bg-gradient-to-r from-purple-200 to-amber-200 rounded-lg appearance-none cursor-pointer">
-                            </div>
-                        </div>
-
-                        {{-- Filtre Durée --}}
-                        <div class="mb-6">
-                            <h4 class="font-bold text-gray-900 mb-3">⏱️ Durée maximum</h4>
-                            <div class="p-4 bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl border border-purple-200">
-                                @php
-                                    $durations = collect($results['best_flights'] ?? [])->pluck('total_duration_minutes')
-                                        ->merge(collect($results['other_flights'] ?? [])->pluck('total_duration_minutes'))
-                                        ->filter(fn($d) => is_numeric($d))
-                                        ->map(fn($d) => (int) $d);
-
-                                    $minDuration = $durations->min() ?? 0;
-                                    $maxDuration = $durations->max() ?? 1440;
-                                @endphp
-
-                                <div class="flex justify-between text-sm font-bold text-purple-700 mb-2">
-                                    <span>{{ floor($minDuration / 60) }}h {{ $minDuration % 60 }}min</span>
-                                    <span id="durationValue">{{ floor($maxDuration / 60) }}h {{ $maxDuration % 60 }}min</span>
-                                </div>
-                                <input type="range" id="durationSlider" min="{{ $minDuration }}" max="{{ $maxDuration }}"
-                                    value="{{ $maxDuration }}" step="30"
-                                    class="w-full h-3 bg-gradient-to-r from-purple-200 to-amber-200 rounded-lg appearance-none cursor-pointer">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Contenu principal --}}
-                <div class="lg:w-3/4">
-                    {{-- Tri --}}
-                    <div class="bg-white rounded-2xl shadow-2xl p-4 mb-6 border-2 border-purple-100">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="flex items-center space-x-4">
-                                <span class="text-base font-bold text-purple-700">Trier par:</span>
-                                <select id="sortSelect"
-                                    class="border-2 border-purple-200 rounded-xl px-4 py-2 bg-gradient-to-r from-purple-50 to-amber-50 text-gray-900 focus:ring-2 focus:ring-purple-500 font-semibold text-sm shadow-lg">
-                                    <option value="best">Meilleur choix</option>
-                                    <option value="price_asc">Prix croissant</option>
-                                    <option value="price_desc">Prix décroissant</option>
-                                    <option value="duration_asc">Durée croissante</option>
-                                    <option value="duration_desc">Durée décroissante</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm font-bold text-purple-700" id="visibleResultsCount">
-                                    {{ count($results['best_flights'] ?? []) + count($results['other_flights'] ?? []) }} résultats
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Résultats --}}
-                    <div id="searchResults">
-                        @if(!empty($results['best_flights']))
-                            <div class="mb-8">
-                                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                                    <span class="text-3xl">✅</span>
-                                    Billets Uniques Protégés 
-                                    <span class="text-sm font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700">
-                                        RECOMMANDÉ
+                            <!-- Détails et actions -->
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                        {{ $flight['cabin_class'] }}
                                     </span>
-                                </h2>
-                                <div class="space-y-4" id="bestFlights">
-                                    @foreach($results['best_flights'] as $flight)
-                                        <x-flight-card :flight="$flight" :searchParams="$searchParams" :isBest="true" />
-                                    @endforeach
+                                    @if(isset($flight['baggage']['checked']) && count($flight['baggage']['checked']) > 0)
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                        Bagage inclus
+                                    </span>
+                                    @endif
+                                </div>
+
+                                <div class="flex gap-2">
+                                    <a href="{{ route('flights.details', $flight['duffel_offer_id']) }}" 
+                                       class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                                        Détails
+                                    </a>
+                                    <a href="{{ route('flights.passengers', $flight['duffel_offer_id']) }}" 
+                                       class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                        Sélectionner
+                                    </a>
                                 </div>
                             </div>
-                        @endif
-
-                        @if(!empty($results['other_flights']))
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                                    <span class="text-3xl">✈️</span>
-                                    Autres vols protégés ({{ count($results['other_flights']) }})
-                                </h2>
-                                <div class="space-y-4" id="otherFlights">
-                                    @foreach($results['other_flights'] as $flight)
-                                        <x-flight-card :flight="$flight" :searchParams="$searchParams" :isBest="false" />
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
-                        @if(empty($results['best_flights']) && empty($results['other_flights']))
-                            <div class="text-center py-20 bg-gradient-to-br from-purple-50 to-amber-50 rounded-3xl border-2 border-purple-200 shadow-2xl">
-                                <div class="text-6xl mb-4">✈️</div>
-                                <h3 class="text-2xl font-black text-gray-800 mb-4">Aucun vol trouvé</h3>
-                                <p class="text-gray-600 text-lg mb-8">
-                                    Aucun vol ne correspond à vos critères de recherche.
-                                </p>
-                                <a href="{{ route('flights.index') }}"
-                                    class="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-10 py-5 rounded-2xl font-bold shadow-2xl hover:from-purple-700 hover:to-purple-800 transition-all">
-                                    🔍 Nouvelle recherche
-                                </a>
-                            </div>
-                        @endif
+                        </div>
                     </div>
+                    @empty
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucun vol trouvé</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Essayez de modifier vos critères de recherche</p>
+                        <a href="{{ route('flights.index') }}" class="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                            Nouvelle recherche
+                        </a>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    @push('scripts')
-        <script src="{{ asset('js/flight-filters.js') }}"></script>
-    @endpush
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const flightCards = document.querySelectorAll('.flight-card');
+    const priceFilter = document.getElementById('priceFilter');
+    const priceValue = document.getElementById('priceValue');
+    const stopsFilters = document.querySelectorAll('.stops-filter');
+    const sortBy = document.getElementById('sortBy');
+    const resultsCount = document.getElementById('resultsCount');
 
+    // Filtrage par prix
+    priceFilter.addEventListener('input', function() {
+        const maxPrice = parseInt(this.value);
+        priceValue.textContent = maxPrice.toLocaleString('fr-FR') + ' XOF';
+        filterFlights();
+    });
+
+    // Filtrage par escales
+    stopsFilters.forEach(filter => {
+        filter.addEventListener('change', filterFlights);
+    });
+
+    // Tri
+    sortBy.addEventListener('change', sortFlights);
+
+    function filterFlights() {
+        const maxPrice = parseInt(priceFilter.value);
+        const selectedStops = Array.from(stopsFilters)
+            .filter(f => f.checked)
+            .map(f => parseInt(f.value));
+
+        let visibleCount = 0;
+
+        flightCards.forEach(card => {
+            const price = parseInt(card.dataset.price);
+            const stops = parseInt(card.dataset.stops);
+
+            const matchesPrice = price <= maxPrice;
+            const matchesStops = selectedStops.includes(stops) || (stops >= 2 && selectedStops.includes(2));
+
+            if (matchesPrice && matchesStops) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        resultsCount.textContent = visibleCount;
+    }
+
+    function sortFlights() {
+        const sortValue = sortBy.value;
+        const container = document.getElementById('flightsList');
+        const cards = Array.from(flightCards);
+
+        cards.sort((a, b) => {
+            if (sortValue === 'price') {
+                return parseInt(a.dataset.price) - parseInt(b.dataset.price);
+            } else if (sortValue === 'duration') {
+                return parseInt(a.dataset.duration) - parseInt(b.dataset.duration);
+            } else if (sortValue === 'departure') {
+                return a.dataset.departure.localeCompare(b.dataset.departure);
+            }
+            return 0;
+        });
+
+        cards.forEach(card => container.appendChild(card));
+    }
+});
+</script>
 @endsection

@@ -62,7 +62,8 @@ class EventController extends Controller
         $request->validate([
             'zone_id' => 'required|exists:event_seat_zones,id',
             'quantity' => 'required|integer|min:1',
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
         ]);
@@ -78,7 +79,7 @@ class EventController extends Controller
         $eventBooking = \App\Models\EventBooking::create([
             'event_id' => $event->id,
             'zone_id' => $zone->id,
-            'user_name' => $request->name,
+            'user_name' => $request->first_name . ' ' . $request->last_name,
             'user_email' => $request->email,
             'user_phone' => $request->phone,
             'quantity' => $request->quantity,
@@ -99,9 +100,12 @@ class EventController extends Controller
             'booking_date' => now(),
             'travel_date' => $event->event_date,
             'number_of_passengers' => $request->quantity,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'passenger_details' => [
                 [
-                    'name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
                     'email' => $request->email,
                     'phone' => $request->phone,
                     'type' => 'adult'
@@ -129,8 +133,8 @@ class EventController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
 
-        return redirect()->route('payment.instructions', $booking)
-            ->with('success', 'Votre réservation a été créée. Veuillez suivre les instructions de paiement pour la confirmer.');
+        return redirect()->route('payment.checkout', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez procéder au paiement pour la confirmer.');
     }
 
     /**

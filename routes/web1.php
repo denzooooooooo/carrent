@@ -208,10 +208,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // --- Routes pour les vols ---
-Route::get('/flights', [FlightController::class, 'flights'])->name('flights');
+Route::get('/flights', [FlightController::class, 'index'])->name('flights');
 //Route::post('/flights/search', [FlightController::class, 'search'])->name('flights.search');
 Route::match(['GET', 'POST'], '/flights/search', [FlightController::class, 'search'])->name('flights.search');
-//Route::get('/api/locations/search', [FlightController::class, 'searchLocations'])->name('api.locations.search');
+Route::match(['GET', 'POST'], '/flights/select', [FlightController::class, 'select'])->name('flights.select');
 Route::get('/flights/search-locations', [FlightController::class, 'searchLocations'])->name('flights.search-locations');
 //Route::post('/flights/booking', [FlightController::class, 'booking'])->name('flights.booking');
 
@@ -224,6 +224,34 @@ Route::post('/flights/details', [FlightController::class, 'details'])->name('fli
 Route::get('/flights/details', [FlightController::class, 'details'])->name('flights.details');
 
 Route::post('/flights/booking-simple', [FlightController::class, 'booking'])->name('flights.booking');
+
+
+// ==================== DUFFEL API v2 ROUTES ====================
+Route::prefix('flights')->name('flights.')->group(function () {
+    // Advanced Search v2
+    Route::match(['GET', 'POST'], '/search-advanced', [FlightController::class, 'searchAdvanced'])->name('search-advanced');
+    
+    // Offer Details v2
+    Route::get('/{offerId}/details', [FlightController::class, 'getFlightDetails'])->name('details-v2');
+    
+    // Passenger Info v2
+    Route::match(['GET', 'POST'], '/passengers', [FlightController::class, 'passengerInfo'])->name('passengers');
+    
+    // Review Booking v2
+    Route::post('/review', [FlightController::class, 'reviewBooking'])->name('review');
+    
+    // Booking Confirmation
+    Route::get('/confirmation/{id}', [FlightController::class, 'confirmation'])->name('confirmation');
+    
+    // Orders History (auth required)
+    Route::middleware('auth')->group(function () {
+        Route::get('/orders', [FlightController::class, 'orders'])->name('orders');
+        Route::post('/{orderId}/cancel', [FlightController::class, 'cancelBooking'])->name('cancel');
+        Route::post('/{orderId}/modify', [FlightController::class, 'modifyBooking'])->name('modify');
+        Route::post('/confirm-modification', [FlightController::class, 'confirmModification'])->name('confirm-modification');
+    });
+});
+// =============================================================
 
 
 

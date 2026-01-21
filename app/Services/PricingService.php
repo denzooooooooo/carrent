@@ -2,321 +2,448 @@
 
 namespace App\Services;
 
-use App\Models\PricingRule;
-use App\Models\Setting;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Service de calcul des prix et marges
+ * Service de tarification pour calculer les commissions
  * 
- * Gère le calcul automatique des prix finaux en appliquant:
- * - Les marges configurées
- * - Les taxes
- * - Les frais de service
- * - Les promotions
+ * Commission variable selon la classe (v2):
+ * - Economy: 15%
+ * - Business: 12%
+ * - First: 10%
  */
 class PricingService
 {
-    /**
-     * Calculer le prix final pour un vol
-     * 
-     * @param float $basePrice Prix de base Amadeus
-     * @param string $flightType 'domestic' ou 'international'
-     * @param string $travelClass 'ECONOMY', 'BUSINESS', 'FIRST'
-     * @return array
-     */
-    public function calculateFlightPrice(float $basePrice, string $flightType = 'international', string $travelClass = 'ECONOMY')
-    {
-        // Récupérer la règle de pricing applicable
-        $rule = PricingRule::where('product_type', 'flight')
-            ->where('category', $flightType)
-            ->where('is_active', true)
-            ->orderBy('priority', 'desc')
-            ->first();
-
-        // Si pas de règle spécifique, utiliser une règle par défaut
-        if (!$rule) {
-            $rule = PricingRule::where('product_type', 'flight')
-                ->where('category', null)
-                ->where('is_active', true)
-                ->first();
-        }
-
-        // Calculer la marge
-        $marginAmount = 0;
-        $marginPercentage = 0;
-
-        if ($rule) {
-            if ($rule->margin_type === 'percentage') {
-                $marginPercentage = $rule->margin_value;
-                $marginAmount = ($basePrice * $marginPercentage) / 100;
-            } else {
-                $marginAmount = $rule->margin_value;
-                $marginPercentage = ($marginAmount / $basePrice) * 100;
-            }
-        }
-
-        // Ajouter une marge supplémentaire pour business/first class
-        if (in_array($travelClass, ['BUSINESS', 'FIRST'])) {
-            $extraMargin = $travelClass === 'FIRST' ? 5 : 3; // % supplémentaire
-            $extraAmount = ($basePrice * $extraMargin) / 100;
-            $marginAmount += $extraAmount;
-            $marginPercentage += $extraMargin;
-        }
-
-        // Calculer les taxes
-        $taxRate = (float)(Setting::where('setting_key', 'tax_rate')->value('setting_value') ?? 0.18);
-        $taxAmount = (($basePrice + $marginAmount) * $taxRate);
-
-        // Frais de réservation
-        $bookingFee = (float)(Setting::where('setting_key', 'booking_fee')->value('setting_value') ?? 5000);
-
-        // Prix final
-        $finalPrice = $basePrice + $marginAmount + $taxAmount + $bookingFee;
-
-        return [
-            'base_price' => round($basePrice, 2),
-            'margin_amount' => round($marginAmount, 2),
-            'margin_percentage' => round($marginPercentage, 2),
-            'tax_amount' => round($taxAmount, 2),
-            'tax_rate' => $taxRate,
-            'booking_fee' => $bookingFee,
-            'final_price' => round($finalPrice, 2),
-            'breakdown' => [
-                'Prix de base' => round($basePrice, 2),
-                'Marge (' . round($marginPercentage, 2) . '%)' => round($marginAmount, 2),
-                'Taxes (' . ($taxRate * 100) . '%)' => round($taxAmount, 2),
-                'Frais de service' => $bookingFee,
-                'Total' => round($finalPrice, 2)
-            ]
-        ];
-    }
+    // Commission par défaut pour Economy
+    const COMMISSION_RATE = 0.15;
+    
+    // Taux de conversion EUR → XOF (approximatif)
+    const EUR_TO_XOF_RATE = 655.957;
 
     /**
-     * Calculer le prix final pour un événement
-     * 
-     * @param float $basePrice
-     * @param string $eventType 'sport', 'concert', 'theater', etc.
-     * @param string $zoneType 'vip', 'standard', 'economy'
-     * @return array
+     * Taux de commission par classe (v2)
      */
-    public function calculateEventPrice(float $basePrice, string $eventType = 'sport', string $zoneType = 'standard')
-    {
-        // Récupérer la règle de pricing
-        $rule = PricingRule::where('product_type', 'event')
-            ->where('category', $eventType)
-            ->where('is_active', true)
-            ->orderBy('priority', 'desc')
-            ->first();
-
-        if (!$rule) {
-            $rule = PricingRule::where('product_type', 'event')
-                ->where('category', null)
-                ->where('is_active', true)
-                ->first();
-        }
-
-        // Calculer la marge
-        $marginAmount = 0;
-        $marginPercentage = 0;
-
-        if ($rule) {
-            if ($rule->margin_type === 'percentage') {
-                $marginPercentage = $rule->margin_value;
-                $marginAmount = ($basePrice * $marginPercentage) / 100;
-            } else {
-                $marginAmount = $rule->margin_value;
-                $marginPercentage = ($marginAmount / $basePrice) * 100;
-            }
-        }
-
-        // Marge supplémentaire pour VIP
-        if ($zoneType === 'vip') {
-            $extraMargin = 10; // % supplémentaire pour VIP
-            $extraAmount = ($basePrice * $extraMargin) / 100;
-            $marginAmount += $extraAmount;
-            $marginPercentage += $extraMargin;
-        }
-
-        // Taxes
-        $taxRate = (float)(Setting::where('setting_key', 'tax_rate')->value('setting_value') ?? 0.18);
-        $taxAmount = (($basePrice + $marginAmount) * $taxRate);
-
-        // Prix final
-        $finalPrice = $basePrice + $marginAmount + $taxAmount;
-
-        return [
-            'base_price' => round($basePrice, 2),
-            'margin_amount' => round($marginAmount, 2),
-            'margin_percentage' => round($marginPercentage, 2),
-            'tax_amount' => round($taxAmount, 2),
-            'tax_rate' => $taxRate,
-            'final_price' => round($finalPrice, 2),
-            'breakdown' => [
-                'Prix de base' => round($basePrice, 2),
-                'Marge (' . round($marginPercentage, 2) . '%)' => round($marginAmount, 2),
-                'Taxes (' . ($taxRate * 100) . '%)' => round($taxAmount, 2),
-                'Total' => round($finalPrice, 2)
-            ]
-        ];
-    }
+    const COMMISSION_RATES = [
+        'economy' => 0.15,
+        'business' => 0.12,
+        'first' => 0.10,
+    ];
 
     /**
-     * Calculer le prix final pour un package touristique
+     * Calculer le prix avec commission
      * 
-     * @param float $basePrice
-     * @param string $packageType 'helicopter', 'private_jet', 'cruise', etc.
-     * @param int $participants
+     * @param float $basePrice Prix de base (en XOF ou EUR)
+     * @param string $currency Devise du prix de base
+     * @param float|null $commissionRate Taux de commission personnalisé
      * @return array
      */
-    public function calculatePackagePrice(float $basePrice, string $packageType = 'standard', int $participants = 1)
-    {
-        // Récupérer la règle de pricing
-        $rule = PricingRule::where('product_type', 'package')
-            ->where('category', $packageType)
-            ->where('is_active', true)
-            ->orderBy('priority', 'desc')
-            ->first();
-
-        if (!$rule) {
-            $rule = PricingRule::where('product_type', 'package')
-                ->where('category', null)
-                ->where('is_active', true)
-                ->first();
-        }
-
-        // Prix de base total pour tous les participants
-        $totalBasePrice = $basePrice * $participants;
-
-        // Calculer la marge
-        $marginAmount = 0;
-        $marginPercentage = 0;
-
-        if ($rule) {
-            if ($rule->margin_type === 'percentage') {
-                $marginPercentage = $rule->margin_value;
-                $marginAmount = ($totalBasePrice * $marginPercentage) / 100;
-            } else {
-                $marginAmount = $rule->margin_value * $participants;
-                $marginPercentage = ($marginAmount / $totalBasePrice) * 100;
-            }
-        }
-
-        // Réduction pour groupe (si plus de 5 participants)
-        $groupDiscount = 0;
-        if ($participants >= 5) {
-            $discountPercentage = min(15, ($participants - 4) * 2); // Max 15%
-            $groupDiscount = ($totalBasePrice * $discountPercentage) / 100;
-        }
-
-        // Taxes
-        $taxRate = (float)(Setting::where('setting_key', 'tax_rate')->value('setting_value') ?? 0.18);
-        $taxAmount = (($totalBasePrice + $marginAmount - $groupDiscount) * $taxRate);
-
-        // Prix final
-        $finalPrice = $totalBasePrice + $marginAmount - $groupDiscount + $taxAmount;
+    public function calculatePriceWithCommission(
+        float $basePrice, 
+        string $currency = 'XOF',
+        ?float $commissionRate = null
+    ): array {
+        $rate = $commissionRate ?? self::COMMISSION_RATE;
+        
+        // Si le prix est en EUR, convertir en XOF
+        $priceInXof = $this->convertToXof($basePrice, $currency);
+        
+        // Calculer la commission
+        $commission = round($priceInXof * $rate);
+        $totalPrice = $priceInXof + $commission;
 
         return [
-            'base_price' => round($basePrice, 2),
-            'base_price_per_person' => round($basePrice, 2),
-            'total_base_price' => round($totalBasePrice, 2),
-            'participants' => $participants,
-            'margin_amount' => round($marginAmount, 2),
-            'margin_percentage' => round($marginPercentage, 2),
-            'group_discount' => round($groupDiscount, 2),
-            'tax_amount' => round($taxAmount, 2),
-            'tax_rate' => $taxRate,
-            'final_price' => round($finalPrice, 2),
-            'price_per_person' => round($finalPrice / $participants, 2),
-            'breakdown' => [
-                'Prix de base (' . $participants . ' pers.)' => round($totalBasePrice, 2),
-                'Marge (' . round($marginPercentage, 2) . '%)' => round($marginAmount, 2),
-                'Réduction groupe' => -round($groupDiscount, 2),
-                'Taxes (' . ($taxRate * 100) . '%)' => round($taxAmount, 2),
-                'Total' => round($finalPrice, 2)
-            ]
-        ];
-    }
-
-    /**
-     * Appliquer un code promo
-     * 
-     * @param float $price
-     * @param string $promoCode
-     * @return array
-     */
-    public function applyPromoCode(float $price, string $promoCode)
-    {
-        // Cette méthode sera implémentée avec le modèle PromoCode
-        // Pour l'instant, retourner le prix sans modification
-        return [
-            'original_price' => $price,
-            'discount' => 0,
-            'final_price' => $price,
-            'promo_applied' => false
-        ];
-    }
-
-    /**
-     * Calculer les frais d'annulation
-     * 
-     * @param float $totalPrice
-     * @param string $productType
-     * @param int $daysBeforeDeparture
-     * @return array
-     */
-    public function calculateCancellationFees(float $totalPrice, string $productType, int $daysBeforeDeparture)
-    {
-        $feePercentage = 0;
-
-        // Politique d'annulation selon le délai
-        if ($daysBeforeDeparture >= 30) {
-            $feePercentage = 10; // 10% de frais
-        } elseif ($daysBeforeDeparture >= 15) {
-            $feePercentage = 25; // 25% de frais
-        } elseif ($daysBeforeDeparture >= 7) {
-            $feePercentage = 50; // 50% de frais
-        } elseif ($daysBeforeDeparture >= 3) {
-            $feePercentage = 75; // 75% de frais
-        } else {
-            $feePercentage = 100; // Non remboursable
-        }
-
-        $feeAmount = ($totalPrice * $feePercentage) / 100;
-        $refundAmount = $totalPrice - $feeAmount;
-
-        return [
+            'base_price' => $priceInXof,
+            'base_currency' => 'XOF',
+            'original_price' => $basePrice,
+            'original_currency' => $currency,
+            'commission_amount' => $commission,
+            'commission_percentage' => $rate * 100,
             'total_price' => $totalPrice,
-            'fee_percentage' => $feePercentage,
-            'fee_amount' => round($feeAmount, 2),
-            'refund_amount' => round($refundAmount, 2),
-            'days_before_departure' => $daysBeforeDeparture,
-            'is_refundable' => $feePercentage < 100
+            'currency' => 'XOF',
+            'breakdown' => [
+                'billet' => $priceInXof,
+                'commission' => $commission,
+                'total' => $totalPrice,
+            ],
         ];
     }
 
     /**
-     * Convertir un prix dans une autre devise
+     * 💰 Calculer le prix avec commission par classe (v2)
      * 
-     * @param float $amount
-     * @param string $fromCurrency
-     * @param string $toCurrency
+     * @param float $basePrice Prix de base
+     * @param string $currency Devise
+     * @param string $cabinClass Classe (economy, business, first)
+     * @return array
+     */
+    public function calculatePriceWithCommissionV2(
+        float $basePrice,
+        string $currency = 'XOF',
+        string $cabinClass = 'economy'
+    ): array {
+        $commissionRate = self::COMMISSION_RATES[strtolower($cabinClass)] ?? self::COMMISSION_RATE;
+        return $this->calculatePriceWithCommission($basePrice, $currency, $commissionRate);
+    }
+
+    /**
+     * Calculer les montants pour la répartition des paiements
+     * 
+     * @param float $totalPaid Montant total payé
+     * @return array
+     */
+    public function calculatePaymentSplit(float $totalPaid): array
+    {
+        $commission = round($totalPaid * self::COMMISSION_RATE);
+        $netToDuffel = $totalPaid - $commission;
+
+        return [
+            'total_paid' => $totalPaid,
+            'commission_amount' => $commission,
+            'commission_percentage' => self::COMMISSION_RATE * 100,
+            'net_to_duffel' => $netToDuffel,
+            'currency' => 'XOF',
+            'breakdown' => [
+                'carre_premium' => $commission,
+                'duffel' => $netToDuffel,
+                'total' => $totalPaid,
+            ],
+        ];
+    }
+
+    /**
+     * 💰 Répartition des paiements v2 avec commission par classe
+     */
+    public function calculatePaymentSplitV2(float $totalPaid, string $cabinClass = 'economy'): array
+    {
+        $commissionRate = self::COMMISSION_RATES[strtolower($cabinClass)] ?? self::COMMISSION_RATE;
+        $commission = round($totalPaid * $commissionRate);
+        $netToDuffel = $totalPaid - $commission;
+
+        return [
+            'total_paid' => $totalPaid,
+            'commission_amount' => $commission,
+            'commission_rate' => $commissionRate,
+            'commission_percentage' => $commissionRate * 100,
+            'net_to_duffel' => $netToDuffel,
+            'currency' => 'XOF',
+            'cabin_class' => $cabinClass,
+            'breakdown' => [
+                'carre_premium' => $commission,
+                'duffel' => $netToDuffel,
+                'total' => $totalPaid,
+            ],
+        ];
+    }
+
+    /**
+     * Calculer juste la commission
+     * 
+     * @param float $basePrice Prix de base
+     * @param string $currency Devise
      * @return float
      */
-    public function convertCurrency(float $amount, string $fromCurrency, string $toCurrency)
+    public function calculateCommission(float $basePrice, string $currency = 'XOF'): float
     {
-        if ($fromCurrency === $toCurrency) {
-            return $amount;
+        $priceInXof = $this->convertToXof($basePrice, $currency);
+        return round($priceInXof * self::COMMISSION_RATE);
+    }
+
+    /**
+     * 💰 Calculer la commission par classe (v2)
+     */
+    public function calculateCommissionV2(float $basePrice, string $currency = 'XOF', string $cabinClass = 'economy'): float
+    {
+        $commissionRate = self::COMMISSION_RATES[strtolower($cabinClass)] ?? self::COMMISSION_RATE;
+        $priceInXof = $this->convertToXof($basePrice, $currency);
+        return round($priceInXof * $commissionRate);
+    }
+
+    /**
+     * 🧾 Calculer le montant total avec taxes
+     * 
+     * @param float $basePrice Prix de base
+     * @param float $taxAmount Montant des taxes
+     * @param string $currency Devise
+     * @param string $cabinClass Classe
+     * @return array
+     */
+    public function calculateTotalWithTaxes(
+        float $basePrice,
+        float $taxAmount = 0,
+        string $currency = 'XOF',
+        string $cabinClass = 'economy'
+    ): array {
+        $commissionRate = self::COMMISSION_RATES[strtolower($cabinClass)] ?? self::COMMISSION_RATE;
+        
+        $baseInXof = $this->convertToXof($basePrice, $currency);
+        $taxInXof = $this->convertToXof($taxAmount, $currency);
+        
+        $subtotal = $baseInXof + $taxInXof;
+        $commission = round($subtotal * $commissionRate);
+        $totalPrice = $subtotal + $commission;
+
+        return [
+            'base_price' => $baseInXof,
+            'tax_amount' => $taxInXof,
+            'subtotal' => $subtotal,
+            'commission_amount' => $commission,
+            'commission_rate' => $commissionRate,
+            'commission_percentage' => $commissionRate * 100,
+            'total_price' => $totalPrice,
+            'currency' => 'XOF',
+        ];
+    }
+
+    /**
+     * 💸 Calculer le montant de remboursement
+     * 
+     * @param float $originalPrice Prix original
+     * @param array $conditions Conditions de remboursement
+     * @param string $currency Devise
+     * @return array
+     */
+    public function calculateRefundAmount(float $originalPrice, array $conditions, string $currency = 'XOF'): array
+    {
+        $priceInXof = $this->convertToXof($originalPrice, $currency);
+        
+        $refundAllowed = $conditions['refund_before_departure']['allowed'] ?? false;
+        $penaltyAmount = $conditions['refund_before_departure']['penalty_amount'] ?? 0;
+        $penaltyCurrency = $conditions['refund_before_departure']['penalty_currency'] ?? 'XOF';
+        
+        if (!$refundAllowed) {
+            return [
+                'refund_allowed' => false,
+                'refund_amount' => 0,
+                'penalty_amount' => $priceInXof,
+                'penalty_percentage' => 100,
+                'message' => 'Remboursement non autorisé pour ce tarif',
+            ];
         }
 
-        // Récupérer les taux de change depuis la table currencies
-        $fromRate = \App\Models\Currency::where('code', $fromCurrency)->value('exchange_rate') ?? 1;
-        $toRate = \App\Models\Currency::where('code', $toCurrency)->value('exchange_rate') ?? 1;
+        // Convertir la pénalité si nécessaire
+        $penaltyInXof = $this->convertToXof($penaltyAmount, $penaltyCurrency);
+        $refundAmount = max(0, $priceInXof - $penaltyInXof);
+        $penaltyPercentage = ($penaltyInXof / $priceInXof) * 100;
 
-        // Convertir en devise de base (XOF) puis dans la devise cible
-        $amountInBase = $amount / $fromRate;
-        $convertedAmount = $amountInBase * $toRate;
+        return [
+            'refund_allowed' => true,
+            'refund_amount' => $refundAmount,
+            'penalty_amount' => $penaltyInXof,
+            'penalty_percentage' => round($penaltyPercentage, 2),
+            'message' => $penaltyAmount > 0 
+                ? "Remboursement de {$refundAmount} XOF après pénalité de {$penaltyInXof} XOF"
+                : 'Remboursement intégral disponible',
+        ];
+    }
 
-        return round($convertedAmount, 2);
+    /**
+     * 🔄 Calculer les frais de modification
+     * 
+     * @param float $originalPrice Prix original
+     * @param array $conditions Conditions de modification
+     * @param string $currency Devise
+     * @return array
+     */
+    public function calculateChangeFee(float $originalPrice, array $conditions, string $currency = 'XOF'): array
+    {
+        $priceInXof = $this->convertToXof($originalPrice, $currency);
+        
+        $changeAllowed = $conditions['change_before_departure']['allowed'] ?? false;
+        $penaltyAmount = $conditions['change_before_departure']['penalty_amount'] ?? 0;
+        $penaltyCurrency = $conditions['change_before_departure']['penalty_currency'] ?? 'XOF';
+        
+        if (!$changeAllowed) {
+            return [
+                'change_allowed' => false,
+                'change_fee' => 0,
+                'message' => 'Modification non autorisée pour ce tarif',
+            ];
+        }
+
+        // Convertir la pénalité si nécessaire
+        $feeInXof = $this->convertToXof($penaltyAmount, $penaltyCurrency);
+
+        return [
+            'change_allowed' => true,
+            'change_fee' => $feeInXof,
+            'message' => $feeInXof > 0
+                ? "Frais de modification: {$feeInXof} XOF"
+                : 'Modification gratuite',
+        ];
+    }
+
+    /**
+     * Convertir un prix en XOF
+     * 
+     * @param float $amount Montant
+     * @param string $currency Devise source
+     * @return float
+     */
+    public function convertToXof(float $amount, string $currency): float
+    {
+        if (strtoupper($currency) === 'XOF') {
+            return $amount;
+        }
+        
+        if (strtoupper($currency) === 'EUR') {
+            return round($amount * self::EUR_TO_XOF_RATE);
+        }
+
+        // Par défaut, retourner le montant tel quel
+        Log::warning('PricingService: Devise non reconnue, pas de conversion', [
+            'currency' => $currency,
+        ]);
+        return $amount;
+    }
+
+    /**
+     * Formater le prix pour l'affichage
+     * 
+     * @param float $amount Montant
+     * @param string $currency Devise
+     * @return string
+     */
+    public function formatPrice(float $amount, string $currency = 'XOF'): string
+    {
+        $formatted = number_format($amount, 0, ',', ' ');
+        $currencySymbol = strtoupper($currency) === 'XOF' ? 'XOF' : $currency;
+        return $formatted . ' ' . $currencySymbol;
+    }
+
+    /**
+     * Calculer le prix de base à partir du prix total (inverse)
+     * Utile pour vérifier les calculs
+     * 
+     * @param float $totalPrice Prix total avec commission
+     * @return array
+     */
+    public function extractFromTotal(float $totalPrice): array
+    {
+        $basePrice = round($totalPrice / (1 + self::COMMISSION_RATE));
+        $commission = $totalPrice - $basePrice;
+
+        return [
+            'base_price' => $basePrice,
+            'commission' => $commission,
+            'commission_percentage' => self::COMMISSION_RATE * 100,
+            'total_price' => $totalPrice,
+            'currency' => 'XOF',
+        ];
+    }
+
+    /**
+     * Vérifier si le prix affiché correspond au prix de base + commission
+     * 
+     * @param float $basePrice Prix de base annoncé
+     * @param float $displayedPrice Prix affiché
+     * @return bool
+     */
+    public function verifyPricing(float $basePrice, float $displayedPrice): bool
+    {
+        $expectedTotal = $basePrice + $this->calculateCommission($basePrice);
+        return abs($displayedPrice - $expectedTotal) < 1; // Tolérance de 1 XOF
+    }
+
+    /**
+     * Obtenir le taux de commission actuel
+     * 
+     * @return float
+     */
+    public function getCommissionRate(): float
+    {
+        return self::COMMISSION_RATE;
+    }
+
+    /**
+     * 💰 Obtenir le taux de commission par classe (v2)
+     */
+    public function getCommissionRateV2(string $cabinClass = 'economy'): float
+    {
+        return self::COMMISSION_RATES[strtolower($cabinClass)] ?? self::COMMISSION_RATE;
+    }
+
+    /**
+     * Obtenir le taux de change EUR → XOF
+     * 
+     * @return float
+     */
+    public function getExchangeRate(): float
+    {
+        return self::EUR_TO_XOF_RATE;
+    }
+
+    /**
+     * Calculer les prix pour plusieurs passagers
+     * 
+     * @param float $pricePerPassenger Prix par passager
+     * @param int $passengers Nombre de passagers
+     * @param string $currency Devise
+     * @return array
+     */
+    public function calculateForMultiplePassengers(
+        float $pricePerPassenger, 
+        int $passengers,
+        string $currency = 'XOF'
+    ): array {
+        $baseTotal = $pricePerPassenger * $passengers;
+        $pricing = $this->calculatePriceWithCommission($baseTotal, $currency);
+
+        return [
+            'per_passenger' => [
+                'base' => $pricePerPassenger,
+                'with_commission' => round($pricing['total_price'] / $passengers),
+            ],
+            'total' => [
+                'base' => $baseTotal,
+                'with_commission' => $pricing['total_price'],
+            ],
+            'commission' => $pricing['commission_amount'],
+            'passengers' => $passengers,
+            'currency' => $pricing['currency'],
+        ];
+    }
+
+    /**
+     * 💰 Calculer les prix pour plusieurs passagers v2
+     */
+    public function calculateForMultiplePassengersV2(
+        float $pricePerPassenger,
+        int $passengers,
+        string $currency = 'XOF',
+        string $cabinClass = 'economy'
+    ): array {
+        $baseTotal = $pricePerPassenger * $passengers;
+        $pricing = $this->calculatePriceWithCommissionV2($baseTotal, $currency, $cabinClass);
+
+        return [
+            'per_passenger' => [
+                'base' => $pricePerPassenger,
+                'with_commission' => round($pricing['total_price'] / $passengers),
+            ],
+            'total' => [
+                'base' => $baseTotal,
+                'with_commission' => $pricing['total_price'],
+            ],
+            'commission' => $pricing['commission_amount'],
+            'commission_rate' => $pricing['commission_percentage'],
+            'passengers' => $passengers,
+            'currency' => $pricing['currency'],
+            'cabin_class' => $cabinClass,
+        ];
+    }
+
+    /**
+     * 📊 Obtenir tous les taux de commission
+     * 
+     * @return array
+     */
+    public function getAllCommissionRates(): array
+    {
+        return [
+            'economy' => self::COMMISSION_RATES['economy'] * 100,
+            'business' => self::COMMISSION_RATES['business'] * 100,
+            'first' => self::COMMISSION_RATES['first'] * 100,
+        ];
     }
 }
+

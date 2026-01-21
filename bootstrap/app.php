@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'guest:admin' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
+            'verified' => \App\Http\Middleware\EnsureAccountIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

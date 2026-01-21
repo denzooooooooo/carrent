@@ -87,13 +87,53 @@ class AuthController extends Controller
             'preferred_language' => 'fr',
             'preferred_currency' => 'XOF',
             'is_active' => true,
+            'is_verified' => false, // Compte non vérifié par défaut
         ]);
 
+        // Générer le code de vérification AVANT de connecter l'utilisateur
+        try {
+            $verificationCode = \App\Models\VerificationCode::generate($user, 'email', $user->email);
+            
+            // Utiliser PHPMailer pour envoyer l'email
+            try {
+                $phpMailer = new \App\Services\PHPMailerService();
+                $sent = $phpMailer->sendVerificationCode(
+                    $user->email,
+                    $user->first_name . ' ' . $user->last_name,
+                    $verificationCode->code
+                );
+                
+                if ($sent) {
+                    Session::flash('success', 'Inscription réussie ! Un code de vérification a été envoyé à votre email.');
+                } else {
+                    Session::flash('info', 'Inscription réussie ! Le code de vérification est: ' . $verificationCode->code . ' (Email non envoyé - vérifiez la configuration SMTP)');
+                }
+            } catch (\Exception $mailError) {
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email vérification: ' . $mailError->getMessage());
+                Session::flash('info', 'Inscription réussie ! Le code de vérification est: ' . $verificationCode->code . ' (Email non envoyé - vérifiez les logs)');
+            }
+            
+            Session::put('last_verification_sent', now());
+            Session::put('verification_method', 'email');
+            Session::put('pending_verification_user_id', $user->id);
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur génération code vérification: ' . $e->getMessage());
+            Session::flash('warning', 'Inscription réussie ! Erreur lors de la génération du code. Contactez le support.');
+        }
+
+        // Connecter l'utilisateur APRÈS avoir généré le code
         Auth::login($user);
 
-        Session::flash('success', 'Inscription réussie ! Bienvenue sur Carré Premium.');
+        // Log pour déboguer
+        \Illuminate\Support\Facades\Log::info('Inscription terminée, redirection vers verify.show', [
+            'user_id' => $user->id,
+            'is_verified' => $user->is_verified,
+            'route' => route('verify.show')
+        ]);
 
-        return redirect()->route('home');
+        // TOUJOURS rediriger vers la page de vérification
+        return redirect()->route('verify.show');
     }
 
     /**

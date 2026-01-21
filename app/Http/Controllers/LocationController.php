@@ -17,7 +17,8 @@ class LocationController extends Controller
         $request->validate([
             'start_date' => 'required|date|after:today',
             'end_date' => 'required|date|after:start_date',
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'special_requests' => 'nullable|string|max:1000',
@@ -40,9 +41,12 @@ class LocationController extends Controller
             'booking_date' => now(),
             'travel_date' => $request->start_date,
             'number_of_passengers' => 1, // Pour les locations, c'est généralement 1
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'passenger_details' => [
                 [
-                    'name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
                     'email' => $request->email,
                     'phone' => $request->phone,
                     'type' => 'adult'
@@ -60,7 +64,7 @@ class LocationController extends Controller
         $locationBooking = \App\Models\LocationBooking::create([
             'location_id' => $location->id,
             'booking_id' => $booking->id,
-            'user_name' => $request->name,
+            'user_name' => $request->first_name . ' ' . $request->last_name,
             'user_email' => $request->email,
             'user_phone' => $request->phone,
             'start_date' => $request->start_date,
@@ -72,8 +76,8 @@ class LocationController extends Controller
             'special_requests' => $request->special_requests,
         ]);
 
-        return redirect()->route('payment.instructions', $booking)
-            ->with('success', 'Votre réservation de location a été créée avec succès! Veuillez suivre les instructions de paiement pour la confirmer.');
+        return redirect()->route('payment.checkout', $booking)
+            ->with('success', 'Votre réservation de location a été créée avec succès! Veuillez procéder au paiement pour la confirmer.');
     }
 
     /**

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Location de véhicules - Quads, voitures et plus') . ' - Carré Premium')
-@section('meta_description', 'Découvrez nos locations de véhicules en Côte d\'Ivoire et Afrique. Quads, voitures, bateaux et véhicules premium avec Carré Premium.')
-@section('meta_keywords', 'location véhicules, quads, voitures luxe, bateaux, Côte d\'Ivoire, Afrique, véhicules premium, Carré Premium')
-@section('og_title', __('Location de véhicules - Quads, voitures et plus') . ' - Carré Premium')
-@section('og_description', 'Réservez vos véhicules en Côte d\'Ivoire. Quads, voitures, bateaux et véhicules exclusifs avec notre service de conciergerie privée.')
+@section('title', __('Vehicle Rental - Quads, Cars and More') . ' - Carré Premium')
+@section('meta_description', __('Discover our vehicle rentals in Ivory Coast and Africa. Quads, cars, boats and premium vehicles with Carré Premium.'))
+@section('meta_keywords', __('vehicle rental, quads, luxury cars, boats, Ivory Coast, Africa, premium vehicles, Carré Premium'))
+@section('og_title', __('Vehicle Rental - Quads, Cars and More') . ' - Carré Premium')
+@section('og_description', __('Book your vehicles in Ivory Coast. Quads, cars, boats and exclusive vehicles with our private concierge service.'))
 
 @section('content')
 
@@ -13,8 +13,8 @@
   <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-blue-600 to-cyan-600 overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Vehicule de location') }}</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Decouvrez nos offres de vehicule premium') }}</p>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Vehicle Rental') }}</h1>
+      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Discover our premium vehicle offers') }}</p>
     </div>
   </section>
 
@@ -25,16 +25,16 @@
         <form method="GET" action="{{ route('location') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Categories') }}</label>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Category') }}</label>
               <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('toutes les categories') }}</option>
+                <option value="">{{ __('All categories') }}</option>
                 <option value="terrestre" {{ request('category') == 'terrestre' ? 'selected' : '' }}>{{ __('Terrestrial') }}</option>
               </select>
             </div>
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Vehicle Type') }}</label>
               <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('Tout type') }}</option>
+                <option value="">{{ __('All types') }}</option>
                 <option value="voiture" {{ request('type') == 'voiture' ? 'selected' : '' }}>{{ __('Car') }}</option>
               </select>
             </div>
@@ -103,10 +103,10 @@
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <span class="text-xl md:text-2xl font-black text-green-600">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</span>
-                      <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">par jour</span>
+                      <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per day') }}</span>
                     </div>
                     <a href="{{ route('location.show', $location) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                      {{ __('Voir les détails') }}
+                      {{ __('View details') }}
                     </a>
                   </div>
                 </div>
@@ -129,8 +129,8 @@
   {{-- CTA Section --}}
   <section class="py-12 md:py-16 bg-gradient-to-r from-green-600 to-teal-600">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('Besoin de vehicule personnalisé ?') }}</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contactez notre équipe pour plus de details') }}</p>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('Need a custom vehicle?') }}</h2>
+      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact our team for more details') }}</p>
       <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
         <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-green-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
           {{ __('Request a quote') }}

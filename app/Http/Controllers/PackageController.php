@@ -143,8 +143,8 @@ class PackageController extends Controller
             \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
         }
 
-        return redirect()->route('payment.instructions', $booking)
-            ->with('success', 'Votre réservation a été créée. Veuillez suivre les instructions de paiement pour la confirmer.');
+        return redirect()->route('payment.checkout', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez procéder au paiement pour la confirmer.');
     }
 
     /**

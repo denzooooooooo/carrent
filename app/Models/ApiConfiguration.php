@@ -48,4 +48,12 @@ class ApiConfiguration extends Model
     {
         return self::active()->provider('amadeus')->first();
     }
+
+    /**
+     * Obtenir la configuration Aviation Edge active
+     */
+    public static function getAviationEdgeConfig()
+    {
+        return self::active()->provider('aviation_edge')->first();
+    }
 }
