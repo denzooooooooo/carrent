@@ -21,7 +21,7 @@ $newTranslations = [
     ],
     "Premium Vehicles" => [
         "fr" => "Véhicules Premium",
-        "en" => "Premium Vehicles"
+        "en" => "Premium Vehicles" 
     ],
     "Premium Flights" => [
         "fr" => "Vols Premium",
