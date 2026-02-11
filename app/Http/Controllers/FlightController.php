@@ -40,7 +40,7 @@ class FlightController extends Controller
     {
         $duffelConfigured = $this->duffelService->isConfigured();
         
-        return view('pages.flight.flights', compact('duffelConfigured'));
+        return view('pages.flight.index', compact('duffelConfigured'));
     }
 
     /**
@@ -237,8 +237,8 @@ class FlightController extends Controller
                 'passengers.*.last_name' => 'required|string|max:100',
                 'passengers.*.born_on' => 'required|date|before:today',
                 'passengers.*.gender' => 'required|in:m,f',
-                'passengers.*.email' => 'required|email',
-                'passengers.*.phone' => 'required|string',
+                'passengers.*.email' => 'nullable|email',
+                'passengers.*.phone' => 'nullable|string',
                 'passengers.*.nationality' => 'required|string|size:2',
                 'passengers.*.identity_document_type' => 'required|in:passport,visa,national_id',
                 'passengers.*.identity_document_number' => 'required|string|max:50',

@@ -334,15 +334,19 @@ class DuffelService
             }
         }
 
+        // Dédupliquer les offres similaires
+        $deduplicated = $this->deduplicateOffers($formatted);
+        
         // Trier par prix
-        usort($formatted, fn($a, $b) => ($a['price'] ?? 0) <=> ($b['price'] ?? 0));
+        usort($deduplicated, fn($a, $b) => ($a['price'] ?? 0) <=> ($b['price'] ?? 0));
 
         Log::info("✅ Offers retrieved", [
-            'total' => count($formatted),
+            'total_raw' => count($formatted),
+            'total_deduplicated' => count($deduplicated),
             'offer_request_id' => $offerRequestId,
         ]);
 
-        return $formatted;
+        return $deduplicated;
     }
 
     /**
@@ -795,6 +799,38 @@ class DuffelService
         } catch (Exception $e) {
             return '';
         }
+    }
+
+    /**
+     * Dédupliquer les offres similaires
+     * Garde uniquement la meilleure offre par combinaison unique de:
+     * - Compagnie aérienne
+     * - Heure de départ
+     * - Nombre d'escales
+     */
+    protected function deduplicateOffers(array $offers): array
+    {
+        $unique = [];
+        $seen = [];
+
+        foreach ($offers as $offer) {
+            // Créer une clé unique basée sur les critères importants
+            $key = sprintf(
+                '%s_%s_%s_%d',
+                $offer['airline_code'] ?? 'XX',
+                $offer['departure']['time'] ?? '',
+                $offer['arrival']['time'] ?? '',
+                $offer['stops'] ?? 0
+            );
+
+            // Si cette combinaison n'existe pas encore, ou si le prix est meilleur
+            if (!isset($seen[$key]) || $offer['price'] < $seen[$key]['price']) {
+                $seen[$key] = $offer;
+                $unique[$key] = $offer;
+            }
+        }
+
+        return array_values($unique);
     }
 }
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\AviationEdgeService;
+use App\Services\DuffelService;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class FlightController extends Controller
 {
-    protected $aviationEdgeService;
+    protected $duffelService;
 
-    public function __construct(AviationEdgeService $aviationEdgeService)
+    public function __construct(DuffelService $duffelService)
     {
-        $this->aviationEdgeService = $aviationEdgeService;
+        $this->duffelService = $duffelService;
     }
 
     /**
@@ -40,18 +40,27 @@ class FlightController extends Controller
                 ], 422);
             }
 
-            // ✅ Recherche des vols via Aviation Edge
-            $flights = $this->aviationEdgeService->searchFlights(
+            // ✅ Recherche des vols via Duffel
+            $result = $this->duffelService->searchFlights(
                 $request->origin,
                 $request->destination,
-                $request->departureDate
+                $request->departureDate,
+                $request->returnDate ?? null,
+                [
+                    'adults' => $request->adults ?? 1,
+                    'children' => $request->children ?? 0,
+                    'infants' => $request->infants ?? 0,
+                    'cabin_class' => $request->cabin_class ?? 'economy',
+                ]
             );
 
+            $flights = $result['flights'] ?? [];
+
             // ✅ Gestion des erreurs API
-            if ($flights === null) {
+            if (!$result['success']) {
                 return response()->json([
                     'status' => 'api_error',
-                    'message' => 'Erreur lors de la communication avec l\'API Aviation Edge.',
+                    'message' => 'Erreur lors de la communication avec l\'API Duffel.',
                 ], 503);
             }
 
@@ -84,7 +93,7 @@ class FlightController extends Controller
             // ✅ Erreur HTTP (timeout, etc.)
             return response()->json([
                 'status' => 'http_error',
-                'message' => 'Erreur lors de la communication avec l’API Aviation Edge.',
+                'message' => 'Erreur lors de la communication avec l’API Duffel.',
                 'error' => $e->getMessage(),
             ], 502);
         } catch (\Exception $e) {
@@ -116,12 +125,25 @@ class FlightController extends Controller
                 ], 422);
             }
 
-            $airports = $this->aviationEdgeService->searchAirports($request->keyword);
+            // Recherche via Duffel API
+            $results = $this->duffelService->searchAirports($request->keyword);
+
+            // Formater les résultats
+            $formatted = [];
+            foreach ($results as $place) {
+                $formatted[] = [
+                    'iata_code' => $place['iata_code'] ?? '',
+                    'name' => $place['name'] ?? '',
+                    'city_name' => $place['city_name'] ?? null,
+                    'type' => $place['type'] ?? 'airport',
+                    'display' => ($place['city_name'] ?? $place['name']) . ' (' . ($place['iata_code'] ?? '') . ')' . (isset($place['name']) && $place['type'] !== 'city' ? ' - ' . $place['name'] : ''),
+                ];
+            }
 
             return response()->json([
                 'status' => 'success',
-                'results' => $airports,
-                'count' => count($airports),
+                'results' => $formatted,
+                'count' => count($formatted),
             ]);
 
         } catch (\Exception $e) {
@@ -153,22 +175,11 @@ class FlightController extends Controller
                 ], 422);
             }
 
-            $details = $this->aviationEdgeService->getFlightDetails(
-                $request->flight_number,
-                $request->date
-            );
-
-            if (!$details) {
-                return response()->json([
-                    'status' => 'not_found',
-                    'message' => 'Vol non trouvé.',
-                ], 404);
-            }
-
+            // Cette fonctionnalité n'est pas disponible avec Duffel
             return response()->json([
-                'status' => 'success',
-                'result' => $details,
-            ]);
+                'status' => 'not_implemented',
+                'message' => 'Cette fonctionnalité n\'est pas disponible.',
+            ], 501);
 
         } catch (\Exception $e) {
             Log::error('Flight details error', ['message' => $e->getMessage()]);
@@ -198,11 +209,15 @@ class FlightController extends Controller
                 ], 422);
             }
 
-            $cities = $this->aviationEdgeService->searchCities($request->keyword);
+            // Utiliser searchAirports qui inclut les villes
+            $results = $this->duffelService->searchAirports($request->keyword);
+            
+            // Filtrer uniquement les villes
+            $cities = array_filter($results, fn($place) => ($place['type'] ?? '') === 'city');
 
             return response()->json([
                 'status' => 'success',
-                'results' => $cities,
+                'results' => array_values($cities),
                 'count' => count($cities),
             ]);
 
@@ -236,17 +251,11 @@ class FlightController extends Controller
                 ], 422);
             }
 
-            $calendar = $this->aviationEdgeService->getPriceCalendar(
-                $request->origin,
-                $request->destination,
-                $request->month
-            );
-
+            // Cette fonctionnalité n'est pas disponible avec Duffel
             return response()->json([
-                'status' => 'success',
-                'results' => $calendar,
-                'month' => $request->month,
-            ]);
+                'status' => 'not_implemented',
+                'message' => 'Cette fonctionnalité n\'est pas disponible.',
+            ], 501);
 
         } catch (\Exception $e) {
             Log::error('Price calendar error', ['message' => $e->getMessage()]);
@@ -395,14 +404,14 @@ class FlightController extends Controller
      */
     public function testConnection()
     {
-        $connection = $this->aviationEdgeService->testConnection();
+        $connection = $this->duffelService->testConnection();
 
         return response()->json([
             'status' => 'success',
             'api_connection' => $connection,
-            'message' => $connection 
-                ? 'Connexion à Aviation Edge établie avec succès.' 
-                : 'Impossible de se connecter à Aviation Edge.',
+            'message' => $connection['success'] ?? false
+                ? 'Connexion à Duffel établie avec succès.' 
+                : 'Impossible de se connecter à Duffel.',
         ]);
     }
 }

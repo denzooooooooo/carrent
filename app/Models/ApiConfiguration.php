@@ -50,10 +50,10 @@ class ApiConfiguration extends Model
     }
 
     /**
-     * Obtenir la configuration Aviation Edge active
+     * Obtenir la configuration Duffel active
      */
-    public static function getAviationEdgeConfig()
+    public static function getDuffelConfig()
     {
-        return self::active()->provider('aviation_edge')->first();
+        return self::active()->provider('duffel')->first();
     }
 }

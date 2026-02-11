@@ -27,7 +27,9 @@
 - ✅ Compteur de résultats dynamique
 - ✅ Amélioration du design des cartes de vol
 
-### 3. Fonctionnalités UX/UI
+### 3. Fonctionnalités UX/U``
+
+
 - ✅ Filtres avancés fonctionnels
 - ✅ Affichage amélioré des prix avec commission
 - ✅ Badges pour vols directs/avec escales
@@ -36,7 +38,7 @@
 
 ### 4. Améliorations Techniques
 - ✅ Gestion d'erreurs robuste
-- ✅ Logs détaillés pour debugging
+- ✅ Logs détaillés pour debugging 
 - ✅ Performance optimisée
 - ✅ Code maintenable et documenté
 

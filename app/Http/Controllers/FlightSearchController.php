@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AviationEdgeService;
+use App\Services\DuffelService;
 use Illuminate\Http\Request;
 
 class FlightSearchController extends Controller
 {
-    protected $aviationEdgeService;
+    protected $duffelService;
 
-    public function __construct(AviationEdgeService $aviationEdgeService)
+    public function __construct(DuffelService $duffelService)
     {
-        $this->aviationEdgeService = $aviationEdgeService;
+        $this->duffelService = $duffelService;
     }
 
     /**
@@ -26,26 +26,27 @@ class FlightSearchController extends Controller
         }
 
         try {
-            $airports = $this->aviationEdgeService->searchAirports($query);
+            $places = $this->duffelService->searchAirports($query);
 
             // Formater pour correspondre à ce que la vue attend
-            $formattedAirports = array_map(function ($airport) {
+            $formattedPlaces = array_map(function ($place) {
+                $cityName = $place['city_name'] ?? $place['name'] ?? '';
+                $iataCode = $place['iata_code'] ?? '';
+                $name = $place['name'] ?? '';
+                $countryCode = $place['iata_country_code'] ?? '';
+                
                 return [
-                    'name' => $airport['name'] ?? '',
-                    'iataCode' => $airport['code'] ?? $airport['iata_code'] ?? '',
-                    'municipality' => $airport['city'] ?? '',
-                    'country' => $airport['country'] ?? '',
-                    'displayText' => $airport['displayText'] ?? sprintf(
-                        '%s (%s) - %s, %s',
-                        $airport['name'] ?? '',
-                        $airport['code'] ?? $airport['iata_code'] ?? '',
-                        $airport['city'] ?? '',
-                        $airport['country'] ?? ''
-                    )
+                    'name' => $name,
+                    'iataCode' => $iataCode,
+                    'municipality' => $cityName,
+                    'country' => $countryCode,
+                    'displayText' => $place['type'] === 'city' 
+                        ? "{$cityName} ({$iataCode})"
+                        : "{$cityName} ({$iataCode}) - {$name}"
                 ];
-            }, $airports);
+            }, $places);
 
-            return response()->json($formattedAirports);
+            return response()->json($formattedPlaces);
 
         } catch (\Exception $e) {
             \Log::error('Airport search error', ['error' => $e->getMessage()]);

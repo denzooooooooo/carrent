@@ -59,23 +59,25 @@
                         <div>
                             <label class="block text-sm font-bold text-[#001F3F] mb-2">{{ __('Départ') }}</label>
                             <div class="relative">
-                                <input type="text" name="departure_id" id="departure_id"
-                                    class="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] uppercase font-bold text-lg"
-                                    placeholder="CDG" required>
+                                <input type="text" name="departure_id" id="departure_id" autocomplete="off"
+                                    class="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] font-bold text-lg"
+                                    placeholder="Ex: Abidjan, Paris, ABJ..." required>
                                 <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
+                                <div id="departure-suggestions" class="absolute z-50 w-full mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden"></div>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-[#001F3F] mb-2">{{ __('Arrivée') }}</label>
                             <div class="relative">
-                                <input type="text" name="arrival_id" id="arrival_id"
-                                    class="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] uppercase font-bold text-lg"
-                                    placeholder="JFK" required>
+                                <input type="text" name="arrival_id" id="arrival_id" autocomplete="off"
+                                    class="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] font-bold text-lg"
+                                    placeholder="Ex: New York, Dubai, JFK..." required>
                                 <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 </svg>
+                                <div id="arrival-suggestions" class="absolute z-50 w-full mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden"></div>
                             </div>
                         </div>
                     </div>
@@ -147,32 +149,77 @@
     <!-- Popular Destinations -->
     <div class="container mx-auto px-4 py-16">
         <h2 class="text-3xl font-black text-[#001F3F] mb-2">{{ __('Destinations populaires') }}</h2>
-        <p class="text-gray-600 mb-8">{{ __('Explorez nos destinations les plus recherchées') }}</p>
+        <p class="text-gray-600 mb-8">{{ __('Explorez nos routes les plus recherchées') }}</p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @php
-                $destinations = [
-                    ['city' => 'Paris', 'country' => 'France', 'code' => 'CDG', 'image' => 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80', 'price' => 'À partir de 120 000 XOF'],
-                    ['city' => 'New York', 'country' => 'États-Unis', 'code' => 'JFK', 'image' => 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&q=80', 'price' => 'À partir de 250 000 XOF'],
-                    ['city' => 'Dubai', 'country' => 'Émirats Arabes', 'code' => 'DXB', 'image' => 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80', 'price' => 'À partir de 180 000 XOF'],
-                    ['city' => 'Londres', 'country' => 'Royaume-Uni', 'code' => 'LHR', 'image' => 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=80', 'price' => 'À partir de 140 000 XOF'],
+                $popularRoutes = [
+                    [
+                        'from_city' => 'Abidjan',
+                        'from_code' => 'ABJ',
+                        'to_city' => 'Paris',
+                        'to_code' => 'CDG',
+                        'image' => 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80',
+                        'price' => '120 000 XOF'
+                    ],
+                    [
+                        'from_city' => 'Paris',
+                        'from_code' => 'CDG',
+                        'to_city' => 'New York',
+                        'to_code' => 'JFK',
+                        'image' => 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&q=80',
+                        'price' => '150 000 XOF'
+                    ],
+                    [
+                        'from_city' => 'Paris',
+                        'from_code' => 'CDG',
+                        'to_city' => 'Dubai',
+                        'to_code' => 'DXB',
+                        'image' => 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80',
+                        'price' => '180 000 XOF'
+                    ],
+                    [
+                        'from_city' => 'Londres',
+                        'from_code' => 'LHR',
+                        'to_city' => 'New York',
+                        'to_code' => 'JFK',
+                        'image' => 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=400&q=80',
+                        'price' => '140 000 XOF'
+                    ],
                 ];
             @endphp
-            @foreach($destinations as $dest)
-            <button type="button" onclick="quickSearch('ABJ', '{{ $dest['code'] }}')"
+            @foreach($popularRoutes as $route)
+            <button type="button" onclick="quickSearch('{{ $route['from_code'] }}', '{{ $route['to_code'] }}')"
                 class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 text-left">
                 <div class="relative h-48 overflow-hidden">
-                    <img src="{{ $dest['image'] }}" alt="{{ $dest['city'] }}" 
+                    <img src="{{ $route['image'] }}" alt="{{ $route['to_city'] }}" 
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-[#001F3F] text-white px-3 py-1 rounded-full text-sm font-bold">{{ $dest['code'] }}</span>
+                    <div class="absolute top-4 right-4 flex gap-2">
+                        <span class="bg-white/90 backdrop-blur-sm text-[#001F3F] px-3 py-1 rounded-full text-xs font-bold">
+                            {{ $route['from_code'] }}
+                        </span>
+                        <svg class="w-4 h-4 text-white mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                        <span class="bg-white/90 backdrop-blur-sm text-[#001F3F] px-3 py-1 rounded-full text-xs font-bold">
+                            {{ $route['to_code'] }}
+                        </span>
                     </div>
                 </div>
                 <div class="p-5">
-                    <h3 class="text-xl font-bold text-[#001F3F] mb-1">{{ $dest['city'] }}</h3>
-                    <p class="text-gray-500 text-sm mb-3">{{ $dest['country'] }}</p>
-                    <p class="text-[#003366] font-semibold">{{ $dest['price'] }}</p>
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-base font-bold text-[#001F3F]">{{ $route['from_city'] }}</h3>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                        <h3 class="text-base font-bold text-[#001F3F]">{{ $route['to_city'] }}</h3>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-3">Vol direct disponible</p>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-gray-500 text-xs">À partir de</span>
+                        <p class="text-[#003366] font-bold text-lg">~{{ $route['price'] }}</p>
+                    </div>
                 </div>
             </button>
             @endforeach
@@ -278,6 +325,7 @@
 
 <script>
 let tripType = 1;
+let searchTimeout = null;
 
 function setTripType(type, btn) {
     tripType = type;
@@ -305,6 +353,79 @@ function quickSearch(from, to) {
     document.getElementById('arrival_id').value = to;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Airport Autocomplete
+function setupAutocomplete(inputId, suggestionsId) {
+    const input = document.getElementById(inputId);
+    const suggestions = document.getElementById(suggestionsId);
+    
+    input.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+            suggestions.classList.add('hidden');
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            fetch(`/api/flights/airports/search?keyword=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.results.length > 0) {
+                        displaySuggestions(data.results, suggestions, input);
+                    } else {
+                        suggestions.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching airports:', error);
+                    suggestions.classList.add('hidden');
+                });
+        }, 300);
+    });
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+            suggestions.classList.add('hidden');
+        }
+    });
+}
+
+function displaySuggestions(results, container, input) {
+    container.innerHTML = '';
+    
+    results.forEach(place => {
+        const div = document.createElement('div');
+        div.className = 'px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0';
+        div.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-[#001F3F]">${place.name || ''}</div>
+                    <div class="text-sm text-gray-500">${place.city_name || ''}</div>
+                </div>
+                <div class="text-lg font-bold text-[#001F3F]">${place.iata_code || ''}</div>
+            </div>
+        `;
+        
+        div.addEventListener('click', function() {
+            input.value = place.iata_code || '';
+            container.classList.add('hidden');
+        });
+        
+        container.appendChild(div);
+    });
+    
+    container.classList.remove('hidden');
+}
+
+// Initialize autocomplete on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setupAutocomplete('departure_id', 'departure-suggestions');
+    setupAutocomplete('arrival_id', 'arrival-suggestions');
+});
 </script>
 @endsection
 

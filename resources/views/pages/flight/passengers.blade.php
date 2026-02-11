@@ -201,9 +201,163 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         Enfant {{ $i + 1 }} (2-11 ans)
                     </h3>
+
                     <input type="hidden" name="passengers[{{ $passengerIndex }}][type]" value="child">
-                    <!-- Mêmes champs que adulte mais avec max age différent -->
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Formulaire similaire aux adultes...</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Civilité -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Civilité <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][title]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="mr">M.</option>
+                                <option value="miss">Mlle</option>
+                            </select>
+                        </div>
+
+                        <!-- Genre -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Genre <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][gender]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="m">Masculin</option>
+                                <option value="f">Féminin</option>
+                            </select>
+                        </div>
+
+                        <!-- Prénom -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Prénom <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="passengers[{{ $passengerIndex }}][first_name]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="Prénom">
+                        </div>
+
+                        <!-- Nom -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nom <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="passengers[{{ $passengerIndex }}][last_name]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="Nom">
+                        </div>
+
+                        <!-- Date de naissance -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Date de naissance <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="passengers[{{ $passengerIndex }}][born_on]" required
+                                min="{{ date('Y-m-d', strtotime('-11 years')) }}"
+                                max="{{ date('Y-m-d', strtotime('-2 years')) }}"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        </div>
+
+                        <!-- Nationalité -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nationalité <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][nationality]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="CI">Côte d'Ivoire</option>
+                                <option value="FR">France</option>
+                                <option value="US">États-Unis</option>
+                                <option value="GB">Royaume-Uni</option>
+                                <option value="SN">Sénégal</option>
+                                <option value="ML">Mali</option>
+                                <option value="BJ">Bénin</option>
+                                <option value="TG">Togo</option>
+                                <option value="GH">Ghana</option>
+                                <option value="NG">Nigeria</option>
+                            </select>
+                        </div>
+
+                        <!-- Email (optionnel pour enfants) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Email
+                            </label>
+                            <input type="email" name="passengers[{{ $passengerIndex }}][email]"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="email@example.com (optionnel)">
+                        </div>
+
+                        <!-- Téléphone (optionnel pour enfants) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Téléphone
+                            </label>
+                            <input type="tel" name="passengers[{{ $passengerIndex }}][phone]"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="+225 XX XX XX XX XX (optionnel)">
+                        </div>
+                    </div>
+
+                    <!-- Document d'identité -->
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-4">Document d'identité</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Type de document -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Type de document <span class="text-red-500">*</span>
+                                </label>
+                                <select name="passengers[{{ $passengerIndex }}][identity_document_type]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="">Sélectionner</option>
+                                    <option value="passport">Passeport</option>
+                                    <option value="national_id">Carte d'identité</option>
+                                </select>
+                            </div>
+
+                            <!-- Numéro -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Numéro <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="passengers[{{ $passengerIndex }}][identity_document_number]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white uppercase"
+                                    placeholder="XX123456">
+                            </div>
+
+                            <!-- Date d'expiration -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date d'expiration <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="passengers[{{ $passengerIndex }}][identity_document_expiry]" required
+                                    min="{{ date('Y-m-d', strtotime('+6 months')) }}"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+
+                            <!-- Pays émetteur -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Pays émetteur <span class="text-red-500">*</span>
+                                </label>
+                                <select name="passengers[{{ $passengerIndex }}][identity_document_issuing_country]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="">Sélectionner</option>
+                                    <option value="CI">Côte d'Ivoire</option>
+                                    <option value="FR">France</option>
+                                    <option value="US">États-Unis</option>
+                                    <option value="GB">Royaume-Uni</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 @php $passengerIndex++; @endphp
                 @endfor
@@ -214,9 +368,148 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         Bébé {{ $i + 1 }} (moins de 2 ans)
                     </h3>
+
                     <input type="hidden" name="passengers[{{ $passengerIndex }}][type]" value="infant">
-                    <!-- Formulaire simplifié pour bébés -->
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Formulaire simplifié...</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Civilité -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Civilité <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][title]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="mr">M.</option>
+                                <option value="miss">Mlle</option>
+                            </select>
+                        </div>
+
+                        <!-- Genre -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Genre <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][gender]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="m">Masculin</option>
+                                <option value="f">Féminin</option>
+                            </select>
+                        </div>
+
+                        <!-- Prénom -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Prénom <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="passengers[{{ $passengerIndex }}][first_name]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="Prénom">
+                        </div>
+
+                        <!-- Nom -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nom <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="passengers[{{ $passengerIndex }}][last_name]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder="Nom">
+                        </div>
+
+                        <!-- Date de naissance -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Date de naissance <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="passengers[{{ $passengerIndex }}][born_on]" required
+                                min="{{ date('Y-m-d', strtotime('-2 years')) }}"
+                                max="{{ date('Y-m-d') }}"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        </div>
+
+                        <!-- Nationalité -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nationalité <span class="text-red-500">*</span>
+                            </label>
+                            <select name="passengers[{{ $passengerIndex }}][nationality]" required
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">Sélectionner</option>
+                                <option value="CI">Côte d'Ivoire</option>
+                                <option value="FR">France</option>
+                                <option value="US">États-Unis</option>
+                                <option value="GB">Royaume-Uni</option>
+                                <option value="SN">Sénégal</option>
+                                <option value="ML">Mali</option>
+                                <option value="BJ">Bénin</option>
+                                <option value="TG">Togo</option>
+                                <option value="GH">Ghana</option>
+                                <option value="NG">Nigeria</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Document d'identité (simplifié pour bébés) -->
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-4">Document d'identité</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Type de document -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Type de document <span class="text-red-500">*</span>
+                                </label>
+                                <select name="passengers[{{ $passengerIndex }}][identity_document_type]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="">Sélectionner</option>
+                                    <option value="passport">Passeport</option>
+                                </select>
+                            </div>
+
+                            <!-- Numéro -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Numéro <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="passengers[{{ $passengerIndex }}][identity_document_number]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white uppercase"
+                                    placeholder="XX123456">
+                            </div>
+
+                            <!-- Date d'expiration -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date d'expiration <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="passengers[{{ $passengerIndex }}][identity_document_expiry]" required
+                                    min="{{ date('Y-m-d', strtotime('+6 months')) }}"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+
+                            <!-- Pays émetteur -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Pays émetteur <span class="text-red-500">*</span>
+                                </label>
+                                <select name="passengers[{{ $passengerIndex }}][identity_document_issuing_country]" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="">Sélectionner</option>
+                                    <option value="CI">Côte d'Ivoire</option>
+                                    <option value="FR">France</option>
+                                    <option value="US">États-Unis</option>
+                                    <option value="GB">Royaume-Uni</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                            ⚠️ Les bébés voyagent sur les genoux d'un adulte (sans siège séparé)
+                        </p>
+                    </div>
                 </div>
                 @php $passengerIndex++; @endphp
                 @endfor
