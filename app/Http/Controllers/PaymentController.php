@@ -507,7 +507,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Envoyer l'email de confirmation
+     * Envoyer l'email de confirmation avec les billets
      */
     protected function sendConfirmationEmail(Booking $booking)
     {
@@ -515,6 +515,25 @@ class PaymentController extends Controller
             $email = $this->getCustomerEmail($booking);
 
             if ($booking->booking_type === 'flight' && $booking->flightBooking) {
+                // Si on a un order Duffel, envoyer les billets
+                if (!empty($booking->flightBooking->duffel_order_id)) {
+                    $duffelOrder = $this->duffelService->getOrderStatus($booking->flightBooking->duffel_order_id);
+                    
+                    if ($duffelOrder) {
+                        // Envoyer l'email avec les billets Duffel
+                        \Illuminate\Support\Facades\Mail::to($email)
+                            ->send(new \App\Mail\FlightTicketsMail($booking, $booking->flightBooking, $duffelOrder));
+                        
+                        Log::info('✅ Email avec billets Duffel envoyé', [
+                            'booking_id' => $booking->id,
+                            'email' => $email,
+                            'duffel_order_id' => $booking->flightBooking->duffel_order_id,
+                        ]);
+                        return;
+                    }
+                }
+                
+                // Sinon, envoyer l'email de confirmation standard
                 \Illuminate\Support\Facades\Mail::to($email)
                     ->send(new \App\Mail\FlightBookingConfirmation($booking->flightBooking));
             }

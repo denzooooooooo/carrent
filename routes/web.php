@@ -110,6 +110,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
+        Route::post('flights/{id}/create-duffel-order', [App\Http\Controllers\Admin\FlightController::class, 'createDuffelOrder'])
+            ->name('flights.create-duffel-order');
+        Route::post('flights/{id}/cancel', [App\Http\Controllers\Admin\FlightController::class, 'cancel'])
+            ->name('flights.cancel');
+        Route::post('flights/{id}/resend-tickets', [App\Http\Controllers\Admin\FlightController::class, 'resendTickets'])
+            ->name('flights.resend-tickets');
+        Route::get('flights/export', [App\Http\Controllers\Admin\FlightController::class, 'export'])
+            ->name('flights.export');
 
         // Gestion des événements       
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
