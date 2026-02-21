@@ -26,19 +26,16 @@
     22 => 'Illuminate\\View\\ViewServiceProvider',
     23 => 'Asciisd\\Cybersource\\CybersourceServiceProvider',
     24 => 'Dedoc\\Scramble\\ScrambleServiceProvider',
-    25 => 'Laravel\\Pail\\PailServiceProvider',
-    26 => 'Laravel\\Sail\\SailServiceProvider',
-    27 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-    28 => 'Laravel\\Scout\\ScoutServiceProvider',
-    29 => 'Laravel\\Socialite\\SocialiteServiceProvider',
-    30 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    31 => 'Mews\\Captcha\\CaptchaServiceProvider',
-    32 => 'Carbon\\Laravel\\ServiceProvider',
-    33 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    34 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    35 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
-    36 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
-    37 => 'App\\Providers\\AppServiceProvider',
+    25 => 'Laravel\\Sanctum\\SanctumServiceProvider',
+    26 => 'Laravel\\Scout\\ScoutServiceProvider',
+    27 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    28 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    29 => 'Mews\\Captcha\\CaptchaServiceProvider',
+    30 => 'Carbon\\Laravel\\ServiceProvider',
+    31 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    32 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
+    33 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
+    34 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -54,16 +51,14 @@
     9 => 'Illuminate\\View\\ViewServiceProvider',
     10 => 'Asciisd\\Cybersource\\CybersourceServiceProvider',
     11 => 'Dedoc\\Scramble\\ScrambleServiceProvider',
-    12 => 'Laravel\\Pail\\PailServiceProvider',
-    13 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-    14 => 'Laravel\\Scout\\ScoutServiceProvider',
-    15 => 'Mews\\Captcha\\CaptchaServiceProvider',
-    16 => 'Carbon\\Laravel\\ServiceProvider',
-    17 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    18 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    19 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
-    20 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
-    21 => 'App\\Providers\\AppServiceProvider',
+    12 => 'Laravel\\Sanctum\\SanctumServiceProvider',
+    13 => 'Laravel\\Scout\\ScoutServiceProvider',
+    14 => 'Mews\\Captcha\\CaptchaServiceProvider',
+    15 => 'Carbon\\Laravel\\ServiceProvider',
+    16 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    17 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
+    18 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
+    19 => 'App\\Providers\\AppServiceProvider',
   ),
   'deferred' => 
   array (
@@ -221,8 +216,6 @@
     'validator' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Illuminate\\Contracts\\Validation\\UncompromisedVerifier' => 'Illuminate\\Validation\\ValidationServiceProvider',
-    'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
-    'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'Laravel\\Socialite\\Contracts\\Factory' => 'Laravel\\Socialite\\SocialiteServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
   ),
@@ -265,9 +258,6 @@
     array (
     ),
     'Illuminate\\Validation\\ValidationServiceProvider' => 
-    array (
-    ),
-    'Laravel\\Sail\\SailServiceProvider' => 
     array (
     ),
     'Laravel\\Socialite\\SocialiteServiceProvider' => 
