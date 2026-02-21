@@ -1,0 +1,435 @@
+/* ============================================
+   SYSTÈME DE THÈME CLAIR/SOMBRE - VERSION COMPLÈTE
+   ============================================ */
+
+/* Variables pour le mode CLAIR (par défaut) */
+:root {
+  --theme-bg: #ffffff;
+  --theme-text: #1f2937;
+  --theme-navbar-bg: #ffffff;
+  --theme-navbar-text: #374151;
+  --theme-navbar-hover: #f3f4f6;
+  --theme-card-bg: #ffffff;
+  --theme-border: #e5e7eb;
+  --theme-secondary-bg: #f9fafb;
+  --theme-input-bg: #ffffff;
+}
+
+/* Variables pour le mode SOMBRE */
+[data-theme="dark"] {
+  --theme-bg: #0f172a;
+  --theme-text: #ffffff;
+  --theme-navbar-bg: #1e293b;
+  --theme-navbar-text: #e2e8f0;
+  --theme-navbar-hover: #334155;
+  --theme-card-bg: #0f172a;
+  --theme-border: #334155;
+  --theme-secondary-bg: #1e293b;
+  --theme-input-bg: #1e293b;
+}
+
+/* ============================================
+   APPLICATION - Header uniquement
+   ============================================ */
+
+/* Header background */
+header {
+  background-color: var(--theme-navbar-bg) !important;
+  transition: background-color 0.3s ease;
+}
+
+/* Texte du logo et titre */
+header h1,
+header p:not([class*="bg-"]) {
+  color: var(--theme-navbar-text) !important;
+}
+
+/* Liens et boutons de navigation - NE PAS forcer si déjà colorés */
+header a:not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]),
+header button:not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]):not(#theme-toggle) {
+  color: var(--theme-navbar-text) !important;
+}
+
+/* Hover states */
+header a:hover:not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]),
+header button:hover:not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]):not(#theme-toggle) {
+  background-color: var(--theme-navbar-hover) !important;
+}
+
+/* Boutons avec bg-gray-100 (devise, langue, etc.) */
+header [class*="bg-gray-100"],
+header button[class*="bg-gray-100"],
+header a[class*="bg-gray-100"] {
+  background-color: var(--theme-navbar-hover) !important;
+  color: var(--theme-navbar-text) !important;
+}
+
+header [class*="bg-gray-100"]:hover,
+header button[class*="bg-gray-100"]:hover,
+header a[class*="bg-gray-100"]:hover {
+  background-color: var(--theme-card-bg) !important;
+}
+
+/* Dropdowns */
+header [class*="absolute"][class*="bg-white"],
+header [class*="dropdown"] {
+  background-color: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Texte dans les dropdowns */
+header [class*="absolute"] a,
+header [class*="absolute"] button,
+header [class*="absolute"] span {
+  color: var(--theme-navbar-text) !important;
+}
+
+header [class*="absolute"] a:hover,
+header [class*="absolute"] button:hover {
+  background-color: var(--theme-navbar-hover) !important;
+}
+
+/* Mobile Menu */
+.lg\:hidden.border-t {
+  background-color: var(--theme-navbar-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Footer */
+footer {
+  background-color: var(--theme-navbar-bg) !important;
+  color: var(--theme-navbar-text) !important;
+  border-top-color: var(--theme-border) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   BOUTON DE TOGGLE - Petit et élégant
+   ============================================ */
+
+#theme-toggle {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--theme-border);
+  border-radius: 0.375rem;
+  background-color: var(--theme-navbar-hover);
+  color: var(--theme-navbar-text);
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#theme-toggle:hover {
+  background-color: var(--theme-card-bg);
+  border-color: var(--theme-navbar-text);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#theme-toggle:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Mode sombre - bouton jaune */
+[data-theme="dark"] #theme-toggle {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+[data-theme="dark"] #theme-toggle:hover {
+  background-color: #4b5563;
+  border-color: #fbbf24;
+}
+
+/* ============================================
+   APPLICATION CIBLÉE - FONDS BLANCS ET BODY
+   ============================================ */
+
+/* Body et fond principal de la page */
+[data-theme="dark"] body {
+  background-color: var(--theme-bg) !important;
+}
+
+/* Sections principales avec fond blanc ou gris clair */
+[data-theme="dark"] body > div,
+[data-theme="dark"] main,
+[data-theme="dark"] section:not([class*="bg-"]):not([class*="carousel"]) {
+  background-color: var(--theme-bg) !important;
+}
+
+/* Cibler spécifiquement bg-gray-50, bg-gray-100, bg-gray-200 */
+[data-theme="dark"] .bg-gray-50,
+[data-theme="dark"] .bg-gray-100,
+[data-theme="dark"] .bg-gray-200 {
+  background-color: var(--theme-bg) !important;
+}
+
+/* Divs avec min-h-screen et fond gris */
+[data-theme="dark"] .min-h-screen.bg-gray-50,
+[data-theme="dark"] .min-h-screen.bg-gray-100 {
+  background-color: var(--theme-bg) !important;
+}
+
+/* Cibler UNIQUEMENT les éléments avec bg-white (sauf carrousel) */
+.bg-white:not(.carousel-item):not([class*="carousel"]) {
+  background-color: var(--theme-card-bg) !important;
+  transition: background-color 0.3s ease;
+}
+
+/* Texte dans les éléments bg-white - Tous les niveaux */
+.bg-white:not(.carousel-item):not([class*="carousel"]) h1,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h2,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h3,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h4,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h5,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h6,
+.bg-white:not(.carousel-item):not([class*="carousel"]) p:not([class*="text-"]),
+.bg-white:not(.carousel-item):not([class*="carousel"]) span:not([class*="bg-"]):not([class*="text-purple"]):not([class*="text-blue"]):not([class*="text-pink"]):not([class*="text-green"]):not([class*="text-orange"]):not([class*="text-red"]),
+.bg-white:not(.carousel-item):not([class*="carousel"]) div:not([class*="bg-"]):not([class*="text-purple"]):not([class*="text-blue"]):not([class*="text-pink"]):not([class*="text-green"]):not([class*="text-orange"]):not([class*="text-red"]),
+.bg-white:not(.carousel-item):not([class*="carousel"]) a:not([class*="bg-"]):not([class*="text-purple"]):not([class*="text-blue"]):not([class*="text-pink"]):not([class*="text-green"]):not([class*="text-orange"]):not([class*="text-red"]),
+.bg-white:not(.carousel-item):not([class*="carousel"]) label,
+.bg-white:not(.carousel-item):not([class*="carousel"]) li {
+  color: var(--theme-text) !important;
+}
+
+/* Texte gris dans bg-white - Plus spécifique */
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-900,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-800,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-700,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-600,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-500,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-gray-400 {
+  color: var(--theme-text) !important;
+}
+
+/* Texte noir dans bg-white */
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-black {
+  color: var(--theme-text) !important;
+}
+
+/* Bordures dans bg-white */
+.bg-white:not(.carousel-item):not([class*="carousel"]) .border-gray-200,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .border-gray-300,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .border-gray-400,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .border {
+  border-color: var(--theme-border) !important;
+}
+
+/* Backgrounds secondaires dans bg-white */
+.bg-white:not(.carousel-item):not([class*="carousel"]) .bg-gray-50,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .bg-gray-100,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .bg-gray-200 {
+  background-color: var(--theme-secondary-bg) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Inputs et formulaires dans bg-white */
+.bg-white:not(.carousel-item):not([class*="carousel"]) input:not([type="submit"]):not([type="button"]):not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]),
+.bg-white:not(.carousel-item):not([class*="carousel"]) textarea,
+.bg-white:not(.carousel-item):not([class*="carousel"]) select {
+  background-color: var(--theme-input-bg) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}. 
+
+/* Placeholder text */
+.bg-white:not(.carousel-item):not([class*="carousel"]) input::placeholder,
+.bg-white:not(.carousel-item):not([class*="carousel"]) textarea::placeholder {
+  color: var(--theme-navbar-text) !important;
+  opacity: 0.6;
+}
+
+/* Links dans bg-white (sauf colorés) */
+.bg-white:not(.carousel-item):not([class*="carousel"]) a:not([class*="bg-purple"]):not([class*="bg-blue"]):not([class*="bg-pink"]):not([class*="bg-green"]):not([class*="bg-orange"]):not([class*="text-purple"]):not([class*="text-blue"]):not([class*="text-pink"]):not([class*="text-green"]):not([class*="text-orange"]) {
+  color: var(--theme-text) !important;
+}
+
+/* Exception: Ne PAS affecter le carrousel */
+[class*="carousel"],
+.carousel-item,
+.carousel-item * {
+  /* Laisser le carrousel intact */
+}
+
+/* Exception: Préserver les textes colorés intentionnels */
+.text-purple-600,
+.text-blue-600,
+.text-pink-600,
+.text-green-600,
+.text-orange-600,
+.text-red-600,
+.text-yellow-600,
+.text-indigo-600 {
+  /* Garder les couleurs originales */
+}
+
+/* ============================================
+   CORRECTIONS SPÉCIFIQUES PAR PAGE
+   ============================================ */
+
+/* PAGE HOME - Section Événements: Forcer TOUS les textes en blanc */
+section.bg-white.relative.overflow-hidden h2,
+section.bg-white.relative.overflow-hidden p,
+section.bg-white.relative.overflow-hidden h3,
+section.bg-white.relative.overflow-hidden span,
+section.bg-white.relative.overflow-hidden div {
+  color: #ffffff !important;
+}
+section.bg-white.relative.overflow-hidden h4
+ {
+  color: #ff7a0d !important;
+}
+
+/* PAGE HOME - Événements: Titres et dates blancs TOUJOURS (mode clair ET sombre) */
+.bg-white:not(.carousel-item):not([class*="carousel"]) h2.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) p.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) .text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) h3.text-white,
+.bg-white:not(.carousel-item):not([class*="carousel"]) span.font-semibold {
+  color: #ffffff !important;
+}
+
+/* PAGE HOME - Événements: Titres blancs en mode sombre pour les autres */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h1:not(.text-white),
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h2:not(.text-white),
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) h3:not(.text-white) {
+  color: #ffffff !important;
+}
+
+/* PAGE VOLS - Titre principal blanc en mode sombre */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2.text-3xl,
+[data-theme="dark"] h2.text-4xl {
+  color: #ffffff !important;
+}
+
+/* PAGE VOLS - Formulaires de recherche */
+[data-theme="dark"] form input:not([type="submit"]):not([type="button"]),
+[data-theme="dark"] form select,
+[data-theme="dark"] form textarea {
+  background-color: var(--theme-input-bg) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme="dark"] form label {
+  color: var(--theme-text) !important;
+}
+
+/* PAGE VOLS - Sections spécifiques */
+[data-theme="dark"] .min-h-screen.bg-white {
+  background-color: var(--theme-bg) !important;
+}
+
+/* PAGE VOLS - Formulaire de recherche (section blanche arrondie) */
+[data-theme="dark"] section.bg-white.rounded-3xl {
+  background-color: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* PAGE VOLS - Suggestions d'aéroports */
+[data-theme="dark"] [id*="suggestions"] {
+  background-color: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme="dark"] [id*="suggestions"] > div {
+  background-color: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme="dark"] [id*="suggestions"] > div:hover {
+  background-color: var(--theme-secondary-bg) !important;
+}
+
+/* PAGE VOLS - Vols multi-villes */
+[data-theme="dark"] #multi-city-flights-container .bg-white {
+  background-color: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* HEADER - Logo sans bordure blanche en mode sombre */
+[data-theme="dark"] header img {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] header a img {
+  border: none !important;
+  outline: none !important;
+}
+
+/* PRODUITS - Bordures blanches en mode sombre pour distinction */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) {
+  border: 1px solid rgba(73, 73, 73, 0.03) !important;
+}
+
+/* Cards de produits/événements/packages */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]).rounded-lg,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]).rounded-xl {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Amélioration des contrastes pour les cards */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .border-t,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .border-b,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .border-l,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .border-r {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ============================================
+   PAGES CONNEXION ET INSCRIPTION
+   ============================================ */
+
+/* Formulaires de connexion/inscription - Mode sombre */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form {
+  background-color: var(--theme-card-bg) !important;
+}
+
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form input,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form select,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form textarea {
+  background-color: var(--theme-input-bg) !important;
+  color: #ffffff !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form label {
+  color: #ffffff !important;
+}
+
+/* Titres des formulaires */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form h1,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form h2,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form h3 {
+  color: #ffffff !important;
+}
+
+/* Liens dans les formulaires */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) form a:not([class*="bg-purple"]):not([class*="bg-blue"]) {
+  color: #93c5fd !important;
+}
+
+/* Messages d'erreur */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .text-red-500,
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .text-red-600 {
+  color: #fca5a5 !important;
+}
+
+/* Texte d'aide */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) .text-sm {
+  color: #d1d5db !important;
+}
+
+/* Checkbox et radio */
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) input[type="checkbox"],
+[data-theme="dark"] .bg-white:not(.carousel-item):not([class*="carousel"]) input[type="radio"] {
+  border-color: var(--theme-border) !important;
+}
