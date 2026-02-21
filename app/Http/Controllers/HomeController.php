@@ -1,0 +1,132 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use App\Services\GoogleFlightsService;
+use App\Models\Event;
+use App\Models\Location;
+
+
+class HomeController extends Controller
+{
+
+    public function index()
+    {
+        // Charger les événements actifs avec leurs relations pour le carrousel
+        $events = Event::where('is_active', true)
+            ->with(['category', 'type', 'seatZones'])
+            ->orderBy('event_date', 'asc')
+            ->take(6)
+            ->get();
+
+        return view('pages.home', compact('events'));
+    }
+
+    public function events()
+    {
+        $events = Event::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('pages.events', compact('events'));
+    }
+
+    public function packages()
+    {
+        return view('pages.packages');
+    }
+
+    public function location()
+    {
+        $locations = Location::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.location', compact('locations'));
+    }
+
+    public function about()
+    {
+        return view('pages.about');
+    }
+
+    public function contact()
+    {
+        return view('pages.contact');
+    }
+
+    public function faq()
+    {
+        return view('pages.faq');
+    }
+
+    public function terms()
+    {
+        return view('pages.terms');
+    }
+
+    public function privacy()
+    {
+        return view('pages.privacy');
+    }
+
+    public function cookies()
+    {
+        return view('pages.cookies');
+    }
+
+    public function partnership()
+    {
+        return view('pages.partnership');
+    }
+
+    public function login()
+    {
+        return view('pages.login');
+    }
+
+    public function register()
+    {
+        return view('pages.register');
+    }
+
+    public function profile()
+    {
+        return view('pages.profile');
+    }
+
+    public function storeContact(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        // Here you can add logic to send email or save to database
+        // For now, we'll just flash a success message
+
+        Session::flash('success', 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+
+        return redirect()->back();
+    }
+
+    public function visaService()
+    {
+        return view('pages.visa-service');
+    }
+
+    public function conciergeLuxury()
+    {
+        return view('pages.concierge.luxury');
+    }
+
+    public function personalShopper()
+    {
+        return view('pages.concierge.personal-shopper');
+    }
+}

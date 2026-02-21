@@ -1,0 +1,55 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  deploy:
+    name: Deploy to VPS Server
+    runs-on: ubuntu-latest
+    env:
+      SSH_USER: ${{ secrets.SSH_USER_PROD }}
+      SSH_HOST: ${{ secrets.SSH_HOST_PROD }}
+      SSH_PORT: ${{ secrets.SSH_PORT_PROD }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
+
+      - name: Add server to known hosts 
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p $SSH_PORT -H $SSH_HOST >> ~/.ssh/known_hosts || true
+      - name: Deploy via SSH
+        run: |
+          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST << 'EOF'
+            cd /home/carrepremium.com/public_html
+
+            echo "🌀 Mise à jour du dépôt..."
+            git fetch origin prod
+            git reset --hard origin/prod
+
+            echo "📦 Installation des dépendances..."
+            composer update 
+
+            composer install 
+
+            echo "⚙️ Optimisation Laravel..."
+            php artisan optimize:clear
+
+            npm install
+
+            npm run build
+                  
+            php artisan optimize
+            php artisan migrate
+
+            echo "✅ Déploiement VPS terminé !"
+          EOF

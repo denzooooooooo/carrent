@@ -1,0 +1,143 @@
+@extends('layouts.app')
+
+@section('title', __('Événements sportifs et culturels VIP') . ' - Carré Premium')
+@section('meta_description', 'Découvrez les événements sportifs et culturels VIP avec Carré Premium. Billets premium pour concerts, matchs de football, spectacles à Abidjan et Côte d\'Ivoire. Réservation exclusive.')
+@section('meta_keywords', 'événements VIP, sports, culture, concerts, football, Côte d\'Ivoire, Abidjan, billets premium, Carré Premium')
+@section('og_title', __('Événements sportifs et culturels VIP') . ' - Carré Premium')
+@section('og_description', 'Réservez vos places pour les meilleurs événements sportifs et culturels en Côte d\'Ivoire avec Carré Premium. Service VIP exclusif.')
+
+@section('content')
+<div class="min-h-screen bg-white">
+  {{-- Hero --}}
+  <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Sports & Cultural Events') }}</h1>
+      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Experience unique moments with Carré Premium') }}</p>
+    </div>
+  </section>
+
+  {{-- Filters --}}
+  <section class="py-6 md:py-8 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        <form method="GET" action="{{ route('events') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Event type') }}</label>
+              <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">{{ __('All events') }}</option>
+                @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name_fr }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Venue') }}</label>
+              <select name="venue" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">{{ __('All venues') }}</option>
+                <option value="Stade Félix Houphouët-Boigny" {{ request('venue') == 'Stade Félix Houphouët-Boigny' ? 'selected' : '' }}>Stade Félix Houphouët-Boigny</option>
+                <option value="Palais de la Culture" {{ request('venue') == 'Palais de la Culture' ? 'selected' : '' }}>Palais de la Culture</option>
+                <option value="Parc des Sports" {{ request('venue') == 'Parc des Sports' ? 'selected' : '' }}>Parc des Sports</option>
+                <option value="Salle des fêtes" {{ request('venue') == 'Salle des fêtes' ? 'selected' : '' }}>Salle des fêtes</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Date') }}</label>
+              <input type="date" name="date" value="{{ request('date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+            </div>
+            <div class="flex items-end gap-2">
+              <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
+                {{ __('Search') }}
+              </button>
+              @if(request()->hasAny(['category', 'venue', 'date']))
+                <a href="{{ route('events') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
+                  ✕
+                </a>
+              @endif
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  {{-- Events Grid --}}
+  <section class="py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+          {{-- Événements réels depuis la base de données --}}
+          @forelse ($events as $event)
+            <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
+              <div class="relative">
+                @php
+                    // Utilisation de la méthode de Spatie pour récupérer l'URL de l'image 'normal'
+                    $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
+                    $placeholder = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&h=300&fit=crop';
+                @endphp
+                <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}" class="w-full h-32 md:h-40 lg:h-48 object-cover" onerror="this.onerror=null;this.src='{{ $placeholder }}';">
+                <div class="absolute top-2 md:top-4 left-2 md:left-4">
+                  <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">{{ __('Available') }}</span>
+                </div>
+                <div class="absolute top-2 md:top-4 right-2 md:right-4">
+                  <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $event->category->name_fr ?? 'Événement' }}</span>
+                </div>
+              </div>
+              <div class="p-4 md:p-6">
+                <h3 class="text-lg md:text-xl font-black mb-2">{{ $event->title_fr }}</h3>
+                <div class="flex items-center text-gray-600 mb-2 md:mb-3">
+                  <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span class="text-sm md:text-base">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }} - {{ $event->event_time }}</span>
+                </div>
+                <div class="flex items-center text-gray-600 mb-3 md:mb-4">
+                  <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span class="text-sm md:text-base">{{ $event->venue_name }}, {{ $event->city }}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</span>
+                    <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per person') }}</span>
+                  </div>
+                  <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
+                    {{ __('Book') }}
+                  </a>
+                </div>
+              </div>
+            </div>
+          @empty
+            {{-- Fallback si aucun événement --}}
+            <div class="col-span-full bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+              <p class="text-xl text-gray-500">{{ __('No events found.') }}</p>
+              <p class="text-sm text-gray-400 mt-2">{{ __('Come back soon to discover our next exclusive events.') }}</p>
+            </div>
+          @endforelse
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{-- CTA Section --}}
+  <section class="py-12 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __("Can't find your dream event?") }}</h2>
+      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact us to organize a tailor-made event') }}</p>
+      <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+        <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
+          {{ __('Request a quote') }}
+        </a>
+        <a href="tel:+225XXXXXXXXX" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg md:rounded-xl hover:bg-white hover:text-purple-600 transition-all text-sm md:text-base">
+          {{ __('Call Now') }}
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+@endsection

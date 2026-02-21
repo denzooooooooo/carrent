@@ -1,0 +1,162 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\TourPackage;
+use App\Models\Booking;
+use App\Mail\PackageBookingConfirmation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
+class PackageController extends Controller
+{
+    /**
+     * Afficher la liste des packages avec filtres.
+     */
+    public function index(Request $request)
+    {
+        $query = TourPackage::where('is_active', true)
+            ->with(['category']);
+
+        // Filtre par type de package
+        if ($request->filled('type')) {
+            $query->where('package_type', $request->type);
+        }
+
+        // Filtre par destination
+        if ($request->filled('destination')) {
+            $query->where('destination', 'like', '%' . $request->destination . '%');
+        }
+
+        // Filtre par durée
+        if ($request->filled('duration')) {
+            switch ($request->duration) {
+                case '1-3':
+                    $query->whereBetween('duration', [1, 3]);
+                    break;
+                case '4-7':
+                    $query->whereBetween('duration', [4, 7]);
+                    break;
+                case '1-2-weeks':
+                    $query->whereBetween('duration', [7, 14]);
+                    break;
+                case 'more-than-2-weeks':
+                    $query->where('duration', '>', 14);
+                    break;
+            }
+        }
+
+        $packages = $query->orderBy('is_featured', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        // Récupérer les types de packages distincts pour les filtres
+        $packageTypes = TourPackage::where('is_active', true)
+            ->distinct()
+            ->pluck('package_type')
+            ->filter()
+            ->values();
+
+        // Récupérer les destinations distinctes
+        $destinations = TourPackage::where('is_active', true)
+            ->distinct()
+            ->pluck('destination')
+            ->filter()
+            ->values();
+
+        return view('pages.packages', compact('packages', 'packageTypes', 'destinations'));
+    }
+
+    /**
+     * Display the specified package.
+     */
+    public function show($slug)
+    {
+        $package = TourPackage::where('slug', $slug)
+            ->where('is_active', true)
+            ->with(['category', 'reviews'])
+            ->firstOrFail();
+
+        // Get similar packages from same category
+        $similarPackages = TourPackage::where('category_id', $package->category_id)
+            ->where('id', '!=', $package->id)
+            ->where('is_active', true)
+            ->limit(3)
+            ->get();
+
+        return view('pages.package-details', compact('package', 'similarPackages'));
+    }
+
+    /**
+     * Handle package booking submission.
+     */
+    public function book(Request $request, TourPackage $package)
+    {
+        $request->validate([
+            'departure_date' => 'required|date|after:today',
+            'participants' => 'required|integer|min:' . $package->min_participants . '|max:' . $package->max_participants,
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'special_requests' => 'nullable|string|max:1000',
+        ]);
+
+        // Calculate total price
+        $unitPrice = $package->discount_price ?? $package->price;
+        $totalPrice = $unitPrice * $request->participants;
+
+        // Create booking
+        $booking = Booking::create([
+            'booking_number' => 'PKG-' . strtoupper(Str::random(8)),
+            'user_id' => auth()->check() ? auth()->id() : null,
+            'booking_type' => 'package',
+            'package_id' => $package->id,
+            'booking_date' => now(),
+            'travel_date' => $request->departure_date,
+            'number_of_passengers' => $request->participants,
+            'passenger_details' => [
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'type' => 'adult'
+                ]
+            ],
+            'total_amount' => $totalPrice,
+            'currency' => 'XAF',
+            'final_amount' => $totalPrice,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'special_requests' => $request->special_requests,
+        ]);
+
+        // Send confirmation email
+        try {
+            $passengerName = $request->first_name . ' ' . $request->last_name;
+            Mail::to($request->email)->send(new PackageBookingConfirmation($booking, $passengerName));
+        } catch (\Exception $e) {
+            // Log email error but don't fail the booking
+            \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
+        }
+
+        return redirect()->route('payment.checkout', $booking)
+            ->with('success', 'Votre réservation a été créée. Veuillez procéder au paiement pour la confirmer.');
+    }
+
+    /**
+     * Display booking confirmation page.
+     */
+    public function bookingConfirmation(Booking $booking)
+    {
+        // Ensure this is a package booking
+        if ($booking->booking_type !== 'package' || !$booking->package) {
+            abort(404);
+        }
+
+        return view('pages.package-booking-confirmation', compact('booking'));
+    }
+}
