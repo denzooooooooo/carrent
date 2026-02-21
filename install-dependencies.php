@@ -8,7 +8,7 @@
  * IMPORTANT: Supprimez ce fichier après utilisation pour des raisons de sécurité!
  */
 
-// Augmenter les limites
+// Augmenter les limites 
 set_time_limit(600); // 10 minutes
 ini_set('memory_limit', '512M');
 ini_set('display_errors', 1);
