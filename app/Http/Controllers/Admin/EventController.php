@@ -11,7 +11,6 @@ use App\Imports\EventPackagesImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
 class EventController extends Controller
 {
@@ -432,36 +431,41 @@ class EventController extends Controller
     }
 
     /**
-     * Importer des packages depuis un fichier Excel
+     * Importer des packages depuis un fichier CSV (sans dépendance externe)
      */
     public function importPackages(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // Max 10MB
-            'event_id' => 'nullable|exists:events,id',
+            'excel_file' => 'required|file|mimes:csv,txt|max:10240', // CSV uniquement, max 10MB
+            'event_id'   => 'nullable|exists:events,id',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $eventId = $request->input('event_id');
-            $file = $request->file('excel_file');
+            $file     = $request->file('excel_file');
+            $filePath = $file->getRealPath();
 
-            // Import des packages
             $import = new EventPackagesImport();
-            Excel::import($import, $file);
+            $import->import($filePath);
 
-            $count = $import->getRowCount();
+            $count  = $import->getRowCount();
+            $errors = $import->getErrors();
 
             DB::commit();
 
+            $message = $count . ' package(s) importé(s) avec succès!';
+            if (!empty($errors)) {
+                $message .= ' (' . count($errors) . ' ligne(s) ignorée(s) : ' . implode(', ', array_slice($errors, 0, 3)) . ')';
+            }
+
             return redirect()->route('admin.events.index')
-                ->with('success', $count . ' package(s) importé(s) avec succès!');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Import Error: ' . $e->getMessage());
-            return back()->with('error', 'Erreur lors de l\'import: ' . $e->getMessage());
+            \Log::error('Import CSV Error: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
         }
     }
 }
