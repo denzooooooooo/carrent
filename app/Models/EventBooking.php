@@ -9,6 +9,7 @@ class EventBooking extends Model
     protected $fillable = [
         'event_id',
         'zone_id',
+        'package_id',
         'user_name',
         'user_email',
         'user_phone',
@@ -34,5 +35,10 @@ class EventBooking extends Model
     public function zone()
     {
         return $this->belongsTo(EventSeatZone::class, 'zone_id');
+    }
+
+    public function package()
+    {
+        return $this->belongsTo(EventPackage::class, 'package_id');
     }
 }

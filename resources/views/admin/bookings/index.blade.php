@@ -202,8 +202,31 @@
                         <tr class="hover:bg-gray-50 transition duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">{{ $booking->booking_number }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $booking->user->name ?? 'N/A' }}</div>
-                                <div class="text-xs text-gray-500">{{ $booking->user->email ?? 'N/A' }}</div>
+@php
+                                    // Gestion robuste pour les réservations de guests (sans compte utilisateur)
+                                    $passengerDetails = $booking->passenger_details;
+                                    
+                                    // Vérifier si passenger_details existe et n'est pas null/empty
+                                    $hasPassengerDetails = !empty($passengerDetails) && is_array($passengerDetails) && isset($passengerDetails[0]);
+                                    
+                                    if ($booking->user) {
+                                        // Réservation avec compte utilisateur connecté
+                                        $customerName = $booking->user->first_name . ' ' . $booking->user->last_name;
+                                        $customerEmail = $booking->user->email;
+                                    } elseif ($hasPassengerDetails) {
+                                        // Réservation guest - utiliser passenger_details
+                                        $firstPax = $passengerDetails[0];
+                                        // Essayer differentes structures de donnees
+                                        $customerName = $firstPax['name'] ?? ($firstPax['first_name'] ?? '') . ' ' . ($firstPax['last_name'] ?? '');
+                                        $customerEmail = $firstPax['email'] ?? 'N/A';
+                                    } else {
+                                        // Aucune information disponible
+                                        $customerName = 'N/A';
+                                        $customerEmail = 'N/A';
+                                    }
+                                @endphp
+                                <div class="text-sm font-medium text-gray-900">{{ $customerName }}</div>
+                                <div class="text-xs text-gray-500">{{ $customerEmail }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @switch($booking->booking_type)

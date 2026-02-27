@@ -19,6 +19,9 @@ class Event extends Model implements HasMedia
     protected $fillable = [
         'category_id',
         'type_id',
+        'event_series_id',
+        'match_number',
+        'is_home_team_match',
         'title_fr',
         'title_en',
         'slug',
@@ -59,6 +62,7 @@ class Event extends Model implements HasMedia
         'max_price' => 'decimal:2',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
+        'is_home_team_match' => 'boolean',
     ];
 
     
@@ -134,6 +138,30 @@ class Event extends Model implements HasMedia
     public function inventory()
     {
         return $this->hasOne(EventInventory::class);
+    }
+
+    /**
+     * Get the series this event belongs to
+     */
+    public function series()
+    {
+        return $this->belongsTo(EventSeries::class, 'event_series_id');
+    }
+
+    /**
+     * Get packages for this event
+     */
+    public function packages()
+    {
+        return $this->hasMany(EventPackage::class)->where('is_active', true)->orderBy('sort_order');
+    }
+
+    /**
+     * Get all packages (including inactive)
+     */
+    public function allPackages()
+    {
+        return $this->hasMany(EventPackage::class)->orderBy('sort_order');
     }
 
     /**

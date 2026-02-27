@@ -249,6 +249,18 @@ class PaymentController extends Controller
     }
 
     /**
+     * Rediriger directement vers CinetPay (route GET pour redirect depuis booking)
+     */
+    public function redirectToCinetPay(Booking $booking)
+    {
+        // Utiliser 'ALL' comme canal de paiement par défaut pour montrer toutes les options
+        return redirect()->route('payment.cinetpay.process', [
+            'booking' => $booking,
+            'payment_channel' => 'ALL'
+        ]);
+    }
+
+    /**
      * Retour après paiement CinetPay - CRÉATION COMMANDE DUFFEL ICI
      */
     public function cinetpayReturn(Request $request, Booking $booking)
@@ -285,9 +297,31 @@ class PaymentController extends Controller
                 // Créer l'enregistrement de paiement
                 $this->createPaymentRecord($booking, $transactionId, $status);
 
-                // 🎯 CRÉER LA COMMANDE DUFFEL ICI (après paiement réussi)
+                // 🎯 CRÉER LA COMMANDE DUFFEL ICI (après paiement réussi pour les vols)
                 if ($booking->booking_type === 'flight') {
                     $this->processFlightBookingWithDuffel($booking);
+                }
+
+                // Confirmer la réservation d'événement après paiement réussi
+                if ($booking->booking_type === 'event' && $booking->eventBooking) {
+                    $booking->eventBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Event booking confirmed after payment', [
+                        'booking_id' => $booking->id,
+                        'event_booking_id' => $booking->eventBooking->id,
+                    ]);
+                }
+
+                // Confirmer la réservation de package après paiement réussi
+                if ($booking->booking_type === 'package' && $booking->packageBooking) {
+                    $booking->packageBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Package booking confirmed after payment', [
+                        'booking_id' => $booking->id,
+                        'package_booking_id' => $booking->packageBooking->id,
+                    ]);
                 }
 
                 // Nettoyer la session
@@ -296,11 +330,24 @@ class PaymentController extends Controller
                 // Envoyer l'email de confirmation
                 $this->sendConfirmationEmail($booking);
 
-                Log::info('Paiement confirmé et commande Duffel créée', [
+                Log::info('Paiement confirmé', [
                     'booking_id' => $booking->id,
+                    'booking_type' => $booking->booking_type,
                 ]);
 
-                return redirect()->route('flight.booking.confirmation', $booking)
+                // Rediriger selon le type de réservation
+                if ($booking->booking_type === 'flight') {
+                    return redirect()->route('flight.booking.confirmation', $booking)
+                        ->with('success', 'Paiement réussi! Votre réservation de vol a été confirmée.');
+                } elseif ($booking->booking_type === 'event') {
+                    return redirect()->route('event.booking.confirmation', $booking)
+                        ->with('success', 'Paiement réussi! Votre réservation d\'événement a été confirmée.');
+                } elseif ($booking->booking_type === 'package') {
+                    return redirect()->route('packages.booking.confirmation', $booking)
+                        ->with('success', 'Paiement réussi! Votre réservation de package a été confirmée.');
+                }
+
+                return redirect()->route('home')
                     ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
             }
 
@@ -356,14 +403,36 @@ class PaymentController extends Controller
 
                 $this->createPaymentRecord($booking, $transactionId, $paymentStatus);
 
-                // Créer commande Duffel
+                // Créer commande Duffel pour les vols
                 if ($booking->booking_type === 'flight') {
                     $this->processFlightBookingWithDuffel($booking);
                 }
 
+                // Confirmer la réservation d'événement après paiement réussi
+                if ($booking->booking_type === 'event' && $booking->eventBooking) {
+                    $booking->eventBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Event booking confirmed via webhook', [
+                        'booking_id' => $booking->id,
+                        'event_booking_id' => $booking->eventBooking->id,
+                    ]);
+                }
+
+                // Confirmer la réservation de package après paiement réussi
+                if ($booking->booking_type === 'package' && $booking->packageBooking) {
+                    $booking->packageBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Package booking confirmed via webhook', [
+                        'booking_id' => $booking->id,
+                        'package_booking_id' => $booking->packageBooking->id,
+                    ]);
+                }
+
                 $this->sendConfirmationEmail($booking);
 
-                Log::info('Webhook: Commande Duffel créée', ['booking_id' => $booking->id]);
+                Log::info('Webhook: Paiement confirmé', ['booking_id' => $booking->id, 'type' => $booking->booking_type]);
             }
 
             return response()->json(['status' => 'success']);

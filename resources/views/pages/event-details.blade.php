@@ -139,53 +139,111 @@
         </section>
       </div>
 
-      {{-- Right Column - Tickets --}}
+      {{-- Right Column - Tickets & Packages --}}
       <div class="lg:col-span-1">
         <div class="sticky top-6 sm:top-8">
           <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Choose your seats') }}</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Choose your tickets') }}</h3>
 
-            @if($event->seatZones->count() > 0)
-              <div class="space-y-3 sm:space-y-4">
-                @foreach($event->seatZones as $zone)
-                  <div class="border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-300 hover:shadow-md transition-all duration-200">
-                    <div class="flex justify-between items-start mb-2 sm:mb-3">
-                      <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $zone->zone_name }}</h4>
-                        <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $zone->zone_code }}</p>
+            {{-- Afficher les Packages (Grilles Tarifaires) --}}
+            @if($event->packages->count() > 0)
+              <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ __('Packages & VIP Offers') }}</h4>
+                <div class="space-y-3 sm:space-y-4">
+                  @foreach($event->packages as $package)
+                    <div class="border-2 border-purple-200 bg-purple-50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-400 hover:shadow-md transition-all duration-200">
+                      <div class="flex justify-between items-start mb-2 sm:mb-3">
+                        <div class="flex-1 min-w-0">
+                          <h4 class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $package->package_name_fr }}</h4>
+                          <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $package->package_code }}</p>
+                        </div>
+                        <div class="text-right ml-2">
+                          <div class="text-xl sm:text-2xl font-bold text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</div>
+                          <div class="text-xs text-gray-500">{{ __('per person') }}</div>
+                        </div>
                       </div>
-                      <div class="text-right ml-2">
-                        <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</div>
-                        <div class="text-xs text-gray-500">{{ __('per person') }}</div>
+
+                      @if($package->description_fr)
+                        <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ $package->description_fr }}</p>
+                      @endif
+
+                      @if($package->description_included_fr)
+                        <div class="text-xs text-gray-500 mb-2 sm:mb-3">
+                          <span class="font-medium">{{ __('Included') }}:</span> {{ $package->description_included_fr }}
+                        </div>
+                      @endif
+
+                      <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+                        <span>{{ $package->available_quantity }} {{ __('available') }}</span>
+                        <span class="text-xs">/ {{ $package->available_quantity }}</span>
                       </div>
+
+                      @if($package->available_quantity > 0)
+                        <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-package-btn"
+                                data-package-id="{{ $package->id }}"
+                                data-package-name="{{ $package->package_name_fr }}"
+                                data-price="{{ $package->price }}"
+                                data-available="{{ $package->available_quantity }}">
+                          {{ __('Select Package') }}
+                        </button>
+                      @else
+                        <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
+                          {{ __('Sold out') }}
+                        </button>
+                      @endif
                     </div>
-
-                    @if($zone->description)
-                      <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ $zone->description }}</p>
-                    @endif
-
-                    <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
-                      <span>{{ $zone->available_seats }} {{ __('remaining') }}</span>
-                      <span class="text-xs">/ {{ $zone->total_seats }}</span>
-                    </div>
-
-                    @if($zone->available_seats > 0)
-                      <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
-                              data-zone-id="{{ $zone->id }}"
-                              data-zone-name="{{ $zone->zone_name }}"
-                              data-price="{{ $zone->price }}"
-                              data-available="{{ $zone->available_seats }}">
-                        {{ __('Select') }}
-                      </button>
-                    @else
-                      <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
-                        {{ __('Sold out') }}
-                      </button>
-                    @endif
-                  </div>
-                @endforeach
+                  @endforeach
+                </div>
               </div>
-            @else
+            @endif
+
+            {{-- Afficher les Seat Zones (Zones de places) --}}
+            @if($event->seatZones->count() > 0)
+              <div class="@if($event->packages->count() > 0) pt-6 border-t border-gray-200 @endif">
+                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ __('Seat Zones') }}</h4>
+                <div class="space-y-3 sm:space-y-4">
+                  @foreach($event->seatZones as $zone)
+                    <div class="border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-300 hover:shadow-md transition-all duration-200">
+                      <div class="flex justify-between items-start mb-2 sm:mb-3">
+                        <div class="flex-1 min-w-0">
+                          <h4 class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $zone->zone_name }}</h4>
+                          <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $zone->zone_code }}</p>
+                        </div>
+                        <div class="text-right ml-2">
+                          <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</div>
+                          <div class="text-xs text-gray-500">{{ __('per person') }}</div>
+                        </div>
+                      </div>
+
+                      @if($zone->description)
+                        <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ $zone->description }}</p>
+                      @endif
+
+                      <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+                        <span>{{ $zone->available_seats }} {{ __('remaining') }}</span>
+                        <span class="text-xs">/ {{ $zone->total_seats }}</span>
+                      </div>
+
+                      @if($zone->available_seats > 0)
+                        <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
+                                data-zone-id="{{ $zone->id }}"
+                                data-zone-name="{{ $zone->zone_name }}"
+                                data-price="{{ $zone->price }}"
+                                data-available="{{ $zone->available_seats }}">
+                          {{ __('Select') }}
+                        </button>
+                      @else
+                        <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
+                          {{ __('Sold out') }}
+                        </button>
+                      @endif
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            @endif
+
+            @if($event->packages->count() == 0 && $event->seatZones->count() == 0)
               <div class="text-center py-6 sm:py-8">
                 <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -219,13 +277,13 @@
   </section>
 </div>
 
-{{-- Seat Selection Modal --}}
+{{-- Seat/Package Selection Modal --}}
 <div id="seatModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
   <div class="flex items-center justify-center min-h-screen p-4">
     <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold text-gray-900">{{ __('Select your seats') }}</h3>
+          <h3 class="text-xl font-bold text-gray-900" id="modalTitle">{{ __('Select your seats') }}</h3>
           <button id="closeModal" class="text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -240,7 +298,7 @@
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Number of seats') }}</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2" id="quantityLabel">{{ __('Number of seats') }}</label>
             <div class="flex items-center space-x-3">
               <button id="decreaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,12 +312,12 @@
                 </svg>
               </button>
             </div>
-            <p class="text-xs text-gray-500 mt-2">{{ __('Maximum:') }} <span id="maxAvailable"></span> {{ __('seats available') }}</p>
+            <p class="text-xs text-gray-500 mt-2">{{ __('Maximum:') }} <span id="maxAvailable"></span></p>
           </div>
 
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-gray-600">{{ __('Price per seat:') }}</span>
+              <span class="text-gray-600" id="pricePerItemLabel">{{ __('Price per seat:') }}</span>
               <span id="unitPrice" class="font-semibold"></span>
             </div>
             <div class="flex justify-between items-center text-lg font-bold">
@@ -270,7 +328,8 @@
 
           <form id="bookingForm" method="POST" action="{{ route('event.book', $event) }}">
             @csrf
-            <input type="hidden" name="zone_id" id="zoneIdInput">
+            <input type="hidden" name="zone_id" id="zoneIdInput" value="">
+            <input type="hidden" name="package_id" id="packageIdInput" value="">
             <input type="hidden" name="quantity" id="quantityInput" value="1">
 
             <div class="space-y-4 mb-6">
@@ -304,37 +363,77 @@ window.currentCurrency = '{{ session('currency', 'XOF') }}';
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('seatModal');
   const closeModal = document.getElementById('closeModal');
-  const selectButtons = document.querySelectorAll('.select-seat-btn');
+  const selectSeatButtons = document.querySelectorAll('.select-seat-btn');
+  const selectPackageButtons = document.querySelectorAll('.select-package-btn');
   const decreaseBtn = document.getElementById('decreaseQty');
   const increaseBtn = document.getElementById('increaseQty');
   const quantitySpan = document.getElementById('quantity');
   const quantityInput = document.getElementById('quantityInput');
   const zoneIdInput = document.getElementById('zoneIdInput');
+  const packageIdInput = document.getElementById('packageIdInput');
+  const modalTitle = document.getElementById('modalTitle');
+  const selectedItemName = document.getElementById('selectedZoneName');
+  const selectedItemPrice = document.getElementById('selectedZonePrice');
 
-  let currentZone = null;
+  let currentItem = null;
   let currentQuantity = 1;
   let maxAvailable = 0;
+  let isPackage = false;
 
-  // Open modal
-  selectButtons.forEach(button => {
+  // Open modal for Seat Zones
+  selectSeatButtons.forEach(button => {
     button.addEventListener('click', function() {
       const zoneId = this.dataset.zoneId;
       const zoneName = this.dataset.zoneName;
       const price = parseFloat(this.dataset.price);
       maxAvailable = parseInt(this.dataset.available);
 
-      currentZone = { id: zoneId, name: zoneName, price: price };
+      isPackage = false;
+      currentItem = { id: zoneId, name: zoneName, price: price, type: 'seat' };
       currentQuantity = 1;
 
-      // Update modal content
-      document.getElementById('selectedZoneName').textContent = zoneName;
-      document.getElementById('selectedZonePrice').textContent = formatPrice(price) + ' par place';
+      // Update modal for seat
+      modalTitle.textContent = '{{ __("Select your seats") }}';
+      selectedItemName.textContent = zoneName;
+      selectedItemPrice.textContent = formatPrice(price) + ' {{ __("per place") }}';
       document.getElementById('unitPrice').textContent = formatPrice(price);
       document.getElementById('maxAvailable').textContent = maxAvailable;
+      document.getElementById('quantityLabel').textContent = '{{ __("Number of seats") }}';
       updateTotal();
 
       // Set form inputs
       zoneIdInput.value = zoneId;
+      packageIdInput.value = '';
+      quantityInput.value = currentQuantity;
+
+      modal.classList.remove('hidden');
+    });
+  });
+
+  // Open modal for Packages
+  selectPackageButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const packageId = this.dataset.packageId;
+      const packageName = this.dataset.packageName;
+      const price = parseFloat(this.dataset.price);
+      maxAvailable = parseInt(this.dataset.available);
+
+      isPackage = true;
+      currentItem = { id: packageId, name: packageName, price: price, type: 'package' };
+      currentQuantity = 1;
+
+      // Update modal for package
+      modalTitle.textContent = '{{ __("Select Package") }}';
+      selectedItemName.textContent = packageName;
+      selectedItemPrice.textContent = formatPrice(price) + ' {{ __("per person") }}';
+      document.getElementById('unitPrice').textContent = formatPrice(price);
+      document.getElementById('maxAvailable').textContent = maxAvailable;
+      document.getElementById('quantityLabel').textContent = '{{ __("Number of packages") }}';
+      updateTotal();
+
+      // Set form inputs
+      packageIdInput.value = packageId;
+      zoneIdInput.value = '';
       quantityInput.value = currentQuantity;
 
       modal.classList.remove('hidden');
@@ -374,8 +473,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function updateTotal() {
-    if (currentZone) {
-      const total = currentZone.price * currentQuantity;
+    if (currentItem) {
+      const total = currentItem.price * currentQuantity;
       document.getElementById('totalPrice').textContent = formatPrice(total);
     }
   }

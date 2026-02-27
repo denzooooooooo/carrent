@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\VerificationCode;
 use App\Services\SMSService;
+use App\Services\PHPMailerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\RateLimiter;
 
 class VerificationController extends Controller
 {
     protected $smsService;
+    protected $phpMailer;
 
-    public function __construct(SMSService $smsService)
+    public function __construct(SMSService $smsService, PHPMailerService $phpMailer)
     {
         $this->smsService = $smsService;
+        $this->phpMailer  = $phpMailer;
     }
 
     /**
@@ -40,7 +43,7 @@ class VerificationController extends Controller
     }
 
     /**
-     * Envoyer le code de vérification par email
+     * Envoyer le code de vérification par email (via PHPMailer — fonctionne en local et en prod)
      */
     public function sendEmailVerification(Request $request)
     {
@@ -59,10 +62,30 @@ class VerificationController extends Controller
             // Générer le code
             $verificationCode = VerificationCode::generate($user, 'email', $user->email);
 
-            // Envoyer l'email
-            Mail::to($user->email)->send(new \App\Mail\VerificationCodeMail($verificationCode));
+            // Envoyer via PHPMailer (SMTP Ionos configuré dans .env)
+            $fullName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            $sent = $this->phpMailer->sendVerificationCode(
+                $user->email,
+                $fullName ?: 'Cher utilisateur',
+                $verificationCode->code
+            );
+
+            if (!$sent) {
+                Log::error('VerificationController: PHPMailer échec envoi email', [
+                    'user_id' => $user->id,
+                    'email'   => $user->email,
+                ]);
+                return back()->withErrors([
+                    'email' => 'Impossible d\'envoyer l\'email de vérification. Veuillez contacter le support.'
+                ]);
+            }
 
             RateLimiter::hit($key, 3600); // 1 heure
+
+            Log::info('VerificationController: Code envoyé par email', [
+                'user_id' => $user->id,
+                'email'   => $user->email,
+            ]);
 
             Session::flash('success', 'Code de vérification envoyé par email à ' . $user->email);
             Session::put('last_verification_sent', now());
@@ -71,8 +94,12 @@ class VerificationController extends Controller
             return back();
 
         } catch (\Exception $e) {
+            Log::error('VerificationController: Exception envoi email', [
+                'user_id' => $user->id ?? null,
+                'message' => $e->getMessage(),
+            ]);
             return back()->withErrors([
-                'email' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()
+                'email' => 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer ou contacter le support.'
             ]);
         }
     }

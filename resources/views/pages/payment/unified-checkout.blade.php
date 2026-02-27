@@ -5,6 +5,17 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
+        <!-- Bouton Retour -->
+        <div class="mb-6">
+            <a href="javascript:history.back()"
+               class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition-colors group">
+                <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Retour
+            </a>
+        </div>
+
         <!-- Progress Bar -->
         <div class="mb-8">
             <div class="flex items-center justify-between mb-2">

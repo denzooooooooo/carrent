@@ -55,7 +55,9 @@ class EventSeatZone extends Model
     public function getZoneNameAttribute(): string
     {
         $locale = app()->getLocale();
-        return $locale === 'fr' ? $this->zone_name_fr : ($this->zone_name_en ?? $this->zone_name_fr);
+        return $locale === 'fr'
+            ? ($this->zone_name_fr ?? $this->zone_name_en ?? '')
+            : ($this->zone_name_en ?? $this->zone_name_fr ?? '');
     }
 
     /**
@@ -64,6 +66,8 @@ class EventSeatZone extends Model
     public function getDescriptionAttribute(): string
     {
         $locale = app()->getLocale();
-        return $locale === 'fr' ? $this->description_fr : ($this->description_en ?? $this->description_fr);
+        return $locale === 'fr'
+            ? ($this->description_fr ?? $this->description_en ?? '')
+            : ($this->description_en ?? $this->description_fr ?? '');
     }
 }

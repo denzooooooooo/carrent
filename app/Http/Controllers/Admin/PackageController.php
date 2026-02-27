@@ -58,7 +58,20 @@ class PackageController extends Controller
         $packages = $query->paginate(12)->withQueryString();
         $categories = Category::all();
 
-        return view('admin.packages.index', compact('packages', 'categories'));
+        $packageTypes = [
+            'sport_event' => 'Événement Sportif',
+            'motorsport'  => 'Motorsport / F1',
+            'football'    => 'Football',
+            'helicopter'  => 'Hélicoptère',
+            'private_jet' => 'Jet Privé',
+            'cruise'      => 'Croisière',
+            'safari'      => 'Safari',
+            'city_tour'   => 'Visite de Ville',
+            'adventure'   => 'Aventure',
+            'luxury'      => 'Luxe',
+        ];
+
+        return view('admin.packages.index', compact('packages', 'categories', 'packageTypes'));
     }
 
     /**
@@ -67,15 +80,18 @@ class PackageController extends Controller
     public function create()
     {
         $categories = Category::where('is_active', true)->get();
-        
+
         $packageTypes = [
-            'helicopter' => 'Hélicoptère',
+            'sport_event' => 'Événement Sportif',
+            'motorsport'  => 'Motorsport / Formule 1',
+            'football'    => 'Football',
+            'helicopter'  => 'Hélicoptère',
             'private_jet' => 'Jet Privé',
-            'cruise' => 'Croisière',
-            'safari' => 'Safari',
-            'city_tour' => 'Visite de Ville',
-            'adventure' => 'Aventure',
-            'luxury' => 'Luxe'
+            'cruise'      => 'Croisière',
+            'safari'      => 'Safari',
+            'city_tour'   => 'Visite de Ville',
+            'adventure'   => 'Aventure',
+            'luxury'      => 'Luxe',
         ];
 
         return view('admin.packages.create', compact('categories', 'packageTypes'));
@@ -92,7 +108,10 @@ class PackageController extends Controller
             'title_en' => 'required|string|max:255',
             'description_fr' => 'nullable|string',
             'description_en' => 'nullable|string',
-            'package_type' => 'required|in:helicopter,private_jet,cruise,safari,city_tour,adventure,luxury',
+            'package_type'     => 'required|in:helicopter,private_jet,cruise,safari,city_tour,adventure,luxury,sport_event,motorsport,football',
+            'currency'         => 'nullable|string|max:10',
+            'event_date_start' => 'nullable|date',
+            'event_date_end'   => 'nullable|date|after_or_equal:event_date_start',
             'destination' => 'required|string|max:255',
             'duration' => 'required|integer|min:1',
             'duration_text_fr' => 'nullable|string|max:100',
@@ -194,15 +213,18 @@ class PackageController extends Controller
     public function edit(TourPackage $package)
     {
         $categories = Category::where('is_active', true)->get();
-        
+
         $packageTypes = [
-            'helicopter' => 'Hélicoptère',
+            'sport_event' => 'Événement Sportif',
+            'motorsport'  => 'Motorsport / Formule 1',
+            'football'    => 'Football',
+            'helicopter'  => 'Hélicoptère',
             'private_jet' => 'Jet Privé',
-            'cruise' => 'Croisière',
-            'safari' => 'Safari',
-            'city_tour' => 'Visite de Ville',
-            'adventure' => 'Aventure',
-            'luxury' => 'Luxe'
+            'cruise'      => 'Croisière',
+            'safari'      => 'Safari',
+            'city_tour'   => 'Visite de Ville',
+            'adventure'   => 'Aventure',
+            'luxury'      => 'Luxe',
         ];
 
         return view('admin.packages.edit', compact('package', 'categories', 'packageTypes'));
@@ -219,7 +241,10 @@ class PackageController extends Controller
             'title_en' => 'required|string|max:255',
             'description_fr' => 'nullable|string',
             'description_en' => 'nullable|string',
-            'package_type' => 'required|in:helicopter,private_jet,cruise,safari,city_tour,adventure,luxury',
+            'package_type'     => 'required|in:helicopter,private_jet,cruise,safari,city_tour,adventure,luxury,sport_event,motorsport,football',
+            'currency'         => 'nullable|string|max:10',
+            'event_date_start' => 'nullable|date',
+            'event_date_end'   => 'nullable|date|after_or_equal:event_date_start',
             'destination' => 'required|string|max:255',
             'duration' => 'required|integer|min:1',
             'duration_text_fr' => 'nullable|string|max:100',

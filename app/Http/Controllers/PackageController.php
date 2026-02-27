@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TourPackage;
 use App\Models\Booking;
+use App\Models\PackageBooking;
 use App\Mail\PackageBookingConfirmation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -93,8 +94,11 @@ class PackageController extends Controller
      */
     public function book(Request $request, TourPackage $package)
     {
+        // Si le package a une date fixe, la date de départ n'est pas requise dans le formulaire
+        $hasFixedDate = !empty($package->event_date_start);
+
         $request->validate([
-            'departure_date' => 'required|date|after:today',
+            'departure_date' => $hasFixedDate ? 'nullable|date' : 'required|date|after:today',
             'participants' => 'required|integer|min:' . $package->min_participants . '|max:' . $package->max_participants,
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -102,6 +106,11 @@ class PackageController extends Controller
             'phone' => 'required|string|max:20',
             'special_requests' => 'nullable|string|max:1000',
         ]);
+
+        // Utiliser la date du package si elle est définie, sinon utiliser la date saisie
+        $departureDate = $hasFixedDate
+            ? $package->event_date_start->format('Y-m-d')
+            : $request->departure_date;
 
         // Calculate total price
         $unitPrice = $package->discount_price ?? $package->price;
@@ -114,7 +123,7 @@ class PackageController extends Controller
             'booking_type' => 'package',
             'package_id' => $package->id,
             'booking_date' => now(),
-            'travel_date' => $request->departure_date,
+            'travel_date' => $departureDate,
             'number_of_passengers' => $request->participants,
             'passenger_details' => [
                 [
@@ -127,12 +136,37 @@ class PackageController extends Controller
                 ]
             ],
             'total_amount' => $totalPrice,
-            'currency' => 'XAF',
+            'currency' => 'XOF',
             'final_amount' => $totalPrice,
             'status' => 'pending',
             'payment_status' => 'pending',
             'special_requests' => $request->special_requests,
         ]);
+
+        // Créer l'enregistrement PackageBooking
+        $packageBooking = PackageBooking::create([
+            'booking_id' => $booking->id,
+            'package_id' => $package->id,
+            'confirmation_number' => $booking->booking_number,
+            'travel_date' => $departureDate,
+            'participants_count' => $request->participants,
+            'participants_details' => [
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                ]
+            ],
+            'base_price' => $package->price,
+            'margin_amount' => $unitPrice - $package->price,
+            'final_price' => $totalPrice,
+            'status' => 'pending',
+            'special_requests' => $request->special_requests,
+        ]);
+
+        // Mettre à jour le booking avec la référence du package booking
+        $booking->update(['package_booking_id' => $packageBooking->id]);
 
         // Send confirmation email
         try {
@@ -143,8 +177,8 @@ class PackageController extends Controller
             \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
         }
 
-        return redirect()->route('payment.checkout', $booking)
-            ->with('success', 'Votre réservation a été créée. Veuillez procéder au paiement pour la confirmer.');
+        return redirect()->route('payment.cinetpay.redirect', $booking)
+            ->with('success', 'Votre réservation a été créée. Redirection vers le paiement sécurisé...');
     }
 
     /**

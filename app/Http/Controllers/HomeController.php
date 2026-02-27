@@ -17,8 +17,8 @@ class HomeController extends Controller
         // Charger les événements actifs avec leurs relations pour le carrousel
         $events = Event::where('is_active', true)
             ->with(['category', 'type', 'seatZones'])
-            ->orderBy('event_date', 'asc')
-            ->take(6)
+            ->orderBy('created_at', 'desc')
+            ->take(8)
             ->get();
 
         return view('pages.home', compact('events'));

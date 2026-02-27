@@ -7,10 +7,16 @@
     <div class="max-w-8xl mx-auto py-8">
         <div class="flex justify-between items-center mb-8 border-b pb-2">
             <h1 class="text-3xl font-bold text-dark gradient-text">Catalogue des Événements ({{ $events->total() }})</h1>
-            <a href="{{ route('admin.events.create') }}"
-                class="py-2 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition duration-300 shadow-md flex items-center">
-                <i class="fas fa-plus-circle mr-2"></i> Ajouter un nouvel Événement
-            </a>
+            <div class="flex space-x-3">
+                <a href="{{ route('admin.events.import.form') }}"
+                    class="py-2 px-4 rounded-lg text-white font-semibold bg-blue-600 hover:bg-blue-700 transition duration-300 shadow-md flex items-center">
+                    <i class="fas fa-file-import mr-2"></i> Importer Packages
+                </a>
+                <a href="{{ route('admin.events.create') }}"
+                    class="py-2 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition duration-300 shadow-md flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i> Ajouter un nouvel Événement
+                </a>
+            </div>
         </div>
 
         {{-- Messages de Session --}}

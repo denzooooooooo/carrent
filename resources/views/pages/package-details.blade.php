@@ -158,10 +158,26 @@
             {{-- Booking Details --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <label for="departure_date" class="block text-sm font-medium text-gray-700 mb-2">Date de départ *</label>
-                <input type="date" id="departure_date" name="departure_date" required
-                       min="{{ date('Y-m-d') }}"
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                @if($package->event_date_start)
+                  {{-- Date fixe définie par le package : affichage en lecture seule --}}
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Date de départ</label>
+                  <div class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg text-gray-700 font-semibold flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ \Carbon\Carbon::parse($package->event_date_start)->translatedFormat('d F Y') }}
+                    @if($package->event_date_end && $package->event_date_end != $package->event_date_start)
+                      &nbsp;→&nbsp;{{ \Carbon\Carbon::parse($package->event_date_end)->translatedFormat('d F Y') }}
+                    @endif
+                  </div>
+                  <input type="hidden" name="departure_date" value="{{ $package->event_date_start->format('Y-m-d') }}">
+                @else
+                  {{-- Date libre : sélecteur de date --}}
+                  <label for="departure_date" class="block text-sm font-medium text-gray-700 mb-2">Date de départ *</label>
+                  <input type="date" id="departure_date" name="departure_date" required
+                         min="{{ date('Y-m-d') }}"
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                @endif
               </div>
               <div>
                 <label for="participants" class="block text-sm font-medium text-gray-700 mb-2">Nombre de participants *</label>

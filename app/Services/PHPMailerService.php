@@ -34,8 +34,20 @@ class PHPMailerService
             $this->mail->CharSet = 'UTF-8';
 
             // Sender info
+            // IMPORTANT: Pour Ionos (et la plupart des SMTP hébergés), l'adresse From
+            // DOIT correspondre au compte authentifié (PHPMAILER_USERNAME).
+            // Utiliser PHPMAILER_FROM_ADDRESS s'il est identique au username, sinon fallback sur username.
+            $username    = env('PHPMAILER_USERNAME');
+            $fromAddress = env('PHPMAILER_FROM_ADDRESS', $username);
+
+            // Si l'adresse From ne correspond pas au username, Ionos rejette l'email.
+            // On force donc l'utilisation du username comme adresse d'envoi.
+            if ($fromAddress !== $username) {
+                $fromAddress = $username;
+            }
+
             $this->mail->setFrom(
-                env('PHPMAILER_FROM_ADDRESS', 'noreply@carrepremium.ci'),
+                $fromAddress,
                 env('PHPMAILER_FROM_NAME', 'Carré Premium')
             );
 

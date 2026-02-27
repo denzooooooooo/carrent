@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\EventType;
+use App\Models\EventPackage;
+use App\Imports\EventPackagesImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventController extends Controller
 {
@@ -20,6 +23,14 @@ class EventController extends Controller
         // On charge la catégorie pour l'affichage dans la carte.
         $events = Event::with('category', 'type')->latest()->paginate(12);
         return view('admin.events.index', compact('events'));
+    }
+
+    /**
+     * Show the import form
+     */
+    public function importForm()
+    {
+        return view('admin.events.import');
     }
 
     /**
@@ -60,9 +71,9 @@ class EventController extends Controller
                       ->toMediaCollection('avatar');
             }
 
-            // Gestion des zones de sièges
-            if ($request->has('seat_zones')) {
-                $this->storeSeatZones($event, $request->input('seat_zones'));
+            // Gestion des packages (grilles tarifaires)
+            if ($request->has('packages')) {
+                $this->storePackages($event, $request->input('packages'));
             }
 
             DB::commit();
@@ -112,7 +123,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        $event->load('seatZones'); // Load seat zones for the form
+        $event->load('seatZones', 'packages'); // Load seat zones and packages for the form
         $categories = EventCategory::where('is_active', true)->pluck('name_fr', 'id');
         $types = EventType::where('is_active', true)->pluck('name_fr', 'id');
         $pageTitle = 'Modifier l\'Événement : ' . $event->title_fr;
@@ -152,9 +163,9 @@ class EventController extends Controller
                 $event->clearMediaCollection('avatar');
             }
 
-            // Gestion des zones de sièges
-            if ($request->has('seat_zones')) {
-                $this->updateSeatZones($event, $request->input('seat_zones'));
+            // Gestion des packages (grilles tarifaires)
+            if ($request->has('packages')) {
+                $this->updatePackages($event, $request->input('packages'));
             }
 
             DB::commit();
@@ -212,12 +223,12 @@ class EventController extends Controller
      */
     protected function validateEvent(Request $request, ?Event $event = null)
     {
-        // Filter out empty seat zones before validation
-        $seatZones = $request->input('seat_zones', []);
-        $filteredZones = array_filter($seatZones, function($zone) {
-            return !empty($zone['zone_name_fr']) && !empty($zone['zone_name_en']);
+        // Filter out empty packages before validation
+        $packages = $request->input('packages', []);
+        $filteredPackages = array_filter($packages, function($package) {
+            return !empty($package['package_name_fr']);
         });
-        $request->merge(['seat_zones' => $filteredZones]);
+        $request->merge(['packages' => $filteredPackages]);
 
         $rules = [
             'category_id' => ['required', 'exists:event_categories,id'],
@@ -231,7 +242,7 @@ class EventController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
             'event_date' => ['required', 'date'],
-            'event_time' => ['required', 'date_format:H:i'],
+            'event_time' => ['required', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/'],
             'end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
             'end_time' => ['nullable', 'date_format:H:i', 'required_with:end_date'],
             'image' => ['nullable', 'image', 'max:2048'], // 2MB max
@@ -245,16 +256,18 @@ class EventController extends Controller
             'meta_title_en' => ['nullable', 'string', 'max:255'],
             'meta_description_fr' => ['nullable', 'string', 'max:500'],
             'meta_description_en' => ['nullable', 'string', 'max:500'],
-            'seat_zones' => ['nullable', 'array'],
-            'seat_zones.*.zone_name_fr' => ['required', 'string', 'max:255'],
-            'seat_zones.*.zone_name_en' => ['required', 'string', 'max:255'],
-            'seat_zones.*.zone_code' => ['required', 'string', 'max:50'],
-            'seat_zones.*.zone_type' => ['required', 'in:standard,vip,vvip,premium'],
-            'seat_zones.*.price' => ['required', 'numeric', 'min:0'],
-            'seat_zones.*.total_seats' => ['required', 'numeric', 'min:1', 'integer'],
-            'seat_zones.*.description_fr' => ['nullable', 'string'],
-            'seat_zones.*.description_en' => ['nullable', 'string'],
-            'seat_zones.*.is_active' => ['nullable', 'boolean'],
+            'packages' => ['nullable', 'array'],
+            'packages.*.package_name_fr' => ['required', 'string', 'max:255'],
+            'packages.*.package_name_en' => ['nullable', 'string', 'max:255'],
+            'packages.*.package_code' => ['nullable', 'string', 'max:50'],
+            'packages.*.description_fr' => ['nullable', 'string'],
+            'packages.*.description_included_fr' => ['nullable', 'string'],
+            'packages.*.price' => ['required', 'numeric', 'min:0'],
+            'packages.*.currency' => ['nullable', 'string', 'max:10'],
+            'packages.*.available_quantity' => ['nullable', 'integer', 'min:0'],
+            'packages.*.max_per_order' => ['nullable', 'integer', 'min:1'],
+            'packages.*.is_active' => ['nullable', 'boolean'],
+            'packages.*.sort_order' => ['nullable', 'integer', 'min:0'],
         ];
 
         $validated = $request->validate($rules);
@@ -342,6 +355,113 @@ class EventController extends Controller
                     ]);
                 }
             }
+        }
+    }
+
+    /**
+     * Store packages for an event
+     */
+    protected function storePackages(Event $event, array $packagesData)
+    {
+        foreach ($packagesData as $index => $packageData) {
+            if (!empty($packageData['package_name_fr'])) {
+                $event->packages()->create([
+                    'package_name_fr' => $packageData['package_name_fr'],
+                    'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
+                    'package_code' => $packageData['package_code'] ?? null,
+                    'description_fr' => $packageData['description_fr'] ?? null,
+                    'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                    'price' => $packageData['price'] ?? 0,
+                    'currency' => $packageData['currency'] ?? 'XOF',
+                    'available_quantity' => $packageData['available_quantity'] ?? 100,
+                    'max_per_order' => $packageData['max_per_order'] ?? 10,
+                    'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
+                    'sort_order' => $packageData['sort_order'] ?? ($index + 1),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Update packages for an event
+     */
+    protected function updatePackages(Event $event, array $packagesData)
+    {
+        // Delete existing packages not in the new data
+        $existingIds = collect($packagesData)->pluck('id')->filter()->toArray();
+        $event->packages()->whereNotIn('id', $existingIds)->delete();
+
+        foreach ($packagesData as $index => $packageData) {
+            if (!empty($packageData['package_name_fr'])) {
+                if (isset($packageData['id']) && $packageData['id']) {
+                    // Update existing package
+                    $package = $event->packages()->find($packageData['id']);
+                    if ($package) {
+                        $package->update([
+                            'package_name_fr' => $packageData['package_name_fr'],
+                            'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
+                            'package_code' => $packageData['package_code'] ?? null,
+                            'description_fr' => $packageData['description_fr'] ?? null,
+                            'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                            'price' => $packageData['price'] ?? 0,
+                            'currency' => $packageData['currency'] ?? 'XOF',
+                            'available_quantity' => $packageData['available_quantity'] ?? 100,
+                            'max_per_order' => $packageData['max_per_order'] ?? 10,
+                            'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
+                            'sort_order' => $packageData['sort_order'] ?? ($index + 1),
+                        ]);
+                    }
+                } else {
+                    // Create new package
+                    $event->packages()->create([
+                        'package_name_fr' => $packageData['package_name_fr'],
+                        'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
+                        'package_code' => $packageData['package_code'] ?? null,
+                        'description_fr' => $packageData['description_fr'] ?? null,
+                        'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                        'price' => $packageData['price'] ?? 0,
+                        'currency' => $packageData['currency'] ?? 'XOF',
+                        'available_quantity' => $packageData['available_quantity'] ?? 100,
+                        'max_per_order' => $packageData['max_per_order'] ?? 10,
+                        'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
+                        'sort_order' => $packageData['sort_order'] ?? ($index + 1),
+                    ]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Importer des packages depuis un fichier Excel
+     */
+    public function importPackages(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // Max 10MB
+            'event_id' => 'nullable|exists:events,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $eventId = $request->input('event_id');
+            $file = $request->file('excel_file');
+
+            // Import des packages
+            $import = new EventPackagesImport();
+            Excel::import($import, $file);
+
+            $count = $import->getRowCount();
+
+            DB::commit();
+
+            return redirect()->route('admin.events.index')
+                ->with('success', $count . ' package(s) importé(s) avec succès!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Import Error: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'import: ' . $e->getMessage());
         }
     }
 }

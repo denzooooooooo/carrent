@@ -108,6 +108,35 @@ $currentAvatarUrl = $package->getFirstMediaUrl('avatar', 'thumb') ?: 'https://pl
             @error('discount_price')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
+        {{-- Devise --}}
+        <div>
+            <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Devise</label>
+            <select name="currency" id="currency" class="form-select @error('currency') border-red-500 @enderror">
+                <option value="XOF" {{ old('currency', $package->currency ?? 'XOF') == 'XOF' ? 'selected' : '' }}>XOF (FCFA)</option>
+                <option value="EUR" {{ old('currency', $package->currency ?? 'XOF') == 'EUR' ? 'selected' : '' }}>EUR (€)</option>
+                <option value="USD" {{ old('currency', $package->currency ?? 'XOF') == 'USD' ? 'selected' : '' }}>USD ($)</option>
+            </select>
+            @error('currency')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        {{-- Date début événement --}}
+        <div>
+            <label for="event_date_start" class="block text-sm font-medium text-gray-700 mb-1">Date début événement</label>
+            <input type="date" name="event_date_start" id="event_date_start"
+                class="form-input @error('event_date_start') border-red-500 @enderror"
+                value="{{ old('event_date_start', $package->event_date_start ? \Carbon\Carbon::parse($package->event_date_start)->format('Y-m-d') : '') }}">
+            @error('event_date_start')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        {{-- Date fin événement --}}
+        <div>
+            <label for="event_date_end" class="block text-sm font-medium text-gray-700 mb-1">Date fin événement</label>
+            <input type="date" name="event_date_end" id="event_date_end"
+                class="form-input @error('event_date_end') border-red-500 @enderror"
+                value="{{ old('event_date_end', $package->event_date_end ? \Carbon\Carbon::parse($package->event_date_end)->format('Y-m-d') : '') }}">
+            @error('event_date_end')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
         {{-- Participants Max --}}
         <div>
             <label for="max_participants" class="block text-sm font-medium text-gray-700 mb-1 required">Participants Max</label>

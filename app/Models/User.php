@@ -44,6 +44,7 @@ class User extends Authenticatable
         'email_verified_at',
         'phone_verified_at',
         'is_active',
+        'is_verified',
         'loyalty_points',
     ];
 
@@ -69,6 +70,7 @@ class User extends Authenticatable
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'is_verified' => 'boolean',
             'date_of_birth' => 'date',
         ];
     }

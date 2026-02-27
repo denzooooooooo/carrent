@@ -22,7 +22,8 @@
     <div class="container mx-auto px-4">
       <div class="max-w-6xl mx-auto">
         <form method="GET" action="{{ route('events') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
+            {{-- Type d'événement (Catégorie) --}}
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Event type') }}</label>
               <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
@@ -34,30 +35,88 @@
                 @endforeach
               </select>
             </div>
+            
+            {{-- Ville --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('City') }}</label>
+              <select name="city" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">{{ __('All cities') }}</option>
+                @foreach($cities as $city)
+                  <option value="{{ $city }}" {{ request('city') == $city ? 'selected' : '' }}>
+                    {{ $city }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            
+            {{-- Pays --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Country') }}</label>
+              <select name="country" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+                <option value="">{{ __('All countries') }}</option>
+                @foreach($countries as $country)
+                  <option value="{{ $country }}" {{ request('country') == $country ? 'selected' : '' }}>
+                    {{ $country }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            
+            {{-- Lieu (Venue) - Dynamique --}}
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Venue') }}</label>
               <select name="venue" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
                 <option value="">{{ __('All venues') }}</option>
-                <option value="Stade Félix Houphouët-Boigny" {{ request('venue') == 'Stade Félix Houphouët-Boigny' ? 'selected' : '' }}>Stade Félix Houphouët-Boigny</option>
-                <option value="Palais de la Culture" {{ request('venue') == 'Palais de la Culture' ? 'selected' : '' }}>Palais de la Culture</option>
-                <option value="Parc des Sports" {{ request('venue') == 'Parc des Sports' ? 'selected' : '' }}>Parc des Sports</option>
-                <option value="Salle des fêtes" {{ request('venue') == 'Salle des fêtes' ? 'selected' : '' }}>Salle des fêtes</option>
+                @foreach($venues as $venue)
+                  <option value="{{ $venue }}" {{ request('venue') == $venue ? 'selected' : '' }}>
+                    {{ $venue }}
+                  </option>
+                @endforeach
               </select>
             </div>
+            
+            {{-- Prix minimum --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Min price') }}</label>
+              <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+            </div>
+            
+            {{-- Prix maximum --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Max price') }}</label>
+              <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Max" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
+            {{-- Date spécifique --}}
             <div>
               <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Date') }}</label>
               <input type="date" name="date" value="{{ request('date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
             </div>
-            <div class="flex items-end gap-2">
-              <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
-                {{ __('Search') }}
-              </button>
-              @if(request()->hasAny(['category', 'venue', 'date']))
-                <a href="{{ route('events') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
-                  ✕
-                </a>
-              @endif
+            
+            {{-- Date de début --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('From date') }}</label>
+              <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
             </div>
+            
+            {{-- Date de fin --}}
+            <div>
+              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('To date') }}</label>
+              <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
+            </div>
+          </div>
+          
+          <div class="flex items-end gap-2 mt-4">
+            <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
+              {{ __('Search') }}
+            </button>
+            @if(request()->hasAny(['category', 'venue', 'date', 'city', 'country', 'min_price', 'max_price', 'start_date', 'end_date']))
+              <a href="{{ route('events') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
+                ✕
+              </a>
+            @endif
           </div>
         </form>
       </div>

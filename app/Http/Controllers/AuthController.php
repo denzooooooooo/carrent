@@ -90,36 +90,38 @@ class AuthController extends Controller
             'is_verified' => false, // Compte non vérifié par défaut
         ]);
 
-        // Générer le code de vérification AVANT de connecter l'utilisateur
+        // Générer et envoyer le code de vérification AVANT de connecter l'utilisateur
         try {
             $verificationCode = \App\Models\VerificationCode::generate($user, 'email', $user->email);
-            
-            // Utiliser PHPMailer pour envoyer l'email
-            try {
-                $phpMailer = new \App\Services\PHPMailerService();
-                $sent = $phpMailer->sendVerificationCode(
-                    $user->email,
-                    $user->first_name . ' ' . $user->last_name,
-                    $verificationCode->code
-                );
-                
-                if ($sent) {
-                    Session::flash('success', 'Inscription réussie ! Un code de vérification a été envoyé à votre email.');
-                } else {
-                    Session::flash('info', 'Inscription réussie ! Le code de vérification est: ' . $verificationCode->code . ' (Email non envoyé - vérifiez la configuration SMTP)');
-                }
-            } catch (\Exception $mailError) {
-                \Illuminate\Support\Facades\Log::error('Erreur envoi email vérification: ' . $mailError->getMessage());
-                Session::flash('info', 'Inscription réussie ! Le code de vérification est: ' . $verificationCode->code . ' (Email non envoyé - vérifiez les logs)');
+
+            // Utiliser PHPMailer (SMTP Ionos — fonctionne en local et en prod)
+            $phpMailer = new \App\Services\PHPMailerService();
+            $sent = $phpMailer->sendVerificationCode(
+                $user->email,
+                $user->first_name . ' ' . $user->last_name,
+                $verificationCode->code
+            );
+
+            if ($sent) {
+                Session::flash('success', 'Inscription réussie ! Un code de vérification a été envoyé à ' . $user->email . '. Veuillez vérifier votre boîte mail (et vos spams).');
+            } else {
+                // Ne jamais exposer le code en production — logger uniquement
+                \Illuminate\Support\Facades\Log::warning('Inscription: email de vérification non envoyé', [
+                    'user_id' => $user->id,
+                    'email'   => $user->email,
+                ]);
+                Session::flash('warning', 'Inscription réussie ! Nous n\'avons pas pu envoyer l\'email de vérification. Utilisez le bouton "Renvoyer le code" sur la page suivante.');
             }
-            
+
             Session::put('last_verification_sent', now());
             Session::put('verification_method', 'email');
             Session::put('pending_verification_user_id', $user->id);
-            
+
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Erreur génération code vérification: ' . $e->getMessage());
-            Session::flash('warning', 'Inscription réussie ! Erreur lors de la génération du code. Contactez le support.');
+            \Illuminate\Support\Facades\Log::error('Erreur génération/envoi code vérification: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+            ]);
+            Session::flash('warning', 'Inscription réussie ! Impossible d\'envoyer le code de vérification. Utilisez le bouton "Renvoyer le code" sur la page suivante.');
         }
 
         // Connecter l'utilisateur APRÈS avoir généré le code

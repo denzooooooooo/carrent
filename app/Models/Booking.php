@@ -16,6 +16,8 @@ class Booking extends Model
         'flight_id',
         'event_id',
         'package_id',
+        'event_booking_id',
+        'package_booking_id',
         'location_id',
         'seat_zone_id',
         'booking_date',
@@ -103,5 +105,13 @@ class Booking extends Model
     public function eventBooking()
     {
         return $this->belongsTo(EventBooking::class, 'event_booking_id');
+    }
+
+    /**
+     * Relation avec la réservation de package
+     */
+    public function packageBooking()
+    {
+        return $this->hasOne(PackageBooking::class);
     }
 }

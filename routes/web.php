@@ -121,6 +121,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Gestion des événements       
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
+        Route::get('/events/import', [App\Http\Controllers\Admin\EventController::class, 'importForm'])
+            ->name('events.import.form');
+        Route::post('/events/import-packages', [App\Http\Controllers\Admin\EventController::class, 'importPackages'])
+            ->name('events.import-packages');
         Route::post('/event-categories/quick-store', [EventController::class, 'quickStoreCat'])
             ->name('event-categories.quick-store');
         Route::post('/event-types/quick-store', [EventController::class, 'quickStoreType'])
@@ -277,7 +281,8 @@ Route::get('/payment/instructions/{booking}', [App\Http\Controllers\PaymentContr
 Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
 
 // CinetPay Routes
-Route::post('/payment/cinetpay/process/{booking}', [App\Http\Controllers\PaymentController::class, 'processCinetPay'])->name('payment.cinetpay.process');
+Route::match(['GET', 'POST'], '/payment/cinetpay/process/{booking}', [App\Http\Controllers\PaymentController::class, 'processCinetPay'])->name('payment.cinetpay.process');
+Route::get('/payment/cinetpay/redirect/{booking}', [App\Http\Controllers\PaymentController::class, 'redirectToCinetPay'])->name('payment.cinetpay.redirect');
 Route::get('/payment/cinetpay/return/{booking}', [App\Http\Controllers\PaymentController::class, 'cinetpayReturn'])->name('payment.cinetpay.return');
 Route::post('/payment/cinetpay/notify', [App\Http\Controllers\PaymentController::class, 'cinetpayNotify'])->name('payment.cinetpay.notify');
 

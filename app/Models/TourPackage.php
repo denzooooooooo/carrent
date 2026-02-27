@@ -50,6 +50,9 @@ class TourPackage extends Model implements HasMedia
         'meta_title_en',
         'meta_description_fr',
         'meta_description_en',
+        'currency',
+        'event_date_start',
+        'event_date_end',
     ];
 
     protected $casts = [
@@ -66,6 +69,8 @@ class TourPackage extends Model implements HasMedia
         'rating' => 'decimal:2',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
+        'event_date_start' => 'date',
+        'event_date_end' => 'date',
     ];
 
 

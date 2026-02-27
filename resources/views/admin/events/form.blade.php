@@ -284,292 +284,96 @@
         </div>
 
 
-        {{-- SECTION 6: ZONES DE SIÈGES --}}
-        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">6. Zones de Sièges (VIP, VVIP, VVVIP)</h2>
-
-        {{-- Zone Standard --}}
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-800">Zone Standard</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Nom de la zone FR --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
-                    <input type="text" name="seat_zones[0][zone_name_fr]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.0.zone_name_fr', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->zone_name_fr ?? 'Zone Standard') : 'Zone Standard') }}">
+        {{-- SECTION 6: PACKAGES (GRILLES TARIFAIRES) --}}
+        <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2 mt-8">6. Packages & Grilles Tarifaires</h2>
+        
+        <div id="packagesContainer">
+            @if($event->exists && $event->packages->count() > 0)
+                @foreach($event->packages as $index => $package)
+                <div class="package-item bg-purple-50 p-6 rounded-lg border border-purple-200 mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-purple-800">Package {{ $index + 1 }}</h3>
+                        <button type="button" class="remove-package-btn text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                    <input type="hidden" name="packages[{{ $index }}][id]" value="{{ $package->id }}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom du Package (Français)</label>
+                            <input type="text" name="packages[{{ $index }}][package_name_fr]" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.package_name_fr', $package->package_name_fr) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom du Package (Anglais)</label>
+                            <input type="text" name="packages[{{ $index }}][package_name_en]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.package_name_en', $package->package_name_en) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code Package</label>
+                            <input type="text" name="packages[{{ $index }}][package_code]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.package_code', $package->package_code) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prix (FCFA)</label>
+                            <input type="number" name="packages[{{ $index }}][price]" required min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.price', $package->price) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantité Disponible</label>
+                            <input type="number" name="packages[{{ $index }}][available_quantity]" min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.available_quantity', $package->available_quantity) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Max par Commande</label>
+                            <input type="number" name="packages[{{ $index }}][max_per_order]" min="1"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.max_per_order', $package->max_per_order) }}">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
+                            <textarea name="packages[{{ $index }}][description_fr]" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">{{ old('packages.' . $index . '.description_fr', $package->description_fr) }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Inclus (Français)</label>
+                            <textarea name="packages[{{ $index }}][description_included_fr]" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">{{ old('packages.' . $index . '.description_included_fr', $package->description_included_fr) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Devise</label>
+                            <select name="packages[{{ $index }}][currency]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                <option value="XOF" {{ old('packages.' . $index . '.currency', $package->currency) == 'XOF' ? 'selected' : '' }}>XOF (FCFA)</option>
+                                <option value="EUR" {{ old('packages.' . $index . '.currency', $package->currency) == 'EUR' ? 'selected' : '' }}>EUR</option>
+                                <option value="USD" {{ old('packages.' . $index . '.currency', $package->currency) == 'USD' ? 'selected' : '' }}>USD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ordre d'Affichage</label>
+                            <input type="number" name="packages[{{ $index }}][sort_order]" min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="{{ old('packages.' . $index . '.sort_order', $package->sort_order) }}">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="packages[{{ $index }}][is_active]" id="package_active_{{ $index }}" value="1" {{ $package->is_active ? 'checked' : '' }}
+                                class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="package_active_{{ $index }}" class="ml-2 text-sm font-medium text-gray-700">Package Actif</label>
+                        </div>
+                    </div>
                 </div>
-                {{-- Nom de la zone EN --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Anglais)</label>
-                    <input type="text" name="seat_zones[0][zone_name_en]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.0.zone_name_en', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->zone_name_en ?? 'Standard Zone') : 'Standard Zone') }}">
-                </div>
-                {{-- Code de la zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
-                    <input type="text" name="seat_zones[0][zone_code]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.0.zone_code', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->zone_code ?? 'STD') : 'STD') }}">
-                </div>
-                {{-- Type de zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
-                    <input type="text" name="seat_zones[0][zone_type]" value="standard" readonly
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600">
-                </div>
-                {{-- Prix par siège --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
-                    <input type="number" name="seat_zones[0][price]" required min="0" step="0.01"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.0.price', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->price ?? 0) : 0) }}">
-                </div>
-                {{-- Nombre total de sièges --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Total de Sièges</label>
-                    <input type="number" name="seat_zones[0][total_seats]" required min="1"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.0.total_seats', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->total_seats ?? 0) : 0) }}">
-                </div>
-                {{-- Description FR --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
-                    <textarea name="seat_zones[0][description_fr]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.0.description_fr', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->description_fr ?? '') : '') }}</textarea>
-                </div>
-                {{-- Description EN --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Anglais)</label>
-                    <textarea name="seat_zones[0][description_en]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.0.description_en', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->description_en ?? '') : '') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Checkbox Actif --}}
-            <div class="flex items-center mt-4">
-                <input type="checkbox" name="seat_zones[0][is_active]" id="zone_active_0" value="1"
-                    class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old('seat_zones.0.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'standard')->first()->is_active ?? true) : true) ? 'checked' : '' }}>
-                <label for="zone_active_0" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
-            </div>
+                @endforeach
+            @endif
         </div>
 
-        {{-- Zone VIP --}}
-        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-blue-800">Zone VIP</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Nom de la zone FR --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
-                    <input type="text" name="seat_zones[1][zone_name_fr]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.1.zone_name_fr', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->zone_name_fr ?? 'Zone VIP') : 'Zone VIP') }}">
-                </div>
-                {{-- Nom de la zone EN --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Anglais)</label>
-                    <input type="text" name="seat_zones[1][zone_name_en]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.1.zone_name_en', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->zone_name_en ?? 'VIP Zone') : 'VIP Zone') }}">
-                </div>
-                {{-- Code de la zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
-                    <input type="text" name="seat_zones[1][zone_code]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.1.zone_code', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->zone_code ?? 'VIP') : 'VIP') }}">
-                </div>
-                {{-- Type de zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
-                    <input type="text" name="seat_zones[1][zone_type]" value="vip" readonly
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600">
-                </div>
-                {{-- Prix par siège --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
-                    <input type="number" name="seat_zones[1][price]" required min="0" step="0.01"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.1.price', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->price ?? 0) : 0) }}">
-                </div>
-                {{-- Nombre total de sièges --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Total de Sièges</label>
-                    <input type="number" name="seat_zones[1][total_seats]" required min="1"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.1.total_seats', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->total_seats ?? 0) : 0) }}">
-                </div>
-                {{-- Description FR --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
-                    <textarea name="seat_zones[1][description_fr]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.1.description_fr', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->description_fr ?? '') : '') }}</textarea>
-                </div>
-                {{-- Description EN --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Anglais)</label>
-                    <textarea name="seat_zones[1][description_en]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.1.description_en', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->description_en ?? '') : '') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Checkbox Actif --}}
-            <div class="flex items-center mt-4">
-                <input type="checkbox" name="seat_zones[1][is_active]" id="zone_active_1" value="1"
-                    class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old('seat_zones.1.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'vip')->first()->is_active ?? true) : true) ? 'checked' : '' }}>
-                <label for="zone_active_1" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
-            </div>
-        </div>
-
-        {{-- Zone VVIP --}}
-        <div class="bg-purple-50 p-6 rounded-lg border border-purple-200 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-purple-800">Zone VVIP</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Nom de la zone FR --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
-                    <input type="text" name="seat_zones[2][zone_name_fr]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.2.zone_name_fr', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->zone_name_fr ?? 'Zone VVIP') : 'Zone VVIP') }}">
-                </div>
-                {{-- Nom de la zone EN --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Anglais)</label>
-                    <input type="text" name="seat_zones[2][zone_name_en]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.2.zone_name_en', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->zone_name_en ?? 'VVIP Zone') : 'VVIP Zone') }}">
-                </div>
-                {{-- Code de la zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
-                    <input type="text" name="seat_zones[2][zone_code]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.2.zone_code', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->zone_code ?? 'VVIP') : 'VVIP') }}">
-                </div>
-                {{-- Type de zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
-                    <input type="text" name="seat_zones[2][zone_type]" value="vvip" readonly
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600">
-                </div>
-                {{-- Prix par siège --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
-                    <input type="number" name="seat_zones[2][price]" required min="0" step="0.01"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.2.price', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->price ?? 0) : 0) }}">
-                </div>
-                {{-- Nombre total de sièges --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Total de Sièges</label>
-                    <input type="number" name="seat_zones[2][total_seats]" required min="1"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.2.total_seats', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->total_seats ?? 0) : 0) }}">
-                </div>
-                {{-- Description FR --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
-                    <textarea name="seat_zones[2][description_fr]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.2.description_fr', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->description_fr ?? '') : '') }}</textarea>
-                </div>
-                {{-- Description EN --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Anglais)</label>
-                    <textarea name="seat_zones[2][description_en]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.2.description_en', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->description_en ?? '') : '') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Checkbox Actif --}}
-            <div class="flex items-center mt-4">
-                <input type="checkbox" name="seat_zones[2][is_active]" id="zone_active_2" value="1"
-                    class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old('seat_zones.2.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'vvip')->first()->is_active ?? true) : true) ? 'checked' : '' }}>
-                <label for="zone_active_2" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
-            </div>
-        </div>
-
-        {{-- Zone Premium --}}
-        <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-yellow-800">Zone Premium</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Nom de la zone FR --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Français)</label>
-                    <input type="text" name="seat_zones[3][zone_name_fr]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.3.zone_name_fr', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_name_fr ?? 'Zone Premium') : 'Zone Premium') }}">
-                </div>
-                {{-- Nom de la zone EN --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la Zone (Anglais)</label>
-                    <input type="text" name="seat_zones[3][zone_name_en]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.3.zone_name_en', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_name_en ?? 'Premium Zone') : 'Premium Zone') }}">
-                </div>
-                {{-- Code de la zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Code de la Zone</label>
-                    <input type="text" name="seat_zones[3][zone_code]" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.3.zone_code', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->zone_code ?? 'PREM') : 'PREM') }}">
-                </div>
-                {{-- Type de zone --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type de Zone</label>
-                    <input type="text" name="seat_zones[3][zone_type]" value="premium" readonly
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600">
-                </div>
-                {{-- Prix par siège --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prix par Siège (FCFA)</label>
-                    <input type="number" name="seat_zones[3][price]" required min="0" step="0.01"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.3.price', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->price ?? 0) : 0) }}">
-                </div>
-                {{-- Nombre total de sièges --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Total de Sièges</label>
-                    <input type="number" name="seat_zones[3][total_seats]" required min="1"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150"
-                        value="{{ old('seat_zones.3.total_seats', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->total_seats ?? 0) : 0) }}">
-                </div>
-                {{-- Description FR --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
-                    <textarea name="seat_zones[3][description_fr]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.3.description_fr', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->description_fr ?? '') : '') }}</textarea>
-                </div>
-                {{-- Description EN --}}
-                <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Anglais)</label>
-                    <textarea name="seat_zones[3][description_en]" rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150">{{ old('seat_zones.3.description_en', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->description_en ?? '') : '') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Checkbox Actif --}}
-            <div class="flex items-center mt-4">
-                <input type="checkbox" name="seat_zones[3][is_active]" id="zone_active_3" value="1"
-                    class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    {{ old('seat_zones.3.is_active', $event->exists ? ($event->seatZones->where('zone_type', 'premium')->first()->is_active ?? true) : true) ? 'checked' : '' }}>
-                <label for="zone_active_3" class="ml-2 text-sm font-medium text-gray-700">Zone Active</label>
-            </div>
-        </div>
+        <button type="button" id="addPackageBtn" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-150 flex items-center">
+            <i class="fas fa-plus mr-2"></i> Ajouter un Package
+        </button>
 
         {{-- BOUTON DE SOUMISSION --}}
         <div class="mt-8 pt-4 border-t">
@@ -582,7 +386,109 @@
 
 </div>
 
-
 </div>
+
+{{-- JavaScript pour gérer l'ajout de packages --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addPackageBtn = document.getElementById('addPackageBtn');
+    const packagesContainer = document.getElementById('packagesContainer');
+    let packageIndex = {{ $event->exists ? $event->packages->count() : 0 }};
+
+    if (addPackageBtn && packagesContainer) {
+        addPackageBtn.addEventListener('click', function() {
+            const template = `
+                <div class="package-item bg-purple-50 p-6 rounded-lg border border-purple-200 mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-purple-800">Package ${packageIndex + 1}</h3>
+                        <button type="button" class="remove-package-btn text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom du Package (Français)</label>
+                            <input type="text" name="packages[${packageIndex}][package_name_fr]" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="VIP Premium">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom du Package (Anglais)</label>
+                            <input type="text" name="packages[${packageIndex}][package_name_en]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="Premium VIP">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code Package</label>
+                            <input type="text" name="packages[${packageIndex}][package_code]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="VIP-001">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prix (FCFA)</label>
+                            <input type="number" name="packages[${packageIndex}][price]" required min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantité Disponible</label>
+                            <input type="number" name="packages[${packageIndex}][available_quantity]" min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Max par Commande</label>
+                            <input type="number" name="packages[${packageIndex}][max_per_order]" min="1"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="10">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description (Français)</label>
+                            <textarea name="packages[${packageIndex}][description_fr]" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="Description du package..."></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Inclus (Français)</label>
+                            <textarea name="packages[${packageIndex}][description_included_fr]" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                placeholder="Accès au match, Boissons incluses, Cadeau souvenir..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Devise</label>
+                            <select name="packages[${packageIndex}][currency]"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                <option value="XOF">XOF (FCFA)</option>
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ordre d'Affichage</label>
+                            <input type="number" name="packages[${packageIndex}][sort_order]" min="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                value="${packageIndex + 1}">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="packages[${packageIndex}][is_active]" id="package_active_${packageIndex}" value="1" checked
+                                class="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="package_active_${packageIndex}" class="ml-2 text-sm font-medium text-gray-700">Package Actif</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            packagesContainer.insertAdjacentHTML('beforeend', template);
+            packageIndex++;
+        });
+
+        // Supprimer un package
+        packagesContainer.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-package-btn')) {
+                e.target.closest('.package-item').remove();
+            }
+        });
+    }
+});
+</script>
 
 @endsection

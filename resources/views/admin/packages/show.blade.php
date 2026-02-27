@@ -3,23 +3,56 @@
 @section('title', 'Détails du Package')
 
 @section('content')
+@php
+$typeConfig = [
+    'sport_event' => ['label' => 'Événement Sportif', 'icon' => 'fa-trophy',        'color' => 'bg-orange-100 text-orange-800'],
+    'motorsport'  => ['label' => 'Motorsport / F1',   'icon' => 'fa-flag-checkered', 'color' => 'bg-red-100 text-red-800'],
+    'football'    => ['label' => 'Football',           'icon' => 'fa-futbol',         'color' => 'bg-green-100 text-green-800'],
+    'helicopter'  => ['label' => 'Hélicoptère',        'icon' => 'fa-helicopter',     'color' => 'bg-sky-100 text-sky-800'],
+    'private_jet' => ['label' => 'Jet Privé',          'icon' => 'fa-plane',          'color' => 'bg-indigo-100 text-indigo-800'],
+    'cruise'      => ['label' => 'Croisière',          'icon' => 'fa-ship',           'color' => 'bg-blue-100 text-blue-800'],
+    'safari'      => ['label' => 'Safari',             'icon' => 'fa-paw',            'color' => 'bg-yellow-100 text-yellow-800'],
+    'city_tour'   => ['label' => 'Visite de Ville',   'icon' => 'fa-city',           'color' => 'bg-purple-100 text-purple-800'],
+    'adventure'   => ['label' => 'Aventure',           'icon' => 'fa-mountain',       'color' => 'bg-lime-100 text-lime-800'],
+    'luxury'      => ['label' => 'Luxe',               'icon' => 'fa-gem',            'color' => 'bg-pink-100 text-pink-800'],
+];
+$type           = $package->package_type ?? 'luxury';
+$cfg            = $typeConfig[$type] ?? ['label' => $type, 'icon' => 'fa-tag', 'color' => 'bg-gray-100 text-gray-700'];
+$currency       = $package->currency ?? 'XOF';
+$currencySymbol = match($currency) { 'EUR' => '€', 'USD' => '$', default => 'FCFA' };
+$priceDecimals  = $currency === 'XOF' ? 0 : 2;
+$isSport        = in_array($type, ['sport_event', 'motorsport', 'football']);
+@endphp
+
 <div class="max-w-7xl mx-auto">
     <!-- Header avec Actions -->
     <div class="flex justify-between items-start mb-6">
         <div>
-            <div class="flex items-center space-x-3 mb-2">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
                 <h1 class="text-3xl font-bold text-gray-900">{{ $package->title_fr }}</h1>
                 @if($package->is_featured)
-                    <span class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full">
-                        <i class="fas fa-star mr-1"></i>EN VEDETTE
+                    <span class="px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
+                        <i class="fas fa-star"></i>EN VEDETTE
                     </span>
                 @endif
                 <span class="px-3 py-1 text-xs font-semibold rounded-full
                     {{ $package->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                     {{ $package->is_active ? 'Actif' : 'Inactif' }}
                 </span>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $cfg['color'] }} flex items-center gap-1">
+                    <i class="fas {{ $cfg['icon'] }}"></i>{{ $cfg['label'] }}
+                </span>
             </div>
             <p class="text-gray-600">{{ $package->destination }} • {{ $package->duration_text_fr ?: $package->duration . ' jours' }}</p>
+            @if($isSport && $package->event_date_start)
+                <p class="text-orange-600 font-medium mt-1 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ \Carbon\Carbon::parse($package->event_date_start)->format('d/m/Y') }}
+                    @if($package->event_date_end && $package->event_date_end != $package->event_date_start)
+                        → {{ \Carbon\Carbon::parse($package->event_date_end)->format('d/m/Y') }}
+                    @endif
+                </p>
+            @endif
         </div>
         
         <div class="flex space-x-2">
@@ -47,10 +80,10 @@
 
         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-5 text-white">
             <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-euro-sign text-3xl opacity-80"></i>
+                <i class="fas fa-coins text-3xl opacity-80"></i>
                 <span class="text-sm font-medium">Revenus</span>
             </div>
-            <p class="text-3xl font-bold">{{ number_format($stats['total_revenue'], 0) }}€</p>
+            <p class="text-3xl font-bold">{{ number_format($stats['total_revenue'], $priceDecimals) }} {{ $currencySymbol }}</p>
             <p class="text-xs opacity-80 mt-1">Total généré</p>
         </div>
 
@@ -68,9 +101,9 @@
                 <i class="fas fa-tag text-3xl opacity-80"></i>
                 <span class="text-sm font-medium">Prix</span>
             </div>
-            <p class="text-3xl font-bold">{{ number_format($package->price, 0) }}€</p>
+            <p class="text-3xl font-bold">{{ number_format($package->price, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}</p>
             @if($package->discount_price)
-                <p class="text-xs opacity-80 mt-1 line-through">{{ number_format($package->discount_price, 0) }}€</p>
+                <p class="text-xs opacity-80 mt-1 line-through">{{ number_format($package->discount_price, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}</p>
             @endif
         </div>
 
@@ -229,8 +262,33 @@
                         <span class="text-gray-600 flex items-center">
                             <i class="fas fa-plane-departure w-5 text-primary mr-2"></i>Type
                         </span>
-                        <span class="font-semibold">{{ $packageTypes[$package->package_type] ?? $package->package_type }}</span>
+                        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full {{ $cfg['color'] }}">
+                            <i class="fas {{ $cfg['icon'] }}"></i>{{ $cfg['label'] }}
+                        </span>
                     </div>
+
+                    @if($currency)
+                    <div class="flex items-center justify-between py-2 border-b">
+                        <span class="text-gray-600 flex items-center">
+                            <i class="fas fa-coins w-5 text-primary mr-2"></i>Devise
+                        </span>
+                        <span class="font-semibold">{{ $currency }} ({{ $currencySymbol }})</span>
+                    </div>
+                    @endif
+
+                    @if($isSport && $package->event_date_start)
+                    <div class="flex items-center justify-between py-2 border-b">
+                        <span class="text-gray-600 flex items-center">
+                            <i class="fas fa-calendar-alt w-5 text-primary mr-2"></i>Dates événement
+                        </span>
+                        <span class="font-semibold text-orange-600 text-sm">
+                            {{ \Carbon\Carbon::parse($package->event_date_start)->format('d/m/Y') }}
+                            @if($package->event_date_end && $package->event_date_end != $package->event_date_start)
+                                → {{ \Carbon\Carbon::parse($package->event_date_end)->format('d/m/Y') }}
+                            @endif
+                        </span>
+                    </div>
+                    @endif
 
                     <div class="flex items-center justify-between py-2 border-b">
                         <span class="text-gray-600 flex items-center">
@@ -288,9 +346,9 @@
                                         {{ $date->available_spots }} places
                                     </p>
                                 </div>
-                                @if($date->price_override)
+                @if($date->price_override)
                                     <span class="text-sm font-bold text-primary">
-                                        {{ number_format($date->price_override, 0) }}€
+                                        {{ number_format($date->price_override, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}
                                     </span>
                                 @endif
                             </div>
