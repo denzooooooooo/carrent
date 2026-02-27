@@ -119,12 +119,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('flights/export', [App\Http\Controllers\Admin\FlightController::class, 'export'])
             ->name('flights.export');
 
-        // Gestion des événements       
-        Route::resource('events', App\Http\Controllers\Admin\EventController::class);
+        // Gestion des événements
+        // ⚠️ Les routes custom DOIVENT être définies AVANT Route::resource pour éviter les conflits
         Route::get('/events/import', [App\Http\Controllers\Admin\EventController::class, 'importForm'])
             ->name('events.import.form');
         Route::post('/events/import-packages', [App\Http\Controllers\Admin\EventController::class, 'importPackages'])
             ->name('events.import-packages');
+        Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::post('/event-categories/quick-store', [EventController::class, 'quickStoreCat'])
             ->name('event-categories.quick-store');
         Route::post('/event-types/quick-store', [EventController::class, 'quickStoreType'])
