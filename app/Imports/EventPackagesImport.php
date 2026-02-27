@@ -5,12 +5,10 @@ namespace App\Imports;
 use App\Models\Event;
 use App\Models\EventPackage;
 use Illuminate\Support\Str;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-
 /**
- * Import de packages événements depuis un fichier CSV ou Excel (.xlsx/.xls).
- * - CSV  : PHP natif (fgetcsv)
- * - XLSX/XLS : PhpSpreadsheet (déjà dans composer.lock)
+ * Import de packages événements depuis un fichier CSV ou Excel (.xlsx).
+ * - CSV  : PHP natif (fgetcsv) — zéro dépendance externe
+ * - XLSX : ZipArchive + SimpleXML (extensions PHP core, toujours disponibles)
  */
 class EventPackagesImport
 {
@@ -85,14 +83,82 @@ class EventPackagesImport
     }
 
     // -------------------------------------------------------------------------
-    // Lecteur Excel via PhpSpreadsheet
+    // Lecteur XLSX via ZipArchive + SimpleXML (PHP core — zéro dépendance)
     // -------------------------------------------------------------------------
 
     protected function importSpreadsheet(string $filePath): void
     {
-        $spreadsheet = IOFactory::load($filePath);
-        $sheet       = $spreadsheet->getActiveSheet();
-        $rows        = $sheet->toArray(null, true, true, false);
+        if (!class_exists('ZipArchive')) {
+            throw new \Exception("L'extension PHP ZipArchive est requise pour lire les fichiers XLSX.");
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($filePath) !== true) {
+            throw new \Exception("Impossible d'ouvrir le fichier XLSX (fichier corrompu ou format invalide).");
+        }
+
+        // 1. Lire les chaînes partagées (sharedStrings.xml)
+        $sharedStrings    = [];
+        $sharedStringsXml = $zip->getFromName('xl/sharedStrings.xml');
+        if ($sharedStringsXml) {
+            $ssXml = simplexml_load_string($sharedStringsXml);
+            foreach ($ssXml->si as $si) {
+                if (isset($si->t)) {
+                    $sharedStrings[] = (string) $si->t;
+                } else {
+                    // Texte enrichi : concaténer tous les éléments r/t
+                    $text = '';
+                    foreach ($si->r as $r) {
+                        $text .= (string) $r->t;
+                    }
+                    $sharedStrings[] = $text;
+                }
+            }
+        }
+
+        // 2. Lire la première feuille (sheet1.xml)
+        $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+
+        if (!$sheetXml) {
+            throw new \Exception("Impossible de lire les données de la feuille Excel.");
+        }
+
+        $xml    = simplexml_load_string($sheetXml);
+        $rows   = [];
+        $maxCol = 0;
+
+        foreach ($xml->sheetData->row as $xmlRow) {
+            $rowIndex = (int) $xmlRow['r'] - 1;
+            $rowData  = [];
+
+            foreach ($xmlRow->c as $cell) {
+                $colIndex = $this->cellRefToColIndex((string) $cell['r']);
+                $maxCol   = max($maxCol, $colIndex);
+
+                $type  = (string) $cell['t'];
+                $value = isset($cell->v) ? (string) $cell->v : '';
+
+                if ($type === 's') {
+                    // Référence vers sharedStrings
+                    $value = $sharedStrings[(int) $value] ?? '';
+                } elseif ($type === 'b') {
+                    $value = $value ? '1' : '0';
+                }
+
+                $rowData[$colIndex] = $value;
+            }
+
+            // Remplir les colonnes manquantes (cellules vides non présentes dans le XML)
+            for ($i = 0; $i <= $maxCol; $i++) {
+                $rowData[$i] = $rowData[$i] ?? '';
+            }
+            ksort($rowData);
+            $rows[$rowIndex] = array_values($rowData);
+        }
+
+        ksort($rows);
+        $rows = array_values($rows);
 
         if (empty($rows)) {
             throw new \Exception("Le fichier Excel est vide.");
@@ -119,6 +185,21 @@ class EventPackagesImport
                 $this->errors[] = "Ligne {$lineNumber} : " . $e->getMessage();
             }
         }
+    }
+
+    /**
+     * Convertit une référence de cellule Excel (ex: "A1", "B2", "AA3")
+     * en index de colonne 0-based.
+     */
+    protected function cellRefToColIndex(string $cellRef): int
+    {
+        preg_match('/^([A-Z]+)/', strtoupper($cellRef), $matches);
+        $col   = $matches[1] ?? 'A';
+        $index = 0;
+        foreach (str_split($col) as $char) {
+            $index = $index * 26 + (ord($char) - ord('A') + 1);
+        }
+        return $index - 1;
     }
 
     // -------------------------------------------------------------------------
