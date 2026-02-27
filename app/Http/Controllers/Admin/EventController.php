@@ -436,18 +436,19 @@ class EventController extends Controller
     public function importPackages(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|file|mimes:csv,txt|max:10240', // CSV uniquement, max 10MB
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240', // Excel + CSV, max 10MB
             'event_id'   => 'nullable|exists:events,id',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $file     = $request->file('excel_file');
-            $filePath = $file->getRealPath();
+            $file      = $request->file('excel_file');
+            $filePath  = $file->getRealPath();
+            $extension = $file->getClientOriginalExtension();
 
             $import = new EventPackagesImport();
-            $import->import($filePath);
+            $import->import($filePath, $extension);
 
             $count  = $import->getRowCount();
             $errors = $import->getErrors();

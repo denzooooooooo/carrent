@@ -43,15 +43,15 @@
                 </div>
 
                 <div class="mb-6">
-                    <label for="excel_file" class="block text-sm font-medium text-gray-700 mb-2">Fichier CSV (.csv) *</label>
+                    <label for="excel_file" class="block text-sm font-medium text-gray-700 mb-2">Fichier Excel ou CSV (.xlsx, .xls, .csv) *</label>
                     <input type="file" name="excel_file" id="excel_file"
                         class="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
-                        accept=".csv,text/csv" required>
-                    <p class="text-sm text-gray-500 mt-1">Format CSV uniquement — Taille maximale : 10 MB</p>
+                        accept=".xlsx,.xls,.csv,text/csv" required>
+                    <p class="text-sm text-gray-500 mt-1">Formats acceptés : .xlsx, .xls, .csv — Taille maximale : 10 MB</p>
                 </div>
 
                 <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 class="font-semibold text-blue-800 mb-2">Format du fichier CSV attendu (1ère ligne = en-têtes) :</h3>
+                    <h3 class="font-semibold text-blue-800 mb-2">Format du fichier attendu (1ère ligne = en-têtes) :</h3>
                     <ul class="text-sm text-blue-700 space-y-1">
                         <li><strong>event_title</strong> ou <strong>event</strong> : Titre de l'événement</li>
                         <li><strong>city</strong> : Ville de l'événement (alternative si event_title non trouvé)</li>
@@ -65,7 +65,7 @@
                         <li><strong>available_quantity</strong> ou <strong>quantite</strong> : Quantité disponible</li>
                         <li><strong>max_per_order</strong> ou <strong>max_order</strong> : Maximum par commande</li>
                     </ul>
-                    <p class="text-xs text-blue-600 mt-3">💡 Exemple de première ligne CSV : <code>event_title,package_name_fr,price,currency,available_quantity</code></p>
+                    <p class="text-xs text-blue-600 mt-3">💡 Exemple de première ligne : <code>event_title,package_name_fr,price,currency,available_quantity</code></p>
                 </div>
 
                 <div class="flex justify-end">
