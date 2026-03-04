@@ -5,22 +5,32 @@ namespace App\Imports;
 use App\Models\Event;
 use App\Models\EventPackage;
 use Illuminate\Support\Str;
+
 /**
  * Import de packages événements depuis un fichier CSV ou Excel (.xlsx).
  * - CSV  : PHP natif (fgetcsv) — zéro dépendance externe
  * - XLSX : ZipArchive + SimpleXML (extensions PHP core, toujours disponibles)
+ *
+ * Supporte deux formats :
+ *  1. Format "Grille Tarifaire" : Ligne 1 = titre événement, Ligne 3 = en-têtes, Ligne 4+ = données
+ *  2. Format générique : Ligne 1 = en-têtes (event_title, package_name_fr, price...), Ligne 2+ = données
  */
 class EventPackagesImport
 {
     protected int $rowCount = 0;
     protected array $errors = [];
+    protected ?int $eventId = null;
+
+    /**
+     * Définir l'événement cible (depuis le formulaire).
+     */
+    public function setEventId(?int $id): void
+    {
+        $this->eventId = $id;
+    }
 
     /**
      * Point d'entrée : détecte le format et délègue au bon lecteur.
-     *
-     * @param string $filePath  Chemin absolu vers le fichier
-     * @param string $extension Extension du fichier original (csv, xlsx, xls)
-     * @throws \Exception
      */
     public function import(string $filePath, string $extension = 'csv'): void
     {
@@ -35,7 +45,7 @@ class EventPackagesImport
         } elseif (in_array($ext, ['xlsx', 'xls', 'ods'])) {
             $this->importSpreadsheet($filePath);
         } else {
-            throw new \Exception("Format de fichier non supporté : .{$ext}. Utilisez .csv, .xlsx ou .xls.");
+            throw new \Exception("Format non supporté : .{$ext}. Utilisez .csv, .xlsx ou .xls.");
         }
     }
 
@@ -203,61 +213,180 @@ class EventPackagesImport
     }
 
     // -------------------------------------------------------------------------
-    // Traitement d'une ligne (commun CSV + Excel)
+    // Détection du format et dispatch
     // -------------------------------------------------------------------------
 
-    protected function processRow(array $row): void
+    /**
+     * Traite un tableau de lignes (commun CSV + XLSX après lecture).
+     * Détecte automatiquement le format : Grille Tarifaire ou Générique.
+     */
+    protected function processRows(array $rows): void
     {
-        // Rechercher l'événement associé
-        $event = null;
-
-        $eventTitle = trim($row['event_title'] ?? $row['event'] ?? '');
-        if ($eventTitle !== '') {
-            $event = Event::where('title_fr', 'like', '%' . $eventTitle . '%')
-                ->orWhere('title_en', 'like', '%' . $eventTitle . '%')
-                ->orWhere('slug', Str::slug($eventTitle))
-                ->first();
+        if (empty($rows)) {
+            return;
         }
 
-        // Fallback : recherche par ville
+        // Compter les cellules non-vides dans la première ligne
+        $firstRowValues  = array_values($rows[0]);
+        $nonEmptyCells   = array_filter($firstRowValues, fn($v) => trim((string) $v) !== '');
+
+        // Format Grille Tarifaire : 1ère ligne = titre événement (1 seule cellule non-vide)
+        if (count($nonEmptyCells) <= 1) {
+            $this->processGrilleTarifaireRows($rows);
+        } else {
+            // Format générique : 1ère ligne = en-têtes
+            $this->processGenericRows($rows);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Format "Grille Tarifaire" (Coupe du Monde, Roland Garros, etc.)
+    // Ligne 0 = titre événement, Ligne 2 = en-têtes, Ligne 3+ = données
+    // -------------------------------------------------------------------------
+
+    protected function processGrilleTarifaireRows(array $rows): void
+    {
+        // Ligne 0 : titre de l'événement
+        $eventTitle = trim((string) (array_values($rows[0])[0] ?? ''));
+
+        // Trouver l'événement
+        $event = $this->findEvent($eventTitle);
+
         if (!$event) {
-            $city = trim($row['city'] ?? '');
-            if ($city !== '') {
-                $event = Event::where('city', 'like', '%' . $city . '%')->first();
+            $this->errors[] = "Événement introuvable pour : \"{$eventTitle}\". Sélectionnez-le manuellement dans le menu déroulant.";
+            return;
+        }
+
+        // Ligne 2 (index 2) : en-têtes de colonnes
+        $rawHeaders = isset($rows[2]) ? array_values($rows[2]) : [];
+        $headers    = array_map(fn($h) => strtolower(trim((string) $h)), $rawHeaders);
+
+        // Lignes 3+ : données
+        $lineNumber = 3;
+        foreach (array_slice($rows, 3) as $rawRow) {
+            $lineNumber++;
+            $rawRow = array_map(fn($v) => trim((string) ($v ?? '')), array_values($rawRow));
+
+            if (count(array_filter($rawRow)) === 0) {
+                continue; // Ignorer les lignes vides
+            }
+
+            $row = array_combine($headers, array_pad($rawRow, count($headers), ''));
+
+            // Mapping colonnes Grille Tarifaire → standard
+            $packageNameFr = $row['forfait'] ?? $row['package'] ?? $row['package_name_fr'] ?? '';
+            $price         = $row['tarif cp catalogue'] ?? $row['tarif'] ?? $row['prix'] ?? $row['price'] ?? '0';
+            $descFr        = $row['description'] ?? '';
+            // La 2ème colonne "Description" (avec espace) devient description_included_fr
+            $descIncluded  = '';
+            foreach ($headers as $idx => $h) {
+                if (rtrim($h) === 'description' && $idx > 0 && isset($rawRow[$idx])) {
+                    $descIncluded = $rawRow[$idx];
+                    break;
+                }
+            }
+            $packageCode = $row['ref'] ?? $row['code'] ?? '';
+
+            $this->createPackage($event->id, $packageNameFr, $price, $packageCode, $descFr, $descIncluded, $lineNumber);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Format générique (en-têtes en ligne 1)
+    // -------------------------------------------------------------------------
+
+    protected function processGenericRows(array $rows): void
+    {
+        $rawHeaders = array_values(array_shift($rows));
+        $headers    = array_map(fn($h) => strtolower(trim((string) $h)), $rawHeaders);
+
+        $lineNumber = 1;
+        foreach ($rows as $rawRow) {
+            $lineNumber++;
+            $rawRow = array_map(fn($v) => trim((string) ($v ?? '')), array_values($rawRow));
+
+            if (count(array_filter($rawRow)) === 0) {
+                continue;
+            }
+
+            $row   = array_combine($headers, array_pad($rawRow, count($headers), ''));
+            $event = $this->findEvent($row['event_title'] ?? $row['event'] ?? '', $row['city'] ?? '');
+
+            if (!$event) {
+                $this->errors[] = "Ligne {$lineNumber} : événement introuvable.";
+                continue;
+            }
+
+            $packageNameFr = $row['package_name_fr'] ?? $row['package_name'] ?? $row['name'] ?? '';
+            $price         = $row['price'] ?? $row['prix'] ?? '0';
+            $packageCode   = $row['package_code'] ?? $row['code'] ?? '';
+            $descFr        = $row['description_fr'] ?? $row['description'] ?? '';
+            $descIncluded  = $row['included'] ?? $row['description_included_fr'] ?? $row['inclus'] ?? '';
+
+            $this->createPackage($event->id, $packageNameFr, $price, $packageCode, $descFr, $descIncluded, $lineNumber);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Trouver l'événement : d'abord par event_id fourni, sinon par titre/ville.
+     */
+    protected function findEvent(string $title = '', string $city = ''): ?Event
+    {
+        // Priorité 1 : event_id fourni via le formulaire
+        if ($this->eventId) {
+            return Event::find($this->eventId);
+        }
+
+        // Priorité 2 : recherche par titre
+        if ($title !== '') {
+            $event = Event::where('title_fr', 'like', '%' . substr($title, 0, 40) . '%')
+                ->orWhere('title_en', 'like', '%' . substr($title, 0, 40) . '%')
+                ->orWhere('slug', Str::slug(substr($title, 0, 40)))
+                ->first();
+            if ($event) return $event;
+
+            // Recherche par mots-clés de ville dans le titre
+            $knownCities = [
+                'San Francisco', 'Los Angeles', 'Seattle', 'Atlanta', 'Boston', 'Miami',
+                'New York', 'Dallas', 'Kansas City', 'Philadelphia', 'Vancouver', 'Toronto',
+                'Guadalajara', 'Mexico', 'Paris', 'London', 'Madrid', 'Barcelona',
+                'Roland Garros', 'Stade de France',
+            ];
+            foreach ($knownCities as $knownCity) {
+                if (stripos($title, $knownCity) !== false) {
+                    $event = Event::where('city', 'like', '%' . $knownCity . '%')
+                        ->orWhere('venue_name', 'like', '%' . $knownCity . '%')
+                        ->first();
+                    if ($event) return $event;
+                }
             }
         }
 
-        if (!$event) {
-            return; // Ignorer si aucun événement trouvé
+        // Priorité 3 : recherche par ville
+        if ($city !== '') {
+            return Event::where('city', 'like', '%' . $city . '%')->first();
         }
 
-        $packageNameFr = trim($row['package_name_fr'] ?? $row['package_name'] ?? $row['name'] ?? '');
-        $price         = floatval(str_replace([' ', ','], ['', '.'], $row['price'] ?? $row['prix'] ?? '0'));
-
-        if ($packageNameFr === '' || $price <= 0) {
-            return; // Ignorer les lignes sans nom ou prix valide
-        }
-
-        $packageCode = trim($row['package_code'] ?? $row['code'] ?? '')
-            ?: ('PKG-' . Str::slug($packageNameFr) . '-' . rand(1000, 9999));
-
-        EventPackage::create([
-            'event_id'                => $event->id,
-            'package_name_fr'         => $packageNameFr,
-            'package_name_en'         => trim($row['package_name_en'] ?? $row['name_en'] ?? '') ?: $packageNameFr,
-            'package_code'            => $packageCode,
-            'description_fr'          => trim($row['description_fr'] ?? $row['description'] ?? '') ?: null,
-            'description_included_fr' => trim($row['included'] ?? $row['description_included_fr'] ?? $row['inclus'] ?? '') ?: null,
-            'price'                   => $price,
-            'currency'                => strtoupper(trim($row['currency'] ?? $row['devise'] ?? 'XOF')),
-            'available_quantity'      => max(1, intval($row['available_quantity'] ?? $row['quantity'] ?? $row['quantite'] ?? 100)),
-            'max_per_order'           => max(1, intval($row['max_per_order'] ?? $row['max_order'] ?? 10)),
-            'is_active'               => true,
-            'sort_order'              => intval($row['sort_order'] ?? $row['order'] ?? 1),
-        ]);
-
-        $this->rowCount++;
+        return null;
     }
+
+    /**
+     * Créer un EventPackage après validation des données.
+     */
+    protected function createPackage(
+        int $eventId,
+        string $packageNameFr,
+        string $rawPrice,
+        string $packageCode,
+        string $descFr,
+        string $descIncluded,
+        int $lineNumber
+    ): void {
+        $packageNameFr = trim($packageNameFr);
 
     public function getRowCount(): int
     {

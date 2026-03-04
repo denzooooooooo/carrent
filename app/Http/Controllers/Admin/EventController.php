@@ -269,7 +269,40 @@ class EventController extends Controller
             'packages.*.sort_order' => ['nullable', 'integer', 'min:0'],
         ];
 
-        $validated = $request->validate($rules);
+        $messages = [
+            'category_id.required' => 'La catégorie est obligatoire.',
+            'category_id.exists' => 'La catégorie sélectionnée est invalide.',
+            'title_fr.required' => 'Le titre en français est obligatoire.',
+            'title_en.required' => 'Le titre en anglais est obligatoire.',
+            'venue_name.required' => 'Le nom du lieu est obligatoire.',
+            'venue_address.required' => 'L\'adresse du lieu est obligatoire.',
+            'city.required' => 'La ville est obligatoire.',
+            'country.required' => 'Le pays est obligatoire.',
+            'event_date.required' => 'La date de l\'événement est obligatoire.',
+            'event_date.date' => 'La date de l\'événement doit être une date valide.',
+            'event_time.required' => 'L\'heure de l\'événement est obligatoire.',
+            'event_time.regex' => 'L\'heure de l\'événement doit être au format HH:MM.',
+            'end_date.after_or_equal' => 'La date de fin doit être égale ou postérieure à la date de début.',
+            'image.image' => 'Le fichier doit être une image.',
+            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'min_price.required' => 'Le prix minimum est obligatoire.',
+            'min_price.numeric' => 'Le prix minimum doit être un nombre.',
+            'min_price.min' => 'Le prix minimum doit être supérieur ou égal à 0.',
+            'max_price.numeric' => 'Le prix maximum doit être un nombre.',
+            'max_price.min' => 'Le prix maximum doit être supérieur ou égal à 0.',
+            'max_price.gte' => 'Le prix maximum (:value) doit être supérieur ou égal au prix minimum.',
+            'total_seats.required' => 'Le nombre total de places est obligatoire.',
+            'total_seats.integer' => 'Le nombre total de places doit être un entier.',
+            'total_seats.min' => 'Le nombre total de places doit être au moins 1.',
+            'packages.*.package_name_fr.required' => 'Le nom du package en français est obligatoire.',
+            'packages.*.price.required' => 'Le prix du package est obligatoire.',
+            'packages.*.price.numeric' => 'Le prix du package doit être un nombre.',
+            'packages.*.price.min' => 'Le prix du package doit être supérieur ou égal à 0.',
+            'packages.*.available_quantity.integer' => 'La quantité disponible doit être un entier.',
+            'packages.*.max_per_order.integer' => 'Le maximum par commande doit être un entier.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         // Ajout/Mise à jour du slug
         $validated['slug'] = Str::slug($validated['title_fr']);
