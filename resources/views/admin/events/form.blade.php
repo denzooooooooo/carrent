@@ -83,7 +83,7 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 @error('type_id') border-red-500 @enderror">
                     <option value="">Sélectionner un type</option>
                     @foreach($types as $id => $name)
-                        <option value="{{ $id }}" {{ old('type_id', $event->event_type) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                        <option value="{{ $id }}" {{ old('type_id', $event->type_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
                     @endforeach
                 </select>
                 @error('type_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror

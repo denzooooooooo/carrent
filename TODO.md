@@ -1,12 +1,9 @@
-# TODO - Packages Touristiques Sportifs (Catalogues PDF)
+# TODO - Fix création d'événement (table event_packages manquante)
 
 ## Étapes
 
-- [ ] 1. Migration : ajouter `currency`, `event_date_start`, `event_date_end` à `tour_packages`
-- [ ] 2. Modèle `TourPackage` : ajouter nouveaux champs à `$fillable` et `$casts`
-- [ ] 3. Admin `PackageController` : ajouter types `sport_event`, `motorsport`, `football` + validation
-- [ ] 4. Seeder `TourPackageCatalogueSeeder` : 30 packages des 3 PDFs + 3 nouvelles catégories
-- [ ] 5. Vue admin `_form.blade.php` : currency, dates événement, nouveaux types
-- [ ] 6. Vue admin `index.blade.php` : filtre par type, affichage currency
-- [ ] 7. Vues `create.blade.php` et `edit.blade.php` : passer nouveaux packageTypes
-- [ ] 8. Exécuter migration + seeder
+- [x] 1. Vérifier l’état des migrations pour `event_packages`
+- [ ] 2. Exécuter les migrations manquantes (si nécessaire)
+- [x] 3. Ajouter un garde-fou dans `Admin/EventController` si la table `event_packages` n'existe pas
+- [ ] 4. Valider la syntaxe PHP des fichiers modifiés
+- [ ] 5. Re-tester la création d’un événement avec package
