@@ -10,6 +10,7 @@ use App\Models\EventPackage;
 use App\Imports\EventPackagesImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class EventController extends Controller
@@ -395,6 +396,10 @@ class EventController extends Controller
      */
     protected function storePackages(Event $event, array $packagesData)
     {
+        if (!Schema::hasTable('event_packages')) {
+            throw new \RuntimeException("La table 'event_packages' n'existe pas. Veuillez exécuter les migrations de base de données.");
+        }
+
         foreach ($packagesData as $index => $packageData) {
             if (!empty($packageData['package_name_fr'])) {
                 $event->packages()->create([
@@ -419,6 +424,10 @@ class EventController extends Controller
      */
     protected function updatePackages(Event $event, array $packagesData)
     {
+        if (!Schema::hasTable('event_packages')) {
+            throw new \RuntimeException("La table 'event_packages' n'existe pas. Veuillez exécuter les migrations de base de données.");
+        }
+
         // Delete existing packages not in the new data
         $existingIds = collect($packagesData)->pluck('id')->filter()->toArray();
         $event->packages()->whereNotIn('id', $existingIds)->delete();
@@ -461,6 +470,52 @@ class EventController extends Controller
                 }
             }
         }
+    }
+
+    /**
+     * Quick store a new event category from the form
+     */
+    public function quickStoreCat(Request $request)
+    {
+        $request->validate([
+            'name_fr' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+        ]);
+
+        $category = \App\Models\EventCategory::create([
+            'name_fr' => $request->name_fr,
+            'name_en' => $request->name_en ?? $request->name_fr,
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Catégorie créée avec succès',
+            'category' => $category
+        ]);
+    }
+
+    /**
+     * Quick store a new event type from the form
+     */
+    public function quickStoreType(Request $request)
+    {
+        $request->validate([
+            'name_fr' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+        ]);
+
+        $type = \App\Models\EventType::create([
+            'name_fr' => $request->name_fr,
+            'name_en' => $request->name_en ?? $request->name_fr,
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Type créé avec succès',
+            'type' => $type
+        ]);
     }
 
     /**
