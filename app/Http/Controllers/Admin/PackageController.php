@@ -9,6 +9,7 @@ use App\Models\PackageInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
@@ -102,6 +103,12 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->has('package_type')) {
+            $request->merge([
+                'package_type' => $this->normalizePackageType($request->input('package_type')),
+            ]);
+        }
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title_fr' => 'required|string|max:255',
@@ -151,6 +158,8 @@ class PackageController extends Controller
                 $validated['slug'] = $originalSlug . '-' . $count;
                 $count++;
             }
+
+            $this->assertPackageTypeAllowedByDatabase($validated['package_type']);
 
             $package = TourPackage::create($validated);
 
@@ -235,6 +244,12 @@ class PackageController extends Controller
      */
     public function update(Request $request, TourPackage $package)
     {
+        if ($request->has('package_type')) {
+            $request->merge([
+                'package_type' => $this->normalizePackageType($request->input('package_type')),
+            ]);
+        }
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title_fr' => 'required|string|max:255',
@@ -286,6 +301,8 @@ class PackageController extends Controller
                     $count++;
                 }
             }
+
+            $this->assertPackageTypeAllowedByDatabase($validated['package_type']);
 
             $package->update($validated);
 
@@ -397,5 +414,54 @@ class PackageController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }   
+    }
+
+    /**
+     * Normalise la valeur package_type (trim + lowercase + alias).
+     */
+    private function normalizePackageType(?string $packageType): ?string
+    {
+        if ($packageType === null) {
+            return null;
+        }
+
+        $raw = $packageType;
+        $normalized = strtolower(trim($packageType));
+
+        $aliases = [
+            'motor_sport' => 'motorsport',
+            'motor sport' => 'motorsport',
+            'formula1'    => 'motorsport',
+            'formula_1'   => 'motorsport',
+            'f1'          => 'motorsport',
+        ];
+
+        $resolved = $aliases[$normalized] ?? $normalized;
+
+        Log::info('Package type normalization', [
+            'raw' => $raw,
+            'normalized' => $normalized,
+            'resolved' => $resolved,
+        ]);
+
+        return $resolved;
+    }
+
+    /**
+     * Vérifie que l'ENUM SQL accepte la valeur.
+     */
+    private function assertPackageTypeAllowedByDatabase(string $packageType): void
+    {
+        $column = DB::selectOne("SHOW COLUMNS FROM tour_packages LIKE 'package_type'");
+        $typeDef = $column->Type ?? '';
+
+        preg_match_all("/'([^']+)'/", $typeDef, $matches);
+        $allowed = $matches[1] ?? [];
+
+        if (!in_array($packageType, $allowed, true)) {
+            throw new \RuntimeException(
+                "Le type de package '{$packageType}' n'est pas accepté par la base de données courante. Valeurs autorisées: " . implode(', ', $allowed)
+            );
+        }
     }
 }
