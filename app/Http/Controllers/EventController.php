@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class EventController extends Controller
 {
@@ -98,11 +99,18 @@ class EventController extends Controller
      */
     public function show($slug)
     {
-        $event = Event::with(['seatZones' => function($query) {
+        $relations = ['seatZones' => function($query) {
             $query->where('is_active', true)->orderBy('price');
-        }, 'packages' => function($query) {
-            $query->where('is_active', true)->orderBy('sort_order');
-        }, 'category', 'type', 'series'])
+        }, 'category', 'type', 'series'];
+
+        // Only load packages if the table exists
+        if (Schema::hasTable('event_packages')) {
+            $relations['packages'] = function($query) {
+                $query->where('is_active', true)->orderBy('sort_order');
+            };
+        }
+
+        $event = Event::with($relations)
         ->where('slug', $slug)
         ->where('is_active', true)
         ->firstOrFail();
@@ -125,6 +133,11 @@ class EventController extends Controller
         // Determiner si c'est une reservation de siege ou de package
         $hasZone = $request->filled('zone_id');
         $hasPackage = $request->filled('package_id');
+
+        // Check if packages table exists before allowing package booking
+        if ($hasPackage && !Schema::hasTable('event_packages')) {
+            return back()->withErrors(['error' => 'Les packages ne sont pas disponibles actuellement. Veuillez contacter le support.']);
+        }
 
         if (!$hasZone && !$hasPackage) {
             return back()->withErrors(['error' => 'Veuillez sélectionner une zone de places ou un package.']);
