@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `event_series` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name_fr` varchar(255) NOT NULL,
   `name_en` varchar(255) DEFAULT NULL,
-  `slug` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL, 
   `description_fr` text,
   `description_en` text,
   `venue_name` varchar(255) DEFAULT NULL,
