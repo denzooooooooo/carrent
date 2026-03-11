@@ -324,6 +324,17 @@ class PaymentController extends Controller
                     ]);
                 }
 
+                // Confirmer la réservation de location après paiement réussi
+                if ($booking->booking_type === 'location' && $booking->locationBooking) {
+                    $booking->locationBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Location booking confirmed after payment', [
+                        'booking_id' => $booking->id,
+                        'location_booking_id' => $booking->locationBooking->id,
+                    ]);
+                }
+
                 // Nettoyer la session
                 Session::forget(['flight_search', 'selected_offer', 'flight_passengers']);
 
@@ -345,6 +356,9 @@ class PaymentController extends Controller
                 } elseif ($booking->booking_type === 'package') {
                     return redirect()->route('packages.booking.confirmation', $booking)
                         ->with('success', 'Paiement réussi! Votre réservation de package a été confirmée.');
+                } elseif ($booking->booking_type === 'location') {
+                    return redirect()->route('location.booking.confirmation', $booking)
+                        ->with('success', 'Paiement réussi! Votre réservation de location a été confirmée.');
                 }
 
                 return redirect()->route('home')
@@ -427,6 +441,17 @@ class PaymentController extends Controller
                     Log::info('Package booking confirmed via webhook', [
                         'booking_id' => $booking->id,
                         'package_booking_id' => $booking->packageBooking->id,
+                    ]);
+                }
+
+                // Confirmer la réservation de location après paiement réussi
+                if ($booking->booking_type === 'location' && $booking->locationBooking) {
+                    $booking->locationBooking->update([
+                        'status' => 'confirmed',
+                    ]);
+                    Log::info('Location booking confirmed via webhook', [
+                        'booking_id' => $booking->id,
+                        'location_booking_id' => $booking->locationBooking->id,
                     ]);
                 }
 
@@ -605,6 +630,24 @@ class PaymentController extends Controller
                 // Sinon, envoyer l'email de confirmation standard
                 \Illuminate\Support\Facades\Mail::to($email)
                     ->send(new \App\Mail\FlightBookingConfirmation($booking->flightBooking));
+                return;
+            }
+
+            // Pour les réservations non-vol (location/event/package), on envoie un reçu générique
+            if (in_array($booking->booking_type, ['location', 'event', 'package'])) {
+                \Illuminate\Support\Facades\Mail::raw(
+                    "Bonjour,\n\nVotre paiement a été validé.\n\nRéférence: {$booking->booking_number}\nType: {$booking->booking_type}\nMontant: {$booking->final_amount} {$booking->currency}\n\nMerci pour votre confiance.\nCarré Premium",
+                    function ($message) use ($email, $booking) {
+                        $message->to($email)
+                            ->subject("Paiement confirmé - {$booking->booking_number}");
+                    }
+                );
+
+                Log::info('✅ Email de confirmation envoyé', [
+                    'booking_id' => $booking->id,
+                    'booking_type' => $booking->booking_type,
+                    'email' => $email,
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Erreur envoi email:', ['message' => $e->getMessage()]);

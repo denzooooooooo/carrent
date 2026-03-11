@@ -72,13 +72,21 @@ class EventController extends Controller
             }
 
             // Gestion des packages (grilles tarifaires)
+            $packagesSkipped = false;
             if ($request->has('packages')) {
-                $this->storePackages($event, $request->input('packages'));
+                $packagesSkipped = !$this->storePackages($event, $request->input('packages'));
             }
 
             DB::commit();
 
-            return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été créé avec succès.');
+            $redirect = redirect()->route('admin.events.index')
+                ->with('success', 'L\'événement **' . $event->title_fr . '** a été créé avec succès.');
+
+            if ($packagesSkipped) {
+                $redirect->with('warning', 'L\'événement a été créé, mais les packages n\'ont pas été enregistrés car la table `event_packages` est absente. Veuillez exécuter les migrations.');
+            }
+
+            return $redirect;
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -164,13 +172,21 @@ class EventController extends Controller
             }
 
             // Gestion des packages (grilles tarifaires)
+            $packagesSkipped = false;
             if ($request->has('packages')) {
-                $this->updatePackages($event, $request->input('packages'));
+                $packagesSkipped = !$this->updatePackages($event, $request->input('packages'));
             }
 
             DB::commit();
 
-            return redirect()->route('admin.events.index')->with('success', 'L\'événement **' . $event->title_fr . '** a été mis à jour avec succès.');
+            $redirect = redirect()->route('admin.events.index')
+                ->with('success', 'L\'événement **' . $event->title_fr . '** a été mis à jour avec succès.');
+
+            if ($packagesSkipped) {
+                $redirect->with('warning', 'L\'événement a été mis à jour, mais les packages n\'ont pas été enregistrés car la table `event_packages` est absente. Veuillez exécuter les migrations.');
+            }
+
+            return $redirect;
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -394,10 +410,14 @@ class EventController extends Controller
     /**
      * Store packages for an event
      */
-    protected function storePackages(Event $event, array $packagesData)
+    protected function storePackages(Event $event, array $packagesData): bool
     {
         if (!Schema::hasTable('event_packages')) {
-            throw new \RuntimeException("La table 'event_packages' n'existe pas. Veuillez exécuter les migrations de base de données.");
+            \Log::warning("La table 'event_packages' est absente. Packages ignorés lors de la création de l'événement.", [
+                'event_id' => $event->id,
+                'packages_count' => count($packagesData),
+            ]);
+            return false;
         }
 
         foreach ($packagesData as $index => $packageData) {
@@ -417,15 +437,21 @@ class EventController extends Controller
                 ]);
             }
         }
+
+        return true;
     }
 
     /**
      * Update packages for an event
      */
-    protected function updatePackages(Event $event, array $packagesData)
+    protected function updatePackages(Event $event, array $packagesData): bool
     {
         if (!Schema::hasTable('event_packages')) {
-            throw new \RuntimeException("La table 'event_packages' n'existe pas. Veuillez exécuter les migrations de base de données.");
+            \Log::warning("La table 'event_packages' est absente. Packages ignorés lors de la mise à jour de l'événement.", [
+                'event_id' => $event->id,
+                'packages_count' => count($packagesData),
+            ]);
+            return false;
         }
 
         // Delete existing packages not in the new data
@@ -470,6 +496,8 @@ class EventController extends Controller
                 }
             }
         }
+
+        return true;
     }
 
     /**
