@@ -148,6 +148,12 @@ class PackageController extends Controller
         DB::beginTransaction();
 
         try {
+            $validated['title_en'] = $validated['title_en'] ?? $validated['title_fr'];
+            $validated['description_en'] = $validated['description_en'] ?? ($validated['description_fr'] ?? null);
+            $validated['duration_text_en'] = $validated['duration_text_en'] ?? ($validated['duration_text_fr'] ?? null);
+            $validated['meta_title_en'] = $validated['meta_title_en'] ?? ($validated['meta_title_fr'] ?? null);
+            $validated['meta_description_en'] = $validated['meta_description_en'] ?? ($validated['meta_description_fr'] ?? null);
+
             // Générer le slug
             $validated['slug'] = Str::slug($validated['title_fr']);
             
@@ -302,6 +308,12 @@ class PackageController extends Controller
                 }
             }
 
+            $validated['title_en'] = $validated['title_en'] ?? $validated['title_fr'];
+            $validated['description_en'] = $validated['description_en'] ?? ($validated['description_fr'] ?? null);
+            $validated['duration_text_en'] = $validated['duration_text_en'] ?? ($validated['duration_text_fr'] ?? null);
+            $validated['meta_title_en'] = $validated['meta_title_en'] ?? ($validated['meta_title_fr'] ?? null);
+            $validated['meta_description_en'] = $validated['meta_description_en'] ?? ($validated['meta_description_fr'] ?? null);
+
             $this->assertPackageTypeAllowedByDatabase($validated['package_type']);
 
             $package->update($validated);
@@ -348,8 +360,9 @@ class PackageController extends Controller
                 ->count();
 
             if ($confirmedBookings > 0) {
+                DB::rollBack();
                 return redirect()->back()
-                    ->with('error', 'Impossible de supprimer ce package car il a des réservations actives.');
+                    ->with('error', 'Impossible de supprimer ce package car il a des réservations actives (confirmées ou en attente).');
             }
 
             // Supprimer les médias
