@@ -1,0 +1,169 @@
+/* public/css/separate-tickets.css */
+
+/* Animation d'entrée pour le bloc billets séparés */
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.separate-tickets-container {
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+/* Effet hover sur les segments */
+.leg-card {
+    transition: all 0.3s ease;
+}
+
+.leg-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Badge de numéro de segment */
+.leg-number {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+
+.leg-number:hover {
+    transform: scale(1.1);
+}
+
+/* Effet de pulsation sur les avertissements */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.warning-icon {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modal overlay */
+#separateTicketsModal {
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+#separateTicketsModal > div {
+    animation: slideInFromTop 0.4s ease-out;
+}
+
+/* Effet de progression sur la barre de vol */
+.flight-progress-bar {
+    background: linear-gradient(
+        90deg,
+        rgb(249, 115, 22) 0%,
+        rgb(239, 68, 68) 50%,
+        rgb(249, 115, 22) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Styles pour les prix */
+.price-comparison {
+    position: relative;
+}
+
+.price-comparison::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgb(239, 68, 68), transparent);
+    transform: translateY(-50%) rotate(-5deg);
+}
+
+/* Badge économie */
+.savings-badge {
+    background: linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74));
+    box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Timeline des segments */
+.segment-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.segment-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(180deg, rgb(249, 115, 22), rgb(239, 68, 68));
+}
+
+.segment-timeline-dot {
+    position: absolute;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 3px solid rgb(249, 115, 22);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .separate-tickets-container {
+        padding: 16px;
+    }
+    
+    .leg-card {
+        padding: 16px;
+    }
+    
+    #separateTicketsModal > div {
+        margin: 16px;
+        max-height: calc(100vh - 32px);
+    }
+}
+
+/* Print styles */
+@media print {
+    .separate-tickets-container {
+        page-break-inside: avoid;
+    }
+    
+    .leg-card {
+        border: 2px solid #000;
+        margin-bottom: 20px;
+    }
+}

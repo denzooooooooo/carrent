@@ -174,7 +174,7 @@ class EventController extends Controller
             // Mettre a jour les places disponibles
             $zone->decrement('available_seats', $request->quantity);
         }
-
+ 
         // Cas 2: Reservation de package
         if ($hasPackage) {
             $request->validate([
