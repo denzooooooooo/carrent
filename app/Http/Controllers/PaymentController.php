@@ -638,7 +638,7 @@ class PaymentController extends Controller
                 \Illuminate\Support\Facades\Mail::to($email)
                     ->send(new \App\Mail\FlightBookingConfirmation($booking->flightBooking));
                 return;
-            }
+            } 
 
             // Pour les réservations non-vol (location/event/package), on envoie un reçu générique
             if (in_array($booking->booking_type, ['location', 'event', 'package'])) {
