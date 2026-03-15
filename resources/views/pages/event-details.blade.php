@@ -418,6 +418,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const price = parseFloat(this.dataset.price);
       maxAvailable = parseInt(this.dataset.available);
 
+      // ✅ NOUVEAU: Limite CinetPay 1.5M → Quantity max basée sur prix
+      const maxCinetpayAmount = 1500000;
+      const maxQuantityCinetpay = Math.floor(maxCinetpayAmount / price);
+      maxAvailable = Math.min(maxAvailable, maxQuantityCinetpay);
+
+      if (maxQuantityCinetpay < 1) {
+        alert(`Package ${packageName} trop cher pour paiement en ligne (max 1.5M XOF). Contactez admin@carrepremium.ci`);
+        return;
+      }
+
       isPackage = true;
       currentItem = { id: packageId, name: packageName, price: price, type: 'package' };
       currentQuantity = 1;
@@ -428,6 +438,9 @@ document.addEventListener('DOMContentLoaded', function() {
       selectedItemPrice.textContent = formatPrice(price) + ' {{ __("per person") }}';
       document.getElementById('unitPrice').textContent = formatPrice(price);
       document.getElementById('maxAvailable').textContent = maxAvailable;
+      if (maxQuantityCinetpay < parseInt(this.dataset.available)) {
+        document.getElementById('maxAvailable').innerHTML = `<span title="Limite paiement en ligne">${maxAvailable}</span> (paiement en ligne)`;
+      }
       document.getElementById('quantityLabel').textContent = '{{ __("Number of packages") }}';
       updateTotal();
 

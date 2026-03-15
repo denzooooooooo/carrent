@@ -188,7 +188,7 @@ class EventController extends Controller
             $zone->decrement('available_seats', $request->quantity);
         }
  
-        // Cas 2: Reservation de package
+// Cas 2: Reservation de package
         if ($hasPackage) {
             $request->validate([
                 'package_id' => 'required|exists:event_packages,id',
@@ -198,11 +198,41 @@ class EventController extends Controller
 
             // Verifier la disponibilite
             if ($request->quantity > $package->available_quantity) {
-                return back()->withErrors(['quantity' => 'Nombre de packages demande superieur a la disponibilite.']);
+                return back()->withErrors(['quantity' => 'Nombre de packages demandé supérieur à la disponibilité.']);
             }
 
             $unitPrice = $package->price;
             $totalPrice = $package->price * $request->quantity;
+            
+            // ✅ SOLUTION GROS MONTANTS: Virement bancaire pour >1.5M XOF
+            if ($totalPrice > 1500000) {
+                // Créer booking avec payment_method='bank_transfer'
+                $booking = \App\Models\Booking::create([
+                    'booking_number' => $bookingReference,
+                    'user_id' => auth()->check() ? auth()->id() : null,
+                    'booking_type' => 'event',
+                    'event_id' => $event->id,
+                    'event_booking_id' => $eventBooking->id ?? null,
+                    'seat_zone_id' => $zoneId,
+                    'booking_date' => now(),
+                    'travel_date' => $event->event_date,
+                    'number_of_passengers' => $request->quantity,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'passenger_details' => [[
+                        'first_name' => $firstName, 'last_name' => $lastName,
+                        'email' => $request->email, 'phone' => $request->phone, 'type' => 'adult'
+                    ]],
+                    'total_amount' => $totalPrice, 'currency' => 'XOF', 'final_amount' => $totalPrice,
+                    'status' => 'pending_payment', 'payment_status' => 'pending',
+                    'payment_method' => 'bank_transfer', // ✅ Virement pour gros montants
+                    'notes' => "VIP Package >1.5M XOF. Paiement par virement bancaire.\nRIB: [INSÉRER RIB COMPTE]\nRéf: {$bookingReference}"
+                ]);
+                
+                return redirect()->route('payment.instructions', $booking)
+                    ->with('info', 'Réservation VIP créée! Suivez les instructions de virement bancaire.');
+            }
+
             $packageId = $package->id;
 
             // Mettre a jour la quantite disponible
