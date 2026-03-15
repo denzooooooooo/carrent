@@ -146,7 +146,7 @@
             <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Choose your tickets') }}</h3>
 
             {{-- Afficher les Packages (Grilles Tarifaires) --}}
-            @if($event->packages->count() > 0)
+            @if(\Illuminate\Support\Facades\Schema::hasTable('event_packages') && $event->packages->count() > 0)
               <div class="mb-6">
                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ __('Packages & VIP Offers') }}</h4>
                 <div class="space-y-3 sm:space-y-4">
@@ -243,8 +243,8 @@
               </div>
             @endif
 
-            @if($event->packages->count() == 0 && $event->seatZones->count() == 0)
-              <div class="text-center py-6 sm:py-8">
+            @if( ! \Illuminate\Support\Facades\Schema::hasTable('event_packages') || $event->packages->count() == 0 && $event->seatZones->count() == 0)
+              <div class="text-center py-6 sm:py-8"> 
                 <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
