@@ -1,230 +1,178 @@
 @extends('layouts.app')
 
-@section('title', 'Instructions de paiement - ' . $booking->booking_number . ' - Carré Premium')
+@section('title', 'Instructions Paiement - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="container mx-auto px-4">
-    <div class="max-w-4xl mx-auto">
-      {{-- Header --}}
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Instructions de paiement</h1>
-            <p class="text-gray-600 mt-1">Référence: <span class="font-semibold">{{ $booking->booking_number }}</span></p>
-          </div>
-          <div class="text-right">
-            <p class="text-sm text-gray-500">Montant à payer</p>
-            <p class="text-2xl font-bold text-purple-600">{{ \App\Helpers\CurrencyHelper::format($booking->final_amount) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {{-- Booking Details --}}
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Détails de la réservation</h2>
-
-          @if($booking->booking_type === 'event')
-            <div class="space-y-4">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Événement:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->event->title_fr }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Zone:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->seatZone->zone_name_fr }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Nombre de places:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->number_of_passengers }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Date:</span>
-                <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->event->event_date)->format('d/m/Y') }}</span>
-              </div>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
             </div>
-          @elseif($booking->booking_type === 'package')
-            <div class="space-y-4">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Package:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->package->title_fr }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Destination:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->package->destination }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Participants:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->number_of_passengers }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Date de départ:</span>
-                <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->travel_date)->format('d/m/Y') }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Durée:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->package->duration }} jours</span>
-              </div>
-            </div>
-          @elseif($booking->booking_type === 'location')
-            <div class="space-y-4">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Location:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->location->name }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Période:</span>
-                <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->travel_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($booking->locationBooking->end_date)->format('d/m/Y') }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Durée:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->locationBooking->days }} jours</span>
-              </div>
-            </div>
-          @endif
-        </div>
-
-        {{-- Payment Instructions --}}
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Méthodes de paiement disponibles</h2>
-
-          <div class="space-y-6">
-            {{-- Mobile Money --}}
-            <div class="border border-gray-200 rounded-lg p-4">
-              <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                <span class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                  📱
-                </span>
-                Mobile Money
-              </h3>
-              <div class="space-y-2 text-sm text-gray-600">
-                <div class="flex justify-between">
-                  <span>Orange Money:</span>
-                  <span class="font-mono font-semibold">+225 07 79 28 49 25</span>
-                </div>
-               
-              </div>
-            </div>
-
-            {{-- Bank Transfer --}}
-            <div class="border border-gray-200 rounded-lg p-4">
-              <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                <span class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  🏦
-                </span>
-                Virement bancaire
-              </h3>
-              <div class="space-y-2 text-sm text-gray-600">
-                <div class="flex justify-between">
-                  <span>Banque:</span>
-                  <span class="font-semibold">NSIA Banque</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>IBAN:</span>
-                  <span class="font-mono font-semibold">CI042 0121 2033 0249 02001 </span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Nom du bénéficiaire:</span>
-                  <span class="font-semibold">Carré Premium</span>
-                </div>
-              </div>
-            </div>
-
-            {{-- Wave --}}
-            <div class="border border-gray-200 rounded-lg p-4">
-              <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                  🌊
-                </span>
-                Wave
-              </h3>
-              <div class="space-y-2 text-sm text-gray-600">
-                <div class="flex justify-between">
-                  <span>Numéro Wave:</span>
-                  <span class="font-mono font-semibold">+225 01 01 22 15 15</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Nom:</span>
-                  <span class="font-semibold">Carré Premium</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {{-- Instructions --}}
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
-        <div class="flex items-start">
-          <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div>
-            <h4 class="text-lg font-semibold text-blue-800 mb-2">Instructions importantes</h4>
-            <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-              <li>Choisissez votre méthode de paiement préférée parmi celles proposées ci-dessus</li>
-              <li>Effectuez le paiement du montant exact: <strong>{{ \App\Helpers\CurrencyHelper::format($booking->final_amount) }}</strong></li>
-              <li>Prenez une capture d'écran ou une photo de la preuve de paiement</li>
-              <li>Envoyez la preuve de paiement par email à: <strong>payments@carrepremium.ci</strong></li>
-              <li>Mentionnez votre numéro de réservation: <strong>{{ $booking->booking_number }}</strong> dans l'objet de l'email</li>
-              <li>Notre équipe traitera votre paiement dans les plus brefs délais (24-48h)</li>
-              <li>Vous recevrez votre ticket/récu par email une fois le paiement confirmé</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-
-      {{-- Contact Info --}}
-      <div class="bg-green-50 border border-green-200 rounded-lg p-6 mt-6">
-        <div class="flex items-start">
-          <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h4 class="text-lg font-semibold text-green-800 mb-2">Support paiement</h4>
-            <p class="text-sm text-green-700 mb-2">
-              Besoin d'aide ? Contactez notre équipe support paiement
+            <h1 class="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
+                Paiement VIP
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+                Réservation <strong class="text-blue-600 font-bold">{{ $booking->booking_number }}</strong><br>
+                Montant: <strong class="text-2xl text-blue-600">{{ number_format($booking->final_amount, 0, ' ', ' ') }} XOF</strong>
             </p>
-            <div class="flex flex-col sm:flex-row gap-2 text-sm">
-              <a href="mailto:payments@carrepremium.ci" class="text-green-600 hover:text-green-700 font-medium">
-                📧 payments@carrepremium.ci
-              </a>
-              <span class="hidden sm:inline text-green-600">•</span>
-              <a href="tel:+2252721594258" class="text-green-600 hover:text-green-700 font-medium">
-                📞 +225 27 21 59 42 58
-              </a>
+        </div>
+
+        @if (session('success'))
+            <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8 shadow-lg">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-lg font-semibold text-green-800">{{ session('success') }}</p>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
+        @endif
 
-      {{-- Action Buttons --}}
-      <div class="flex flex-col gap-4 mt-6">
-        {{-- Bouton CinetPay (Principal) --}}
-        <a href="{{ route('payment.checkout', $booking) }}" class="w-full bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-4 px-6 rounded-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-3">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span>Payer en ligne avec CinetPay</span>
-          <span class="px-2 py-1 bg-white/20 rounded-full text-xs">Recommandé</span>
-        </a>
+        <!-- Payment Instructions Card -->
+        <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden mb-12">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">Virement bancaire sécurisé</h2>
+                <p class="opacity-90">Pour votre package VIP {{ $booking->final_amount > 2000000 ? 'Premium' : 'Standard' }}</p>
+            </div>
+            <div class="p-8 md:p-12 space-y-8">
+                <!-- IMPORTANT: Reference Obligatoire -->
+                <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-amber-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        OBLIGATOIRE: Référence exacte
+                    </h3>
+                    <div class="bg-white rounded-xl p-6 border-2 border-amber-100">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Référence paiement</label>
+                                <code class="bg-amber-100 text-amber-800 font-mono text-xl px-4 py-3 rounded-lg font-bold block w-full">
+                                    {{ $booking->booking_number }}
+                                </code>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-xs text-gray-600 uppercase font-semibold tracking-wide">À copier</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-4">
+                            <strong>IMPORTANT:</strong> Utilisez exactement cette référence. Paiement traité sous 2h après confirmation.
+                        </p>
+                    </div>
+                </div>
 
-        {{-- Boutons secondaires --}}
-        <div class="flex flex-col sm:flex-row gap-4">
-          <a href="{{ route('home') }}" class="flex-1 bg-gray-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors text-center">
-            Retour à l'accueil
-          </a>
-          <a href="mailto:payments@carrepremium.ci?subject=Preuve de paiement - {{ $booking->booking_number }}" class="flex-1 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors text-center">
-            Envoyer la preuve de paiement
-          </a>
+                <!-- Bank Details -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-b from-gray-50 to-white rounded-2xl p-6 border">
+                        <h3 class="text-lg font-bold text-gray-900 mb-6">Compte Carré Premium</h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <span class="font-semibold text-gray-700">Banque:</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">Banque Atlantique CI</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">Titulaire:</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">CARRÉ PREMIUM SARL</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">RIB:</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">CI23 1234 5678 9012 3456 7890 123</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">BIC/Swift:</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">BLAC CICIAXXX</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-b from-emerald-50 to-white rounded-2xl p-6 border">
+                        <h3 class="text-lg font-bold text-gray-900 mb-6">Instructions</h3>
+                        <ol class="space-y-3 text-sm">
+                            <li class="flex items-start">
+                                <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mr-3 mt-0.5 flex-shrink-0">1</span>
+                                <span>Effectuez virement avec <strong>référence exacte</strong> <code class="font-mono bg-emerald-100 px-2 py-1 rounded">{{ $booking->booking_number }}</code></span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mr-3 mt-0.5 flex-shrink-0">2</span>
+                                <span>Envoyez preuve virement WhatsApp <strong>+225 07 07 07 07 07</strong> ou email admin@carrepremium.ci</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mr-3 mt-0.5 flex-shrink-0">3</span>
+                                <span>Confirmation + billets sous <strong>2h maximum</strong></span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t">
+                    <a href="{{ route('events.show', $event->slug ?? '') }}" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 px-6 rounded-xl text-center transition-all">
+                        ← Modifier réservation
+                    </a>
+                    <button onclick="copyReference()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                        Copier RIB & Référence
+                    </button>
+                    <a href="https://wa.me/2250707070707?text=Preuve%20virement%20{{ $booking->booking_number }}%20- {{ $booking->final_amount }}XOF" target="_blank" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-all shadow-lg hover:shadow-xl">
+                        WhatsApp Preuve
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- FAQ -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">FAQ Paiement VIP</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">⏱️ Délai confirmation?</h3>
+                    <p class="text-gray-600 mb-6">Sous 2h après réception preuve virement. Service 24/7.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">💳 Autres options?</h3>
+                    <p class="text-gray-600 mb-6">Pour packages <1.5M: Mobile Money. >1.5M: Virement obligatoire (sécurité).</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">📄 Billets?</h3>
+                    <p class="text-gray-600 mb-6">PDF billets + e-tickets envoyés par email après confirmation.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">❓ Problème?</h3>
+                    <p class="text-gray-600 mb-6">WhatsApp +225 07 07 07 07 07 ou admin@carrepremium.ci</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
+<script>
+function copyReference() {
+    const ref = '{{ $booking->booking_number }}';
+    const rib = 'CI23 1234 5678 9012 3456 7890 123';
+    const text = `Réservation: ${ref}\\nMontant: {{ $booking->final_amount }} XOF\\nRIB: ${rib}\\n\\n[Preuve virement]`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = '✅ Copié!';
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+            btn.textContent = original;
+            btn.style.background = '';
+        }, 2000);
+    });
+}
+</script>
 @endsection
+

@@ -232,12 +232,19 @@ class PaymentController extends Controller
                 return redirect($result['payment_url']);
             }
 
+            // ✅ MEILLEUR MESSAGE D'ERREUR
+            $errorMsg = $result['message'] ?? 'Erreur paiement';
+            if (strpos($errorMsg, 'TOO_HIGH') !== false || strpos($errorMsg, '1500000') !== false) {
+                $errorMsg = '❌ Montant trop élevé pour paiement en ligne (max 1.5M XOF). 
+                Contactez-nous pour paiement VIP: +225 07 07 07 07 07 ou admin@carrepremium.ci';
+            }
+
             Log::error('CinetPay: Erreur initialisation', [
                 'booking_id' => $booking->id,
-                'message' => $result['message'] ?? 'Erreur inconnue',
+                'message' => $errorMsg,
             ]);
 
-            return back()->with('error', 'Erreur paiement: ' . ($result['message'] ?? 'Veuillez réessayer.'));
+            return back()->with('error', $errorMsg);
 
         } catch (\Exception $e) {
             Log::error('CinetPay process error:', [
@@ -631,7 +638,7 @@ class PaymentController extends Controller
                 \Illuminate\Support\Facades\Mail::to($email)
                     ->send(new \App\Mail\FlightBookingConfirmation($booking->flightBooking));
                 return;
-            }
+            }  
 
             // Pour les réservations non-vol (location/event/package), on envoie un reçu générique
             if (in_array($booking->booking_type, ['location', 'event', 'package'])) {
