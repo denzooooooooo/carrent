@@ -25,15 +25,17 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+public function boot(): void
     {
-        Scramble::afterOpenApiGenerated(
-            function (OpenApi $openApi) {
-                $openApi->secure(
-                    SecurityScheme::http('bearer', 'JWT')
-                );
-            }
-        );
+        if (app()->environment('local', 'development')) {
+            Scramble::afterOpenApiGenerated(
+                function (OpenApi $openApi) {
+                    $openApi->secure(
+                        SecurityScheme::http('bearer', 'JWT')
+                    );
+                }
+            );
+        }
 
         setlocale(LC_TIME, 'fr_FR', 'fr', 'FR', 'French', 'fr_FR.UTF-8');
         Carbon::setLocale(config('app.locale'));
