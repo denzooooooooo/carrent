@@ -1,0 +1,231 @@
+-- MySQL dump 10.13  Distrib 9.5.0, for macos26.0 (arm64)
+--
+-- Host: localhost    Database: carrepremium
+-- ------------------------------------------------------
+-- Server version	9.5.0
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '46b98398-408e-11f0-9773-b34b5df09b37:1-8098';
+
+--
+-- Table structure for table `event_series`
+--
+
+DROP TABLE IF EXISTS `event_series`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_series` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name_fr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_en` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_fr` text COLLATE utf8mb4_unicode_ci,
+  `description_en` text COLLATE utf8mb4_unicode_ci,
+  `venue_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `venue_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `main_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `organizer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sport_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `event_series_slug_unique` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_series`
+--
+
+LOCK TABLES `event_series` WRITE;
+/*!40000 ALTER TABLE `event_series` DISABLE KEYS */;
+INSERT INTO `event_series` VALUES (1,'Coupe du Monde FIFA 2026 - États-Unis','FIFA World Cup 2026 - United States','coupe-du-monde-2026','La première Coupe du Monde à se tenir conjointement entre trois pays: États-Unis, Canada et Mexique. Venez vivre l\'événement le plus attendu au monde!','The first World Cup to be hosted jointly by three countries: United States, Canada and Mexico. Experience the world\'s most anticipated event!','Multiple Venues',NULL,'Various Cities','USA',NULL,NULL,'2026-06-11','2026-07-19','FIFA','Football',1,1,'2026-02-21 11:50:40','2026-02-21 11:50:40');
+/*!40000 ALTER TABLE `event_series` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event_packages`
+--
+
+DROP TABLE IF EXISTS `event_packages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_packages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `event_id` bigint unsigned NOT NULL,
+  `package_name_fr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `package_name_en` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `package_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_fr` text COLLATE utf8mb4_unicode_ci,
+  `description_included_fr` text COLLATE utf8mb4_unicode_ci,
+  `description_included_en` text COLLATE utf8mb4_unicode_ci,
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `currency` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'XAF',
+  `available_quantity` int NOT NULL DEFAULT '0',
+  `max_per_order` int NOT NULL DEFAULT '10',
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `event_packages_event_id_foreign` (`event_id`),
+  CONSTRAINT `event_packages_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_packages`
+--
+
+LOCK TABLES `event_packages` WRITE;
+/*!40000 ALTER TABLE `event_packages` DISABLE KEYS */;
+INSERT INTO `event_packages` VALUES (1,2,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-san-francisco-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2154530.00,'XOF',100,10,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(2,2,'Single Match Pitchside Lounge Premium','Single Match Pitchside Lounge Premium','CDM2026-san-francisco-2','Package premium avec services additionnels','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2500000.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(3,2,'VIP Standard','VIP Standard','CDM2026-san-francisco-3','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,1876055.00,'XOF',100,10,NULL,1,3,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(4,2,'VIP Premium','VIP Premium','CDM2026-san-francisco-4','Package VIP premium avec accès special','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,3200000.00,'XOF',100,10,NULL,1,4,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(5,3,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-los-angeles-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2131300.00,'XOF',100,10,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(6,3,'Single Match Pitchside Lounge Premium','Single Match Pitchside Lounge Premium','CDM2026-los-angeles-2','Package premium avec services additionnels','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2620700.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(7,3,'VIP Standard','VIP Standard','CDM2026-los-angeles-3','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,1876055.00,'XOF',100,10,NULL,1,3,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(8,4,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-seattle-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2543625.00,'XOF',100,10,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(9,4,'VIP Standard','VIP Standard','CDM2026-seattle-2','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2100000.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(10,5,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-atlanta-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2200000.00,'XOF',100,10,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(11,5,'VIP Standard','VIP Standard','CDM2026-atlanta-2','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,1850000.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(12,6,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-boston-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2138570.00,'XOF',98,10,NULL,1,1,'2026-02-21 12:04:12','2026-03-15 19:01:34'),(13,6,'Single Match Pitchside Lounge Premium','Single Match Pitchside Lounge Premium','CDM2026-boston-2','Package premium avec services additionnels','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2298150.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(14,6,'VIP Standard','VIP Standard','CDM2026-boston-3','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,1819145.00,'XOF',100,10,NULL,1,3,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(15,7,'Single Match Pitchside Lounge Standard','Single Match Pitchside Lounge Standard','CDM2026-miami-1','Places haut de gamme le long de la ligne de touche','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2244890.00,'XOF',100,10,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(16,7,'Single Match Pitchside Lounge Premium','Single Match Pitchside Lounge Premium','CDM2026-miami-2','Package premium avec services additionnels','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,2489545.00,'XOF',100,10,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(17,7,'VIP Standard','VIP Standard','CDM2026-miami-3','Places surélevées avec services VIP','Accès au match, Services hospitality, Boissons incluses, Cadeau souvenir',NULL,1787800.00,'XOF',100,10,NULL,1,3,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(18,8,'VIP1 - INFINITY CIRCLE VIP PACKAGE','VIP1 - INFINITY CIRCLE VIP PACKAGE','CONCERT-katy-perry-1',' billet en fosse or debout, produit dérivé VIP, laminé commemoratif','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,239096.00,'XOF',49,6,NULL,1,1,'2026-02-21 12:04:12','2026-03-15 19:06:48'),(19,8,'VIP2 - LIFETIMES FRONT OF STAGE VIP PACKAGE','VIP2 - LIFETIMES FRONT OF STAGE VIP PACKAGE','CONCERT-katy-perry-2','billet en fosse or debout, produit derive VIP, accesoires','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,203019.00,'XOF',50,6,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(20,9,'VIP - EXPERIENCE DU SALON VIP','VIP - EXPERIENCE DU SALON VIP','CONCERT-one-republic-1','billet premium, acces salon VIP, cadeau VIP','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,199411.00,'XOF',48,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 14:03:29'),(21,9,'VIP - FORFAIT VIP ENTREE ANTICIPEE','VIP - FORFAIT VIP ENTREE ANTICIPEE','CONCERT-one-republic-2','billet Gold Circle, entree anticipée, laminé VIP','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,112825.00,'XOF',50,6,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(22,10,'PLATINUM 1','PLATINUM 1','CONCERT-sting-1','Package Platinum','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,364056.00,'XOF',49,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-26 20:57:52'),(23,10,'PLATINUM 2','PLATINUM 2','CONCERT-sting-2','Package Platinum','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,357497.00,'XOF',50,6,NULL,1,2,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(24,11,'VIP PACKAGE','VIP PACKAGE','CONCERT-m-pokora-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,163989.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(25,12,'VIP PACKAGE','VIP PACKAGE','CONCERT-amir-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,144311.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(26,13,'VIP PACKAGE','VIP PACKAGE','CONCERT-soprano-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,131191.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(27,14,'VIP PACKAGE','VIP PACKAGE','CONCERT-dinos-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,118072.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(28,15,'VIP PACKAGE','VIP PACKAGE','CONCERT-kendji-girac-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,124632.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(29,16,'VIP PACKAGE','VIP PACKAGE','CONCERT-indochine-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,183668.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(30,17,'VIP PACKAGE','VIP PACKAGE','CONCERT-nej-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,98394.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(31,18,'VIP PACKAGE','VIP PACKAGE','CONCERT-will-smith-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,229585.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(32,19,'VIP PACKAGE','VIP PACKAGE','CONCERT-yseult-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,104953.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(33,20,'VIP PACKAGE','VIP PACKAGE','CONCERT-pit-baccardi-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,114792.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(34,21,'VIP PACKAGE','VIP PACKAGE','CONCERT-gad-elmaleh-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,131191.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(35,22,'VIP PACKAGE','VIP PACKAGE','CONCERT-angelique-kidjo-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,118072.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(36,23,'VIP PACKAGE','VIP PACKAGE','CONCERT-vybz-kartel-1','Package VIP special','Billet d\'accès, Accès VIP, Cadeau souvenir',NULL,108233.00,'XOF',50,6,NULL,1,1,'2026-02-21 12:04:12','2026-02-21 12:04:12'),(37,24,'sdvf','dvdf','dfvfdf','dfdd','dgdgdg',NULL,22222.00,'XOF',100,10,NULL,1,1,'2026-02-27 01:00:28','2026-02-27 01:00:28'),(38,25,'ffs','fsfsfs','fsfsfs','fddfgd','dggdgd',NULL,111.00,'XOF',95,10,NULL,1,1,'2026-02-27 01:04:21','2026-03-15 18:59:19'),(39,26,'eef','fefe','v\"\'\'','erere','reerfref',NULL,1222222.00,'XOF',98,10,NULL,1,1,'2026-03-04 19:57:41','2026-03-04 19:58:35'),(40,27,'gfgb','bbfg','fb','fbbg','gbffg',NULL,1222.00,'XOF',100,10,NULL,1,1,'2026-03-09 23:31:48','2026-03-09 23:31:48');
+/*!40000 ALTER TABLE `event_packages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `events`
+--
+
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `events` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `category_id` bigint unsigned NOT NULL,
+  `type_id` bigint unsigned DEFAULT NULL,
+  `title_fr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_en` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_fr` text COLLATE utf8mb4_unicode_ci,
+  `description_en` text COLLATE utf8mb4_unicode_ci,
+  `venue_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `venue_address` text COLLATE utf8mb4_unicode_ci,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `event_date` date NOT NULL,
+  `event_time` time NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gallery` json DEFAULT NULL COMMENT 'Array of images',
+  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `organizer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `min_price` decimal(10,2) DEFAULT NULL,
+  `max_price` decimal(10,2) DEFAULT NULL,
+  `cost_price` decimal(10,2) DEFAULT NULL COMMENT 'Prix d''achat/coût',
+  `total_seats` int NOT NULL DEFAULT '0',
+  `available_seats` int NOT NULL DEFAULT '0',
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `meta_title_fr` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_title_en` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_description_fr` text COLLATE utf8mb4_unicode_ci,
+  `meta_description_en` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `profit_margin` decimal(5,2) DEFAULT NULL COMMENT 'Marge bénéficiaire en %',
+  `commission_rate` decimal(5,2) NOT NULL DEFAULT '15.00' COMMENT 'Taux de commission en %',
+  `event_series_id` bigint unsigned DEFAULT NULL,
+  `match_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_home_team_match` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `events_slug_unique` (`slug`),
+  KEY `events_category_id_foreign` (`category_id`),
+  KEY `events_slug_index` (`slug`),
+  KEY `events_event_date_index` (`event_date`),
+  KEY `events_city_index` (`city`),
+  KEY `events_type_id_foreign` (`type_id`),
+  KEY `events_event_series_id_foreign` (`event_series_id`),
+  FULLTEXT KEY `idx_ft_event_title_description` (`title_fr`,`description_fr`),
+  CONSTRAINT `events_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `events_event_series_id_foreign` FOREIGN KEY (`event_series_id`) REFERENCES `event_series` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `events_type_id_foreign` FOREIGN KEY (`type_id`) REFERENCES `event_types` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `events`
+--
+
+LOCK TABLES `events` WRITE;
+/*!40000 ALTER TABLE `events` DISABLE KEYS */;
+INSERT INTO `events` VALUES (2,1,1,'Coupe du Monde 2026 - San Francisco','World Cup 2026 - San Francisco','coupe-du-monde-2026-san-francisco','Match de la Coupe du Monde FIFA 2026 à San Francisco','FIFA World Cup 2026 match in San Francisco','Levi\'s Stadium, Santa Clara',NULL,'San Francisco','USA','2026-06-13','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,1876055.00,3200000.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:12:56',NULL,15.00,1,NULL,0),(3,1,1,'Coupe du Monde 2026 - Los Angeles','World Cup 2026 - Los Angeles','coupe-du-monde-2026-los-angeles','Match de la Coupe du Monde FIFA 2026 à Los Angeles','FIFA World Cup 2026 match in Los Angeles','SoFi Stadium, Los Angeles',NULL,'Los Angeles','USA','2026-06-15','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,1876055.00,2620700.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,1,NULL,0),(4,1,1,'Coupe du Monde 2026 - Seattle','World Cup 2026 - Seattle','coupe-du-monde-2026-seattle','Match de la Coupe du Monde FIFA 2026 à Seattle','FIFA World Cup 2026 match in Seattle','Lumen Field, Seattle',NULL,'Seattle','USA','2026-06-15','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,2100000.00,2543625.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,1,NULL,0),(5,1,1,'Coupe du Monde 2026 - Atlanta','World Cup 2026 - Atlanta','coupe-du-monde-2026-atlanta','Match de la Coupe du Monde FIFA 2026 à Atlanta','FIFA World Cup 2026 match in Atlanta','Mercedes-Benz Stadium, Atlanta',NULL,'Atlanta','USA','2026-06-15','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,1850000.00,2200000.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,1,NULL,0),(6,1,1,'Coupe du Monde 2026 - Boston','World Cup 2026 - Boston','coupe-du-monde-2026-boston','Match de la Coupe du Monde FIFA 2026 à Boston','FIFA World Cup 2026 match in Boston','Gillette Stadium, Foxborough',NULL,'Boston','USA','2026-06-13','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,1819145.00,2298150.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,1,NULL,0),(7,1,1,'Coupe du Monde 2026 - Miami','World Cup 2026 - Miami','coupe-du-monde-2026-miami','Match de la Coupe du Monde FIFA 2026 à Miami','FIFA World Cup 2026 match in Miami','Hard Rock Stadium, Miami Gardens',NULL,'Miami','USA','2026-06-15','21:00:00',NULL,NULL,NULL,NULL,NULL,NULL,1787800.00,2489545.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,1,NULL,0),(8,2,2,'Concert KATY PERRY - Paris','Concert KATY PERRY - Paris','katy-perry-paris-2025-11-04','Concert de KATY PERRY à l\'Accor Arena de Paris','KATY PERRY concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-04','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,203019.00,239096.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(9,2,2,'Concert ONE REPUBLIC - Paris','Concert ONE REPUBLIC - Paris','one-republic-paris-2025-10-07','Concert de ONE REPUBLIC à l\'Accor Arena de Paris','ONE REPUBLIC concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-10-07','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,112825.00,199411.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(10,2,2,'Concert STING - Paris','Concert STING - Paris','sting-paris-2025-10-09','Concert de STING à l\'Accor Arena de Paris','STING concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-10-09','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,357497.00,364056.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(11,2,2,'Concert M. POKORA - Paris','Concert M. POKORA - Paris','m-pokora-paris-2025-11-15','Concert de M. POKORA à l\'Accor Arena de Paris','M. POKORA concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-15','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,163989.00,163989.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(12,2,2,'Concert AMIR - Paris','Concert AMIR - Paris','amir-paris-2025-11-20','Concert de AMIR à l\'Accor Arena de Paris','AMIR concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-20','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,144311.00,144311.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(13,2,2,'Concert SOPRANO - Paris','Concert SOPRANO - Paris','soprano-paris-2025-11-28','Concert de SOPRANO à l\'Accor Arena de Paris','SOPRANO concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-28','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,131191.00,131191.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(14,2,2,'Concert DINOS - Paris','Concert DINOS - Paris','dinos-paris-2025-12-05','Concert de DINOS à l\'Accor Arena de Paris','DINOS concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-12-05','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,118072.00,118072.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(15,2,2,'Concert KENDJI GIRAC - Paris','Concert KENDJI GIRAC - Paris','kendji-girac-paris-2026-03-20','Concert de KENDJI GIRAC à l\'Accor Arena de Paris','KENDJI GIRAC concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2026-03-20','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,124632.00,124632.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(16,2,2,'Concert INDOCHINE - Paris','Concert INDOCHINE - Paris','indochine-paris-2026-06-12','Concert de INDOCHINE à l\'Accor Arena de Paris','INDOCHINE concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2026-06-12','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,183668.00,183668.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(17,2,2,'Concert NEJ - Paris','Concert NEJ - Paris','nej-paris-2026-04-10','Concert de NEJ à l\'Accor Arena de Paris','NEJ concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2026-04-10','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,98394.00,98394.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(18,2,2,'Concert WILL SMITH - Paris','Concert WILL SMITH - Paris','will-smith-paris-2025-11-10','Concert de WILL SMITH à l\'Accor Arena de Paris','WILL SMITH concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-10','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,229585.00,229585.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(19,2,2,'Concert YSEULT - Paris','Concert YSEULT - Paris','yseult-paris-2025-11-22','Concert de YSEULT à l\'Accor Arena de Paris','YSEULT concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-22','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,104953.00,104953.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(20,2,2,'Concert PIT BACCARDI - Paris','Concert PIT BACCARDI - Paris','pit-baccardi-paris-2025-11-30','Concert de PIT BACCARDI à l\'Accor Arena de Paris','PIT BACCARDI concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-11-30','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,114792.00,114792.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(21,2,2,'Concert GAD ELMALEH - Paris','Concert GAD ELMALEH - Paris','gad-elmaleh-paris-2025-12-18','Concert de GAD ELMALEH à l\'Accor Arena de Paris','GAD ELMALEH concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-12-18','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,131191.00,131191.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(22,2,2,'Concert ANGELIQUE KIDJO - Paris','Concert ANGELIQUE KIDJO - Paris','angelique-kidjo-paris-2025-10-25','Concert de ANGELIQUE KIDJO à l\'Accor Arena de Paris','ANGELIQUE KIDJO concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-10-25','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,118072.00,118072.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(23,2,2,'Concert VYBZ KARTEL - Paris','Concert VYBZ KARTEL - Paris','vybz-kartel-paris-2025-10-15','Concert de VYBZ KARTEL à l\'Accor Arena de Paris','VYBZ KARTEL concert at Accor Arena Paris','Accor Arena, Paris',NULL,'Paris','France','2025-10-15','20:00:00',NULL,NULL,NULL,NULL,NULL,NULL,108233.00,108233.00,NULL,0,0,1,1,NULL,NULL,NULL,NULL,'2026-02-21 12:04:12','2026-02-21 12:11:58',NULL,15.00,NULL,NULL,0),(24,1,1,'sff','fsf','sff','sfff','fsfsfs','fsffsfs','sffsfsfs','sffsfsfs','sffsfsfs','2026-02-28','04:44:00',NULL,NULL,NULL,NULL,NULL,'rfsf',12222.00,1222222.00,NULL,122,122,0,1,NULL,NULL,NULL,NULL,'2026-02-27 01:00:28','2026-02-27 01:00:28',NULL,15.00,NULL,NULL,0),(25,1,1,'dghggd','gdgdg','dghggd','gdgdghd','gdhghdgd','fgfgfgd','dgfgdfdgf','dgfd','dffdggf','2026-02-28','14:23:00',NULL,NULL,NULL,NULL,NULL,'dggd',1111.00,11111.00,NULL,111,111,0,1,NULL,NULL,NULL,NULL,'2026-02-27 01:04:21','2026-02-27 01:04:21',NULL,15.00,NULL,NULL,0),(26,1,NULL,'dfgfd','dff','dfgfd','dgdgf','dggdf','essdf','dsfdfs','dsfdsf','dsfds','2026-03-05','17:05:00',NULL,NULL,NULL,NULL,NULL,'fddgfd',12222.00,122333.00,NULL,1222,1222,0,1,NULL,NULL,NULL,NULL,'2026-03-04 19:54:22','2026-03-04 19:57:41',NULL,15.00,NULL,NULL,0),(27,2,2,'iohighuik','ghcchggjv','iohighuik','ghchn','kjvygujh','rtt','ghdf','dfhhfh','fdhhf','2028-12-30','20:04:00',NULL,NULL,NULL,NULL,NULL,'hnvhv,jn',12222.00,NULL,NULL,1222,1222,0,1,NULL,NULL,NULL,NULL,'2026-03-09 23:31:48','2026-03-09 23:31:48',NULL,15.00,NULL,NULL,0);
+/*!40000 ALTER TABLE `events` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event_seat_zones`
+--
+
+DROP TABLE IF EXISTS `event_seat_zones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_seat_zones` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `event_id` bigint unsigned NOT NULL,
+  `zone_name_fr` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `zone_name_en` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `zone_code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `zone_type` enum('standard','vip','vvip','premium') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'standard',
+  `price` decimal(10,2) NOT NULL,
+  `cost_price` decimal(10,2) DEFAULT NULL COMMENT 'Prix d''achat par siège',
+  `total_seats` int NOT NULL,
+  `available_seats` int NOT NULL,
+  `description_fr` text COLLATE utf8mb4_unicode_ci,
+  `description_en` text COLLATE utf8mb4_unicode_ci,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `profit_margin` decimal(5,2) DEFAULT NULL COMMENT 'Marge bénéficiaire en %',
+  PRIMARY KEY (`id`),
+  KEY `event_seat_zones_event_id_zone_code_index` (`event_id`,`zone_code`),
+  CONSTRAINT `event_seat_zones_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_seat_zones`
+--
+
+LOCK TABLES `event_seat_zones` WRITE;
+/*!40000 ALTER TABLE `event_seat_zones` DISABLE KEYS */;
+INSERT INTO `event_seat_zones` VALUES (1,24,'Zone Standard','Standard Zone','STD','standard',11.00,NULL,1,1,NULL,NULL,1,'2026-02-27 01:00:28','2026-02-27 01:00:28',NULL),(2,24,'Zone VIP','VIP Zone','VIP','vip',1.00,NULL,1,1,NULL,NULL,1,'2026-02-27 01:00:28','2026-02-27 01:00:28',NULL),(3,24,'Zone VVIP','VVIP Zone','VVIP','vvip',2.00,NULL,2,2,NULL,NULL,1,'2026-02-27 01:00:28','2026-02-27 01:00:28',NULL),(4,24,'Zone Premium','Premium Zone','PREM','premium',3.00,NULL,3,3,NULL,NULL,1,'2026-02-27 01:00:28','2026-02-27 01:00:28',NULL);
+/*!40000 ALTER TABLE `event_seat_zones` ENABLE KEYS */;
+UNLOCK TABLES;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-03-17 14:50:30

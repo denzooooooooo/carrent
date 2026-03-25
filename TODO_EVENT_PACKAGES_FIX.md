@@ -6,16 +6,31 @@
 - [ ] `cat deploy_fix_event_packages.sh`
 - [ ] Exécuter sur prod server
 
-## Étape 3: Ajouter sécurité dans la vue Blade
-- [ ] Modifier `resources/views/pages/event-details.blade.php`
-- [ ] Ajouter `Schema::hasTable('event_packages')` check
+## Étape 3: ✅ Sécurité Blade ajoutée (2 edits)
 
-## Étape 4: Exécuter migrations sur PROD
+## Étape 4: ❌ GitHub Actions FAIL - SSH timeout
+
+**SSH secrets manquants/invalides:**
+- SSH_USER_PROD
+- SSH_HOST_PROD  
+- SSH_PORT_PROD
+- SSH_PRIVATE_KEY_PROD
+
+**FIX MANUAL (recommandé):**
 ```
-ssh prod-server
-cd /path/to/app
+ssh votre-serveur-prod
+cd /home/carrepremium.com/public_html  # Chemin dans workflow
 php artisan migrate --force
+php artisan db:seed --class=EventGrilleTarifaireSeeder --force
 ```
+
+**OU** Modifier `deploy_fix_event_packages.sh`:
+```
+nano deploy_fix_event_packages.sh  # Remplacer /path/to/your/carrent-collaborative/current
+scp deploy_fix_event_packages.sh user@serveur:/tmp/
+ssh user@serveur "bash /tmp/deploy_fix_event_packages.sh"
+```
+
 
 ## Étape 5: Populer les données packages
 - [ ] Vérifier `EventGrilleTarifaireSeeder.php`
@@ -36,5 +51,5 @@ php artisan migrate --force
 gh pr create --title "Fix: event_packages table"
 ```
 
-**Prochaine étape:** Vérifier le script existant `deploy_fix_event_packages.sh`
+
 

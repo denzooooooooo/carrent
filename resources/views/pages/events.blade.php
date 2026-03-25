@@ -22,6 +22,7 @@
     <div class="container mx-auto px-4">
       <div class="max-w-6xl mx-auto">
         <form method="GET" action="{{ route('events') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
+          <input type="hidden" name="view" value="{{ $viewMode }}">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
             {{-- Type d'événement (Catégorie) --}}
             <div>
@@ -123,62 +124,118 @@
     </div>
   </section>
 
-  {{-- Events Grid --}}
+  {{-- View Toggle + Content --}}
   <section class="py-8 md:py-12">
     <div class="container mx-auto px-4">
       <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-          {{-- Événements réels depuis la base de données --}}
-          @forelse ($events as $event)
-            <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
-              <div class="relative">
-                @php
-                    // Utilisation de la méthode de Spatie pour récupérer l'URL de l'image 'normal'
-                    $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
-                    $placeholder = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&h=300&fit=crop';
-                @endphp
-                <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}" class="w-full h-32 md:h-40 lg:h-48 object-cover" onerror="this.onerror=null;this.src='{{ $placeholder }}';">
-                <div class="absolute top-2 md:top-4 left-2 md:left-4">
-                  <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">{{ __('Available') }}</span>
-                </div>
-                <div class="absolute top-2 md:top-4 right-2 md:right-4">
-                  <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $event->category->name_fr ?? 'Événement' }}</span>
-                </div>
-              </div>
-              <div class="p-4 md:p-6">
-                <h3 class="text-lg md:text-xl font-black mb-2">{{ $event->title_fr }}</h3>
-                <div class="flex items-center text-gray-600 mb-2 md:mb-3">
-                  <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-sm md:text-base">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }} - {{ $event->event_time }}</span>
-                </div>
-                <div class="flex items-center text-gray-600 mb-3 md:mb-4">
-                  <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span class="text-sm md:text-base">{{ $event->venue_name }}, {{ $event->city }}</span>
-                </div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</span>
-                    <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per person') }}</span>
-                  </div>
-                  <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                    {{ __('Book') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          @empty
-            {{-- Fallback si aucun événement --}}
-            <div class="col-span-full bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-              <p class="text-xl text-gray-500">{{ __('No events found.') }}</p>
-              <p class="text-sm text-gray-400 mt-2">{{ __('Come back soon to discover our next exclusive events.') }}</p>
-            </div>
-          @endforelse
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl md:text-2xl font-black text-gray-900">{{ __('Events') }}</h2>
+          <div class="flex gap-2">
+            <a href="{{ route('events', array_merge(request()->except('page'), ['view' => 'list'])) }}"
+               class="px-4 py-2 rounded-lg text-sm font-bold {{ $viewMode === 'list' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700' }}">
+              {{ __('List view') }}
+            </a>
+            <a href="{{ route('events', array_merge(request()->except('page'), ['view' => 'calendar'])) }}"
+               class="px-4 py-2 rounded-lg text-sm font-bold {{ $viewMode === 'calendar' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700' }}">
+              {{ __('Calendar view') }}
+            </a>
+          </div>
         </div>
+
+        @if($viewMode === 'calendar')
+          @php
+            $startOfMonth = $calendarMonth->copy()->startOfMonth();
+            $startCalendar = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+            $endCalendar = $calendarMonth->copy()->endOfMonth()->endOfWeek(\Carbon\Carbon::SUNDAY);
+          @endphp
+
+          <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <a href="{{ route('events', array_merge(request()->except('page'), ['view' => 'calendar', 'month' => $calendarMonth->copy()->subMonth()->format('Y-m')])) }}"
+                 class="px-3 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-bold">←</a>
+              <h3 class="text-lg font-black">{{ $calendarMonth->translatedFormat('F Y') }}</h3>
+              <a href="{{ route('events', array_merge(request()->except('page'), ['view' => 'calendar', 'month' => $calendarMonth->copy()->addMonth()->format('Y-m')])) }}"
+                 class="px-3 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-bold">→</a>
+            </div>
+
+            <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-500 mb-2">
+              <div>{{ __('Mon') }}</div><div>{{ __('Tue') }}</div><div>{{ __('Wed') }}</div><div>{{ __('Thu') }}</div><div>{{ __('Fri') }}</div><div>{{ __('Sat') }}</div><div>{{ __('Sun') }}</div>
+            </div>
+
+            <div class="grid grid-cols-7 gap-2">
+              @for($date = $startCalendar->copy(); $date <= $endCalendar; $date->addDay())
+                @php
+                  $dateKey = $date->toDateString();
+                  $dayEvents = $eventsByDate->get($dateKey, collect());
+                @endphp
+                <div class="min-h-[120px] border rounded-lg p-2 {{ $date->month !== $calendarMonth->month ? 'bg-gray-50 text-gray-400' : 'bg-white' }}">
+                  <div class="text-xs font-bold mb-1">{{ $date->day }}</div>
+                  <div class="space-y-1">
+                    @foreach($dayEvents as $event)
+                      <a href="{{ route('events.show', $event->slug) }}" class="block text-[11px] px-2 py-1 rounded bg-purple-100 text-purple-700 hover:bg-purple-200 truncate" title="{{ $event->title_fr }}">
+                        {{ $event->title_fr }}
+                      </a>
+                    @endforeach
+                  </div>
+                </div>
+              @endfor
+            </div>
+          </div>
+        @else
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+            @forelse ($events as $event)
+              <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
+                <div class="relative">
+                  @php
+                      $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
+                      $placeholder = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&h=300&fit=crop';
+                  @endphp
+                  <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}" class="w-full h-32 md:h-40 lg:h-48 object-cover" onerror="this.onerror=null;this.src='{{ $placeholder }}';">
+                  <div class="absolute top-2 md:top-4 left-2 md:left-4">
+                    <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">{{ __('Available') }}</span>
+                  </div>
+                  <div class="absolute top-2 md:top-4 right-2 md:right-4">
+                    <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $event->category->name_fr ?? 'Événement' }}</span>
+                  </div>
+                </div>
+                <div class="p-4 md:p-6">
+                  <h3 class="text-lg md:text-xl font-black mb-2">{{ $event->title_fr }}</h3>
+                  <div class="flex items-center text-gray-600 mb-2 md:mb-3">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm md:text-base">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }} - {{ $event->event_time }}</span>
+                  </div>
+                  <div class="flex items-center text-gray-600 mb-3 md:mb-4">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="text-sm md:text-base">{{ $event->venue_name }}, {{ $event->city }}</span>
+                  </div>
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span class="text-xl md:text-2xl font-black text-purple-600">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</span>
+                      <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per person') }}</span>
+                    </div>
+                    <a href="{{ route('events.show', $event->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
+                      {{ __('Book') }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            @empty
+              <div class="col-span-full bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+                <p class="text-xl text-gray-500">{{ __('No events found.') }}</p>
+                <p class="text-sm text-gray-400 mt-2">{{ __('Come back soon to discover our next exclusive events.') }}</p>
+              </div>
+            @endforelse
+          </div>
+
+          <div class="mt-6">
+            {{ $events->links() }}
+          </div>
+        @endif
       </div>
     </div>
   </section>

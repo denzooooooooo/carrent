@@ -1,0 +1,18 @@
+
+#!/bin/bash
+
+echo "=== PROD EVENTS SYNC ==="
+
+# 1. Dump prod (running, wait Ctrl+C then)
+# scp root@72.60.90.8:/tmp/prod_events_dump.sql .
+
+# 2. Migrate + seed local
+php artisan migrate
+php artisan db:seed
+
+# 3. Test
+echo "Test local: open http://localhost:8000/events"
+php artisan serve &
+
+echo "✅ 26 Prod events + UEFA local ready!"
+

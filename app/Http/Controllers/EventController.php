@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -61,8 +62,24 @@ class EventController extends Controller
             $query->whereDate('event_date', '<=', $request->end_date);
         }
 
-        $events = $query->orderBy('event_date', 'asc')
-            ->paginate(12);
+        $query->orderBy('event_date', 'asc');
+
+        $viewMode = $request->get('view', 'list');
+        $monthParam = $request->get('month');
+        $calendarMonth = $monthParam ? Carbon::createFromFormat('Y-m', $monthParam)->startOfMonth() : Carbon::now()->startOfMonth();
+
+        $events = $query->paginate(12)->appends($request->query());
+
+        $calendarEvents = (clone $query)
+            ->whereBetween('event_date', [
+                $calendarMonth->copy()->startOfMonth()->toDateString(),
+                $calendarMonth->copy()->endOfMonth()->toDateString(),
+            ])
+            ->get();
+
+        $eventsByDate = $calendarEvents->groupBy(function ($event) {
+            return Carbon::parse($event->event_date)->toDateString();
+        });
 
         // Récupérer les catégories pour les filtres
         $categories = \App\Models\EventCategory::where('is_active', true)->get();
@@ -91,7 +108,16 @@ class EventController extends Controller
             ->sort()
             ->values();
 
-        return view('pages.events', compact('events', 'categories', 'cities', 'countries', 'venues'));
+        return view('pages.events', compact(
+            'events',
+            'categories',
+            'cities',
+            'countries',
+            'venues',
+            'viewMode',
+            'calendarMonth',
+            'eventsByDate'
+        ));
     }
 
     /**

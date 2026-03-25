@@ -17,9 +17,17 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+        $this->call([
+            TourPackageRGSeeder::class,
+            TourPackageCatalogueSeeder::class,
+            EventGrilleTarifaireSeeder::class,
+            UefaEuropaLeagueSeeder::class,
+        ]);
+
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
     }
+
 }

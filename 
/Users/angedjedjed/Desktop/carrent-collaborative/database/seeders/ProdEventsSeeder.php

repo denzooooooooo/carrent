@@ -1,0 +1,95 @@
+
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Event;
+use App\Models\EventCategory;
+use App\Models\EventType;
+use App\Models\EventPackage;
+use Carbon\Carbon;
+
+class ProdEventsSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Create Sport category
+        $sportCat = EventCategory::firstOrCreate([
+            'name_fr' => 'Sport'
+        ], [
+            'name_fr' => 'Sport',
+            'name_en' => 'Sports',
+            'is_active' => true
+        ]);
+
+        $footballType = EventType::firstOrCreate([
+            'name_fr' => 'Football'
+        ], [
+            'name_fr' => 'Football',
+            'name_en' => 'Football',
+            'is_active' => true
+        ]);
+
+        // UEFA Europa League Final - Istanbul 2026 (from PDF)
+        $uefaEvent = Event::updateOrCreate([
+            'slug' => 'finale-uefa-europa-league'
+        ], [
+            'title_fr' => 'Finale UEFA Europa League - Istanbul 2026',
+            'title_en' => 'UEFA Europa League Final - Istanbul 2026',
+            'description_fr' => 'Vivez la Finale de l\'UEFA Europa League le 20 mai 2026 à Istanbul dans une loge privée Shared Skybox. Formules Platinum, Gold, Silver.',
+            'venue_name' => 'Atatürk Olympic Stadium',
+            'venue_address' => 'Istanbul, Turquie',
+            'city' => 'Istanbul',
+            'country' => 'Turquie',
+            'event_date' => '2026-05-20',
+            'event_time' => '20:00',
+            'min_price' => 675000,
+            'max_price' => 975000,
+            'total_seats' => 500,
+            'category_id' => $sportCat->id,
+            'type_id' => $footballType->id,
+            'is_active' => true,
+            'is_featured' => true,
+        ]);
+
+        // Packages from PDF
+        $packages = [
+            [
+                'package_name_fr' => 'Platinum - Skybox Central',
+                'package_code' => 'UEFA-PLAT',
+                'description_fr' => 'Emplacement central, meilleure visibilité',
+                'price' => 975000,
+                'available_quantity' => 50,
+                'sort_order' => 1,
+            ],
+            [
+                'package_name_fr' => 'Gold - Vue Panoramique',
+                'package_code' => 'UEFA-GOLD',
+                'description_fr' => 'Vue panoramique, loge premium',
+                'price' => 825000,
+                'available_quantity' => 100,
+                'sort_order' => 2,
+            ],
+            [
+                'package_name_fr' => 'Silver - Proche Action',
+                'package_code' => 'UEFA-SILVER',
+                'description_fr' => 'Vue immersive, VIP accessible',
+                'price' => 675000,
+                'available_quantity' => 200,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($packages as $pkgData) {
+            $uefaEvent->packages()->updateOrCreate(
+                ['package_code' => $pkgData['package_code']],
+                $pkgData
+            );
+        }
+
+        $this->command->info('✅ Prod-like UEFA Event + 3 Packages ajoutés!');
+        $this->command->info('Test: http://localhost:8000/events/finale-uefa-europa-league');
+    }
+}
+
