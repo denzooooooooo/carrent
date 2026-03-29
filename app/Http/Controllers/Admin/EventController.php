@@ -333,7 +333,7 @@ class EventController extends Controller
             'type_id' => ['nullable', 'exists:event_types,id'],
             'family' => ['nullable', 'in:sportif,culturel'],
             'title_fr' => ['required', 'string', 'max:255'],
-            'title_en' => ['required', 'string', 'max:255'],
+            'title_en' => ['nullable', 'string', 'max:255'],
             'tagline_fr' => ['nullable', 'string', 'max:255'],
             'tagline_en' => ['nullable', 'string', 'max:255'],
             'description_fr' => ['nullable', 'string'],
@@ -394,7 +394,6 @@ class EventController extends Controller
             'category_id.required' => 'La catégorie est obligatoire.',
             'category_id.exists' => 'La catégorie sélectionnée est invalide.',
             'title_fr.required' => 'Le titre en français est obligatoire.',
-            'title_en.required' => 'Le titre en anglais est obligatoire.',
             'venue_name.required' => 'Le nom du lieu est obligatoire.',
             'venue_address.required' => 'L\'adresse du lieu est obligatoire.',
             'city.required' => 'La ville est obligatoire.',
@@ -424,6 +423,14 @@ class EventController extends Controller
         ];
 
         $validated = $request->validate($rules, $messages);
+
+        $validated['title_en'] = $validated['title_en'] ?? $validated['title_fr'];
+        $validated['tagline_en'] = $validated['tagline_en'] ?? ($validated['tagline_fr'] ?? null);
+        $validated['description_en'] = $validated['description_en'] ?? ($validated['description_fr'] ?? null);
+        $validated['program_en'] = $validated['program_en'] ?? ($validated['program_fr'] ?? null);
+        $validated['conditions_en'] = $validated['conditions_en'] ?? ($validated['conditions_fr'] ?? null);
+        $validated['meta_title_en'] = $validated['meta_title_en'] ?? ($validated['meta_title_fr'] ?? null);
+        $validated['meta_description_en'] = $validated['meta_description_en'] ?? ($validated['meta_description_fr'] ?? null);
 
         // Ajout/Mise à jour du slug
         $validated['slug'] = Str::slug($validated['title_fr']);
