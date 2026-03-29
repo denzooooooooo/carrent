@@ -51,7 +51,51 @@ class EventController extends Controller
         ->where('is_active', true)
         ->firstOrFail();
 
-        return view('pages.event-details', compact('event'));
+        $relatedEventsQuery = Event::query()
+            ->active()
+            ->with(['category', 'type'])
+            ->where('id', '!=', $event->id);
+
+        $relatedEventsQuery->where(function ($query) use ($event) {
+            $hasConstraint = false;
+
+            if ($event->event_series_id) {
+                $query->where('event_series_id', $event->event_series_id);
+                $hasConstraint = true;
+            }
+
+            if ($event->category_id) {
+                $hasConstraint
+                    ? $query->orWhere('category_id', $event->category_id)
+                    : $query->where('category_id', $event->category_id);
+                $hasConstraint = true;
+            }
+
+            if (filled($event->city)) {
+                $hasConstraint
+                    ? $query->orWhere('city', $event->city)
+                    : $query->where('city', $event->city);
+            }
+        });
+
+        $relatedEvents = $relatedEventsQuery
+            ->orderByDesc('is_featured')
+            ->orderBy('event_date')
+            ->limit(3)
+            ->get();
+
+        if ($relatedEvents->isEmpty()) {
+            $relatedEvents = Event::query()
+                ->active()
+                ->with(['category', 'type'])
+                ->where('id', '!=', $event->id)
+                ->orderByDesc('is_featured')
+                ->orderBy('event_date')
+                ->limit(3)
+                ->get();
+        }
+
+        return view('pages.event-details', compact('event', 'relatedEvents'));
     }
 
     /**

@@ -8,7 +8,6 @@
     $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
     $currentLocale = strtoupper(session('locale', 'fr'));
     $currentCurrency = session('currency', 'XOF');
-    $searchQuery = request('q', '');
     $userName = $user?->name ?: trim(($user?->first_name ?? '') . ' ' . ($user?->last_name ?? ''));
     $userName = $userName !== '' ? $userName : __('My Account');
     $userInitial = strtoupper(substr($userName, 0, 1));
@@ -18,39 +17,44 @@
             'label' => 'Accueil',
             'route' => 'home',
             'patterns' => ['home'],
-            'summary' => 'Vue d’ensemble de nos services premium',
+            'summary' => 'Vue d’ensemble du site et des services premium.',
+            'icon' => 'fa-house',
         ],
         [
             'label' => 'Événements',
             'route' => 'events',
             'patterns' => ['events', 'events.*'],
-            'summary' => 'Billets sportifs et culturels',
+            'summary' => 'Billets sportifs et culturels, avec lecture simple des offres.',
+            'icon' => 'fa-ticket',
         ],
         [
             'label' => 'Packages',
             'route' => 'packages',
             'patterns' => ['packages', 'packages.*'],
-            'summary' => 'Séjours et expériences organisées',
+            'summary' => 'Séjours organisés, expériences et voyages signature.',
+            'icon' => 'fa-suitcase-rolling',
         ],
         [
             'label' => 'Location',
             'route' => 'location',
-            'patterns' => ['location'],
-            'summary' => 'Véhicules premium et sur mesure',
+            'patterns' => ['location', 'location.*'],
+            'summary' => 'Véhicules premium, chauffeur et solutions sur mesure.',
+            'icon' => 'fa-car-side',
         ],
         [
             'label' => 'Vols accompagnés',
             'route' => 'flights.index',
             'patterns' => ['flights.*'],
-            'summary' => 'Demandes traitées avec un conseiller',
+            'summary' => 'Demandes traitées avec un conseiller, pas un moteur opaque.',
+            'icon' => 'fa-plane-up',
         ],
     ];
 
     $secondaryNavigation = [
-        ['label' => 'À propos', 'route' => 'about'],
-        ['label' => 'Contact', 'route' => 'contact'],
-        ['label' => 'FAQ', 'route' => 'faq'],
-        ['label' => 'Partenariat', 'route' => 'partnership'],
+        ['label' => 'Contact', 'route' => 'contact', 'icon' => 'fa-envelope'],
+        ['label' => 'FAQ', 'route' => 'faq', 'icon' => 'fa-circle-question'],
+        ['label' => 'À propos', 'route' => 'about', 'icon' => 'fa-building'],
+        ['label' => 'Partenariat', 'route' => 'partnership', 'icon' => 'fa-handshake'],
     ];
 
     $isRouteActive = function (array $patterns): bool {
@@ -62,6 +66,8 @@
 
         return false;
     };
+
+    $activeNavigationItem = collect($mainNavigation)->first(fn (array $item) => $isRouteActive($item['patterns'])) ?? $mainNavigation[0];
 @endphp
 
 <div
@@ -70,126 +76,37 @@
     class="fixed inset-x-0 top-0 z-50"
 >
     <header class="theme-shell-header px-3 pt-3 lg:px-4 lg:pt-4">
-        <div class="cp-shell hidden lg:block">
-            <div class="cp-glass flex items-center justify-between rounded-[1.75rem] px-5 py-3">
-                <div class="flex flex-wrap items-center gap-3 text-sm">
-                    <a href="{{ $landlineLink }}" class="cp-pill">
-                        <i class="fa-solid fa-phone-volume text-[0.7rem]"></i>
-                        <span>{{ $landlineDisplay }}</span>
-                    </a>
-                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-pill">
-                        <i class="fa-brands fa-whatsapp text-[0.8rem]"></i>
-                        <span>WhatsApp</span>
-                    </a>
-                    <span class="text-sm font-medium text-[color:var(--cp-ink-muted)]">
-                        Vols accompagnés, événements VIP, packages et location premium
-                    </span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    @foreach($secondaryNavigation as $item)
-                        <a href="{{ route($item['route']) }}" class="cp-link-muted rounded-full px-3 py-2 text-sm font-semibold">
-                            {{ $item['label'] }}
-                        </a>
-                    @endforeach
-
-                    <div x-data="{ open: false }" class="relative">
-                        <button
-                            type="button"
-                            @click="open = !open"
-                            class="cp-icon-button w-auto gap-2 px-3 text-sm font-semibold"
-                            aria-label="Changer la langue"
-                        >
-                            <i class="fa-solid fa-globe text-xs"></i>
-                            <span>{{ $currentLocale }}</span>
-                        </button>
-                        <div
-                            x-cloak
-                            x-show="open"
-                            @click.outside="open = false"
-                            x-transition
-                            class="absolute right-0 mt-3 w-44 rounded-3xl border border-[color:var(--cp-border)] bg-white p-2 shadow-2xl"
-                        >
-                            <button type="button" onclick="changeLanguage('fr')" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe2ff] text-[color:var(--cp-plum-800)]">FR</span>
-                                <span>Français</span>
-                            </button>
-                            <button type="button" onclick="changeLanguage('en')" class="mt-1 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe2ff] text-[color:var(--cp-plum-800)]">EN</span>
-                                <span>English</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div x-data="{ open: false }" class="relative">
-                        <button
-                            type="button"
-                            @click="open = !open"
-                            class="cp-icon-button w-auto gap-2 px-3 text-sm font-semibold"
-                            aria-label="Changer la devise"
-                        >
-                            <i class="fa-solid fa-wallet text-xs"></i>
-                            <span>{{ $currentCurrency }}</span>
-                        </button>
-                        <div
-                            x-cloak
-                            x-show="open"
-                            @click.outside="open = false"
-                            x-transition
-                            class="absolute right-0 mt-3 w-40 rounded-3xl border border-[color:var(--cp-border)] bg-white p-2 shadow-2xl"
-                        >
-                            @foreach(['XOF', 'EUR', 'USD', 'GBP'] as $currency)
-                                <button type="button" onclick="changeCurrency('{{ $currency }}')" class="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
-                                    <span>{{ $currency }}</span>
-                                    @if($currentCurrency === $currency)
-                                        <i class="fa-solid fa-check text-[color:var(--cp-plum-800)]"></i>
-                                    @endif
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cp-shell mt-3">
-            <div class="cp-glass rounded-[2rem] px-4 py-4 lg:px-6">
+        <div class="cp-shell">
+            <div class="cp-glass rounded-[2rem] px-4 py-4 lg:px-6 lg:py-5">
                 <div class="flex items-center gap-3 lg:gap-5">
-                    <a href="{{ route('home') }}" class="flex min-w-0 flex-1 items-center gap-3 sm:flex-none">
+                    <a href="{{ route('home') }}" class="flex min-w-0 flex-1 items-center gap-3 lg:flex-none">
                         <span class="inline-flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white shadow-lg">
                             <img src="{{ asset('logos/logo2.jpg') }}" alt="{{ $companyName }}" class="h-full w-full object-cover">
                         </span>
                         <span class="min-w-0">
                             <span class="block truncate text-base font-black tracking-[0.08em] text-[color:var(--cp-plum-950)] sm:text-lg">{{ strtoupper($companyName) }}</span>
-                            <span class="block truncate text-xs font-semibold uppercase tracking-[0.24em] text-[color:var(--cp-ink-muted)]">Travel, Events, Concierge</span>
+                            <span class="block truncate text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--cp-ink-muted)]">Travel, Events, Concierge</span>
                         </span>
                     </a>
 
-                    <nav class="hidden lg:flex flex-1 items-center justify-center gap-2">
+                    <nav class="hidden flex-1 flex-wrap items-center justify-center gap-2 lg:flex">
                         @foreach($mainNavigation as $item)
                             @php($active = $isRouteActive($item['patterns']))
                             <a
                                 href="{{ route($item['route']) }}"
-                                class="{{ $active ? 'bg-[color:var(--cp-plum-900)] text-white shadow-lg' : 'text-[color:var(--cp-ink-soft)] hover:bg-white/70 hover:text-[color:var(--cp-plum-900)]' }} rounded-full px-4 py-3 text-sm font-extrabold transition"
+                                @class([
+                                    'cp-nav-link',
+                                    'is-active' => $active,
+                                ])
                                 @if($active) aria-current="page" @endif
                             >
-                                {{ $item['label'] }}
+                                <i class="fa-solid {{ $item['icon'] }} text-[0.8rem]"></i>
+                                <span>{{ $item['label'] }}</span>
                             </a>
                         @endforeach
                     </nav>
 
-                    <form action="{{ route('search') }}" method="GET" class="hidden xl:flex min-w-[18rem] max-w-[24rem] flex-1 items-center gap-3 rounded-full border border-[color:var(--cp-border)] bg-white/80 px-4 py-3">
-                        <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
-                        <input
-                            type="search"
-                            name="q"
-                            value="{{ $searchQuery }}"
-                            placeholder="Rechercher un événement, un service ou un package"
-                            class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
-                        >
-                    </form>
-
-                    <div class="hidden sm:flex items-center gap-2">
+                    <div class="hidden items-center gap-2 lg:flex">
                         <button
                             id="theme-toggle"
                             type="button"
@@ -200,13 +117,52 @@
                             🌙
                         </button>
 
-                        <a href="{{ route('contact') }}" class="cp-primary-button hidden md:inline-flex">
-                            <i class="fa-solid fa-headset text-sm"></i>
-                            <span>Parler à un conseiller</span>
-                        </a>
+                        <div x-data="{ open: false }" class="relative">
+                            <button
+                                type="button"
+                                @click="open = !open"
+                                class="cp-secondary-button !px-4 !py-3"
+                                aria-label="Préférences"
+                            >
+                                <i class="fa-solid fa-sliders text-sm"></i>
+                                <span>Préférences</span>
+                            </button>
+
+                            <div
+                                x-cloak
+                                x-show="open"
+                                @click.outside="open = false"
+                                x-transition
+                                class="absolute right-0 mt-3 w-72 rounded-[1.8rem] border border-[color:var(--cp-border)] bg-white p-3 shadow-2xl"
+                            >
+                                <div class="rounded-[1.3rem] bg-[#faf6ff] px-4 py-4">
+                                    <p class="text-sm font-black text-[color:var(--cp-plum-950)]">Personnaliser l’affichage</p>
+                                    <p class="mt-1 text-xs font-medium text-[color:var(--cp-ink-muted)]">Langue {{ $currentLocale }} · Devise {{ $currentCurrency }}</p>
+                                </div>
+
+                                <div class="mt-3">
+                                    <p class="px-2 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Langue</p>
+                                    <div class="mt-2 flex gap-2">
+                                        <button type="button" onclick="changeLanguage('fr')" class="cp-secondary-button !px-4 !py-3 text-sm">FR</button>
+                                        <button type="button" onclick="changeLanguage('en')" class="cp-secondary-button !px-4 !py-3 text-sm">EN</button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <p class="px-2 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Devise</p>
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        @foreach(['XOF', 'EUR', 'USD', 'GBP'] as $currency)
+                                            <button type="button" onclick="changeCurrency('{{ $currency }}')" class="cp-secondary-button !px-4 !py-3 text-sm">
+                                                {{ $currency }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         @if(!$isAuthenticated)
-                            <a href="{{ route('login') }}" class="cp-secondary-button hidden md:inline-flex">Connexion</a>
+                            <a href="{{ route('login') }}" class="cp-secondary-button">Connexion</a>
                         @else
                             <div x-data="{ open: false }" class="relative">
                                 <button
@@ -255,18 +211,59 @@
                                 </div>
                             </div>
                         @endif
+
+                        <a href="{{ route('contact') }}" class="cp-primary-button !hidden xl:!inline-flex">
+                            <i class="fa-solid fa-headset text-sm"></i>
+                            <span>Parler à un conseiller</span>
+                        </a>
                     </div>
 
-                    <button
-                        type="button"
-                        @click="mobileMenuOpen = !mobileMenuOpen"
-                        class="cp-icon-button lg:hidden"
-                        :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
-                        aria-controls="mobile-main-menu"
-                    >
-                        <i class="fa-solid fa-bars-staggered text-base" x-show="!mobileMenuOpen"></i>
-                        <i class="fa-solid fa-xmark text-base" x-show="mobileMenuOpen" x-cloak></i>
-                    </button>
+                    <div class="flex items-center gap-2 lg:hidden">
+                        <a href="{{ route('contact') }}" class="cp-secondary-button !px-4 !py-3 text-sm">
+                            <i class="fa-solid fa-headset text-sm"></i>
+                            <span>Conseiller</span>
+                        </a>
+
+                        <button
+                            type="button"
+                            @click="mobileMenuOpen = !mobileMenuOpen"
+                            class="cp-icon-button"
+                            :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
+                            aria-controls="mobile-main-menu"
+                        >
+                            <i class="fa-solid fa-bars-staggered text-base" x-show="!mobileMenuOpen"></i>
+                            <i class="fa-solid fa-xmark text-base" x-show="mobileMenuOpen" x-cloak></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/72 px-4 py-3 text-sm font-semibold text-[color:var(--cp-ink-soft)] lg:hidden">
+                    <span class="text-[color:var(--cp-plum-900)]">Site plus simple :</span>
+                    {{ $activeNavigationItem['summary'] }}
+                </div>
+
+                <div class="mt-4 hidden gap-3 lg:grid lg:grid-cols-[minmax(0,1.15fr)_auto_auto] lg:items-center">
+                    <div class="cp-context-strip">
+                        <div class="cp-kicker">
+                            <span class="cp-eyebrow-dot"></span>
+                            <span>Repère rapide</span>
+                        </div>
+                        <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                            <span class="font-black text-[color:var(--cp-plum-950)]">{{ $activeNavigationItem['label'] }}</span>
+                            :
+                            {{ $activeNavigationItem['summary'] }}
+                        </p>
+                    </div>
+
+                    <a href="{{ $landlineLink }}" class="cp-utility-badge">
+                        <i class="fa-solid fa-phone-volume text-sm"></i>
+                        <span>{{ $landlineDisplay }}</span>
+                    </a>
+
+                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-utility-badge">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>WhatsApp</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -276,7 +273,7 @@
         x-cloak
         x-show="mobileMenuOpen"
         @click="mobileMenuOpen = false"
-        class="fixed inset-0 top-[5.5rem] bg-[#1f1230]/38 backdrop-blur-sm lg:hidden"
+        class="fixed inset-0 top-[6.25rem] bg-[#1f1230]/38 backdrop-blur-sm lg:hidden"
     ></div>
 
     <div class="cp-shell lg:hidden">
@@ -290,55 +287,73 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 -translate-y-4"
-            class="relative mt-3 rounded-[2rem] border border-[color:var(--cp-border)] bg-[color:var(--cp-panel-strong)] p-5 shadow-2xl"
+            class="relative mt-3 max-h-[calc(100vh-7.25rem)] overflow-y-auto rounded-[2rem] border border-[color:var(--cp-border)] bg-[color:var(--cp-panel-strong)] p-5 shadow-2xl"
         >
-            <div class="cp-kicker">
-                <span class="cp-eyebrow-dot"></span>
-                <span>Navigation claire</span>
-            </div>
+            <div class="overflow-hidden rounded-[1.8rem] bg-gradient-to-br from-[#241233] via-[#4c2872] to-[#d89b43] p-5 text-white">
+                <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                    <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                    <span>Navigation claire</span>
+                </div>
 
-            <form action="{{ route('search') }}" method="GET" class="mt-4 flex items-center gap-3 rounded-[1.4rem] border border-[color:var(--cp-border)] bg-white px-4 py-4">
-                <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
-                <input
-                    type="search"
-                    name="q"
-                    value="{{ $searchQuery }}"
-                    placeholder="Rechercher un service, un événement ou un package"
-                    class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
-                >
-            </form>
+                <h2 class="mt-3 text-2xl font-black leading-tight">
+                    Choisissez d’abord votre besoin principal.
+                </h2>
 
-            <div class="mt-4 grid grid-cols-2 gap-3">
-                <a href="{{ $mobileLink }}" class="cp-secondary-button !rounded-[1.2rem] !px-4 !py-4 text-sm">
-                    <i class="fa-solid fa-phone"></i>
-                    <span>Appeler</span>
-                </a>
-                <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !rounded-[1.2rem] !px-4 !py-4 text-sm">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <span>WhatsApp</span>
-                </a>
-            </div>
+                <p class="mt-3 text-sm leading-7 text-white/80">
+                    Le site est organisé en 4 services simples : événements, packages, location et vols accompagnés. Chaque entrée doit mener vers un parcours compréhensible.
+                </p>
 
-            <div class="mt-6 space-y-2">
-                @foreach($mainNavigation as $item)
-                    @php($active = $isRouteActive($item['patterns']))
-                    <a
-                        href="{{ route($item['route']) }}"
-                        @click="mobileMenuOpen = false"
-                        class="{{ $active ? 'border-[color:var(--cp-plum-800)] bg-[#f4edff]' : 'border-transparent bg-white/75' }} block rounded-[1.5rem] border px-4 py-4 shadow-sm"
-                    >
-                        <span class="block text-base font-black text-[color:var(--cp-plum-950)]">{{ $item['label'] }}</span>
-                        <span class="mt-1 block text-sm text-[color:var(--cp-ink-muted)]">{{ $item['summary'] }}</span>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <a href="{{ $mobileLink }}" class="cp-secondary-button !rounded-[1.2rem] !border-white/20 !bg-white/12 !px-4 !py-4 !text-white hover:!bg-white/16">
+                        <i class="fa-solid fa-phone text-sm"></i>
+                        <span>Appeler</span>
                     </a>
-                @endforeach
+                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !rounded-[1.2rem] !border-white/20 !bg-white/12 !px-4 !py-4 !text-white hover:!bg-white/16">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">Services</p>
+                <div class="mt-3 space-y-3">
+                    @foreach($mainNavigation as $item)
+                        @php($active = $isRouteActive($item['patterns']))
+                        <a
+                            href="{{ route($item['route']) }}"
+                            @click="mobileMenuOpen = false"
+                            @class([
+                                'cp-nav-card',
+                                'is-active' => $active,
+                            ])
+                        >
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex min-w-0 gap-3">
+                                    <span class="inline-flex h-11 w-11 flex-none items-center justify-center rounded-[1rem] bg-[#f6f0ff] text-[color:var(--cp-plum-800)]">
+                                        <i class="fa-solid {{ $item['icon'] }} text-sm"></i>
+                                    </span>
+                                    <div class="min-w-0">
+                                        <span class="block text-base font-black text-[color:var(--cp-plum-950)]">{{ $item['label'] }}</span>
+                                        <span class="mt-1 block text-sm leading-6 text-[color:var(--cp-ink-muted)]">{{ $item['summary'] }}</span>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-arrow-right mt-1 text-xs text-[color:var(--cp-ink-muted)]"></i>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
 
             <div class="mt-6 rounded-[1.6rem] bg-[#281b37] p-4 text-white">
-                <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">Accès direct</p>
+                <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">Aide rapide</p>
                 <div class="mt-3 grid grid-cols-2 gap-2">
                     @foreach($secondaryNavigation as $item)
                         <a href="{{ route($item['route']) }}" @click="mobileMenuOpen = false" class="rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold text-white/90 transition hover:bg-white/15">
-                            {{ $item['label'] }}
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid {{ $item['icon'] }} text-xs"></i>
+                                <span>{{ $item['label'] }}</span>
+                            </span>
                         </a>
                     @endforeach
                 </div>
@@ -357,7 +372,9 @@
                     <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Devise</p>
                     <div class="mt-3 flex flex-wrap gap-2">
                         @foreach(['XOF', 'EUR', 'USD', 'GBP'] as $currency)
-                            <button type="button" onclick="changeCurrency('{{ $currency }}')" class="cp-secondary-button !rounded-full !px-4 !py-3 text-sm">{{ $currency }}</button>
+                            <button type="button" onclick="changeCurrency('{{ $currency }}')" class="cp-secondary-button !rounded-full !px-4 !py-3 text-sm">
+                                {{ $currency }}
+                            </button>
                         @endforeach
                     </div>
                 </div>

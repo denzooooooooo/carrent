@@ -184,6 +184,85 @@
         color: var(--cp-plum-800);
     }
 
+    .cp-nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: rgba(255, 255, 255, 0.56);
+        padding: 0.85rem 1.1rem;
+        color: var(--cp-ink-soft);
+        font-size: 0.93rem;
+        font-weight: 800;
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .cp-nav-link:hover {
+        transform: translateY(-1px);
+        border-color: var(--cp-border-strong);
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--cp-plum-900);
+    }
+
+    .cp-nav-link.is-active {
+        background: var(--cp-plum-900);
+        color: #fff;
+        box-shadow: 0 18px 38px rgba(42, 22, 61, 0.22);
+    }
+
+    .cp-nav-card {
+        display: block;
+        border-radius: 1.5rem;
+        border: 1px solid var(--cp-border);
+        background: rgba(255, 255, 255, 0.86);
+        padding: 1rem;
+        box-shadow: 0 10px 24px rgba(31, 17, 44, 0.08);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cp-nav-card:hover {
+        transform: translateY(-1px);
+        border-color: var(--cp-border-strong);
+        background: #fff;
+        box-shadow: 0 18px 34px rgba(31, 17, 44, 0.12);
+    }
+
+    .cp-nav-card.is-active {
+        border-color: rgba(75, 40, 112, 0.32);
+        background: #f4edff;
+        box-shadow: 0 18px 34px rgba(75, 40, 112, 0.12);
+    }
+
+    .cp-utility-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        border-radius: 1.15rem;
+        border: 1px solid var(--cp-border);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 0.95rem 1rem;
+        color: var(--cp-plum-900);
+        font-size: 0.84rem;
+        font-weight: 800;
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .cp-utility-badge:hover {
+        transform: translateY(-1px);
+        border-color: var(--cp-border-strong);
+        background: #fff;
+    }
+
+    .cp-context-strip {
+        border-radius: 1.4rem;
+        border: 1px solid var(--cp-border);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 240, 255, 0.88));
+        padding: 1rem 1.1rem;
+        box-shadow: 0 12px 30px rgba(31, 17, 44, 0.08);
+    }
+
     .cp-kicker {
         display: inline-flex;
         align-items: center;

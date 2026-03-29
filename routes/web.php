@@ -15,10 +15,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\SearchController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
-
 Route::prefix('chatbot')->name('chatbot.')->group(function () {
     Route::get('/', [ChatbotController::class, 'index'])->name('index');
     Route::post('/process', [ChatbotController::class, 'processMessage'])->name('process');
