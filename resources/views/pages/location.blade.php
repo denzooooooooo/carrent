@@ -9,6 +9,25 @@
 @section('content')
 @php
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $locations = $locations ?? new \Illuminate\Pagination\LengthAwarePaginator(
+        collect(),
+        0,
+        9,
+        request()->integer('page', 1),
+        ['path' => route('location'), 'query' => request()->query()]
+    );
+    $categories = isset($categories) ? collect($categories)->filter()->values() : collect();
+    $types = isset($types) ? collect($types)->filter()->values() : collect();
+    $selectedSort = isset($selectedSort) && $selectedSort !== '' ? (string) $selectedSort : (string) request('sort', 'recommended');
+    $sortOptions = $sortOptions ?? [
+        'recommended' => $t('Recommandés', 'Recommended'),
+        'price_low' => $t('Prix croissant', 'Price low to high'),
+        'price_high' => $t('Prix décroissant', 'Price high to low'),
+        'capacity_high' => $t('Grande capacité', 'Highest capacity'),
+        'name' => $t('Nom A-Z', 'Name A-Z'),
+    ];
+    $totalLocationsCount = isset($totalLocationsCount) ? (int) $totalLocationsCount : (int) $locations->total();
+    $startingPrice = $startingPrice ?? null;
     $searchTerm = trim((string) request('q'));
     $selectedCategory = (string) request('category');
     $selectedType = (string) request('type');
@@ -25,7 +44,7 @@
         $selectedCategory !== '' ? ['label' => $t('Catégorie', 'Category'), 'value' => ucfirst($selectedCategory)] : null,
         $selectedType !== '' ? ['label' => $t('Type', 'Type'), 'value' => ucfirst($selectedType)] : null,
         $selectedCapacity !== '' ? ['label' => $t('Capacité', 'Capacity'), 'value' => $capacityLabels[$selectedCapacity] ?? $selectedCapacity] : null,
-        ($selectedSort ?? 'recommended') !== 'recommended' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
+        $selectedSort !== 'recommended' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
     ])->filter()->values();
 
     $resetUrl = route('location');

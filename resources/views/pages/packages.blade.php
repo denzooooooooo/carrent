@@ -9,6 +9,27 @@
 @section('content')
 @php
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $packages = $packages ?? new \Illuminate\Pagination\LengthAwarePaginator(
+        collect(),
+        0,
+        12,
+        request()->integer('page', 1),
+        ['path' => route('packages'), 'query' => request()->query()]
+    );
+    $packageTypes = isset($packageTypes) ? collect($packageTypes)->filter()->values() : collect();
+    $destinations = isset($destinations) ? collect($destinations)->filter()->values() : collect();
+    $selectedSort = isset($selectedSort) && $selectedSort !== '' ? (string) $selectedSort : (string) request('sort', 'featured');
+    $sortOptions = $sortOptions ?? [
+        'featured' => $t('Sélection Carré Premium', 'Carré Premium selection'),
+        'price_low' => $t('Prix croissant', 'Price low to high'),
+        'price_high' => $t('Prix décroissant', 'Price high to low'),
+        'duration_short' => $t('Durée courte', 'Shortest duration'),
+        'duration_long' => $t('Durée longue', 'Longest duration'),
+        'newest' => $t('Nouveautés', 'Newest'),
+    ];
+    $totalPackagesCount = isset($totalPackagesCount) ? (int) $totalPackagesCount : (int) $packages->total();
+    $featuredPackagesCount = isset($featuredPackagesCount) ? (int) $featuredPackagesCount : 0;
+    $startingPrice = $startingPrice ?? null;
     $searchTerm = trim((string) request('q'));
     $selectedType = (string) request('type');
     $selectedDestination = (string) request('destination');
@@ -37,11 +58,9 @@
         $selectedDestination !== '' ? ['label' => $t('Destination', 'Destination'), 'value' => $selectedDestination] : null,
         $selectedDuration !== '' ? ['label' => $t('Durée', 'Duration'), 'value' => $durationLabels[$selectedDuration] ?? $selectedDuration] : null,
         request()->boolean('featured') ? ['label' => $t('Sélection', 'Selection'), 'value' => $t('À la une', 'Featured')] : null,
-        ($selectedSort ?? 'featured') !== 'featured' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
+        $selectedSort !== 'featured' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
     ])->filter()->values();
 
-    $featuredPackagesCount = isset($featuredPackagesCount) ? (int) $featuredPackagesCount : 0;
-    $startingPrice = $startingPrice ?? null;
     $resetUrl = route('packages');
 @endphp
 
