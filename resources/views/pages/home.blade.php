@@ -1,271 +1,504 @@
 @extends('layouts.app')
 
-@section('title', __('Home - Carré Premium'))
+@section('title', 'Accueil - Carré Premium')
+@section('meta_description', 'Carré Premium simplifie l’accès aux événements VIP, packages signature, location premium et demandes de vols accompagnées avec un parcours clair et un support humain visible.')
+@section('meta_keywords', 'conciergerie premium, événements VIP, packages luxe, location premium, vols accompagnés, Carré Premium, Abidjan')
+@section('og_title', 'Accueil - Carré Premium')
+@section('og_description', 'Événements VIP, packages signature, mobilité premium et accompagnement humain dans un parcours plus clair, plus cohérent et plus rassurant.')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-  {{-- Hero Carrousel responsive (nouveau) --}}
-  @include('components.home-carousel')
-  {{-- Texte de bienvenue --}}
-  <section class="py-12 bg-white dark:bg-gray-900">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{{ __('Welcome to Carré Premium') }}</h2>
-      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{{ __('Discover our tailor-made tourist packages, private flights, and 24/7 concierge service to organize your most exclusive experiences. Our advisors are at your disposal to personalize every detail.') }}</br>
-      <blockquote class="italic text-amber-600">"{{ __('Carré Premium, our limit is the reflection of our imagination.') }}"</blockquote>
-      </p>
-    </div>
-  </section>
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $supportPhone = config('carre_premium.contact.mobile_display', '+225 01 01 22 15 15');
+    $supportPhoneLink = config('carre_premium.contact.mobile_link', 'tel:+2250101221515');
+    $supportEmail = config('carre_premium.contact.support_email', 'infos@carrepremium.com');
+    $whatsAppUrl = config('carre_premium.contact.whatsapp_url', 'https://wa.me/2250101221515');
+    $events = $events ?? collect();
+    $featuredPackages = $featuredPackages ?? collect();
+    $featuredLocations = $featuredLocations ?? collect();
+    $stats = $stats ?? [];
 
+    $heroStats = [
+        [
+            'label' => $t('Événements actifs', 'Active events'),
+            'value' => number_format((int) ($stats['events'] ?? $events->count()), 0, ',', ' '),
+        ],
+        [
+            'label' => $t('Packages signature', 'Signature packages'),
+            'value' => number_format((int) ($stats['packages'] ?? $featuredPackages->count()), 0, ',', ' '),
+        ],
+        [
+            'label' => $t('Solutions mobilité', 'Mobility solutions'),
+            'value' => number_format((int) ($stats['locations'] ?? $featuredLocations->count()), 0, ',', ' '),
+        ],
+    ];
 
-  {{-- Événements à la Une - Carrousel Dynamique --}}
-  @include('components.events-carousel')
+    $serviceCards = [
+        [
+            'title' => $t('Événements VIP', 'VIP events'),
+            'description' => $t('Matchs, concerts et expériences premium avec une lecture plus simple des offres, du prix et du parcours de réservation.', 'Matches, concerts and premium experiences with a clearer reading of offers, pricing and booking flow.'),
+            'route' => route('events'),
+            'cta' => $t('Voir les événements', 'See events'),
+            'icon' => 'fa-ticket',
+        ],
+        [
+            'title' => $t('Packages signature', 'Signature packages'),
+            'description' => $t('Séjours, circuits et expériences exclusives présentés avec un vrai niveau de comparaison et un support sur mesure.', 'Trips, circuits and exclusive experiences presented with true comparison and tailored support.'),
+            'route' => route('packages'),
+            'cta' => $t('Explorer les packages', 'Explore packages'),
+            'icon' => 'fa-suitcase-rolling',
+        ],
+        [
+            'title' => $t('Location premium', 'Premium rental'),
+            'description' => $t('Véhicules, transferts et solutions de mobilité premium avec repères clairs sur la capacité, le prix et le service.', 'Vehicles, transfers and premium mobility solutions with clear guidance on capacity, pricing and service.'),
+            'route' => route('location'),
+            'cta' => $t('Voir la flotte', 'See the fleet'),
+            'icon' => 'fa-car-side',
+        ],
+        [
+            'title' => $t('Vols accompagnés', 'Supported flights'),
+            'description' => $t('Demandes de vols traitées avec accompagnement humain pour sécuriser la recherche, la validation et le paiement.', 'Flight requests handled with human guidance to secure research, validation and payment.'),
+            'route' => route('flights.index'),
+            'cta' => $t('Parler à un conseiller', 'Talk to an advisor'),
+            'icon' => 'fa-plane-departure',
+        ],
+    ];
 
-  {{-- Nos Services Premium --}}
-  <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 relative overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="container mx-auto px-4 relative z-10">
-      <div class="text-center mb-12 md:mb-16">
-        <div class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-3 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-4 md:mb-6 border-2 border-white/30">
-          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          <span>{{ __('OUR PREMIUM SERVICES') }}</span>
+    $trustSignals = [
+        $t('Support humain visible', 'Visible human support'),
+        $t('Parcours mobile-first', 'Mobile-first journey'),
+        $t('Paiement et accompagnement clarifiés', 'Payment and guidance clarified'),
+    ];
+
+    $journeySteps = [
+        [
+            'step' => '01',
+            'title' => $t('Choisir un service', 'Choose a service'),
+            'description' => $t('Événement, package, location ou demande de vol: chaque entrée doit orienter immédiatement.', 'Event, package, rental or flight request: each entry should orient instantly.'),
+        ],
+        [
+            'step' => '02',
+            'title' => $t('Comprendre l’offre', 'Understand the offer'),
+            'description' => $t('Prix, disponibilité, format de réservation et canal de support sont visibles sans effort.', 'Price, availability, booking format and support channel are visible without effort.'),
+        ],
+        [
+            'step' => '03',
+            'title' => $t('Réserver sans friction', 'Book without friction'),
+            'description' => $t('Le client avance avec un parcours clair, cohérent et rassurant jusqu’au paiement ou à la demande accompagnée.', 'Clients move forward with a clear, coherent and reassuring flow until payment or assisted request.'),
+        ],
+    ];
+
+    $featuredEvent = $events->first();
+@endphp
+
+<div class="cp-page">
+    <section class="cp-page-hero">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.4rem] bg-gradient-to-br from-[#211130] via-[#4b2870] to-[#d89b43] text-white shadow-[0_28px_90px_rgba(41,20,58,0.26)]">
+                <div class="grid gap-8 px-5 py-8 sm:px-8 sm:py-10 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,430px)] xl:px-10 xl:py-12">
+                    <div class="cp-fade-up max-w-3xl">
+                        <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                            <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                            <span>{{ $t('Carré Premium', 'Carré Premium') }}</span>
+                        </div>
+
+                        <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl xl:text-[3.65rem] xl:leading-[1.04]">
+                            {{ $t('Une conciergerie premium plus claire à comprendre, plus simple à réserver et plus solide sur mobile.', 'A premium concierge experience that is clearer to understand, easier to book and more reliable on mobile.') }}
+                        </h1>
+
+                        <p class="mt-5 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
+                            {{ $t('Événements VIP, packages signature, location premium et vols accompagnés dans un parcours cohérent, avec des points de contact visibles et une vraie logique commerciale.', 'VIP events, signature packages, premium rental and supported flights in one coherent journey, with visible contact points and real commercial logic.') }}
+                        </p>
+
+                        <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <a href="{{ route('events') }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e4ae54]">
+                                <i class="fa-solid fa-calendar-check text-sm"></i>
+                                <span>{{ $t('Commencer par les événements', 'Start with events') }}</span>
+                            </a>
+                            <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/20 !bg-white/10 !text-white hover:!bg-white/16">
+                                <i class="fa-regular fa-envelope text-sm"></i>
+                                <span>{{ $t('Demander un accompagnement', 'Request guidance') }}</span>
+                            </a>
+                        </div>
+
+                        <div class="mt-7 flex flex-wrap gap-2.5">
+                            @foreach($trustSignals as $signal)
+                                <span class="event-step-pill !bg-white/8 !text-white/88">{{ $signal }}</span>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-8 grid gap-3 sm:grid-cols-3">
+                            @foreach($heroStats as $item)
+                                <div class="rounded-[1.55rem] border border-white/12 bg-white/10 p-4 backdrop-blur">
+                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/58">{{ $item['label'] }}</p>
+                                    <p class="mt-2 text-2xl font-black sm:text-[1.75rem]">{{ $item['value'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="cp-fade-up grid gap-4 [animation-delay:120ms]">
+                        <div class="overflow-hidden rounded-[2rem] border border-white/14 bg-black/16">
+                            <div class="relative aspect-[4/3]">
+                                <img
+                                    src="{{ $featuredEvent?->getFirstMediaUrl('avatar', 'normal') ?: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200&h=900&fit=crop' }}"
+                                    alt="{{ $featuredEvent?->title_fr ?: 'Carré Premium' }}"
+                                    class="h-full w-full object-cover"
+                                >
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#120a1d]/92 via-[#120a1d]/32 to-transparent"></div>
+
+                                <div class="absolute inset-x-0 bottom-0 p-5">
+                                    <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-gold-300)]">
+                                        {{ $featuredEvent ? $t('Événement mis en avant', 'Featured event') : $t('Parcours premium', 'Premium journey') }}
+                                    </p>
+                                    <h2 class="mt-2 text-2xl font-black leading-tight text-white">
+                                        {{ $featuredEvent?->title_fr ?: $t('Une expérience unifiée du premier clic au paiement.', 'One unified experience from first click to payment.') }}
+                                    </h2>
+                                    <p class="mt-3 text-sm leading-6 text-white/78">
+                                        @if($featuredEvent)
+                                            {{ $featuredEvent->venue_name ?: $featuredEvent->city }}
+                                            @if($featuredEvent->event_date)
+                                                · {{ $featuredEvent->event_date->format('d/m/Y') }}
+                                            @endif
+                                        @else
+                                            {{ $t('Clarté de l’offre, support visible et meilleure cohérence entre pages publiques et tunnel de conversion.', 'Offer clarity, visible support and stronger consistency across public pages and the conversion funnel.') }}
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-[1.7rem] border border-white/12 bg-white/10 p-5 backdrop-blur">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/58">{{ $t('Canal recommandé', 'Recommended channel') }}</p>
+                                <p class="mt-3 text-lg font-black text-white">{{ $t('Conseiller + WhatsApp', 'Advisor + WhatsApp') }}</p>
+                                <p class="mt-2 text-sm leading-6 text-white/74">{{ $t('Pour un besoin urgent, un montant élevé ou une demande sur mesure.', 'For an urgent need, a high amount or a bespoke request.') }}</p>
+                            </div>
+
+                            <div class="rounded-[1.7rem] border border-white/12 bg-white/10 p-5 backdrop-blur">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/58">{{ $t('Contact direct', 'Direct contact') }}</p>
+                                <p class="mt-3 text-lg font-black text-white">{{ $supportPhone }}</p>
+                                <p class="mt-2 text-sm leading-6 text-white/74">{{ $supportEmail }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h2 class="text-5xl md:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
-          {{ __('Excellence at Your Fingertips') }}
-        </h2>
-        <p class="text-xl text-white/90 max-w-3xl mx-auto">
-          {{ __('Discover our complete range of premium services for unforgettable experiences') }}
-        </p>
-      </div>
+    </section>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
-        {{-- Service Cards --}}
-        <a href="{{ route('flights.index') }}" class="group">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
-            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Private Flights') }}</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Private jets and helicopters for your exclusive travel') }}</p>
-            <div class="flex items-center text-amber-400 font-semibold">
-              <span>{{ __('Discover') }}</span>
-              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-          </div>
-        </a>
+    <section class="cp-page-overlap">
+        <div class="cp-shell">
+            <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
+                <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Entrées principales', 'Main entries') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Les 4 parcours utiles du site', 'The 4 useful journeys on the site') }}</h2>
+                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                            {{ $t('La home doit orienter vite. Chaque carte ci-dessous annonce clairement le service, le bénéfice et l’action suivante.', 'The home page must orient quickly. Each card below clearly announces the service, the benefit and the next action.') }}
+                        </p>
+                    </div>
 
-        <a href="{{ route('events') }}" class="group">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
-            <div class="w-16 h-16 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('VIP Events') }}</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Exclusive access to world sports and cultural events') }}</p>
-            <div class="flex items-center text-amber-400 font-semibold">
-              <span>{{ __('Book') }}</span>
-              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-          </div>
-        </a>
+                    <a href="{{ route('contact') }}" class="cp-secondary-button !self-start lg:!self-auto">
+                        <i class="fa-solid fa-headset text-sm"></i>
+                        <span>{{ $t('Parler à un conseiller', 'Talk to an advisor') }}</span>
+                    </a>
+                </div>
 
-        <a href="{{ route('packages') }}" class="group">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
-            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-amber-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
+                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    @foreach($serviceCards as $card)
+                        <a href="{{ $card['route'] }}" class="group rounded-[1.7rem] border border-[color:var(--cp-border)] bg-white p-5 shadow-[0_16px_36px_rgba(41,20,58,0.08)] transition hover:-translate-y-1 hover:border-[color:var(--cp-border-strong)] hover:shadow-[0_22px_48px_rgba(41,20,58,0.12)]">
+                            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--cp-plum-900),var(--cp-plum-700))] text-white shadow-lg">
+                                <i class="fa-solid {{ $card['icon'] }}"></i>
+                            </span>
+                            <h3 class="mt-4 text-xl font-black text-[color:var(--cp-plum-950)]">{{ $card['title'] }}</h3>
+                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $card['description'] }}</p>
+                            <span class="mt-5 inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-900)]">
+                                <span>{{ $card['cta'] }}</span>
+                                <i class="fa-solid fa-arrow-right text-xs transition group-hover:translate-x-1"></i>
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
             </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Luxury Packages') }}</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Tailor-made experiences: safaris, yachting, exclusive tours') }}</p>
-            <div class="flex items-center text-amber-400 font-semibold">
-              <span>{{ __('Explore') }}</span>
-              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-          </div>
-        </a>
-
-        <a href="{{ route('contact') }}" class="group">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
-            <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Concierge') }}</h3>
-            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('24/7 service to organize your most exclusive desires') }}</p>
-            <div class="flex items-center text-amber-400 font-semibold">
-              <span>{{ __('Contact') }}</span>
-              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  {{-- Véhicules de Luxe --}}
-  <section class="py-24 bg-gradient-to-br from-amber-900 via-amber-800 to-purple-900">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-12 md:mb-16">
-        <div class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-3 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-4 md:mb-6 border-2 border-white/30">
-          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <span>{{ __('PREMIUM VEHICLE RENTAL') }}</span>
         </div>
-        <h2 class="text-6xl md:text-7xl font-black text-white mb-4 md:mb-6 leading-tight">
-          {{ __('Drive Excellence') }}
-        </h2>
-        <p class="text-2xl text-white/90 max-w-3xl mx-auto">
-          {{ __('Private Jets • Luxury Cars • Sports Cars • Premium 4x4') }}
-        </p>
-      </div>
+    </section>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-        @php
-          $vehicles = [
-            ['icon' => 'motorcycle', 'title' => __('Premium Vehicles'), 'desc' => __('Rental with or without guide'), 'image' => 'https://i.pinimg.com/736x/c0/7a/ca/c07acad260e24f8cd0868d5d9c6169b5.jpg'],
-            ['icon' => 'car', 'title' => __('Sports Cars'), 'desc' => __('Ferrari, Lamborghini, Porsche'), 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
-            ['icon' => 'car', 'title' => __('Luxury 4x4'), 'desc' => __('Range Rover, G-Wagon'), 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
-            ['icon' => 'motorcycle', 'title' => __('Premium Flights'), 'desc' => __('Private jet rental for your travels'), 'image' => 'https://i.pinimg.com/1200x/22/5f/4d/225f4d17aa8a81f488d0794c0e4fdb80.jpg']
-          ];
-        @endphp
+    <section class="cp-page-section">
+        <div class="cp-shell">
+            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-3xl">
+                    <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Événements en vedette', 'Featured events') }}</p>
+                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Des événements mieux présentés et plus rapides à réserver', 'Events presented more clearly and faster to book') }}</h2>
+                    <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                        {{ $t('La home doit montrer immédiatement le niveau de service attendu: visuel fort, lieu, date, prix d’entrée et accès au détail.', 'The home page should immediately show the expected level of service: strong visual, venue, date, entry price and access to detail.') }}
+                    </p>
+                </div>
 
-        @foreach($vehicles as $vehicle)
-          <a
-            href="{{ route('packages') }}"
-            class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-500 hover:-translate-y-4"
-          >
-            <div class="aspect-square overflow-hidden relative">
-              <img
-                src="{{ $vehicle['image'] }}"
-                alt="{{ $vehicle['title'] }}"
-                class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-
-              <div class="absolute top-6 left-6 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/30">
-                @if($vehicle['icon'] === 'motorcycle')
-                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                @else
-                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                @endif
-              </div>
+                <a href="{{ route('events') }}" class="cp-primary-button !w-full sm:!w-auto">
+                    <span>{{ $t('Voir tous les événements', 'See all events') }}</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
             </div>
 
-            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <h3 class="text-2xl font-black mb-2 group-hover:text-amber-400 transition-colors">
-                {{ $vehicle['title'] }}
-              </h3>
-              <p class="text-white/80 text-sm mb-4">{{ $vehicle['desc'] }}</p>
+            @if($events->isNotEmpty())
+                <div class="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,420px)]">
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        @foreach($events->take(4) as $event)
+                            @php
+                                $eventTitle = app()->getLocale() === 'fr'
+                                    ? ($event->title_fr ?? $event->title_en ?? 'Événement')
+                                    : ($event->title_en ?? $event->title_fr ?? 'Event');
+                                $eventImage = $event->getFirstMediaUrl('avatar', 'normal')
+                                    ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900&h=700&fit=crop';
+                                $eventCategory = app()->getLocale() === 'fr'
+                                    ? ($event->category?->name_fr ?? 'Événement VIP')
+                                    : ($event->category?->name_en ?? $event->category?->name_fr ?? 'VIP event');
+                            @endphp
 
-              <div class="flex items-center justify-between p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                <span class="font-bold text-base">{{ __('Available') }}</span>
-                <svg class="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </div>
-            </div>
-          </a>
-        @endforeach
-      </div>
-    </div>
-  </section>
+                            <a href="{{ route('events.show', $event->slug ?? $event->id) }}" class="group overflow-hidden rounded-[1.9rem] border border-[color:var(--cp-border)] bg-white shadow-[0_18px_48px_rgba(41,20,58,0.09)] transition hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(41,20,58,0.14)]">
+                                <div class="relative aspect-[4/3] overflow-hidden">
+                                    <img src="{{ $eventImage }}" alt="{{ $eventTitle }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#120a1d]/84 via-[#120a1d]/10 to-transparent"></div>
+                                    <div class="absolute left-4 top-4 flex flex-wrap gap-2">
+                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">{{ $eventCategory }}</span>
+                                        @if($event->is_featured)
+                                            <span class="rounded-full bg-[color:var(--cp-gold-400)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#2a163d]">{{ $t('À la une', 'Featured') }}</span>
+                                        @endif
+                                    </div>
+                                    @if($event->event_date)
+                                        <div class="absolute right-4 top-4 rounded-[1rem] bg-white/92 px-3 py-2 text-center shadow-lg">
+                                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $event->event_date->translatedFormat('M') }}</p>
+                                            <p class="text-lg font-black text-[color:var(--cp-plum-950)]">{{ $event->event_date->format('d') }}</p>
+                                        </div>
+                                    @endif
+                                </div>
 
-  {{-- Flights Section --}}
-  <section class="py-20 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="max-w-4xl mx-auto text-center">
-        <div class="inline-flex items-center justify-center space-x-2 md:space-x-3 mb-4 md:mb-6">
-          <svg class="w-10 h-10 md:w-12 md:h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
+                                <div class="p-5">
+                                    <h3 class="text-xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $eventTitle }}</h3>
+                                    <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $event->venue_name ?: $event->city }}</p>
+                                    <div class="mt-5 flex items-center justify-between gap-3 border-t border-[color:var(--cp-border)] pt-4">
+                                        <div>
+                                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('À partir de', 'From') }}</p>
+                                            <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">
+                                                {{ $event->min_price ? \App\Helpers\CurrencyHelper::format($event->min_price) : $t('Sur demande', 'On request') }}
+                                            </p>
+                                        </div>
+                                        <span class="inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-900)]">
+                                            <span>{{ $t('Voir le détail', 'View details') }}</span>
+                                            <i class="fa-solid fa-arrow-right text-xs transition group-hover:translate-x-1"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <div class="event-sticky-rail rounded-[2rem] border border-[color:var(--cp-border)] p-6 shadow-[0_20px_54px_rgba(41,20,58,0.10)]">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Pourquoi ça marche mieux', 'Why it works better') }}</p>
+                        <h3 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Une home qui oriente vraiment le client', 'A home page that truly orients the client') }}</h3>
+
+                        <div class="mt-5 space-y-4">
+                            @foreach([
+                                $t('Les parcours principaux sont visibles dès le haut de page.', 'Main journeys are visible from the top of the page.'),
+                                $t('Les événements en vedette montrent immédiatement le niveau d’offre.', 'Featured events immediately show the level of offer.'),
+                                $t('Le support reste joignable sans sortir du parcours.', 'Support remains reachable without leaving the journey.'),
+                            ] as $message)
+                                <div class="rounded-[1.35rem] bg-white/80 px-4 py-4">
+                                    <p class="text-sm font-semibold leading-7 text-[color:var(--cp-ink-soft)]">{{ $message }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-3">
+                            <a href="{{ route('contact') }}" class="cp-primary-button !w-full">
+                                <i class="fa-solid fa-headset text-sm"></i>
+                                <span>{{ $t('Être rappelé par un conseiller', 'Get a callback from an advisor') }}</span>
+                            </a>
+                            <a href="{{ $supportPhoneLink }}" class="cp-secondary-button !w-full">
+                                <i class="fa-solid fa-phone text-sm"></i>
+                                <span>{{ $supportPhone }}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="rounded-[2rem] border border-dashed border-[color:var(--cp-border-strong)] bg-white/70 px-6 py-14 text-center">
+                    <p class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Les événements arrivent bientôt.', 'Events are coming soon.') }}</p>
+                    <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('La page d’accueil reste prête à orienter vers les autres services et à capter les demandes accompagnées.', 'The home page remains ready to orient users toward the other services and capture assisted requests.') }}</p>
+                </div>
+            @endif
         </div>
-        <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6">
-          {{ __('Need a flight with support?') }}
-        </h2>
-        <p class="text-xl text-gray-600 mb-6 md:mb-8">
-          {{ __('Our team now handles flight requests directly to give clients a clearer and more reliable process.') }}
-        </p>
-        <a
-          href="{{ route('flights.index') }}"
-          class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl text-base"
-        >
-          <span>{{ __('Talk to an Advisor') }}</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </a>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  {{-- CTA Final --}}
-  <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-5xl md:text-6xl font-black text-white mb-6 md:mb-8">
-        {{ __('Ready for an Unforgettable Experience?') }}
-      </h2>
-      <p class="text-2xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto">
-        {{ __('Contact our concierge to create your tailor-made experience') }}
-      </p>
-      <div class="flex flex-wrap justify-center gap-4 md:gap-6">
-        <a
-          href="{{ route('events') }}"
-          class="inline-flex items-center justify-center space-x-2 px-10 py-5 bg-white text-purple-900 font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          <span>{{ __('VIP EVENTS') }}</span>
-        </a>
-        <a
-          href="{{ route('packages') }}"
-          class="inline-flex items-center justify-center space-x-2 px-10 py-5 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-          <span>{{ __('LUXURY PACKAGES') }}</span>
-        </a>
-      </div>
-    </div>
-  </section>
+    <section class="cp-page-section">
+        <div class="cp-shell">
+            <div class="grid gap-6 xl:grid-cols-2">
+                <article class="cp-panel rounded-[2rem] p-6 sm:p-7">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Packages signature', 'Signature packages') }}</p>
+                            <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Des séjours plus lisibles', 'Trips made easier to read') }}</h2>
+                        </div>
+                        <a href="{{ route('packages') }}" class="cp-secondary-button !px-4 !py-2.5 text-sm">{{ $t('Tout voir', 'View all') }}</a>
+                    </div>
+
+                    <div class="mt-5 space-y-4">
+                        @forelse($featuredPackages->take(3) as $package)
+                            @php
+                                $packageTitle = app()->getLocale() === 'fr'
+                                    ? ($package->title_fr ?? $package->title_en ?? $package->slug)
+                                    : ($package->title_en ?? $package->title_fr ?? $package->slug);
+                                $packageDescription = app()->getLocale() === 'fr'
+                                    ? ($package->description_fr ?? $package->description_en ?? '')
+                                    : ($package->description_en ?? $package->description_fr ?? '');
+                                $packageImage = $package->getFirstMediaUrl('avatar', 'normal')
+                                    ?: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=900&h=700&fit=crop';
+                            @endphp
+
+                            <a href="{{ route('packages.show', $package->slug) }}" class="group grid gap-4 overflow-hidden rounded-[1.6rem] border border-[color:var(--cp-border)] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:grid-cols-[132px_minmax(0,1fr)]">
+                                <div class="relative h-40 overflow-hidden sm:h-full">
+                                    <img src="{{ $packageImage }}" alt="{{ $packageTitle }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @if($package->destination)
+                                            <span class="rounded-full bg-[#f4edff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">{{ $package->destination }}</span>
+                                        @endif
+                                        @if($package->duration)
+                                            <span class="rounded-full bg-[#fff5e6] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#a86308]">{{ $package->duration }} {{ $t('jours', 'days') }}</span>
+                                        @endif
+                                    </div>
+                                    <h3 class="mt-3 text-xl font-black text-[color:var(--cp-plum-950)]">{{ $packageTitle }}</h3>
+                                    <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ \Illuminate\Support\Str::limit($packageDescription, 120) }}</p>
+                                    <div class="mt-4 flex items-center justify-between gap-3">
+                                        <p class="text-sm font-black text-[color:var(--cp-plum-950)]">
+                                            {{ ($package->discount_price ?? $package->price) ? \App\Helpers\CurrencyHelper::format($package->discount_price ?? $package->price) : $t('Sur demande', 'On request') }}
+                                        </p>
+                                        <span class="inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-900)]">
+                                            <span>{{ $t('Voir le détail', 'View details') }}</span>
+                                            <i class="fa-solid fa-arrow-right text-xs transition group-hover:translate-x-1"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="rounded-[1.6rem] border border-dashed border-[color:var(--cp-border-strong)] bg-[#fffaf4] px-5 py-8 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                {{ $t('Les packages mis en avant apparaîtront ici pour aider le client à entrer rapidement dans un séjour adapté.', 'Featured packages will appear here to help clients quickly enter the right kind of trip.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </article>
+
+                <article class="cp-panel rounded-[2rem] p-6 sm:p-7">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Location premium', 'Premium rental') }}</p>
+                            <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Mobilité premium sans ambiguïté', 'Premium mobility without ambiguity') }}</h2>
+                        </div>
+                        <a href="{{ route('location') }}" class="cp-secondary-button !px-4 !py-2.5 text-sm">{{ $t('Voir la flotte', 'See the fleet') }}</a>
+                    </div>
+
+                    <div class="mt-5 grid gap-4">
+                        @forelse($featuredLocations->take(3) as $location)
+                            @php
+                                $locationName = app()->getLocale() === 'fr'
+                                    ? ($location->name_fr ?? $location->name_en ?? $t('Véhicule premium', 'Premium vehicle'))
+                                    : ($location->name_en ?? $location->name_fr ?? $t('Véhicule premium', 'Premium vehicle'));
+                                $locationDescription = app()->getLocale() === 'fr'
+                                    ? ($location->description_fr ?? $location->description_en ?? '')
+                                    : ($location->description_en ?? $location->description_fr ?? '');
+                                $locationImage = $location->image_url ?: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900&h=700&fit=crop';
+                            @endphp
+
+                            <a href="{{ route('location.show', $location->id) }}" class="group overflow-hidden rounded-[1.6rem] border border-[color:var(--cp-border)] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                                <div class="grid gap-0 sm:grid-cols-[minmax(160px,200px)_minmax(0,1fr)]">
+                                    <div class="relative h-44 overflow-hidden sm:h-full">
+                                        <img src="{{ $locationImage }}" alt="{{ $locationName }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                                    </div>
+                                    <div class="p-4">
+                                        <div class="flex flex-wrap gap-2">
+                                            @if($location->category)
+                                                <span class="rounded-full bg-[#f4edff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">{{ ucfirst($location->category) }}</span>
+                                            @endif
+                                            @if($location->capacity)
+                                                <span class="rounded-full bg-[#eefaf7] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#0f766e]">{{ $location->capacity }} {{ $t('places', 'seats') }}</span>
+                                            @endif
+                                        </div>
+                                        <h3 class="mt-3 text-xl font-black text-[color:var(--cp-plum-950)]">{{ $locationName }}</h3>
+                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ \Illuminate\Support\Str::limit($locationDescription, 120) }}</p>
+                                        <div class="mt-4 flex items-center justify-between gap-3">
+                                            <p class="text-sm font-black text-[color:var(--cp-plum-950)]">
+                                                {{ $location->price_per_day ? \App\Helpers\CurrencyHelper::format($location->price_per_day) : $t('Sur demande', 'On request') }}
+                                            </p>
+                                            <span class="inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-900)]">
+                                                <span>{{ $t('Réserver', 'Book') }}</span>
+                                                <i class="fa-solid fa-arrow-right text-xs transition group-hover:translate-x-1"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="rounded-[1.6rem] border border-dashed border-[color:var(--cp-border-strong)] bg-[#fffaf4] px-5 py-8 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                {{ $t('La flotte premium apparaît ici avec la capacité, le niveau de service et le tarif journalier mieux mis en avant.', 'The premium fleet appears here with capacity, service level and daily pricing made clearer.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="cp-page-section-lg">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Cheminement client', 'Client journey') }}</p>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Le site doit guider, pas fatiguer', 'The site should guide, not tire users') }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-white/82 sm:text-base">
+                            {{ $t('Cette refonte de la home doit installer une logique simple: comprendre l’offre, choisir son parcours, réserver ou demander un accompagnement sans se perdre.', 'This home page refactor is meant to establish one simple logic: understand the offer, choose a journey, book or request guidance without getting lost.') }}
+                        </p>
+                    </div>
+
+                    <div class="grid gap-4 lg:max-w-[34rem] lg:grid-cols-3">
+                        @foreach($journeySteps as $step)
+                            <div class="rounded-[1.5rem] border border-white/12 bg-white/10 p-4 backdrop-blur">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-gold-300)]">{{ $step['step'] }}</p>
+                                <h3 class="mt-2 text-lg font-black text-white">{{ $step['title'] }}</h3>
+                                <p class="mt-2 text-sm leading-6 text-white/76">{{ $step['description'] }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e2aa54]">
+                        <i class="fa-regular fa-envelope text-sm"></i>
+                        <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
+                    </a>
+                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>{{ $t('WhatsApp direct', 'Direct WhatsApp') }}</span>
+                    </a>
+                    <a href="{{ route('flights.index') }}" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                        <i class="fa-solid fa-plane-departure text-sm"></i>
+                        <span>{{ $t('Demande de vol', 'Flight request') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
-{{-- WhatsApp Floating Chat Button --}}
 <a
-  href="{{ config('carre_premium.contact.whatsapp_url') }}" 
-  target="_blank"
-  class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-transform transform hover:scale-110"
-  aria-label="Contact WhatsApp"
+    href="{{ $whatsAppUrl }}"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#1fbf5b] text-white shadow-[0_18px_40px_rgba(31,191,91,0.34)] transition hover:scale-105 hover:bg-[#17a44b] sm:bottom-6 sm:right-6 sm:h-16 sm:w-16"
+    aria-label="Contact WhatsApp"
 >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 32 32"
-    fill="white"
-    class="w-12 h-12"
-  >
-    <path d="M19.11 17.47c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.66.15-.2.3-.76.97-.93 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.77-1.64-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.51.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.9-2.2-.24-.57-.48-.5-.66-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.02-1.05 2.5 1.08 2.9 1.23 3.1c.15.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.28-.2-.58-.35z"/>
-    <path d="M16.04 2.003c-7.732 0-14.037 6.305-14.037 14.037 0 2.48.66 4.9 1.9 7.03L2 30l7.1-1.86c2.07 1.13 4.4 1.72 6.94 1.72h.01c7.73 0 14.04-6.31 14.04-14.04 0-3.75-1.46-7.27-4.11-9.92-2.65-2.65-6.17-4.1-9.94-4.1zm0 25.66c-2.11 0-4.17-.56-5.96-1.62l-.43-.26-4.22 1.11 1.13-4.11-.28-.44c-1.13-1.83-1.73-3.94-1.73-6.12 0-6.35 5.17-11.52 11.52-11.52 3.08 0 5.97 1.2 8.15 3.37 2.18 2.18 3.38 5.07 3.38 8.15 0 6.35-5.17 11.52-11.52 11.52z"/>
-  </svg>
+    <i class="fa-brands fa-whatsapp text-2xl sm:text-[1.7rem]"></i>
 </a>
-
 @endsection

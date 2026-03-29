@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Services\GoogleFlightsService;
 use App\Models\Event;
 use App\Models\Location;
+use App\Models\TourPackage;
 use App\Mail\ContactMessage;
 
 
@@ -17,14 +18,39 @@ class HomeController extends Controller
 
     public function index()
     {
-        // Charger les événements actifs avec leurs relations pour le carrousel
         $events = Event::where('is_active', true)
             ->with(['category', 'type', 'seatZones'])
-            ->orderBy('created_at', 'desc')
-            ->take(8)
+            ->orderByDesc('is_featured')
+            ->orderBy('event_date')
+            ->orderBy('event_time')
+            ->take(6)
             ->get();
 
-        return view('pages.home', compact('events'));
+        $featuredPackages = TourPackage::query()
+            ->where('is_active', true)
+            ->orderByDesc('is_featured')
+            ->orderByDesc('created_at')
+            ->take(3)
+            ->get();
+
+        $featuredLocations = Location::query()
+            ->active()
+            ->orderByDesc('created_at')
+            ->take(3)
+            ->get();
+
+        $stats = [
+            'events' => Event::query()->where('is_active', true)->count(),
+            'packages' => TourPackage::query()->where('is_active', true)->count(),
+            'locations' => Location::query()->active()->count(),
+            'starting_package_price' => TourPackage::query()
+                ->where('is_active', true)
+                ->selectRaw('MIN(COALESCE(discount_price, price)) as starting_price')
+                ->value('starting_price'),
+            'starting_location_price' => Location::query()->active()->min('price_per_day'),
+        ];
+
+        return view('pages.home', compact('events', 'featuredPackages', 'featuredLocations', 'stats'));
     }
 
     public function events()
