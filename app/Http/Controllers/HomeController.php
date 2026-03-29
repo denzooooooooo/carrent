@@ -187,9 +187,25 @@ class HomeController extends Controller
             'phone' => 'nullable|string|max:20',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
+            'company_name' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'partnership_type' => 'nullable|string|max:100',
         ]);
 
+        $message = $validated['message'];
+
+        if (!empty($validated['company_name']) || !empty($validated['partnership_type']) || !empty($validated['website'])) {
+            $message = collect([
+                !empty($validated['company_name']) ? 'Entreprise: ' . $validated['company_name'] : null,
+                !empty($validated['partnership_type']) ? 'Type de partenariat: ' . $validated['partnership_type'] : null,
+                !empty($validated['website']) ? 'Site web: ' . $validated['website'] : null,
+                null,
+                $validated['message'],
+            ])->filter(static fn ($value) => $value !== null)->implode("\n");
+        }
+
         $payload = array_merge($validated, [
+            'message' => $message,
             'source_page' => $request->headers->get('referer') ?: $request->fullUrl(),
             'submitted_at' => now()->toDateTimeString(),
         ]);

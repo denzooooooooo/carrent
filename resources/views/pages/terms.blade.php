@@ -1,144 +1,65 @@
 @extends('layouts.app')
 
-@section('title', __('Terms of Use') . ' - Carré Premium')
+@section('title', 'Conditions générales - Carré Premium')
+@section('meta_description', 'Consultez les conditions générales d’utilisation et de réservation de Carré Premium.')
+@section('meta_keywords', 'conditions générales carré premium, conditions réservation, CGU, CGV')
+@section('og_title', 'Conditions générales - Carré Premium')
+@section('og_description', 'Conditions générales d’utilisation et de réservation Carré Premium.')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
-  {{-- Hero --}}
-  <section class="relative h-[30vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-5xl font-black text-white mb-2">{{ __('Terms of Use') }}</h1>
-      <p class="text-white/90">{{ __('Last updated: January 10, 2025') }}</p>
-    </div>
-  </section>
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $updatedAt = '29 mars 2026';
+    $sections = [
+        ['title' => $t('1. Objet', '1. Scope'), 'body' => $t('Les présentes conditions encadrent l’utilisation du site, la consultation des offres et les parcours de réservation proposés par Carré Premium.', 'These terms govern the use of the site, the browsing of offers and the booking journeys offered by Carré Premium.')],
+        ['title' => $t('2. Réservations', '2. Bookings'), 'body' => $t('Toute réservation reste soumise à disponibilité, validation des informations transmises et confirmation effective du paiement ou du mode de règlement retenu.', 'Any booking remains subject to availability, validation of the provided information and effective confirmation of payment or the chosen payment method.')],
+        ['title' => $t('3. Tarifs et paiements', '3. Pricing and payments'), 'body' => $t('Les prix affichés peuvent dépendre du service, de la devise et du mode de paiement. La réservation n’est considérée comme finalisée qu’après validation du règlement.', 'Displayed prices may depend on the service, currency and payment method. A booking is only considered finalized after payment validation.')],
+        ['title' => $t('4. Modifications et annulations', '4. Changes and cancellations'), 'body' => $t('Les possibilités de modification ou d’annulation varient selon le type de service, le fournisseur concerné et l’état d’avancement du dossier.', 'Change and cancellation options vary depending on the service type, the relevant provider and the stage of the booking.')],
+        ['title' => $t('5. Responsabilités', '5. Liability'), 'body' => $t('Carré Premium organise et structure le parcours client mais certaines prestations dépendent de partenaires, fournisseurs ou organisateurs externes.', 'Carré Premium structures the customer journey, but some services depend on external partners, providers or organizers.')],
+        ['title' => $t('6. Données et sécurité', '6. Data and security'), 'body' => $t('L’usage du service implique le traitement de certaines données personnelles et le respect des règles de sécurité décrites dans notre politique de confidentialité.', 'Using the service implies the processing of personal data and compliance with the security rules described in our privacy policy.')],
+    ];
+@endphp
 
-  {{-- Content --}}
-  <section class="py-12">
-    <div class="container mx-auto">
-      <div class="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-xl">
-
-        <div class="prose prose-lg max-w-none text-gray-900">
-
-          <h2 class="text-3xl font-black mb-4 text-gray-900">{{ __('1. Acceptance of Terms') }}</h2>
-          <p class="mb-6 text-gray-700">
-            En accédant et en utilisant le site web de Carré Premium (ci-après "le Site"), vous acceptez d'être lié par les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre Site.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('2. Services Offered') }}</h2>
-          <p class="mb-4 text-gray-700">Carré Premium propose les services suivants :</p>
-          <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
-            <li>Réservation de billets d'avion</li>
-            <li>Réservation de billets pour événements sportifs et culturels</li>
-            <li>Packages touristiques (hélicoptère, jet privé, circuits)</li>
-            <li>Services de conciergerie voyage</li>
-          </ul>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('3. Registration and User Account') }}</h2>
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">3.1 Création de Compte</h3>
-          <p class="mb-4 text-gray-700">
-            Pour effectuer une réservation, vous devez créer un compte en fournissant des informations exactes et à jour. Vous êtes responsable de la confidentialité de vos identifiants de connexion.
-          </p>
-
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">3.2 Responsabilité du Compte</h3>
-          <p class="mb-6 text-gray-700">
-            Vous êtes entièrement responsable de toutes les activités effectuées sous votre compte. En cas d'utilisation non autorisée, vous devez nous en informer immédiatement.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('4. Bookings and Payments') }}</h2>
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">4.1 Processus de Réservation</h3>
-          <p class="mb-4 text-gray-700">
-            Toutes les réservations sont soumises à disponibilité. Une réservation n'est confirmée qu'après réception du paiement intégral et envoi d'un email de confirmation.
-          </p>
-
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">4.2 Prix et Paiement</h3>
-          <ul class="list-disc pl-6 mb-4 space-y-2 text-gray-700">
-            <li>Les prix sont affichés en Francs CFA (XOF), Euros (EUR) ou Dollars US (USD)</li>
-            <li>Les prix incluent toutes les taxes sauf mention contraire</li>
-            <li>Le paiement doit être effectué au moment de la réservation</li>
-            <li>Nous acceptons les cartes bancaires, Mobile Money et virements</li>
-          </ul>
-
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">4.3 Confirmation</h3>
-          <p class="mb-6 text-gray-700">
-            Après paiement, vous recevrez un email de confirmation contenant votre e-ticket et les détails de votre réservation. Vérifiez attentivement toutes les informations.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('5. Modifications and Cancellations') }}</h2>
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">5.1 Modifications</h3>
-          <p class="mb-4 text-gray-700">
-            Les modifications de réservation sont possibles selon les conditions tarifaires de votre billet. Des frais peuvent s'appliquer. Contactez notre service client pour toute modification.
-          </p>
-
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">5.2 Annulations</h3>
-          <p class="mb-4 text-gray-700">Les conditions d'annulation varient selon le type de réservation :</p>
-          <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
-            <li><strong>Vols :</strong> Selon les conditions de la compagnie aérienne</li>
-            <li><strong>Événements :</strong> Généralement non remboursables sauf annulation de l'événement</li>
-            <li><strong>Packages :</strong> Annulation gratuite jusqu'à 30 jours avant le départ, puis frais dégressifs</li>
-          </ul>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('6. Responsibilities') }}</h2>
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">6.1 Responsabilité de Carré Premium</h3>
-          <p class="mb-4 text-gray-700">
-            Carré Premium agit en tant qu'intermédiaire entre vous et les prestataires de services (compagnies aériennes, organisateurs d'événements, etc.). Nous ne sommes pas responsables des retards, annulations ou modifications effectués par ces prestataires.
-          </p>
-
-          <h3 class="text-2xl font-bold mb-3 text-gray-900">6.2 Responsabilité de l'Utilisateur</h3>
-          <p class="mb-4 text-gray-700">Vous êtes responsable de :</p>
-          <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
-            <li>Vérifier la validité de vos documents de voyage (passeport, visa)</li>
-            <li>Arriver à l'heure aux points de départ</li>
-            <li>Respecter les règles des compagnies aériennes et organisateurs</li>
-            <li>Fournir des informations exactes lors de la réservation</li>
-          </ul>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('7. Intellectual Property') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Tous les contenus du Site (textes, images, logos, vidéos) sont la propriété de Carré Premium ou de ses partenaires. Toute reproduction sans autorisation est interdite.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('8. Data Protection') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Vos données personnelles sont traitées conformément à notre Politique de Confidentialité. Nous nous engageons à protéger vos informations et à ne les utiliser que dans le cadre de nos services.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('9. Limitation of Liability') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Carré Premium ne peut être tenu responsable des dommages indirects, incidents ou consécutifs résultant de l'utilisation de nos services, sauf en cas de faute grave ou intentionnelle de notre part.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('10. Force Majeure') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Nous ne serons pas tenus responsables de tout manquement à nos obligations en cas de force majeure (catastrophes naturelles, guerres, pandémies, grèves, etc.).
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('11. Changes to Terms') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications entreront en vigueur dès leur publication sur le Site. Votre utilisation continue du Site après modification constitue votre acceptation des nouvelles conditions.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('12. Applicable Law and Jurisdiction') }}</h2>
-          <p class="mb-6 text-gray-700">
-            Ces conditions sont régies par le droit ivoirien. Tout litige sera soumis à la juridiction exclusive des tribunaux d'Abidjan, Côte d'Ivoire.
-          </p>
-
-          <h2 class="text-3xl font-black mb-4 mt-8 text-gray-900">{{ __('13. Contact') }}</h2>
-          <p class="mb-2 text-gray-700">Pour toute question concernant ces conditions, contactez-nous :</p>
-          <ul class="list-none space-y-2 mb-6 text-gray-700">
-            <li><strong>Email :</strong> legal@carrepremium.com</li>
-            <li><strong>Téléphone :</strong> +225 27 XX XX XX XX</li>
-            <li><strong>Adresse :</strong> Abidjan, Plateau, Côte d'Ivoire</li>
-          </ul>
-
-          <div class="mt-12 p-6 bg-purple-50 rounded-2xl border-2 border-purple-200">
-            <p class="text-sm text-gray-600">
-              <strong>Note importante :</strong> En utilisant nos services, vous reconnaissez avoir lu, compris et accepté l'intégralité de ces conditions d'utilisation. Si vous avez des questions, n'hésitez pas à contacter notre service client avant d'effectuer une réservation.
-            </p>
-          </div>
+<div class="cp-page">
+    <section class="cp-page-hero">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.35rem] bg-gradient-to-br from-[#22112f] via-[#4d2973] to-[#d9a64d] px-6 py-8 text-white shadow-[0_28px_90px_rgba(41,20,58,0.22)] sm:px-8 sm:py-10">
+                <div class="max-w-3xl">
+                    <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                        <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                        <span>{{ $t('Conditions générales', 'Terms') }}</span>
+                    </div>
+                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Le cadre de réservation doit rester lisible avant, pendant et après l’achat.', 'The booking framework should stay readable before, during and after purchase.') }}</h1>
+                    <p class="mt-4 text-sm leading-7 text-white/84 sm:text-base">{{ $t('Dernière mise à jour :', 'Last updated:') }} {{ $updatedAt }}</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="cp-page-overlap">
+        <div class="cp-shell">
+            <div class="cp-panel rounded-[2rem] px-5 py-6 sm:px-7 sm:py-8">
+                <div class="space-y-5">
+                    @foreach($sections as $section)
+                        <article class="rounded-[1.8rem] border border-[color:var(--cp-border)] bg-white px-5 py-5">
+                            <h2 class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $section['title'] }}</h2>
+                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $section['body'] }}</p>
+                        </article>
+                    @endforeach
+
+                    <article class="rounded-[1.8rem] border border-[color:var(--cp-border)] bg-white px-5 py-5">
+                        <h2 class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('7. Contact', '7. Contact') }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                            {{ $t('Avant toute réservation sensible ou si un point n’est pas clair, contactez l’équipe Carré Premium pour obtenir une confirmation écrite du cadre applicable.', 'Before any sensitive booking, or if anything is unclear, contact the Carré Premium team to obtain written confirmation of the applicable framework.') }}
+                        </p>
+                        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                            <a href="{{ route('contact') }}" class="cp-primary-button">{{ $t('Poser une question', 'Ask a question') }}</a>
+                            <a href="{{ route('privacy') }}" class="cp-secondary-button">{{ $t('Voir la confidentialité', 'View privacy policy') }}</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 @endsection

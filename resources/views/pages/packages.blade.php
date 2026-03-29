@@ -55,11 +55,11 @@
                         </div>
 
                         <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                            {{ $t('Des séjours premium compréhensibles en quelques secondes, même sur mobile.', 'Premium journeys that stay understandable in a few seconds, even on mobile.') }}
+                            {{ $t('Des packages premium plus faciles à comparer, comprendre et réserver.', 'Premium packages that are easier to compare, understand and book.') }}
                         </h1>
 
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                            {{ $t('Chaque offre doit répondre tout de suite à trois questions: où part-on, combien de temps, et quel niveau d’expérience est inclus. Cette page pose enfin cette lecture clairement.', 'Each offer should answer three questions immediately: where you go, how long it lasts, and what level of experience is included. This page now makes that reading explicit.') }}
+                            {{ $t('Destination, durée, niveau d’expérience et prix de départ doivent être visibles sans effort. Cette page recentre cette lecture pour aider le client à choisir plus vite.', 'Destination, duration, experience level and starting price should be visible without effort. This page refocuses that reading so clients can choose faster.') }}
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -108,7 +108,7 @@
                         <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Lecture rapide', 'Fast reading') }}</p>
                         <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Filtres et tri cohérents', 'Consistent filters and sorting') }}</h2>
                         <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                            {{ $t('Sur téléphone, on doit pouvoir comprendre une offre puis réduire la liste sans friction. Les filtres restent visibles, simples et alignés sur le reste du site.', 'On mobile, users should understand an offer first, then narrow the list without friction. Filters remain visible, simple and aligned with the rest of the site.') }}
+                            {{ $t('Utilisez ces filtres pour réduire la sélection sans perdre de vue l’essentiel: destination, durée, type d’expérience et niveau de prix.', 'Use these filters to reduce the list without losing sight of what matters: destination, duration, experience type and price level.') }}
                         </p>
                     </div>
 
@@ -238,10 +238,19 @@
                             $packageImage = $package->getFirstMediaUrl('avatar', 'normal');
                             $packageFallback = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&h=700&fit=crop';
                             $displayPrice = $package->discount_price ?? $package->price;
+                            $displayPriceLabel = $displayPrice ? \App\Helpers\CurrencyHelper::format($displayPrice) : $t('Sur demande', 'On request');
                             $durationLabel = app()->getLocale() === 'fr'
                                 ? ($package->duration_text_fr ?: ($package->duration ? $package->duration . ' jours' : $t('Durée sur demande', 'Duration on request')))
                                 : ($package->duration_text_en ?? $package->duration_text_fr ?? ($package->duration ? $package->duration . ' days' : $t('Durée sur demande', 'Duration on request')));
                             $packageTypeLabel = $typeLabels[$package->package_type] ?? ucfirst(str_replace('_', ' ', $package->package_type ?? ''));
+                            $packageDescription = trim($packageDescription) !== ''
+                                ? $packageDescription
+                                : $t('Programme premium construit autour du confort, de la logistique et d’une expérience plus fluide.', 'Premium itinerary built around comfort, logistics and a smoother experience.');
+                            $participantLabel = match (true) {
+                                filled($package->min_participants) && filled($package->max_participants) => $package->min_participants . '-' . $package->max_participants . ' ' . $t('pers.', 'pax'),
+                                filled($package->max_participants) => $t('Jusqu’à', 'Up to') . ' ' . $package->max_participants . ' ' . $t('pers.', 'pax'),
+                                default => null,
+                            };
                         @endphp
 
                         <article class="group overflow-hidden rounded-[2rem] border border-[color:var(--cp-border)] bg-white/95 shadow-[0_18px_55px_rgba(41,20,58,0.10)] transition hover:-translate-y-1 hover:shadow-[0_28px_75px_rgba(41,20,58,0.16)]">
@@ -270,7 +279,7 @@
 
                                     <div class="rounded-[1.1rem] bg-white/92 px-4 py-3 text-right shadow-lg">
                                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('À partir de', 'From') }}</p>
-                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($displayPrice) }}</p>
+                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $displayPriceLabel }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -280,9 +289,9 @@
                                     <span class="rounded-full bg-[#f4edff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
                                         {{ $durationLabel }}
                                     </span>
-                                    @if($package->max_participants)
+                                    @if($participantLabel)
                                         <span class="rounded-full bg-[#fff6e8] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#a86308]">
-                                            {{ $package->min_participants }}-{{ $package->max_participants }} {{ $t('pers.', 'pax') }}
+                                            {{ $participantLabel }}
                                         </span>
                                     @endif
                                 </div>
@@ -298,12 +307,12 @@
                                 <div class="mt-5 grid grid-cols-2 gap-3">
                                     <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
                                         <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Départ', 'Departure') }}</p>
-                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $package->departure_city ?: $t('À confirmer', 'To be confirmed') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $package->departure_city ?: $t('Départ à confirmer', 'Departure to confirm') }}</p>
                                     </div>
                                     <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
                                         <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Date repère', 'Date cue') }}</p>
                                         <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">
-                                            {{ $package->event_date_start ? $package->event_date_start->format('d/m/Y') : $t('Flexible', 'Flexible') }}
+                                            {{ $package->event_date_start ? $package->event_date_start->format('d/m/Y') : $t('Dates flexibles', 'Flexible dates') }}
                                         </p>
                                     </div>
                                 </div>
@@ -314,11 +323,13 @@
                                             <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif remisé', 'Discounted fare') }}</p>
                                             <div class="mt-1 flex items-center gap-2">
                                                 <span class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
-                                                <span class="text-sm font-semibold text-[color:var(--cp-ink-muted)] line-through">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                                                @if($package->price)
+                                                    <span class="text-sm font-semibold text-[color:var(--cp-ink-muted)] line-through">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                                                @endif
                                             </div>
                                         @else
                                             <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif estimatif', 'Estimated fare') }}</p>
-                                            <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                                            <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $package->price ? \App\Helpers\CurrencyHelper::format($package->price) : $t('Sur demande', 'On request') }}</span>
                                         @endif
                                     </div>
 
@@ -358,9 +369,9 @@
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div class="max-w-3xl">
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Demande sur mesure', 'Tailor-made request') }}</p>
-                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Un voyage à composer complètement autour du client ?', 'Need a journey built entirely around the client?') }}</h2>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d’un séjour totalement sur mesure ?', 'Need a fully bespoke journey?') }}</h2>
                         <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
-                            {{ $t('Notre équipe peut recomposer une expérience complète avec transport, hébergement, activités et accompagnement humain clair.', 'Our team can rebuild the full experience with transport, accommodation, activities and clear human support.') }}
+                            {{ $t('Notre équipe peut composer un séjour complet avec transport, hébergement, activités et accompagnement humain du devis jusqu’au départ.', 'Our team can build a full journey with transport, accommodation, activities and human guidance from quote to departure.') }}
                         </p>
                     </div>
 

@@ -68,7 +68,7 @@
                         @endforeach
                         
                         {{-- Cart Button --}}
-                        <a href="/cart" class="relative cp-icon-button group" aria-label="Panier ({{ $cartItemsCount }})">
+                        <a href="{{ route('cart') }}" class="relative cp-icon-button group" aria-label="Panier ({{ $cartItemsCount }})">
                             <i class="fa-solid fa-bag-shopping text-lg group-hover:text-[color:var(--cp-plum-900)]"></i>
                             @if($cartItemsCount > 0)
                                 <span class="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
@@ -239,7 +239,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 lg:hidden">
-                        <a href="/cart" class="relative cp-icon-button" aria-label="Panier">
+                        <a href="{{ route('cart') }}" class="relative cp-icon-button" aria-label="Panier">
                             <i class="fa-solid fa-bag-shopping text-sm"></i>
                             @if($cartItemsCount > 0)
                                 <span class="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">

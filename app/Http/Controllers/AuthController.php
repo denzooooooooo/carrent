@@ -180,24 +180,29 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'required|string|max:20|unique:users,phone,' . $user->id,
             'date_of_birth' => 'nullable|date|before:today',
             'gender' => 'nullable|in:male,female,other',
             'nationality' => 'nullable|string|max:100',
+            'passport_number' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
+            'preferred_language' => 'nullable|in:fr,en',
+            'preferred_currency' => 'nullable|in:XOF,EUR,USD,GBP',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator);
+            return back()->withErrors($validator)->withInput();
         }
 
         $data = $request->only([
             'first_name',
             'last_name',
+            'email',
             'phone',
             'date_of_birth',
             'gender',
@@ -206,7 +211,9 @@ class AuthController extends Controller
             'address',
             'city',
             'country',
-            'postal_code'
+            'postal_code',
+            'preferred_language',
+            'preferred_currency',
         ]);
 
         // Handle avatar upload

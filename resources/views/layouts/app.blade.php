@@ -2,27 +2,38 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    @php
+        $pageTitle = trim($__env->yieldContent('title')) ?: config('app.name', 'Carré Premium');
+        $pageDescription = trim($__env->yieldContent('meta_description')) ?: 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.';
+        $pageKeywords = trim($__env->yieldContent('meta_keywords')) ?: 'conciergerie privée, voyages luxe, événements VIP, vols privés, packages touristiques, Côte d\'Ivoire, Abidjan, sports, culture, hélicoptère, jet privé';
+        $pageRobots = trim($__env->yieldContent('robots')) ?: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+        $pageOgType = trim($__env->yieldContent('og_type')) ?: 'website';
+        $pageOgTitle = trim($__env->yieldContent('og_title')) ?: $pageTitle;
+        $pageOgDescription = trim($__env->yieldContent('og_description')) ?: $pageDescription;
+        $pageOgImage = trim($__env->yieldContent('og_image')) ?: asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg');
+    @endphp
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
+    <title>{{ $pageTitle }}</title>
 
     {{-- SEO Meta Tags --}}
-    <meta name="description" content="{{ $meta_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
-    <meta name="keywords" content="{{ $meta_keywords ?? 'conciergerie privée, voyages luxe, événements VIP, vols privés, packages touristiques, Côte d\'Ivoire, Abidjan, sports, culture, hélicoptère, jet privé' }}">
+    <meta name="description" content="{{ $pageDescription }}">
+    <meta name="keywords" content="{{ $pageKeywords }}">
     <meta name="author" content="Carré Premium">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="robots" content="{{ $pageRobots }}">
 
     {{-- Canonical URL --}}
     <link rel="canonical" href="{{ url()->current() }}">
 
     {{-- Open Graph / Facebook --}}
-    <meta property="og:type" content="{{ $og_type ?? 'website' }}">
+    <meta property="og:type" content="{{ $pageOgType }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $og_title ?? ($title ?? config('app.name', 'Laravel')) }}">
-    <meta property="og:description" content="{{ $og_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
-    <meta property="og:image" content="{{ $og_image ?? asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}">
+    <meta property="og:title" content="{{ $pageOgTitle }}">
+    <meta property="og:description" content="{{ $pageOgDescription }}">
+    <meta property="og:image" content="{{ $pageOgImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Carré Premium">
@@ -31,9 +42,9 @@
     {{-- Twitter --}}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{ $og_title ?? ($title ?? config('app.name', 'Laravel')) }}">
-    <meta property="twitter:description" content="{{ $og_description ?? 'Carré Premium - Conciergerie privée spécialisée dans les voyages de luxe, événements sportifs et culturels VIP, vols privés et packages touristiques exclusifs en Côte d\'Ivoire.' }}">
-    <meta property="twitter:image" content="{{ $og_image ?? asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}">
+    <meta property="twitter:title" content="{{ $pageOgTitle }}">
+    <meta property="twitter:description" content="{{ $pageOgDescription }}">
+    <meta property="twitter:image" content="{{ $pageOgImage }}">
 
     {{-- Additional SEO --}}
     <meta name="theme-color" content="#2A163D">
@@ -64,6 +75,7 @@
         })();
     </script>
 
+    @stack('head')
     @stack('styles')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])

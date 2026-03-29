@@ -1,245 +1,169 @@
 @extends('layouts.app')
 
-@section('title', __('FAQ') . ' - Carré Premium')
+@section('title', 'FAQ - Carré Premium')
+@section('meta_description', 'Retrouvez les réponses essentielles sur les réservations, paiements, documents et demandes premium chez Carré Premium.')
+@section('meta_keywords', 'faq carré premium, aide réservation, paiement, documents, support client')
+@section('og_title', 'FAQ - Carré Premium')
+@section('og_description', 'Toutes les réponses utiles sur les réservations, paiements et documents Carré Premium.')
+
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $faqGroups = [
+        [
+            'title' => $t('Réservations', 'Bookings'),
+            'items' => [
+                ['q' => $t('Comment réserver un événement ?', 'How do I book an event?'), 'a' => $t('Ouvrez la fiche événement, choisissez votre offre ou votre zone, renseignez les coordonnées demandées puis poursuivez vers le paiement.', 'Open the event page, select your offer or zone, fill in the requested details and continue to payment.')],
+                ['q' => $t('Puis-je réserver sans créer de compte ?', 'Can I book without creating an account?'), 'a' => $t('Oui sur plusieurs parcours, mais créer un compte simplifie fortement le suivi des documents et paiements.', 'Yes on several flows, but creating an account makes tracking documents and payments much easier.')],
+                ['q' => $t('Comment retrouver une réservation déjà commencée ?', 'How do I recover a started booking?'), 'a' => $t('Si le dossier a été créé, reconnectez-vous ou repassez par le lien reçu par email pour reprendre le parcours.', 'If the booking record exists, sign in or use the link received by email to resume the flow.')],
+            ],
+        ],
+        [
+            'title' => $t('Paiement', 'Payment'),
+            'items' => [
+                ['q' => $t('Quels moyens de paiement sont proposés ?', 'Which payment methods are available?'), 'a' => $t('Selon le service, le site peut proposer CinetPay, Mobile Money, carte bancaire ou virement bancaire.', 'Depending on the service, the site may offer CinetPay, Mobile Money, card payment or bank transfer.')],
+                ['q' => $t('Que se passe-t-il si le paiement échoue ?', 'What happens if payment fails?'), 'a' => $t('Le dossier reste généralement en attente. Vous pouvez relancer le paiement depuis votre espace ou contacter un conseiller.', 'The booking usually stays pending. You can restart payment from your account or contact an advisor.')],
+                ['q' => $t('Comment envoyer une preuve de virement ?', 'How do I send bank transfer proof?'), 'a' => $t('Lorsque le parcours passe en virement, la page d’instructions vous permet d’envoyer le justificatif directement.', 'When the flow switches to bank transfer, the instruction page lets you upload proof directly.')],
+            ],
+        ],
+        [
+            'title' => $t('Documents', 'Documents'),
+            'items' => [
+                ['q' => $t('Où télécharger ma facture ?', 'Where can I download my invoice?'), 'a' => $t('Depuis Mes réservations ou le détail d’une réservation payée, la facture et le reçu sont disponibles au téléchargement.', 'From My bookings or a paid booking detail page, the invoice and receipt are available for download.')],
+                ['q' => $t('Quand les billets sont-ils disponibles ?', 'When are tickets available?'), 'a' => $t('Ils sont générés une fois le paiement confirmé et le dossier finalisé selon le type de service.', 'They are generated once payment is confirmed and the booking is finalized depending on the service.')],
+                ['q' => $t('Puis-je recevoir mes documents par email ?', 'Can I receive my documents by email?'), 'a' => $t('Oui. Un bouton dans le détail de réservation permet de renvoyer les documents.', 'Yes. A button inside the booking detail lets you resend documents by email.')],
+            ],
+        ],
+        [
+            'title' => $t('Support', 'Support'),
+            'items' => [
+                ['q' => $t('Comment contacter l’équipe rapidement ?', 'How do I contact the team quickly?'), 'a' => $t('Le plus direct reste la page contact, le téléphone ou WhatsApp selon l’urgence de votre demande.', 'The fastest route remains the contact page, phone or WhatsApp depending on urgency.')],
+                ['q' => $t('Proposez-vous du sur-mesure ?', 'Do you offer bespoke services?'), 'a' => $t('Oui. Décrivez votre besoin dans le formulaire contact ou contactez un conseiller pour être orienté.', 'Yes. Describe your need in the contact form or contact an advisor for guidance.')],
+            ],
+        ],
+    ];
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => collect($faqGroups)->flatMap(fn ($group) => collect($group['items'])->map(fn ($item) => [
+            '@type' => 'Question',
+            'name' => $item['q'],
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => $item['a'],
+            ],
+        ]))->values()->all(),
+    ];
+@endphp
+
+@push('head')
+<script type="application/ld+json">{!! json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+@endpush
 
 @section('content')
-<div class="min-h-screen bg-white">
-  {{-- Hero --}}
-  <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-5xl font-black text-white mb-4">{{ __('Frequently Asked Questions') }}</h1>
-      <p class="text-xl text-white/90">{{ __('Quickly find answers to your questions') }}</p>
-    </div>
-  </section>
-
-  {{-- Search --}}
-  <section class="py-8">
-    <div class="container mx-auto">
-      <div class="max-w-2xl mx-auto -mt-8 relative z-20">
-          <div class="bg-white rounded-2xl shadow-2xl p-4">
-          <div class="relative">
-            <input
-              type="text"
-              placeholder="{{ __('Search a question...') }}"
-              class="w-full px-6 py-4 pl-12 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
-            />
-            <svg class="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {{-- FAQ Categories --}}
-  <section class="py-12">
-    <div class="container mx-auto">
-      <div class="max-w-4xl mx-auto space-y-8">
-        @php
-          $faqs = [
-            [
-              'category' => __('Bookings'),
-              'questions' => [
-                [
-                  'q' => 'Comment réserver un vol sur Carré Premium ?',
-                  'a' => 'Pour réserver un vol, rendez-vous sur notre page "Vols", entrez vos critères de recherche (départ, arrivée, dates), sélectionnez le vol qui vous convient, remplissez les informations des passagers et procédez au paiement sécurisé.'
-                ],
-                [
-                  'q' => 'Puis-je modifier ma réservation après confirmation ?',
-                  'a' => 'Oui, vous pouvez modifier votre réservation selon les conditions tarifaires de votre billet. Connectez-vous à votre compte, accédez à "Mes Réservations" et cliquez sur "Modifier". Des frais peuvent s\'appliquer.'
-                ],
-                [
-                  'q' => 'Comment annuler ma réservation ?',
-                  'a' => 'Pour annuler, connectez-vous à votre compte, allez dans "Mes Réservations", sélectionnez la réservation concernée et cliquez sur "Annuler". Les conditions d\'annulation et frais dépendent du type de billet acheté.'
-                ],
-                [
-                  'q' => 'Puis-je réserver pour quelqu\'un d\'autre ?',
-                  'a' => 'Oui, vous pouvez réserver pour d\'autres personnes. Il suffit d\'entrer leurs informations lors de la réservation. Assurez-vous que les noms correspondent exactement à ceux des documents d\'identité.'
-                ]
-              ]
-            ],
-            [
-              'category' => __('Payments'),
-              'questions' => [
-                [
-                  'q' => 'Quels moyens de paiement acceptez-vous ?',
-                  'a' => 'Nous acceptons les cartes bancaires (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), virements bancaires et PayPal. Tous les paiements sont sécurisés.'
-                ],
-                [
-                  'q' => 'Mon paiement est-il sécurisé ?',
-                  'a' => 'Absolument ! Nous utilisons le cryptage SSL et travaillons avec des partenaires de paiement certifiés PCI-DSS. Vos informations bancaires ne sont jamais stockées sur nos serveurs.'
-                ],
-                [
-                  'q' => 'Quand serai-je débité ?',
-                  'a' => 'Vous êtes débité immédiatement après la confirmation de votre réservation. Vous recevrez un email de confirmation avec tous les détails de votre achat.'
-                ],
-                [
-                  'q' => 'Puis-je payer en plusieurs fois ?',
-                  'a' => 'Pour certains packages et vols, le paiement en plusieurs fois est disponible. Cette option vous sera proposée lors du processus de paiement si elle est applicable.'
-                ]
-              ]
-            ],
-            [
-              'category' => __('Tickets & Documents'),
-              'questions' => [
-                [
-                  'q' => 'Comment recevoir mon billet ?',
-                  'a' => 'Votre e-ticket est envoyé par email immédiatement après confirmation du paiement. Vous pouvez également le télécharger depuis votre compte dans la section "Mes Réservations".'
-                ],
-                [
-                  'q' => 'Dois-je imprimer mon billet ?',
-                  'a' => 'Non, un e-ticket sur votre smartphone suffit. Cependant, nous recommandons d\'avoir une copie imprimée en cas de problème technique.'
-                ],
-                [
-                  'q' => 'Quels documents dois-je présenter à l\'aéroport ?',
-                  'a' => 'Vous devez présenter votre e-ticket, une pièce d\'identité valide (passeport pour les vols internationaux) et tout visa requis pour votre destination.'
-                ],
-                [
-                  'q' => 'Mon passeport expire bientôt, puis-je voyager ?',
-                  'a' => 'Votre passeport doit être valide au moins 6 mois après votre date de retour. Vérifiez également les exigences spécifiques de votre pays de destination.'
-                ]
-              ]
-            ],
-            [
-              'category' => __('Luggage'),
-              'questions' => [
-                [
-                  'q' => 'Quelle est la franchise bagage ?',
-                  'a' => 'La franchise bagage dépend de votre classe de voyage et de la compagnie aérienne. En général : Économique (1x23kg), Affaires (2x32kg), Première (3x32kg). Vérifiez les détails sur votre e-ticket.'
-                ],
-                [
-                  'q' => 'Puis-je ajouter des bagages supplémentaires ?',
-                  'a' => 'Oui, vous pouvez ajouter des bagages lors de la réservation ou ultérieurement via votre compte. Il est moins cher de les ajouter en ligne qu\'à l\'aéroport.'
-                ],
-                [
-                  'q' => 'Que puis-je emporter en cabine ?',
-                  'a' => 'En cabine, vous pouvez généralement emporter un bagage de 8kg maximum (dimensions : 55x40x20cm) plus un accessoire personnel (sac à main, ordinateur portable).'
-                ],
-                [
-                  'q' => 'Que faire si mes bagages sont perdus ?',
-                  'a' => 'Signalez immédiatement la perte au comptoir bagages de l\'aéroport. Conservez votre récépissé et contactez-nous pour vous assister dans les démarches avec la compagnie aérienne.'
-                ]
-              ]
-            ],
-            [
-              'category' => __('Events & Packages'),
-              'questions' => [
-                [
-                  'q' => 'Comment réserver des billets pour un événement ?',
-                  'a' => 'Parcourez notre section "Événements", sélectionnez l\'événement souhaité, choisissez votre zone de siège et le nombre de billets, puis procédez au paiement.'
-                ],
-                [
-                  'q' => 'Les billets d\'événements sont-ils remboursables ?',
-                  'a' => 'Cela dépend de l\'événement et des conditions de vente. Consultez les conditions spécifiques lors de votre réservation. En cas d\'annulation de l\'événement, vous serez remboursé intégralement.'
-                ],
-                [
-                  'q' => 'Que comprend un package touristique ?',
-                  'a' => 'Nos packages incluent généralement le transport, l\'hébergement, certains repas et activités. Les détails exacts sont spécifiés sur chaque page de package.'
-                ],
-                [
-                  'q' => 'Puis-je personnaliser un package ?',
-                  'a' => 'Oui ! Contactez notre service client pour discuter de vos besoins spécifiques. Nous pouvons adapter nos packages selon vos préférences.'
-                ]
-              ]
-            ],
-            [
-              'category' => __('Account & Security'),
-              'questions' => [
-                [
-                  'q' => 'Comment créer un compte ?',
-                  'a' => 'Cliquez sur "S\'inscrire" en haut de la page, remplissez le formulaire avec vos informations et validez votre email. Vous pouvez aussi vous inscrire lors de votre première réservation.'
-                ],
-                [
-                  'q' => 'J\'ai oublié mon mot de passe, que faire ?',
-                  'a' => 'Cliquez sur "Mot de passe oublié" sur la page de connexion, entrez votre email et suivez les instructions pour réinitialiser votre mot de passe.'
-                ],
-                [
-                  'q' => 'Mes données personnelles sont-elles protégées ?',
-                  'a' => 'Oui, nous prenons la protection de vos données très au sérieux. Consultez notre Politique de Confidentialité pour plus de détails sur la gestion de vos informations.'
-                ],
-                [
-                  'q' => 'Comment supprimer mon compte ?',
-                  'a' => 'Pour supprimer votre compte, contactez notre service client. Notez que cette action est irréversible et toutes vos données seront supprimées.'
-                ]
-              ]
-            ]
-          ];
-        @endphp
-
-        @foreach($faqs as $catIndex => $category)
-          <div class="bg-white rounded-3xl p-8 shadow-xl">
-            <h2 class="text-3xl font-black mb-6 flex items-center">
-              <span class="w-12 h-12 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center text-white mr-4">
-                {{ $catIndex + 1 }}
-              </span>
-              {{ $category['category'] }}
-            </h2>
-
-            <div class="space-y-4">
-              @foreach($category['questions'] as $qIndex => $faq)
-                <div class="border-2 border-gray-200 rounded-xl overflow-hidden">
-                  <button
-                    x-on:click="openIndex = openIndex === '{{ $catIndex }}-{{ $qIndex }}' ? null : '{{ $catIndex }}-{{ $qIndex }}'"
-                    class="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <span class="font-bold text-lg pr-4">{{ $faq['q'] }}</span>
-                    <svg
-                      class="w-6 h-6 flex-shrink-0 transform transition-transform"
-                      :class="openIndex === '{{ $catIndex }}-{{ $qIndex }}' ? 'rotate-180' : ''"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  <div
-                    x-show="openIndex === '{{ $catIndex }}-{{ $qIndex }}'"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 max-h-0"
-                    x-transition:enter-end="opacity-100 max-h-screen"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 max-h-screen"
-                    x-transition:leave-end="opacity-0 max-h-0"
-                    class="px-6 pb-6 text-gray-600 leading-relaxed overflow-hidden"
-                    style="display: none;"
-                  >
-                    {{ $faq['a'] }}
-                  </div>
+<div class="cp-page">
+    <section class="cp-page-hero">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.35rem] bg-gradient-to-br from-[#22112f] via-[#4d2973] to-[#d9a64d] px-6 py-8 text-white shadow-[0_28px_90px_rgba(41,20,58,0.22)] sm:px-8 sm:py-10">
+                <div class="max-w-3xl">
+                    <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                        <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                        <span>{{ $t('FAQ', 'FAQ') }}</span>
+                    </div>
+                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Les réponses essentielles, structurées par vrai besoin client.', 'The essential answers, structured around real client needs.') }}</h1>
+                    <p class="mt-4 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
+                        {{ $t('Cette page doit vous aider à agir vite: comprendre un paiement, récupérer un document ou savoir quel canal utiliser.', 'This page should help you act fast: understand a payment, recover a document or know which support channel to use.') }}
+                    </p>
                 </div>
-              @endforeach
             </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
+        </div>
+    </section>
 
-  {{-- Contact CTA --}}
-  <section class="py-16 bg-gradient-to-r from-purple-600 to-amber-600">
-    <div class="container mx-auto text-center">
-      <h2 class="text-4xl font-black text-white mb-4">{{ __('Can\'t find your answer?') }}</h2>
-      <p class="text-xl text-white/90 mb-8">{{ __('Our team is here to help you 24/7') }}</p>
-      <div class="flex flex-wrap gap-4 justify-center">
-        <a href="{{ route('contact') }}" class="px-8 py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all">
-          {{ __('Contact us') }}
-        </a>
-        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all">
-          {{ __('Call now') }}
-        </a>
-      </div>
-    </div>
-  </section>
+    <section class="cp-page-overlap">
+        <div class="cp-shell">
+            <div class="cp-panel rounded-[2rem] px-5 py-6 sm:px-7 sm:py-8">
+                <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Recherche rapide', 'Quick search') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Trouvez la bonne réponse en quelques secondes', 'Find the right answer in seconds') }}</h2>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[color:var(--cp-ink-muted)]"></i>
+                        <input id="faq-search" type="search" placeholder="{{ $t('Chercher une question...', 'Search a question...') }}" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white py-3 pl-11 pr-4 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]">
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-5">
+                    @foreach($faqGroups as $group)
+                        <section class="rounded-[1.8rem] border border-[color:var(--cp-border)] bg-white/80 p-4 sm:p-5">
+                            <h3 class="text-xl font-black text-[color:var(--cp-plum-950)]">{{ $group['title'] }}</h3>
+                            <div class="mt-4 space-y-3">
+                                @foreach($group['items'] as $index => $item)
+                                    <details class="event-accordion" data-faq-item data-search="{{ Str::lower($group['title'] . ' ' . $item['q'] . ' ' . $item['a']) }}" @if($loop->first && $loop->parent->first) open @endif>
+                                        <summary class="cursor-pointer list-none px-4 py-4 text-sm font-black text-[color:var(--cp-plum-950)] sm:text-base">
+                                            {{ $item['q'] }}
+                                        </summary>
+                                        <div class="px-4 pb-4 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                            {{ $item['a'] }}
+                                        </div>
+                                    </details>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endforeach
+                </div>
+
+                <div id="faq-empty-state" class="mt-6 hidden rounded-[1.8rem] border border-dashed border-[color:var(--cp-border-strong)] bg-[#faf6ff] px-6 py-10 text-center">
+                    <p class="text-xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Aucun résultat pour cette recherche.', 'No result for this search.') }}</p>
+                    <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Essayez un mot plus large ou passez directement par la page contact.', 'Try a broader term or use the contact page directly.') }}</p>
+                    <a href="{{ route('contact') }}" class="cp-primary-button !mt-5">{{ $t('Contacter l’équipe', 'Contact the team') }}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cp-page-section-lg">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Toujours bloqué ?', 'Still blocked?') }}</p>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Passez à un conseiller si la réponse dépend de votre dossier.', 'Switch to an advisor if the answer depends on your booking.') }}</h2>
+                    </div>
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e2aa54]">{{ $t('Écrire au support', 'Write to support') }}</a>
+                        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">{{ $t('Appeler maintenant', 'Call now') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+@endsection
 
+@push('scripts')
 <script>
-document.addEventListener('alpine:init', () => {
-  Alpine.data('faq', () => ({
-    openIndex: null
-  }));
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('faq-search');
+    const items = Array.from(document.querySelectorAll('[data-faq-item]'));
+    const emptyState = document.getElementById('faq-empty-state');
+
+    if (!input || !items.length || !emptyState) {
+        return;
+    }
+
+    input.addEventListener('input', function () {
+        const query = input.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        items.forEach(function (item) {
+            const haystack = item.dataset.search || '';
+            const visible = !query || haystack.includes(query);
+            item.style.display = visible ? '' : 'none';
+            visibleCount += visible ? 1 : 0;
+        });
+
+        emptyState.classList.toggle('hidden', visibleCount > 0);
+    });
 });
 </script>
-@endsection
+@endpush
