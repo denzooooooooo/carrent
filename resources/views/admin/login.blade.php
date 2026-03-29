@@ -10,38 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Manrope', 'sans-serif'],
-                        display: ['Sora', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f4efff',
-                            100: '#ece3ff',
-                            500: '#6d28d9',
-                            600: '#5b21b6',
-                            700: '#4c1d95',
-                            900: '#24123b',
-                        },
-                        sand: {
-                            50: '#f9f5ef',
-                            100: '#f2e7d6',
-                            300: '#dbc19a',
-                            500: '#c88a2a',
-                        },
-                    },
-                    boxShadow: {
-                        admin: '0 30px 80px rgba(24, 12, 44, 0.18)',
-                    },
-                }
-            }
-        };
-    </script>
+    @vite(['resources/css/app.css'])
     <style>
         body {
             font-family: 'Manrope', sans-serif;
@@ -65,21 +34,25 @@
         .admin-auth-glow {
             box-shadow: 0 32px 90px rgba(76, 29, 149, 0.18);
         }
+
+        .admin-display {
+            font-family: 'Sora', sans-serif;
+        }
     </style>
 </head>
 
 <body class="text-slate-900 antialiased">
     <div class="relative min-h-screen overflow-hidden">
         <div class="admin-auth-shell relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:items-stretch lg:gap-6 lg:px-8">
-            <section class="relative hidden overflow-hidden rounded-[2rem] bg-[linear-gradient(150deg,#24123b_0%,#4c1d95_48%,#7c3aed_100%)] p-10 text-white shadow-admin lg:flex lg:w-[46%] lg:flex-col lg:justify-between">
+            <section class="relative hidden overflow-hidden rounded-[2rem] bg-[linear-gradient(150deg,#24123b_0%,#4c1d95_48%,#7c3aed_100%)] p-10 text-white shadow-[0_30px_80px_rgba(24,12,44,0.18)] lg:flex lg:w-[46%] lg:flex-col lg:justify-between">
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(200,138,42,0.2),transparent_35%)]"></div>
                 <div class="relative z-10">
                     <div class="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold tracking-[0.22em] uppercase text-white/75">
-                        <i class="fas fa-shield-halved text-sand-300"></i>
+                        <i class="fas fa-shield-halved text-[#dbc19a]"></i>
                         Console sécurisée
                     </div>
                     <div class="mt-8 max-w-xl">
-                        <p class="font-display text-5xl font-semibold leading-tight">
+                        <p class="admin-display text-5xl font-semibold leading-tight">
                             Pilote l’activité premium avec une interface plus claire et plus sûre.
                         </p>
                         <p class="mt-6 text-lg leading-8 text-white/78">
@@ -91,17 +64,17 @@
                 <div class="relative z-10 grid gap-4 sm:grid-cols-3">
                     <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
                         <p class="text-xs uppercase tracking-[0.24em] text-white/55">Accès</p>
-                        <p class="mt-3 font-display text-3xl font-semibold">24/7</p>
+                        <p class="admin-display mt-3 text-3xl font-semibold">24/7</p>
                         <p class="mt-2 text-sm text-white/72">Interface disponible pour l’équipe opérationnelle.</p>
                     </div>
                     <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
                         <p class="text-xs uppercase tracking-[0.24em] text-white/55">Protection</p>
-                        <p class="mt-3 font-display text-3xl font-semibold">Token</p>
+                        <p class="admin-display mt-3 text-3xl font-semibold">Token</p>
                         <p class="mt-2 text-sm text-white/72">Session régénérée et accès cloisonné par rôle.</p>
                     </div>
                     <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
                         <p class="text-xs uppercase tracking-[0.24em] text-white/55">Support</p>
-                        <p class="mt-3 font-display text-3xl font-semibold">Ops</p>
+                        <p class="admin-display mt-3 text-3xl font-semibold">Ops</p>
                         <p class="mt-2 text-sm text-white/72">Gestion rapide des demandes et des réservations clients.</p>
                     </div>
                 </div>
@@ -114,8 +87,8 @@
                             <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#5b21b6,#c88a2a)] text-white shadow-lg">
                                 <i class="fas fa-user-shield text-2xl"></i>
                             </div>
-                            <p class="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-brand-600">Connexion admin</p>
-                            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-slate-950">
+                            <p class="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-[#5b21b6]">Connexion admin</p>
+                            <h1 class="admin-display mt-3 text-3xl font-semibold tracking-tight text-slate-950">
                                 Accéder au cockpit Carré Premium
                             </h1>
                             <p class="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
@@ -123,7 +96,7 @@
                             </p>
                         </div>
                         <a href="{{ route('home') }}"
-                            class="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-brand-200 hover:text-brand-700 sm:inline-flex sm:items-center sm:gap-2">
+                            class="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-[#ece3ff] hover:text-[#4c1d95] sm:inline-flex sm:items-center sm:gap-2">
                             <i class="fas fa-arrow-left"></i>
                             Site public
                         </a>
@@ -161,7 +134,7 @@
                                     <i class="fas fa-envelope pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                                     <input id="email" name="email" type="email" autocomplete="email" required
                                         value="{{ old('email') }}"
-                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 text-base text-slate-900 outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 text-base text-slate-900 outline-none transition focus:border-[#cdb7f4] focus:ring-4 focus:ring-[#ece3ff]"
                                         placeholder="admin@carrepremium.com">
                                 </span>
                             </label>
@@ -171,10 +144,10 @@
                                 <span class="relative block">
                                     <i class="fas fa-lock pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                                     <input id="password" name="password" type="password" autocomplete="current-password" required
-                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 pr-14 text-base text-slate-900 outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 pr-14 text-base text-slate-900 outline-none transition focus:border-[#cdb7f4] focus:ring-4 focus:ring-[#ece3ff]"
                                         placeholder="Votre mot de passe">
                                     <button type="button" id="toggle-password"
-                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-brand-600"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-[#5b21b6]"
                                         aria-label="Afficher ou masquer le mot de passe">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -185,7 +158,7 @@
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <label class="inline-flex items-center gap-3 text-sm text-slate-600">
                                 <input id="remember_me" name="remember" type="checkbox"
-                                    class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    class="h-4 w-4 rounded border-slate-300 text-[#5b21b6] focus:ring-[#6d28d9]">
                                 Rester connecté
                             </label>
                             <span class="text-sm text-slate-500">
@@ -194,7 +167,7 @@
                         </div>
 
                         <button type="submit"
-                            class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(135deg,#5b21b6,#7c3aed)] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-brand-200 transition hover:-translate-y-0.5 hover:shadow-xl">
+                            class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(135deg,#5b21b6,#7c3aed)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_45px_rgba(91,33,182,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(91,33,182,0.22)]">
                             <i class="fas fa-arrow-right-to-bracket"></i>
                             Se connecter
                         </button>
@@ -202,7 +175,7 @@
 
                     <div class="mt-8 flex items-center justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-slate-50/80 px-5 py-4 text-sm text-slate-600">
                         <div class="flex items-center gap-3">
-                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f4efff] text-[#5b21b6]">
                                 <i class="fas fa-headset"></i>
                             </span>
                             <div>
@@ -211,7 +184,7 @@
                             </div>
                         </div>
                         <a href="{{ route('home') }}"
-                            class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 px-4 py-2 font-semibold text-slate-600 transition hover:border-brand-200 hover:text-brand-700 sm:hidden">
+                            class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 px-4 py-2 font-semibold text-slate-600 transition hover:border-[#ece3ff] hover:text-[#4c1d95] sm:hidden">
                             <i class="fas fa-arrow-left"></i>
                             Site
                         </a>

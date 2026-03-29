@@ -187,20 +187,6 @@
             </div>
         @endif
 
-        @if (session('debug_data') || session('debug_logs'))
-            <details class="admin-panel p-5">
-                <summary class="cursor-pointer text-sm font-semibold text-slate-700">Données de debug</summary>
-                <div class="mt-4 space-y-4">
-                    @if (session('debug_data'))
-                        <pre class="overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-slate-100">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-                    @endif
-                    @if (session('debug_logs'))
-                        <pre class="overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-slate-100">{{ session('debug_logs') }}</pre>
-                    @endif
-                </div>
-            </details>
-        @endif
-
         <form action="{{ $route }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if ($isEdit)

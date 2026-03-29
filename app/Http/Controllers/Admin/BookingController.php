@@ -12,6 +12,7 @@ use App\Models\Payment;
 use App\Services\BookingFulfillmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -152,6 +153,7 @@ class BookingController extends Controller
         ]);
 
         $booking = Booking::findOrFail($id);
+        $previousStatus = $booking->status;
 
         DB::beginTransaction();
         try {
@@ -178,13 +180,30 @@ class BookingController extends Controller
 
             DB::commit();
 
+            Log::info('Admin booking status updated', [
+                'admin_id' => auth('admin')->id(),
+                'booking_id' => $booking->id,
+                'booking_number' => $booking->booking_number,
+                'from' => $previousStatus,
+                'to' => $booking->status,
+                'reason' => $request->input('reason'),
+            ]);
+
             return redirect()
                 ->route('admin.bookings.show', $booking->id)
                 ->with('success', 'Statut de la réservation mis à jour avec succès.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+
+            Log::error('Admin booking status update failed', [
+                'admin_id' => auth('admin')->id(),
+                'booking_id' => $id,
+                'target_status' => $request->input('status'),
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'La mise à jour du statut a échoué. Consulte les logs serveur si le problème persiste.');
         }
     }
 
@@ -202,6 +221,8 @@ class BookingController extends Controller
         ]);
 
         $booking = Booking::findOrFail($id);
+        $previousPaymentStatus = $booking->payment_status;
+        $previousStatus = $booking->status;
         DB::beginTransaction();
 
         try {
@@ -262,10 +283,30 @@ class BookingController extends Controller
             }
 
             DB::commit();
+
+            Log::info('Admin booking payment updated', [
+                'admin_id' => auth('admin')->id(),
+                'booking_id' => $booking->id,
+                'booking_number' => $booking->booking_number,
+                'payment_from' => $previousPaymentStatus,
+                'payment_to' => $booking->payment_status,
+                'status_from' => $previousStatus,
+                'status_to' => $booking->status,
+                'transaction_id' => $request->input('transaction_id'),
+                'payment_method' => $request->input('payment_method'),
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Erreur lors de la mise à jour du paiement : ' . $e->getMessage());
+            Log::error('Admin booking payment update failed', [
+                'admin_id' => auth('admin')->id(),
+                'booking_id' => $id,
+                'target_payment_status' => $request->input('payment_status'),
+                'transaction_id' => $request->input('transaction_id'),
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'La mise à jour du paiement a échoué. Consulte les logs serveur si le problème persiste.');
         }
 
         return redirect()

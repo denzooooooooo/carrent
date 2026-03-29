@@ -11,6 +11,7 @@ use App\Imports\EventPackagesImport;
 use App\Services\PdfEventDraftImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -118,13 +119,7 @@ class EventController extends Controller
     public function store(Request $request)
     {
         try {
-            // Debug: Afficher les données reçues
-            \Log::info('Event Store - Request Data:', $request->all());
-
             $validatedData = $this->validateEvent($request);
-
-            // Debug: Afficher les données validées
-            \Log::info('Event Store - Validated Data:', $validatedData);
 
             DB::beginTransaction();
 
@@ -161,30 +156,24 @@ class EventController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            \Log::error('Event Store - Validation Error:', $e->errors());
-            // Ne pas inclure les fichiers uploadés dans les données de debug
-            $debugData = $request->except(['image']);
-            // Récupérer les logs récents pour debug
-            $logContent = '';
-            if (file_exists(storage_path('logs/laravel.log'))) {
-                $logContent = file_get_contents(storage_path('logs/laravel.log'));
-                $logLines = explode("\n", $logContent);
-                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
-            }
-            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
+            Log::warning('Admin event store validation failed', [
+                'admin_id' => auth('admin')->id(),
+                'title_fr' => $request->input('title_fr'),
+                'category_id' => $request->input('category_id'),
+                'errors' => $e->errors(),
+            ]);
+
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Certains champs sont invalides.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Event Store - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            // Ne pas inclure les fichiers uploadés dans les données de debug
-            $debugData = $request->except(['image']);
-            // Récupérer les logs récents pour debug
-            $logContent = '';
-            if (file_exists(storage_path('logs/laravel.log'))) {
-                $logContent = file_get_contents(storage_path('logs/laravel.log'));
-                $logLines = explode("\n", $logContent);
-                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
-            }
-            return back()->withInput()->with('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
+            Log::error('Admin event store failed', [
+                'admin_id' => auth('admin')->id(),
+                'title_fr' => $request->input('title_fr'),
+                'category_id' => $request->input('category_id'),
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'La création de l’événement a échoué. Consulte les logs serveur pour le détail.');
         }
     }
 
@@ -216,13 +205,7 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         try {
-            // Debug: Afficher les données reçues
-            \Log::info('Event Update - Request Data:', $request->all());
-
             $validatedData = $this->validateEvent($request, $event);
-
-            // Debug: Afficher les données validées
-            \Log::info('Event Update - Validated Data:', $validatedData);
 
             DB::beginTransaction();
 
@@ -266,30 +249,24 @@ class EventController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            \Log::error('Event Update - Validation Error:', $e->errors());
-            // Ne pas inclure les fichiers uploadés dans les données de debug
-            $debugData = $request->except(['image']);
-            // Récupérer les logs récents pour debug
-            $logContent = '';
-            if (file_exists(storage_path('logs/laravel.log'))) {
-                $logContent = file_get_contents(storage_path('logs/laravel.log'));
-                $logLines = explode("\n", $logContent);
-                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
-            }
-            return back()->withInput()->withErrors($e->errors())->with('error', 'Erreurs de validation')->with('debug_data', $debugData)->with('debug_logs', $logContent);
+            Log::warning('Admin event update validation failed', [
+                'admin_id' => auth('admin')->id(),
+                'event_id' => $event->id,
+                'title_fr' => $request->input('title_fr', $event->title_fr),
+                'errors' => $e->errors(),
+            ]);
+
+            return back()->withInput()->withErrors($e->errors())->with('error', 'Certains champs sont invalides.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Event Update - General Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            // Ne pas inclure les fichiers uploadés dans les données de debug
-            $debugData = $request->except(['image']);
-            // Récupérer les logs récents pour debug
-            $logContent = '';
-            if (file_exists(storage_path('logs/laravel.log'))) {
-                $logContent = file_get_contents(storage_path('logs/laravel.log'));
-                $logLines = explode("\n", $logContent);
-                $logContent = implode("\n", array_slice($logLines, -20)); // Dernières 20 lignes
-            }
-            return back()->withInput()->with('error', 'Erreur lors de la mise à jour de l\'événement : ' . $e->getMessage())->with('debug_data', $debugData)->with('debug_logs', $logContent);
+            Log::error('Admin event update failed', [
+                'admin_id' => auth('admin')->id(),
+                'event_id' => $event->id,
+                'title_fr' => $request->input('title_fr', $event->title_fr),
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'La mise à jour de l’événement a échoué. Consulte les logs serveur pour le détail.');
         }
     }
 
