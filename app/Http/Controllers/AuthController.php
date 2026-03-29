@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -483,16 +484,19 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            // 1. Tente de récupérer l'utilisateur Socialite.
-            // C'est ici que l'erreur 400 (Client ID/Secret/URI incorrect) apparaît souvent.
             $googleUser = Socialite::driver('google')->user();
+            $googleEmail = $googleUser->getEmail();
+
+            if (blank($googleEmail)) {
+                throw new \RuntimeException('Google n’a pas retourné d’adresse email exploitable.');
+            }
 
             // 2. Vérifie si l'utilisateur existe déjà par Google ID
             $user = User::where('google_id', $googleUser->getId())->first();
 
             if (!$user) {
                 // 3. Vérifie si l'utilisateur existe déjà par email
-                $user = User::where('email', $googleUser->getEmail())->first();
+                $user = User::where('email', $googleEmail)->first();
 
                 if ($user) {
                     // L'utilisateur existe, lie le compte Google
@@ -506,30 +510,15 @@ class AuthController extends Controller
                     // 4. Crée un nouvel utilisateur
                     $nameParts = $this->splitName($googleUser->getName());
 
-                    // *** ATTENTION ICI : ***
-                    // Vos règles de validation (phone, password) nécessitent d'être gérées.
-                    // Pour le Socialite, on peut générer un mot de passe et un faux numéro de téléphone
-                    // si les champs sont obligatoires dans la base de données.
-
-                    // N'oubliez pas d'importer Str si vous utilisez Str::random(24)
-                    // use Illuminate\Support\Str; 
-
                     $user = User::create([
                         'google_id' => $googleUser->getId(),
                         'provider' => 'google',
                         'first_name' => $nameParts['first_name'],
                         'last_name' => $nameParts['last_name'],
-                        'email' => $googleUser->getEmail(),
+                        'email' => $googleEmail,
                         'email_verified_at' => now(),
                         'avatar_url' => $googleUser->getAvatar(),
-                        // Si le champ 'password' est NULLABLE, vous pouvez l'omettre.
-                        // S'il est requis, il faut le fournir (même si l'utilisateur ne l'utilisera pas)
-                        //'password' => Hash::make(Str::random(24)),    
-                        // Si 'phone' est REQUIS et UNIQUE, générez une valeur unique ou rendez-le NULLABLE
-                        //'phone' => '00000000000' . $googleUser->getId(), // Exemple : Faux numéro unique
-                        //'country' => 'Côte d\'Ivoire',
-                        //'preferred_language' => 'fr',
-                        //'preferred_currency' => 'XOF',
+                        'password' => Hash::make(Str::random(40)),
                         'is_active' => true,
                     ]);
                 }
@@ -550,13 +539,7 @@ class AuthController extends Controller
             return redirect()->intended(route('home'));
 
         } catch (\Exception $e) {
-            // *** BLOC DE DÉBOGAGE CRUCIAL ***
-            // Cela affichera l'erreur exacte renvoyée par Socialite ou Google
-            if (config('app.env') === 'local' || config('app.debug') === true) {
-                // Affiche le message d'erreur et arrête l'exécution
-                dd("Socialite Error: " . $e->getMessage() . " | Code: " . $e->getCode() . " | File: " . $e->getFile() . " | Line: " . $e->getLine());
-            }
-
+            report($e);
             Session::flash('error', 'Erreur lors de la connexion avec Google. Veuillez réessayer.');
             return redirect()->route('login');
         }
@@ -593,13 +576,18 @@ class AuthController extends Controller
         try {
             // 1. Récupère l'utilisateur Facebook via Socialite
             $facebookUser = Socialite::driver('facebook')->user();
+            $facebookEmail = $facebookUser->getEmail();
+
+            if (blank($facebookEmail)) {
+                throw new \RuntimeException('Facebook n’a pas retourné d’adresse email exploitable.');
+            }
 
             // 2. Vérifie si l'utilisateur existe déjà par Facebook ID
             $user = User::where('facebook_id', $facebookUser->getId())->first();
 
             if (!$user) {
                 // 3. Vérifie si l'utilisateur existe déjà par email
-                $user = User::where('email', $facebookUser->getEmail())->first();
+                $user = User::where('email', $facebookEmail)->first();
 
                 if ($user) {
                     // L'utilisateur existe, lie le compte Facebook
@@ -613,25 +601,16 @@ class AuthController extends Controller
                     // 4. Crée un nouvel utilisateur
                     $nameParts = $this->splitName($facebookUser->getName());
 
-                    // Génère un numéro de téléphone unique si requis
-                    $uniquePhone = 'FB' . time() . rand(1000, 9999);
-
                     $user = User::create([
                         'facebook_id' => $facebookUser->getId(),
                         'provider' => 'facebook',
                         'first_name' => $nameParts['first_name'],
                         'last_name' => $nameParts['last_name'],
-                        'email' => $facebookUser->getEmail(),
+                        'email' => $facebookEmail,
                         'email_verified_at' => now(),
                         'avatar_url' => $facebookUser->getAvatar(),
-                        // Si 'phone' est requis et unique, utilisez un placeholder
-                        //'phone' => $uniquePhone,
-                        // Mot de passe nullable ou généré aléatoirement
-                        // 'password' => Hash::make(Str::random(24)),
-                        //'country' => 'Côte d\'Ivoire',
-                        //'preferred_language' => 'fr',
-                        //'preferred_currency' => 'XOF',
-                        //'is_active' => true,
+                        'password' => Hash::make(Str::random(40)),
+                        'is_active' => true,
                     ]);
                 }
             } else {
@@ -651,18 +630,7 @@ class AuthController extends Controller
             return redirect()->intended(route('home'));
 
         } catch (\Exception $e) {
-            // Débogage en environnement local
-            if (config('app.debug')) {
-                dd([
-                    'error' => 'Facebook OAuth Error',
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-            }
-
+            report($e);
             Session::flash('error', 'Erreur lors de la connexion avec Facebook. Veuillez réessayer.');
             return redirect()->route('login');
         }
