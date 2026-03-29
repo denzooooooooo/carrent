@@ -1,14 +1,17 @@
 <!-- Sidebar -->
-<aside id="sidebar" class="w-64 glass shadow-2xl flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out">
+<aside id="sidebar" class="w-72 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out border-r border-white/10 bg-[linear-gradient(180deg,#26163f_0%,#2f1c55_48%,#36215e_100%)] text-white shadow-2xl">
     <!-- Logo -->
     <div
-        class="h-16 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-primary to-purple-600 relative overflow-hidden">
+        class="h-20 flex items-center justify-center border-b border-white/10 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_45%),linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0))] relative overflow-hidden">
         <div
             class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse-slow">
         </div>
         <div class="relative z-10 flex items-center">
-            <i class="fas fa-crown text-secondary text-2xl mr-2"></i>
-            <h1 class="text-xl font-bold text-black font-montserrat">Carré Premium</h1>
+            <i class="fas fa-crown text-secondary text-2xl mr-3"></i>
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">Admin Console</p>
+                <h1 class="text-lg font-bold text-white font-montserrat">Carré Premium</h1>
+            </div>
         </div>
     </div>
 
@@ -21,39 +24,39 @@
         </a>
 
         <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
                 <i class="fas fa-grip-horizontal mr-2"></i>
                 Gestion
             </p>
 
             @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
             <a href="{{ route('admin.members.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.members.*') ? 'active' : 'text-gray-700' }}">
+                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.members.*') ? 'active' : '' }}">
                 <i class="fas fa-users w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Membres</span>
                 <span
-                    class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\Admin::count() }}</span>
+                    class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\Admin::count() }}</span>
             </a>
 
             <a href="{{ route('admin.users.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.users.*') ? 'active' : 'text-gray-700' }}">
+                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                 <i class="fas fa-users w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Utilisateurs</span>
                 <span
-                    class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\User::count() }}</span>
+                    class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\User::count() }}</span>
             </a>
             @endif
 
             <a href="{{ route('admin.bookings.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.bookings.*') ? 'active' : 'text-gray-700' }}">
+                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                 <i class="fas fa-ticket-alt w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Réservations</span>
-                <span class="ml-auto bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">{{ \App\Models\Booking::count() }}</span>
+                <span class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\Booking::count() }}</span>
             </a>
         </div>
 
         <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
                 <i class="fas fa-box mr-2"></i>
                 Produits
             </p>
@@ -66,25 +69,25 @@
             </a> -->
 
             <a href="{{ route('admin.events.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.events.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
                 <i class="fas fa-calendar-alt w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Événements</span>
             </a>
 
             <a href="{{ route('admin.packages.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.packages.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
                 <i class="fas fa-suitcase w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Packages</span>
             </a>
 
             <a href="{{ route('admin.categories.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.categories.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <i class="fas fa-folder w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Catégories</span>
             </a>
 
             <a href="{{ route('admin.locations.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.locations.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                 <i class="fas fa-car w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Locations</span>
             </a>
@@ -92,14 +95,14 @@
         </div>
 
         <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
                 <i class="fas fa-palette mr-2"></i>
                 Contenu
             </p>
 
             @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
             <a href="{{ route('admin.carousels.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.carousels.*') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.carousels.*') ? 'active' : '' }}">
                 <i class="fas fa-images w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Carrousels</span>
             </a>
@@ -108,13 +111,13 @@
 
         @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin() || auth('admin')->user()->isAccountant())
         <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
                 <i class="fas fa-calculator mr-2"></i>
                 Comptabilité
             </p>
 
             <a href="{{ route('admin.accountant.reports') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.reports') ? 'active' : 'text-gray-700' }}">
+                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.accountant.reports') ? 'active' : '' }}">
                 <i class="fas fa-file-alt w-5 text-lg"></i>
                 <span class="ml-3 font-medium">Rapports</span>
             </a>
@@ -182,21 +185,21 @@
     </nav>
 
     <!-- User Info -->
-    <div class="border-t border-gray-200 p-4 bg-gradient-to-r from-purple-50 to-pink-50">
+    <div class="border-t border-white/10 p-4 bg-white/5">
         <a href="{{ route('admin.profile') }}"
-            class="flex items-center hover:bg-white p-3 rounded-lg transition-all duration-300 group">
+            class="flex items-center hover:bg-white/10 p-3 rounded-2xl transition-all duration-300 group">
             <div class="relative">
                 <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-xl transition-shadow">
+                    class="w-11 h-11 rounded-full bg-[linear-gradient(135deg,#ffffff_0%,#f0e7ff_100%)] flex items-center justify-center text-[#4b2386] font-bold shadow-lg group-hover:shadow-xl transition-shadow">
                     {{ substr(auth('admin')->user()->name, 0, 1) }}
                 </div>
                 <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div class="ml-3 flex-1">
-                <p class="text-sm font-semibold text-gray-800">{{ auth('admin')->user()->name }}</p>
-                <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', auth('admin')->user()->role)) }}</p>
+                <p class="text-sm font-semibold text-white">{{ auth('admin')->user()->name }}</p>
+                <p class="text-xs text-white/55">{{ ucfirst(str_replace('_', ' ', auth('admin')->user()->role)) }}</p>
             </div>
-            <i class="fas fa-chevron-right text-gray-400 group-hover:text-primary transition-colors"></i>
+            <i class="fas fa-chevron-right text-white/35 group-hover:text-white transition-colors"></i>
         </a>
     </div>
 </aside>

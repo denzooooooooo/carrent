@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('events', 'event_series_id')) {
+            return;
+        }
+
         Schema::table('events', function (Blueprint $table) {
             $table->foreignId('event_series_id')->nullable()->constrained('event_series')->onDelete('set null');
             $table->string('match_number')->nullable()->after('event_series_id');
@@ -17,10 +21,13 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasColumn('events', 'event_series_id')) {
+            return;
+        }
+
         Schema::table('events', function (Blueprint $table) {
             $table->dropForeign(['event_series_id']);
             $table->dropColumn(['event_series_id', 'match_number', 'is_home_team_match']);
         });
     }
 };
-

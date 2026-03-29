@@ -3,18 +3,18 @@
 @section('title', 'Mon Profil')
 
 @section('header-content')
-    <div class="bg-white border-b border-gray-200 px-4 py-4 md:px-6">
-        <div class="flex items-center justify-between">
+    <div class="admin-page-header">
+        <div>
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Mon Profil</h1>
                 <p class="text-sm text-gray-600 mt-1">Gérez vos informations personnelles</p>
             </div>
-            <div class="flex items-center space-x-3">
+        </div>
+        <div class="flex items-center space-x-3">
                 <a href="{{ route('admin.dashboard') }}" 
-                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                   class="admin-btn-ghost px-5 py-3 text-sm">
                     <i class="fas fa-arrow-left mr-2"></i>Retour
                 </a>
-            </div>
         </div>
     </div>
 @endsection

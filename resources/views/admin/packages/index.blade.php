@@ -22,16 +22,17 @@ $typeConfig = [
 <div class="max-w-8xl mx-auto py-8 px-4">
 
     {{-- ===== EN-TÊTE ===== --}}
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div class="admin-page-header mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">
+            <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Catalogue</p>
+            <h1 class="mt-2 text-3xl font-bold text-gray-900">
                 <i class="fas fa-suitcase-rolling text-primary mr-2"></i>
                 Packages Touristiques
             </h1>
-            <p class="text-gray-500 mt-1">{{ $packages->total() }} package(s) au total</p>
+            <p class="mt-3 text-gray-600">{{ $packages->total() }} package(s) au total</p>
         </div>
         <a href="{{ route('admin.packages.create') }}"
-           class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-primary to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-primary transition-all duration-300">
+           class="admin-btn-primary px-5 py-3 text-sm">
             <i class="fas fa-plus-circle mr-2"></i> Nouveau Package
         </a>
     </div>

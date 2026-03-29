@@ -193,7 +193,7 @@
             <i class="fas fa-chart-line text-6xl text-gray-300 mb-4"></i>
             <h4 class="text-xl font-bold text-gray-900 mb-2">Aucune réservation récente</h4>
             <p class="text-gray-600 mb-6">Effectuez votre première réservation pour voir vos statistiques</p>
-            <a href="{{ route('flights') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors">
+            <a href="{{ route('flights.index') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors">
               <i class="fas fa-plane mr-2"></i>Réserver un vol
             </a>
           </div>

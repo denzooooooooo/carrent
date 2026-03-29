@@ -333,6 +333,47 @@
                     </div>
                 </form>
             </div>
+
+            <div class="mt-8 bg-white rounded-3xl shadow-xl p-8 border border-purple-100">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Documents recents</h2>
+                        <p class="text-gray-600">Retrouvez vos dernieres factures et recus de paiement.</p>
+                    </div>
+                    <a href="{{ route('bookings') }}" class="inline-flex items-center justify-center rounded-2xl border border-purple-200 px-5 py-3 text-sm font-bold text-purple-700 hover:bg-purple-50">
+                        Voir toutes mes reservations
+                    </a>
+                </div>
+
+                @php($recentPaidBookings = auth()->user()->recent_bookings->where('payment_status', 'paid')->take(3))
+
+                @if($recentPaidBookings->isEmpty())
+                    <div class="mt-6 rounded-2xl bg-gray-50 px-6 py-8 text-center text-gray-600">
+                        Aucun document de paiement recent pour le moment.
+                    </div>
+                @else
+                    <div class="mt-6 grid gap-4">
+                        @foreach($recentPaidBookings as $booking)
+                            <div class="rounded-2xl border border-gray-200 px-5 py-4">
+                                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                    <div>
+                                        <p class="font-bold text-gray-900">{{ $booking->title }}</p>
+                                        <p class="text-sm text-gray-500">{{ $booking->booking_number }} • {{ number_format((float) $booking->final_amount, 0, ',', ' ') }} {{ $booking->currency }}</p>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3">
+                                        <a href="{{ route('user.booking.documents.download', ['booking' => $booking, 'documentType' => 'invoice']) }}" class="inline-flex items-center rounded-xl bg-purple-600 px-4 py-3 text-sm font-bold text-white hover:bg-purple-700">
+                                            Facture
+                                        </a>
+                                        <a href="{{ route('user.booking.documents.download', ['booking' => $booking, 'documentType' => 'receipt']) }}" class="inline-flex items-center rounded-xl bg-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-amber-600">
+                                            Recu
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>

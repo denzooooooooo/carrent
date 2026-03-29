@@ -5,15 +5,19 @@
 @section('content')
 
     <div class="max-w-8xl mx-auto py-8">
-        <div class="flex justify-between items-center mb-8 border-b pb-2">
-            <h1 class="text-3xl font-bold text-dark gradient-text">Catalogue des Événements ({{ $events->total() }})</h1>
-            <div class="flex space-x-3">
+        <div class="admin-page-header mb-8">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Catalogue</p>
+                <h1 class="mt-2 text-3xl font-bold text-dark gradient-text">Événements ({{ $events->total() }})</h1>
+                <p class="mt-3 text-gray-600">Supervisez les événements publiés, leur statut, leur lieu et leurs tarifs depuis une seule vue.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
                 <a href="{{ route('admin.events.import.form') }}"
-                    class="py-2 px-4 rounded-lg text-white font-semibold bg-blue-600 hover:bg-blue-700 transition duration-300 shadow-md flex items-center">
+                    class="admin-btn-ghost px-5 py-3 text-sm">
                     <i class="fas fa-file-import mr-2"></i> Importer Packages
                 </a>
                 <a href="{{ route('admin.events.create') }}"
-                    class="py-2 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition duration-300 shadow-md flex items-center">
+                    class="admin-btn-primary px-5 py-3 text-sm">
                     <i class="fas fa-plus-circle mr-2"></i> Ajouter un nouvel Événement
                 </a>
             </div>
@@ -37,7 +41,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @forelse ($events as $event)
                 <div
-                    class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transform hover:scale-[1.02] transition duration-300 relative">
+                    class="admin-panel overflow-hidden transform hover:scale-[1.01] transition duration-300 relative">
 
                     {{-- Image de l'Événement --}}
                     <a href="{{ route('admin.events.show', $event) }}" class="block h-48 overflow-hidden group">
@@ -79,7 +83,7 @@
                                 {{ $event->venue_name }}, {{ $event->city }}
                             </p>
                             <p class="flex items-center"><i class="fas fa-tag w-5 text-primary mr-2"></i>
-                                À partir de **{{ number_format($event->min_price, 2, ',', ' ') }} FCFA**
+                                À partir de <span class="font-bold text-gray-900">{{ number_format($event->min_price, 2, ',', ' ') }} FCFA</span>
                             </p>
                         </div>
 

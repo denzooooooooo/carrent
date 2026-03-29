@@ -104,7 +104,7 @@ class User extends Authenticatable
      */
     public function getBookingsCountAttribute()
     {
-        return $this->bookings()->count();
+        return Booking::visibleToUser($this)->count();
     }
 
     /**
@@ -112,8 +112,19 @@ class User extends Authenticatable
      */
     public function getRecentBookingsAttribute()
     {
-        return $this->bookings()
-            ->with(['event', 'eventBooking.zone', 'package', 'flight'])
+        return Booking::visibleToUser($this)
+            ->with([
+                'event',
+                'eventBooking.zone',
+                'eventBooking.event',
+                'package',
+                'packageBooking.package',
+                'flight',
+                'flightBooking',
+                'location',
+                'locationBooking',
+                'payment',
+            ])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
@@ -124,6 +135,8 @@ class User extends Authenticatable
      */
     public function getConfirmedBookingsAttribute()
     {
-        return $this->bookings()->where('status', 'confirmed')->count();
+        return Booking::visibleToUser($this)
+            ->where('status', 'confirmed')
+            ->count();
     }
 }

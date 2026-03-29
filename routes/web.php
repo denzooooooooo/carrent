@@ -78,6 +78,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
     Route::get('/bookings/{booking}/details', [AuthController::class, 'showBooking'])->name('user.booking.details');
+    Route::get('/bookings/{booking}/documents/{documentType}', [AuthController::class, 'downloadBookingDocument'])->name('user.booking.documents.download');
+    Route::get('/bookings/{booking}/download', [AuthController::class, 'downloadBookingDocument'])
+        ->defaults('documentType', 'invoice')
+        ->name('user.booking.download');
+    Route::post('/bookings/{booking}/resend-documents', [AuthController::class, 'resendReceipt'])->name('user.booking.resend-documents');
     Route::post('/bookings/{booking}/cancel', [AuthController::class, 'cancelBooking'])->name('user.booking.cancel');
 
     // Routes de réservation de vols (authentification requise)

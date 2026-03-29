@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use Carbon\Carbon;
+use App\Services\EventDiscoveryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -14,110 +14,9 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Event::where('is_active', true)
-            ->with(['category', 'type']);
+        $payload = app(EventDiscoveryService::class)->buildIndexPayload($request);
 
-        // Filtre par catégorie/type d'événement
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
-
-        // Filtre par lieu/venue - Recherche partielle (LIKE)
-        if ($request->filled('venue')) {
-            $query->where('venue_name', 'like', '%' . $request->venue . '%');
-        }
-
-        // Filtre par ville - Recherche partielle
-        if ($request->filled('city')) {
-            $query->where('city', 'like', '%' . $request->city . '%');
-        }
-
-        // Filtre par pays - Recherche partielle
-        if ($request->filled('country')) {
-            $query->where('country', 'like', '%' . $request->country . '%');
-        }
-
-        // Filtre par prix minimum
-        if ($request->filled('min_price')) {
-            $query->where('min_price', '>=', $request->min_price);
-        }
-
-        // Filtre par prix maximum
-        if ($request->filled('max_price')) {
-            $query->where('max_price', '<=', $request->max_price);
-        }
-
-        // Filtre par date
-        if ($request->filled('date')) {
-            $query->whereDate('event_date', $request->date);
-        }
-
-        // Filtre par date de début
-        if ($request->filled('start_date')) {
-            $query->whereDate('event_date', '>=', $request->start_date);
-        }
-
-        // Filtre par date de fin
-        if ($request->filled('end_date')) {
-            $query->whereDate('event_date', '<=', $request->end_date);
-        }
-
-        $query->orderBy('event_date', 'asc');
-
-        $viewMode = $request->get('view', 'list');
-        $monthParam = $request->get('month');
-        $calendarMonth = $monthParam ? Carbon::createFromFormat('Y-m', $monthParam)->startOfMonth() : Carbon::now()->startOfMonth();
-
-        $events = $query->paginate(12)->appends($request->query());
-
-        $calendarEvents = (clone $query)
-            ->whereBetween('event_date', [
-                $calendarMonth->copy()->startOfMonth()->toDateString(),
-                $calendarMonth->copy()->endOfMonth()->toDateString(),
-            ])
-            ->get();
-
-        $eventsByDate = $calendarEvents->groupBy(function ($event) {
-            return Carbon::parse($event->event_date)->toDateString();
-        });
-
-        // Récupérer les catégories pour les filtres
-        $categories = \App\Models\EventCategory::where('is_active', true)->get();
-        
-        // Récupérer les villes uniques pour le filtre
-        $cities = \App\Models\Event::where('is_active', true)
-            ->whereNotNull('city')
-            ->distinct()
-            ->pluck('city')
-            ->sort()
-            ->values();
-            
-        // Récupérer les pays uniques pour le filtre
-        $countries = \App\Models\Event::where('is_active', true)
-            ->whereNotNull('country')
-            ->distinct()
-            ->pluck('country')
-            ->sort()
-            ->values();
-            
-        // Récupérer les lieux uniques pour le filtre
-        $venues = \App\Models\Event::where('is_active', true)
-            ->whereNotNull('venue_name')
-            ->distinct()
-            ->pluck('venue_name')
-            ->sort()
-            ->values();
-
-        return view('pages.events', compact(
-            'events',
-            'categories',
-            'cities',
-            'countries',
-            'venues',
-            'viewMode',
-            'calendarMonth',
-            'eventsByDate'
-        ));
+        return view('pages.events', $payload);
     }
 
     /**

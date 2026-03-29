@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('event_types', function (Blueprint $table) {
-            //
+        Schema::table('payments', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->change();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('event_types', function (Blueprint $table) {
-            //
+        Schema::table('payments', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable(false)->change();
         });
     }
 };

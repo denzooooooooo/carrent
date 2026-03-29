@@ -31,8 +31,9 @@
             'icon' => 'fa-calendar-star',
             'color' => 'pink',
             'submenu' => [
-                ['name' => __('Cultural'), 'name_fr' => 'Culturel', 'path' => '/events?type=culturel', 'icon' => 'fa-theater-masks'],
-                ['name' => __('Sports'), 'name_fr' => 'Sportif', 'path' => '/events?type=sportif', 'icon' => 'fa-futbol'],
+                ['name' => __('See all events'), 'name_fr' => 'Voir tout', 'path' => '/events', 'icon' => 'fa-layer-group'],
+                ['name' => __('Cultural'), 'name_fr' => 'Culturel', 'path' => '/events?family=culturel', 'icon' => 'fa-theater-masks'],
+                ['name' => __('Sports'), 'name_fr' => 'Sportif', 'path' => '/events?family=sportif', 'icon' => 'fa-futbol'],
             ]
         ],
         [

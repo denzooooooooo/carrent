@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('event_bookings') || Schema::hasColumn('event_bookings', 'package_id')) {
+            return;
+        }
+
         Schema::table('event_bookings', function (Blueprint $table) {
             // Rendre zone_id nullable pour permettre les réservations de packages
             $table->foreignId('zone_id')->nullable()->change();
@@ -26,6 +30,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('event_bookings') || !Schema::hasColumn('event_bookings', 'package_id')) {
+            return;
+        }
+
         Schema::table('event_bookings', function (Blueprint $table) {
             $table->foreignId('zone_id')->constrained('event_seat_zones')->onDelete('cascade')->change();
             $table->dropForeign(['package_id']);
@@ -33,4 +41,3 @@ return new class extends Migration
         });
     }
 };
-

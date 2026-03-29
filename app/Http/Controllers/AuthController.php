@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingPaymentDocumentsMail;
+use App\Models\Booking;
 use App\Models\User;
+use App\Services\BookingAccessService;
+use App\Services\DocumentGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -255,30 +261,67 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        // Get user bookings - for event bookings, since user_id is null in bookings table
-        // We need to get bookings where the event_booking belongs to the user
-        $bookings = \App\Models\Booking::with(['event', 'eventBooking.zone', 'package', 'flight'])
-            ->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhereHas('eventBooking', function ($q) use ($user) {
-                          $q->where('user_email', $user->email);
-                      });
-            })
+        $bookings = Booking::with([
+                'event',
+                'eventBooking.zone',
+                'eventBooking.event',
+                'package',
+                'packageBooking.package',
+                'flight',
+                'flightBooking',
+                'location',
+                'locationBooking',
+                'payment',
+            ])
+            ->visibleToUser($user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('pages.users.bookings', compact('bookings'));
     }
 
+    public function showBooking(Request $request, Booking $booking)
+    {
+        $this->authorizeBookingAccess($request, $booking);
+
+        $booking = $this->ensureBillingDocuments($booking);
+
+        return view('pages.users.booking-details', compact('booking'));
+    }
+
+    public function downloadBookingDocument(Request $request, Booking $booking, string $documentType)
+    {
+        $this->authorizeBookingAccess($request, $booking);
+
+        if (!in_array($documentType, ['invoice', 'receipt'], true)) {
+            abort(404);
+        }
+
+        $booking = $this->ensureBillingDocuments($booking);
+
+        $path = $documentType === 'invoice'
+            ? $booking->invoice_pdf_path
+            : $booking->receipt_pdf_path;
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            return back()->with('error', 'Le document demande est introuvable.');
+        }
+
+        $downloadName = $documentType === 'invoice'
+            ? $booking->invoice_filename
+            : $booking->receipt_filename;
+
+        return Storage::disk('public')->download($path, $downloadName);
+    }
+
     /**
      * Cancel a booking
      */
-    public function cancelBooking(Request $request, \App\Models\Booking $booking)
+    public function cancelBooking(Request $request, Booking $booking)
     {
-        $user = Auth::user();
-
-        // Check if the booking belongs to the user
-        if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
+        try {
+            $this->authorizeBookingAccess($request, $booking);
+        } catch (\Throwable $exception) {
             return response()->json(['success' => false, 'error' => 'Vous n\'avez pas accès à cette réservation.'], 403);
         }
 
@@ -300,52 +343,84 @@ class AuthController extends Controller
      */
     public function resendReceipt(Request $request, $bookingId)
     {
-        $user = Auth::user();
-        $booking = \App\Models\Booking::with(['eventBooking', 'flightBooking'])->findOrFail($bookingId);
+        $booking = Booking::findOrFail($bookingId);
+        $this->authorizeBookingAccess($request, $booking);
 
-        // Check if the booking belongs to the user
-        if ($booking->user_id !== $user->id && (!$booking->eventBooking || $booking->eventBooking->user_email !== $user->email)) {
-            return back()->with('error', 'Vous n\'avez pas accès à cette réservation.');
+        try {
+            $booking = $this->ensureBillingDocuments($booking);
+            $email = app(BookingAccessService::class)->contactEmail($booking) ?? Auth::user()->email;
+
+            Mail::to($email)->send(new BookingPaymentDocumentsMail($booking));
+
+            return back()->with('success', 'Les documents de paiement ont ete renvoyes a ' . $email);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de l\'envoi des documents : ' . $e->getMessage());
+        }
+    }
+
+    protected function authorizeBookingAccess(Request $request, Booking $booking): void
+    {
+        app(BookingAccessService::class)->authorize($request, $booking);
+    }
+
+    protected function ensureBillingDocuments(Booking $booking): Booking
+    {
+        $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
+
+        $documents = app(DocumentGeneratorService::class);
+        $updates = [];
+
+        if (blank($booking->invoice_number)) {
+            $booking->invoice_number = $documents->makeInvoiceNumber($booking);
+            $updates['invoice_number'] = $booking->invoice_number;
         }
 
-        if ($booking->booking_type === 'event' && $booking->eventBooking) {
-            try {
-                \Illuminate\Support\Facades\Mail::to($booking->eventBooking->user_email)->send(
-                    new \App\Mail\EventBookingConfirmation($booking->eventBooking)
-                );
-
-                return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $booking->eventBooking->user_email);
-            } catch (\Exception $e) {
-                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
-            }
+        if (blank($booking->receipt_number)) {
+            $booking->receipt_number = $documents->makeReceiptNumber($booking);
+            $updates['receipt_number'] = $booking->receipt_number;
         }
 
-        if ($booking->booking_type === 'flight' && $booking->flightBooking) {
-            try {
-                // Get passenger name from booking details
-                $passengerDetails = $booking->passenger_details;
-                $passengerName = 'Client';
-
-                if (is_array($passengerDetails) && !empty($passengerDetails)) {
-                    $firstPassenger = $passengerDetails[0];
-                    if (isset($firstPassenger['name'])) {
-                        $passengerName = $firstPassenger['name'];
-                    } elseif (isset($firstPassenger['first_name']) && isset($firstPassenger['last_name'])) {
-                        $passengerName = $firstPassenger['first_name'] . ' ' . $firstPassenger['last_name'];
-                    }
-                }
-
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(
-                    new \App\Mail\FlightBookingConfirmation($booking, $booking->flightBooking, $passengerName)
-                );
-
-                return back()->with('success', 'Le reçu a été renvoyé avec succès à ' . $user->email);
-            } catch (\Exception $e) {
-                return back()->with('error', 'Erreur lors de l\'envoi du reçu : ' . $e->getMessage());
-            }
+        if (blank($booking->invoice_pdf_path) || !Storage::disk('public')->exists($booking->invoice_pdf_path)) {
+            $updates['invoice_pdf_path'] = $documents->generateInvoice($booking);
+            $booking->invoice_pdf_path = $updates['invoice_pdf_path'];
         }
 
-        return back()->with('error', 'Type de réservation non supporté pour le renvoi de reçu.');
+        if (blank($booking->receipt_pdf_path) || !Storage::disk('public')->exists($booking->receipt_pdf_path)) {
+            $updates['receipt_pdf_path'] = $documents->generatePaymentReceipt($booking);
+            $booking->receipt_pdf_path = $updates['receipt_pdf_path'];
+        }
+
+        if ($updates !== []) {
+            $updates['documents_generated_at'] = now();
+            $booking->update($updates);
+            $booking->refresh();
+        }
+
+        return $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
     }
 
     /**

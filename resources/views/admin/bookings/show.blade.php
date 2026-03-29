@@ -5,33 +5,34 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+    <div class="admin-page-header mb-6">
         <div>
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-1">Réservation #{{ $booking->booking_number }}</h2>
+            <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Réservation</p>
+            <h2 class="mt-2 text-3xl font-extrabold text-gray-900 mb-1">#{{ $booking->booking_number }}</h2>
             <nav aria-label="breadcrumb">
                 <ol class="flex text-sm text-gray-500 space-x-2">
-                    <li><a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600">Dashboard</a></li>
+                    <li><a href="{{ route('admin.dashboard') }}" class="hover:text-purple-600">Dashboard</a></li>
                     <li class="text-gray-400">/</li>
-                    <li><a href="{{ route('admin.bookings.index') }}" class="hover:text-blue-600">Réservations</a></li>
+                    <li><a href="{{ route('admin.bookings.index') }}" class="hover:text-purple-600">Réservations</a></li>
                     <li class="text-gray-400">/</li>
                     <li class="text-gray-700 font-semibold">{{ $booking->booking_number }}</li>
                 </ol>
             </nav>
         </div>
-        <a href="{{ route('admin.bookings.index') }}" class="mt-4 sm:mt-0 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition duration-150">
+        <a href="{{ route('admin.bookings.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
             <i class="fas fa-arrow-left mr-2"></i> Retour
         </a>
     </div>
 
     @if(session('success'))
         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg shadow-sm" role="alert">
-            <i class="fas fa-check-circle mr-2"></i> **Succès :** {{ session('success') }}
+            <i class="fas fa-check-circle mr-2"></i> <strong>Succès :</strong> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg shadow-sm" role="alert">
-            <i class="fas fa-exclamation-circle mr-2"></i> **Erreur :** {{ session('error') }}
+            <i class="fas fa-exclamation-circle mr-2"></i> <strong>Erreur :</strong> {{ session('error') }}
         </div>
     @endif
 
@@ -39,9 +40,9 @@
         
         <div class="lg:col-span-8 space-y-6">
             
-            <div class="bg-white rounded-xl shadow-lg">
+            <div class="admin-panel">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-blue-600">Informations générales</h3>
+                    <h3 class="text-lg font-bold text-purple-700">Informations générales</h3>
                     @switch($booking->booking_type)
                         @case('flight')
                             <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
@@ -111,9 +112,9 @@
             </div>
 
             @if($booking->booking_type === 'flight' && isset($additionalData['flight_details']))
-                <div class="bg-white rounded-xl shadow-lg">
+                <div class="admin-panel">
                     <div class="p-5 border-b border-gray-100">
-                        <h3 class="text-lg font-bold text-blue-600">Détails du vol</h3>
+                        <h3 class="text-lg font-bold text-purple-700">Détails du vol</h3>
                     </div>
                     <div class="p-5">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -191,9 +192,9 @@
             @endif
 
             @if($booking->passenger_details && count($booking->passenger_details) > 0)
-                <div class="bg-white rounded-xl shadow-lg">
+                <div class="admin-panel">
                     <div class="p-5 border-b border-gray-100">
-                        <h3 class="text-lg font-bold text-blue-600">Passagers</h3>
+                        <h3 class="text-lg font-bold text-purple-700">Passagers</h3>
                     </div>
                     <div class="p-5">
                         <div class="overflow-x-auto">
@@ -235,9 +236,9 @@
             @endif
 
             @if($booking->payments && count($booking->payments) > 0)
-                <div class="bg-white rounded-xl shadow-lg">
+                <div class="admin-panel">
                     <div class="p-5 border-b border-gray-100">
-                        <h3 class="text-lg font-bold text-blue-600">Historique des paiements</h3>
+                        <h3 class="text-lg font-bold text-purple-700">Historique des paiements</h3>
                     </div>
                     <div class="p-5">
                         <div class="overflow-x-auto">

@@ -3,18 +3,18 @@
 @section('title', 'Gestion des Utilisateurs')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+<div class="mx-auto max-w-7xl space-y-8">
+    <section class="admin-page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Utilisateurs</h1>
-            <p class="text-gray-600 mt-2">Gérez tous les utilisateurs de la plateforme</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Communauté</p>
+            <h1 class="mt-2 text-3xl font-bold text-gray-900">Utilisateurs</h1>
+            <p class="mt-3 text-gray-600">Gestion des profils, statuts et points de fidélité sur toute la plateforme.</p>
         </div>
-        <button onclick="openAddModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors">
+        <button onclick="openAddModal()" class="admin-btn-primary px-6 py-3 text-sm">
             <i class="fas fa-plus"></i>
             Ajouter un utilisateur
         </button>
-    </div>
+    </section>
 
     <!-- Messages de succès/erreur -->
     @if(session('success'))
@@ -30,47 +30,47 @@
     @endif
 
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-gradient-to-br from-blue-900 to-blue-600 rounded-lg p-6 text-white">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="admin-kpi p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-blue-400 text-sm">Total Utilisateurs</p>
-                    <p class="text-3xl font-bold mt-2">{{ $stats['total'] ?? 0 }}</p>
+                    <p class="text-sm font-semibold uppercase tracking-[0.16em] text-purple-600">Total Utilisateurs</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900">{{ $stats['total'] ?? 0 }}</p>
                 </div>
-                <i class="fas fa-users text-4xl text-blue-400"></i>
+                <i class="fas fa-users text-4xl text-purple-300"></i>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-green-900 to-green-600 rounded-lg p-6 text-white">
+        <div class="admin-kpi p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-green-100 text-sm">Actifs</p>
-                    <p class="text-3xl font-bold mt-2">{{ $stats['active'] ?? 0 }}</p>
+                    <p class="text-sm font-semibold uppercase tracking-[0.16em] text-green-600">Actifs</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900">{{ $stats['active'] ?? 0 }}</p>
                 </div>
-                <i class="fas fa-user-check text-4xl text-green-200"></i>
+                <i class="fas fa-user-check text-4xl text-green-300"></i>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-yellow-900 to-yellow-600 rounded-lg p-6 text-white">
+        <div class="admin-kpi admin-kpi-accent p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-yellow-100 text-sm">Nouveaux (30j)</p>
-                    <p class="text-3xl font-bold mt-2">{{ $stats['new'] ?? 0 }}</p>
+                    <p class="text-sm font-semibold uppercase tracking-[0.16em] text-amber-700">Nouveaux (30j)</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900">{{ $stats['new'] ?? 0 }}</p>
                 </div>
-                <i class="fas fa-user-plus text-4xl text-yellow-200"></i>
+                <i class="fas fa-user-plus text-4xl text-amber-300"></i>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-purple-900 to-purple-600 rounded-lg p-6 text-white">
+        <div class="admin-kpi p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-purple-100 text-sm">Points Fidélité</p>
-                    <p class="text-3xl font-bold mt-2">{{ number_format($stats['total_points'] ?? 0) }}</p>
+                    <p class="text-sm font-semibold uppercase tracking-[0.16em] text-purple-600">Points Fidélité</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900">{{ number_format($stats['total_points'] ?? 0) }}</p>
                 </div>
-                <i class="fas fa-star text-4xl text-purple-200"></i>
+                <i class="fas fa-star text-4xl text-purple-300"></i>
             </div>
         </div>
     </div>
 
     <!-- Filtres et Recherche -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="admin-panel p-6">
         <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
@@ -98,10 +98,10 @@
                 </select>
             </div>
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <button type="submit" class="flex-1 rounded-full bg-purple-600 px-4 py-2.5 text-white transition-colors hover:bg-purple-700">
                     <i class="fas fa-filter mr-2"></i>Filtrer
                 </button>
-                <a href="{{ route('admin.users.index') }}" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors text-center">
+                <a href="{{ route('admin.users.index') }}" class="flex-1 rounded-full border border-[#ddcfbb] bg-white px-4 py-2.5 text-center text-gray-700 transition-colors hover:bg-[#faf6f0]">
                     <i class="fas fa-redo mr-2"></i>Réinitialiser
                 </a>
             </div>
@@ -109,7 +109,7 @@
     </div>
 
     <!-- Table des utilisateurs -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="admin-panel overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">

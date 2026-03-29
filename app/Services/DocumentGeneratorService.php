@@ -218,8 +218,23 @@ class DocumentGeneratorService
      */
     public function generatePaymentReceipt($booking)
     {
+        $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
+
         $user = $booking->user;
         $payment = $booking->payments()->latest()->first();
+        $receiptNumber = $booking->receipt_number ?: $this->makeReceiptNumber($booking);
 
         // Calculer les détails de prix
         $breakdown = [
@@ -235,7 +250,10 @@ class DocumentGeneratorService
             'user' => $user,
             'payment' => $payment,
             'breakdown' => $breakdown,
-            'receipt_number' => 'REC-' . $booking->booking_number,
+            'receipt_number' => $receiptNumber,
+            'customer_name' => $this->customerName($booking),
+            'customer_email' => $this->customerEmail($booking),
+            'customer_phone' => $this->customerPhone($booking),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
             'company' => [
                 'name' => 'Carré Premium',
@@ -252,9 +270,9 @@ class DocumentGeneratorService
         $pdf->setPaper('a4', 'portrait');
         
         // Sauvegarder le PDF
-        $filename = 'receipts/receipt_' . $booking->booking_number . '_' . time() . '.pdf';
-        $pdfPath = storage_path('app/public/' . $filename);
-        $pdf->save($pdfPath);
+        Storage::disk('public')->makeDirectory('receipts');
+        $filename = 'receipts/receipt_' . strtolower($receiptNumber) . '_' . time() . '.pdf';
+        $pdf->save(storage_path('app/public/' . $filename));
 
         return $filename;
     }
@@ -267,11 +285,25 @@ class DocumentGeneratorService
      */
     public function generateInvoice($booking)
     {
+        $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
+
         $user = $booking->user;
         $payment = $booking->payments()->latest()->first();
 
         // Numéro de facture
-        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT);
+        $invoiceNumber = $booking->invoice_number ?: $this->makeInvoiceNumber($booking);
 
         // Données pour le template
         $data = [
@@ -279,6 +311,9 @@ class DocumentGeneratorService
             'user' => $user,
             'payment' => $payment,
             'invoice_number' => $invoiceNumber,
+            'customer_name' => $this->customerName($booking),
+            'customer_email' => $this->customerEmail($booking),
+            'customer_phone' => $this->customerPhone($booking),
             'invoice_date' => Carbon::now()->format('d/m/Y'),
             'due_date' => Carbon::now()->addDays(30)->format('d/m/Y'),
             'company' => [
@@ -299,11 +334,21 @@ class DocumentGeneratorService
         $pdf->setPaper('a4', 'portrait');
         
         // Sauvegarder le PDF
-        $filename = 'invoices/invoice_' . $invoiceNumber . '_' . time() . '.pdf';
-        $pdfPath = storage_path('app/public/' . $filename);
-        $pdf->save($pdfPath);
+        Storage::disk('public')->makeDirectory('invoices');
+        $filename = 'invoices/invoice_' . strtolower($invoiceNumber) . '_' . time() . '.pdf';
+        $pdf->save(storage_path('app/public/' . $filename));
 
         return $filename;
+    }
+
+    public function makeReceiptNumber(Booking $booking): string
+    {
+        return 'REC-' . $booking->booking_number;
+    }
+
+    public function makeInvoiceNumber(Booking $booking): string
+    {
+        return 'INV-' . date('Y') . '-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -430,6 +475,21 @@ class DocumentGeneratorService
         $pdf->setPaper('a4', 'portrait');
         
         return $pdf;
+    }
+
+    protected function customerName(Booking $booking): string
+    {
+        return app(BookingAccessService::class)->contactName($booking);
+    }
+
+    protected function customerEmail(Booking $booking): ?string
+    {
+        return app(BookingAccessService::class)->contactEmail($booking);
+    }
+
+    protected function customerPhone(Booking $booking): ?string
+    {
+        return $booking->customer_phone;
     }
 
     /**

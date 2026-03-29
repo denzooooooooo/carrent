@@ -94,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-2xl font-bold">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($booking->total_amount)) }}</div>
+                                        <div class="text-2xl font-bold">{{ \App\Helpers\CurrencyHelper::format(\App\Helpers\CurrencyHelper::convert($booking->final_amount)) }}</div>
                                         <div class="text-sm text-purple-100">{{ $booking->created_at->format('d/m/Y') }}</div>
                                     </div>
                                 </div>
@@ -178,11 +178,24 @@
                                                 @elseif($booking->booking_type === 'flight')
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Vol:</span>
-                                                        <span class="font-medium">{{ $booking->flight->flight_number ?? 'N/A' }}</span>
+                                                        <span class="font-medium">{{ $booking->flightBooking->flight_number ?? $booking->flight->flight_number ?? 'N/A' }}</span>
                                                     </div>
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Départ:</span>
-                                                        <span class="font-medium">{{ $booking->flight->departure_date ?? 'N/A' }}</span>
+                                                        <span class="font-medium">{{ $booking->travel_date_label ?? 'N/A' }}</span>
+                                                    </div>
+                                                @elseif($booking->booking_type === 'location')
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-600">Location:</span>
+                                                        <span class="font-medium">{{ $booking->location->name ?? 'N/A' }}</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-600">Debut:</span>
+                                                        <span class="font-medium">{{ optional($booking->locationBooking->start_date)->format('d/m/Y') ?? 'N/A' }}</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-600">Fin:</span>
+                                                        <span class="font-medium">{{ optional($booking->locationBooking->end_date)->format('d/m/Y') ?? 'N/A' }}</span>
                                                     </div>
                                                 @endif
                                             </div>
@@ -211,21 +224,27 @@
                                                     </a>
                                                 @endif
                                                 @if($booking->status === 'confirmed' && $booking->payment_status === 'paid')
-                                                    @if(isset($booking->ticket_available) && $booking->ticket_available)
-                                                        <a href="{{ route('user.booking.download', $booking) }}" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                    <a href="{{ route('user.booking.documents.download', ['booking' => $booking, 'documentType' => 'invoice']) }}" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <span>Télécharger la facture</span>
+                                                    </a>
+                                                    <a href="{{ route('user.booking.documents.download', ['booking' => $booking, 'documentType' => 'receipt']) }}" class="w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <span>Télécharger le reçu</span>
+                                                    </a>
+                                                    <form action="{{ route('user.booking.resend-documents', $booking) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8m-2 8H5a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2z"></path>
                                                             </svg>
-                                                            <span>Télécharger le billet</span>
-                                                        </a>
-                                                    @else
-                                                        <div class="w-full px-4 py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white text-sm font-bold rounded-xl flex items-center justify-center space-x-2">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                            </svg>
-                                                            <span>En attente du billet</span>
-                                                        </div>
-                                                    @endif
+                                                            <span>Recevoir les documents par email</span>
+                                                        </button>
+                                                    </form>
                                                 @endif
                                                 @if(in_array($booking->status, ['confirmed', 'pending']))
                                                     <button onclick="cancelBooking({{ $booking->id }}, '{{ $booking->booking_number }}')" class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">

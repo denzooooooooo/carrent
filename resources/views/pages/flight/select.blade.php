@@ -29,7 +29,7 @@
                 </svg>
                 <h2 class="text-xl font-bold text-red-800 mb-2">{{ __('Session Expired') }}</h2>
                 <p class="text-red-600 mb-4">{{ __('Your flight selection has expired. Please search again.') }}</p>
-                <a href="{{ route('flights') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">
+                <a href="{{ route('flights.index') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">
                     {{ __('New Search') }}
                 </a>
             </div>
@@ -348,4 +348,3 @@ document.getElementById('passengerForm').addEventListener('submit', function(e) 
 });
 </script>
 @endsection
-

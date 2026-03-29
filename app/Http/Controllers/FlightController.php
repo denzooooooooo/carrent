@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\FlightBooking;
 use App\Services\DuffelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 /**
  * FlightController - Gestion complète des réservations de vols avec Duffel
@@ -38,9 +35,7 @@ class FlightController extends Controller
      */
     public function index()
     {
-        $duffelConfigured = $this->duffelService->isConfigured();
-        
-        return view('pages.flight.index', compact('duffelConfigured'));
+        return view('pages.flight.index');
     }
 
     /**
@@ -58,62 +53,7 @@ class FlightController extends Controller
      */
     public function search(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'departure_id' => 'required|string|size:3',
-                'arrival_id' => 'required|string|size:3',
-                'outbound_date' => 'required|date|after_or_equal:today',
-                'return_date' => 'nullable|date|after:outbound_date',
-                'adults' => 'nullable|integer|min:1|max:9',
-                'children' => 'nullable|integer|min:0|max:8',
-                'infants' => 'nullable|integer|min:0|max:4',
-                'travel_class' => 'nullable|string|in:economy,business,first',
-            ]);
-
-            Log::info('🔍 Flight Search Request', $validated);
-
-            // Appel API Duffel
-            $result = $this->duffelService->searchFlights(
-                strtoupper($validated['departure_id']),
-                strtoupper($validated['arrival_id']),
-                $validated['outbound_date'],
-                $validated['return_date'] ?? null,
-                [
-                    'adults' => $validated['adults'] ?? 1,
-                    'children' => $validated['children'] ?? 0,
-                    'infants' => $validated['infants'] ?? 0,
-                    'cabin_class' => $validated['travel_class'] ?? 'economy',
-                ]
-            );
-
-            if (!$result['success'] || empty($result['flights'])) {
-                return redirect()->route('flights.index')->with('error', 'Aucun vol trouvé pour cette recherche. Veuillez essayer d\'autres dates ou destinations.');
-            }
-
-            // Stocker la recherche en session
-            Session::put('flight_search', [
-                'departure_id' => strtoupper($validated['departure_id']),
-                'arrival_id' => strtoupper($validated['arrival_id']),
-                'outbound_date' => $validated['outbound_date'],
-                'return_date' => $validated['return_date'] ?? null,
-                'adults' => $validated['adults'] ?? 1,
-                'children' => $validated['children'] ?? 0,
-                'infants' => $validated['infants'] ?? 0,
-                'travel_class' => $validated['travel_class'] ?? 'economy',
-                'offer_request_id' => $result['offer_request_id'],
-            ]);
-
-            // Rediriger vers la page de résultats
-            return redirect()->route('flights.results');
-
-        } catch (\Exception $e) {
-            Log::error('❌ Flight Search Error', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            
-            return back()->with('error', 'Erreur lors de la recherche: ' . $e->getMessage())->withInput();
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -121,33 +61,7 @@ class FlightController extends Controller
      */
     public function results()
     {
-        $search = Session::get('flight_search');
-        
-        if (!$search || !isset($search['offer_request_id'])) {
-            return redirect()->route('flights.index')->with('error', 'Veuillez effectuer une nouvelle recherche.');
-        }
-
-        try {
-            // Récupérer les offres depuis Duffel
-            $flights = $this->duffelService->getOffers($search['offer_request_id']);
-
-            if (empty($flights)) {
-                return redirect()->route('flights.index')->with('error', 'Aucun vol disponible pour cette recherche.');
-            }
-
-            // Taux de change pour affichage
-            $exchangeRate = config('services.duffel.exchange_rate', 655.957);
-
-            return view('pages.flight.results', [
-                'flights' => $flights,
-                'search' => $search,
-                'exchange_rate' => $exchangeRate,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('❌ Error fetching results', ['error' => $e->getMessage()]);
-            return redirect()->route('flights.index')->with('error', 'Erreur lors de la récupération des résultats.');
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -155,34 +69,7 @@ class FlightController extends Controller
      */
     public function details(string $offerId)
     {
-        try {
-            $offer = $this->duffelService->getOffer($offerId);
-            
-            if (!$offer) {
-                return redirect()->route('flights.index')->with('error', 'Offre non trouvée ou expirée.');
-            }
-
-            $search = Session::get('flight_search', []);
-            $exchangeRate = config('services.duffel.exchange_rate', 655.957);
-
-            // Formater l'offre pour l'affichage
-            $formattedOffer = $this->formatOfferForDisplay($offer);
-
-            return view('pages.flight.details', [
-                'offer' => $formattedOffer,
-                'offer_id' => $offerId,
-                'search' => $search,
-                'exchange_rate' => $exchangeRate,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('❌ Error fetching offer details', [
-                'offer_id' => $offerId,
-                'error' => $e->getMessage(),
-            ]);
-            
-            return redirect()->route('flights.results')->with('error', 'Impossible de charger les détails de ce vol.');
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -190,36 +77,7 @@ class FlightController extends Controller
      */
     public function passengers(string $offerId)
     {
-        try {
-            $offer = $this->duffelService->getOffer($offerId);
-            
-            if (!$offer) {
-                return redirect()->route('flights.index')->with('error', 'Offre expirée. Veuillez refaire une recherche.');
-            }
-
-            $search = Session::get('flight_search', []);
-            $totalPassengers = ($search['adults'] ?? 1) + ($search['children'] ?? 0) + ($search['infants'] ?? 0);
-
-            // Stocker l'offre sélectionnée
-            Session::put('selected_offer', [
-                'offer_id' => $offerId,
-                'offer_data' => $offer,
-            ]);
-
-            return view('pages.flight.passengers', [
-                'offer' => $offer,
-                'offer_id' => $offerId,
-                'search' => $search,
-                'total_passengers' => $totalPassengers,
-                'adults' => $search['adults'] ?? 1,
-                'children' => $search['children'] ?? 0,
-                'infants' => $search['infants'] ?? 0,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('❌ Error loading passengers form', ['error' => $e->getMessage()]);
-            return redirect()->route('flights.results')->with('error', 'Erreur lors du chargement du formulaire.');
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -227,56 +85,7 @@ class FlightController extends Controller
      */
     public function review(Request $request)
     {
-        try {
-            // Validation des passagers
-            $validated = $request->validate([
-                'passengers' => 'required|array|min:1',
-                'passengers.*.type' => 'required|in:adult,child,infant',
-                'passengers.*.title' => 'required|in:mr,mrs,miss,dr',
-                'passengers.*.first_name' => 'required|string|max:100',
-                'passengers.*.last_name' => 'required|string|max:100',
-                'passengers.*.born_on' => 'required|date|before:today',
-                'passengers.*.gender' => 'required|in:m,f',
-                'passengers.*.email' => 'nullable|email',
-                'passengers.*.phone' => 'nullable|string',
-                'passengers.*.nationality' => 'required|string|size:2',
-                'passengers.*.identity_document_type' => 'required|in:passport,visa,national_id',
-                'passengers.*.identity_document_number' => 'required|string|max:50',
-                'passengers.*.identity_document_expiry' => 'required|date|after:today',
-                'passengers.*.identity_document_issuing_country' => 'required|string|size:2',
-            ]);
-
-            $selectedOffer = Session::get('selected_offer');
-            
-            if (!$selectedOffer) {
-                return redirect()->route('flights.index')->with('error', 'Session expirée. Veuillez refaire une recherche.');
-            }
-
-            // Stocker les passagers
-            Session::put('flight_passengers', $validated['passengers']);
-
-            $offer = $selectedOffer['offer_data'];
-            $search = Session::get('flight_search', []);
-            $exchangeRate = config('services.duffel.exchange_rate', 655.957);
-
-            $priceEur = (float) ($offer['total_amount'] ?? 0);
-            $priceXof = $priceEur * $exchangeRate;
-
-            return view('pages.flight.review', [
-                'offer' => $offer,
-                'passengers' => $validated['passengers'],
-                'search' => $search,
-                'price_eur' => $priceEur,
-                'price_xof' => $priceXof,
-                'exchange_rate' => $exchangeRate,
-            ]);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors($e->errors())->withInput();
-        } catch (\Exception $e) {
-            Log::error('❌ Review Error', ['error' => $e->getMessage()]);
-            return back()->with('error', 'Erreur lors de la validation: ' . $e->getMessage())->withInput();
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -284,82 +93,7 @@ class FlightController extends Controller
      */
     public function processPayment(Request $request)
     {
-        try {
-            $selectedOffer = Session::get('selected_offer');
-            $passengers = Session::get('flight_passengers');
-            $search = Session::get('flight_search');
-
-            if (!$selectedOffer || !$passengers) {
-                return redirect()->route('flights.index')->with('error', 'Session expirée. Veuillez recommencer.');
-            }
-
-            $offer = $selectedOffer['offer_data'];
-            $exchangeRate = config('services.duffel.exchange_rate', 655.957);
-            
-            $priceEur = (float) ($offer['total_amount'] ?? 0);
-            $priceXof = round($priceEur * $exchangeRate, 0);
-
-            // Créer le numéro de réservation
-            $bookingNumber = 'FL-' . strtoupper(Str::random(8));
-
-            // Créer le Booking
-            $booking = Booking::create([
-                'booking_number' => $bookingNumber,
-                'booking_type' => 'flight',
-                'status' => 'pending',
-                'payment_status' => 'pending',
-                'currency' => 'XOF',
-                'total_amount' => $priceXof,
-                'final_amount' => $priceXof,
-                'user_id' => Auth::id(),
-                'passenger_details' => $passengers,
-            ]);
-
-            // Créer le FlightBooking
-            $firstSlice = $offer['slices'][0] ?? [];
-            $slices = $offer['slices'];
-            $lastSlice = end($slices);
-            $firstSegment = $firstSlice['segments'][0] ?? [];
-            $segments = $lastSlice['segments'] ?? [];
-            $lastSegment = end($segments);
-
-            FlightBooking::create([
-                'booking_id' => $booking->id,
-                'flight_number' => ($firstSegment['marketing_carrier']['iata_code'] ?? 'XX') . ($firstSegment['marketing_carrier_flight_number'] ?? ''),
-                'airline' => $firstSegment['marketing_carrier']['name'] ?? 'Unknown',
-                'departure_airport' => $firstSlice['origin']['iata_code'] ?? '',
-                'arrival_airport' => $lastSlice['destination']['iata_code'] ?? '',
-                'departure_time' => $firstSegment['departing_at'] ?? now(),
-                'arrival_time' => $lastSegment['arriving_at'] ?? now(),
-                'departure_date' => $firstSegment['departing_at'] ?? now(),
-                'cabin_class' => strtoupper($offer['cabin_class'] ?? 'ECONOMY'),
-                'duffel_offer_id' => $selectedOffer['offer_id'],
-                'base_price' => $priceXof,
-                'total_price' => $priceXof,
-                'passengers_count' => count($passengers),
-                'adults_count' => $search['adults'] ?? 1,
-                'children_count' => $search['children'] ?? 0,
-                'infants_count' => $search['infants'] ?? 0,
-            ]);
-
-            Log::info('✅ Booking created', [
-                'booking_id' => $booking->id,
-                'booking_number' => $bookingNumber,
-            ]);
-
-            // Rediriger vers le paiement CinetPay
-            return redirect()->route('payment.cinetpay.process', [
-                'booking' => $booking->id,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('❌ Process Payment Error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            
-            return back()->with('error', 'Erreur lors de la création de la réservation: ' . $e->getMessage());
-        }
+        return $this->redirectToFlightConcierge();
     }
 
     /**
@@ -490,5 +224,12 @@ class FlightController extends Controller
         }
 
         return $formatted;
+    }
+
+    protected function redirectToFlightConcierge()
+    {
+        return redirect()
+            ->route('flights.index')
+            ->with('info', 'La réservation de vols se fait désormais avec notre service client. Contactez un conseiller pour recevoir des options adaptées et finaliser votre demande.');
     }
 }

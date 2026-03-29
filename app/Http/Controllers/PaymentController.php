@@ -4,29 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\FlightBooking;
+use App\Services\BookingAccessService;
 use App\Services\CinetPayService;
+use App\Services\DocumentGeneratorService;
 use App\Services\DuffelService;
 use App\Services\PaymentSplitService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
     protected $cinetpayService;
     protected $duffelService;
     protected $paymentSplitService;
+    protected $documentGeneratorService;
+    protected $bookingAccessService;
 
     public function __construct(
         CinetPayService $cinetpayService,
         DuffelService $duffelService,
-        PaymentSplitService $paymentSplitService
+        PaymentSplitService $paymentSplitService,
+        DocumentGeneratorService $documentGeneratorService,
+        BookingAccessService $bookingAccessService
     ) {
         $this->cinetpayService = $cinetpayService;
         $this->duffelService = $duffelService;
         $this->paymentSplitService = $paymentSplitService;
+        $this->documentGeneratorService = $documentGeneratorService;
+        $this->bookingAccessService = $bookingAccessService;
     }
 
     /**
@@ -274,6 +284,7 @@ class PaymentController extends Controller
     {
         try {
             $transactionId = $request->query('transaction_id') ?? $booking->payment_transaction_id;
+            $wasAlreadyPaid = $booking->payment_status === 'paid';
 
             if (!$transactionId) {
                 return redirect()->route('payment.checkout', $booking)
@@ -345,12 +356,16 @@ class PaymentController extends Controller
                 // Nettoyer la session
                 Session::forget(['flight_search', 'selected_offer', 'flight_passengers']);
 
-                // Envoyer l'email de confirmation
-                $this->sendConfirmationEmail($booking);
+                $booking = $this->ensureBillingDocuments($booking);
+
+                if (!$wasAlreadyPaid) {
+                    $this->sendConfirmationEmail($booking);
+                }
 
                 Log::info('Paiement confirmé', [
                     'booking_id' => $booking->id,
                     'booking_type' => $booking->booking_type,
+                    'already_paid' => $wasAlreadyPaid,
                 ]);
 
                 // Rediriger selon le type de réservation
@@ -462,6 +477,7 @@ class PaymentController extends Controller
                     ]);
                 }
 
+                $booking = $this->ensureBillingDocuments($booking);
                 $this->sendConfirmationEmail($booking);
 
                 Log::info('Webhook: Paiement confirmé', ['booking_id' => $booking->id, 'type' => $booking->booking_type]);
@@ -553,11 +569,14 @@ class PaymentController extends Controller
                 ['transaction_id' => $transactionId],
                 [
                     'booking_id' => $booking->id,
+                    'user_id' => $booking->user_id,
                     'amount' => $booking->final_amount,
                     'currency' => $booking->currency,
-                    'payment_method' => 'cinetpay',
+                    'payment_method' => 'mobile_money',
+                    'payment_provider' => 'cinetpay',
                     'status' => 'completed',
                     'payment_date' => now(),
+                    'payment_details' => $status,
                 ]
             );
         } catch (\Exception $e) {
@@ -570,13 +589,9 @@ class PaymentController extends Controller
      */
     protected function getCustomerEmail(Booking $booking)
     {
-        if (!empty($booking->passenger_details[0]['email'])) {
-            return $booking->passenger_details[0]['email'];
-        }
-        if (Auth::check()) {
-            return Auth::user()->email;
-        }
-        return 'customer@carrepremium.ci';
+        return $this->bookingAccessService->contactEmail($booking)
+            ?? (Auth::check() ? Auth::user()->email : null)
+            ?? 'customer@carrepremium.ci';
     }
 
     /**
@@ -584,13 +599,7 @@ class PaymentController extends Controller
      */
     protected function getCustomerName(Booking $booking)
     {
-        if (!empty($booking->passenger_details[0]['first_name'])) {
-            return $booking->passenger_details[0]['first_name'] . ' ' . ($booking->passenger_details[0]['last_name'] ?? '');
-        }
-        if (Auth::check() && Auth::user()->first_name) {
-            return Auth::user()->first_name . ' ' . (Auth::user()->last_name ?? '');
-        }
-        return 'Client Carré Premium';
+        return $this->bookingAccessService->contactName($booking);
     }
 
     /**
@@ -598,13 +607,9 @@ class PaymentController extends Controller
      */
     protected function getCustomerPhone(Booking $booking)
     {
-        if (!empty($booking->passenger_details[0]['phone'])) {
-            return $booking->passenger_details[0]['phone'];
-        }
-        if (Auth::check()) {
-            return Auth::user()->phone ?? '';
-        }
-        return '';
+        return $booking->customer_phone
+            ?? (Auth::check() ? Auth::user()->phone : null)
+            ?? '';
     }
 
     /**
@@ -613,52 +618,93 @@ class PaymentController extends Controller
     protected function sendConfirmationEmail(Booking $booking)
     {
         try {
+            $booking = $this->ensureBillingDocuments($booking);
             $email = $this->getCustomerEmail($booking);
 
-            if ($booking->booking_type === 'flight' && $booking->flightBooking) {
+            if ($booking->booking_type === 'flight' && $booking->flightBooking && !empty($booking->flightBooking->duffel_order_id)) {
                 // Si on a un order Duffel, envoyer les billets
-                if (!empty($booking->flightBooking->duffel_order_id)) {
-                    $duffelOrder = $this->duffelService->getOrderStatus($booking->flightBooking->duffel_order_id);
-                    
-                    if ($duffelOrder) {
-                        // Envoyer l'email avec les billets Duffel
-                        \Illuminate\Support\Facades\Mail::to($email)
-                            ->send(new \App\Mail\FlightTicketsMail($booking, $booking->flightBooking, $duffelOrder));
-                        
-                        Log::info('✅ Email avec billets Duffel envoyé', [
-                            'booking_id' => $booking->id,
-                            'email' => $email,
-                            'duffel_order_id' => $booking->flightBooking->duffel_order_id,
-                        ]);
-                        return;
-                    }
+                $duffelOrder = $this->duffelService->getOrderStatus($booking->flightBooking->duffel_order_id);
+
+                if ($duffelOrder) {
+                    Mail::to($email)
+                        ->send(new \App\Mail\FlightTicketsMail($booking, $booking->flightBooking, $duffelOrder));
+
+                    Log::info('✅ Email avec billets Duffel envoyé', [
+                        'booking_id' => $booking->id,
+                        'email' => $email,
+                        'duffel_order_id' => $booking->flightBooking->duffel_order_id,
+                    ]);
                 }
-                
-                // Sinon, envoyer l'email de confirmation standard
-                \Illuminate\Support\Facades\Mail::to($email)
-                    ->send(new \App\Mail\FlightBookingConfirmation($booking->flightBooking));
-                return;
             }  
 
-            // Pour les réservations non-vol (location/event/package), on envoie un reçu générique
-            if (in_array($booking->booking_type, ['location', 'event', 'package'])) {
-                \Illuminate\Support\Facades\Mail::raw(
-                    "Bonjour,\n\nVotre paiement a été validé.\n\nRéférence: {$booking->booking_number}\nType: {$booking->booking_type}\nMontant: {$booking->final_amount} {$booking->currency}\n\nMerci pour votre confiance.\nCarré Premium",
-                    function ($message) use ($email, $booking) {
-                        $message->to($email)
-                            ->subject("Paiement confirmé - {$booking->booking_number}");
-                    }
-                );
+            Mail::to($email)->send(new \App\Mail\BookingPaymentDocumentsMail($booking));
 
-                Log::info('✅ Email de confirmation envoyé', [
-                    'booking_id' => $booking->id,
-                    'booking_type' => $booking->booking_type,
-                    'email' => $email,
-                ]);
-            }
+            Log::info('✅ Email de documents de paiement envoyé', [
+                'booking_id' => $booking->id,
+                'booking_type' => $booking->booking_type,
+                'email' => $email,
+            ]);
         } catch (\Exception $e) {
             Log::error('Erreur envoi email:', ['message' => $e->getMessage()]);
         }
     }
-}
 
+    protected function ensureBillingDocuments(Booking $booking): Booking
+    {
+        $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
+
+        $updates = [];
+
+        if (blank($booking->invoice_number)) {
+            $booking->invoice_number = $this->documentGeneratorService->makeInvoiceNumber($booking);
+            $updates['invoice_number'] = $booking->invoice_number;
+        }
+
+        if (blank($booking->receipt_number)) {
+            $booking->receipt_number = $this->documentGeneratorService->makeReceiptNumber($booking);
+            $updates['receipt_number'] = $booking->receipt_number;
+        }
+
+        if (blank($booking->invoice_pdf_path) || !Storage::disk('public')->exists($booking->invoice_pdf_path)) {
+            $updates['invoice_pdf_path'] = $this->documentGeneratorService->generateInvoice($booking);
+            $booking->invoice_pdf_path = $updates['invoice_pdf_path'];
+        }
+
+        if (blank($booking->receipt_pdf_path) || !Storage::disk('public')->exists($booking->receipt_pdf_path)) {
+            $updates['receipt_pdf_path'] = $this->documentGeneratorService->generatePaymentReceipt($booking);
+            $booking->receipt_pdf_path = $updates['receipt_pdf_path'];
+        }
+
+        if ($updates !== []) {
+            $updates['documents_generated_at'] = now();
+            $booking->update($updates);
+            $booking->refresh();
+        }
+
+        return $booking->loadMissing([
+            'user',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.event',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+            'flightBooking',
+            'payment',
+            'payments',
+        ]);
+    }
+}
