@@ -55,7 +55,7 @@
                             {{ $t('Un seul point d’entrée pour poser une question, débloquer un paiement ou demander du sur-mesure.', 'One clear entry point to ask a question, unblock a payment or request something bespoke.') }}
                         </h1>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
-                            {{ $t('Le support doit être simple à trouver et simple à utiliser. Cette page regroupe les bons canaux, un formulaire utile et les contacts directs de l’équipe.', 'Support should be easy to find and easy to use. This page gathers the right channels, a useful form and the team’s direct contacts.') }}
+                            {{ $t('Réservation VIP, demande corporate, besoin urgent ou voyage sur mesure: choisissez le canal qui vous convient et l’équipe Carré Premium reprend la main.', 'VIP booking, corporate request, urgent need or bespoke travel: choose the contact channel that suits you and the Carré Premium team takes over.') }}
                         </p>
                     </div>
 

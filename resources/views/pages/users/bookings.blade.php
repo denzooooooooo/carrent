@@ -29,9 +29,9 @@
                                     <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
                                     <span>{{ $t('Mes réservations', 'My bookings') }}</span>
                                 </div>
-                                <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">{{ $t('Un suivi plus lisible de tous vos dossiers clients.', 'A clearer overview of all your client bookings.') }}</h1>
+                                <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">{{ $t('Toutes vos réservations réunies au même endroit.', 'All your bookings gathered in one place.') }}</h1>
                                 <p class="mt-4 text-sm leading-7 text-white/82 sm:text-base">
-                                    {{ $t('Chaque réservation doit permettre d’identifier immédiatement le service, le statut, le paiement et l’action suivante.', 'Every booking should make the service, status, payment and next action immediately clear.') }}
+                                    {{ $t('Consultez ici le service réservé, le statut du dossier, le paiement et les documents disponibles.', 'Consult the booked service, booking status, payment and available documents here.') }}
                                 </p>
                             </div>
 

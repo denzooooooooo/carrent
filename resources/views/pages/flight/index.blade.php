@@ -57,7 +57,7 @@
         [
             'number' => '03',
             'title' => $t('Un conseiller vous répond', 'An advisor replies'),
-            'text' => $t('Vous recevez une proposition plus claire qu’un tunnel de réservation générique.', 'You receive a proposal that is clearer than a generic booking funnel.'),
+            'text' => $t('Vous recevez une proposition adaptée à votre itinéraire, à votre timing et à votre niveau de confort.', 'You receive an offer tailored to your route, timing and comfort level.'),
         ],
         [
             'number' => '04',
@@ -77,7 +77,7 @@
     $serviceReasons = [
         $t('Mieux adapté aux demandes premium ou urgentes', 'Better suited to premium or urgent requests'),
         $t('Plus simple pour les familles, groupes et besoins spécifiques', 'Simpler for families, groups and special requirements'),
-        $t('Plus cohérent qu’un moteur de recherche partiel', 'More consistent than a partial search engine'),
+        $t('Adapté aux demandes premium et urgentes', 'Built for premium and urgent requests'),
         $t('Permet un suivi direct avec une équipe humaine', 'Allows direct follow-up with a human team'),
     ];
 @endphp
@@ -92,11 +92,11 @@
                 </span>
 
                 <h1 class="mt-5 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
-                    {{ $t('La réservation de vols passe maintenant directement par notre équipe.', 'Flight bookings now go directly through our team.') }}
+                    {{ $t('Vols privés, voyages d’affaires et itinéraires sensibles gérés par notre équipe.', 'Private flights, business travel and sensitive itineraries handled by our team.') }}
                 </h1>
 
                 <p class="mt-4 max-w-3xl text-sm leading-7 text-white/90 sm:text-base md:text-lg">
-                    {{ $t('Nous avons retiré le parcours autonome. Cette page sert désormais à vous mettre rapidement en relation avec le service client pour une demande plus propre, plus fiable et mieux suivie.', 'We removed the self-service flow. This page now exists to connect you quickly with customer service for a cleaner, more reliable and better tracked request.') }}
+                    {{ $t('Confiez votre trajet à un conseiller Carré Premium pour obtenir une proposition adaptée aux horaires, aux passagers et au niveau de confort attendu.', 'Share your itinerary with a Carré Premium advisor to receive a proposal aligned with schedules, passengers and the level of comfort expected.') }}
                 </p>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -110,7 +110,7 @@
                     </a>
                     <a href="{{ route('contact') }}" class="inline-flex items-center justify-center gap-3 rounded-xl border border-white/25 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">
                         <i class="fa-regular fa-envelope"></i>
-                        <span>{{ $t('Ouvrir la page contact', 'Open contact page') }}</span>
+                        <span>{{ $t('Nous écrire', 'Write to us') }}</span>
                     </a>
                 </div>
             </div>
@@ -122,7 +122,7 @@
             <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
                 <aside class="rounded-3xl bg-white p-6 shadow-xl shadow-purple-100/40 ring-1 ring-gray-100">
                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-purple-600">{{ $t('Contacts rapides', 'Quick contacts') }}</p>
-                    <h2 class="mt-3 text-2xl font-black text-gray-900">{{ $t('Choisissez le canal le plus simple pour vous.', 'Choose the easiest contact channel for you.') }}</h2>
+                        <h2 class="mt-3 text-2xl font-black text-gray-900">{{ $t('Choisissez le canal qui convient à votre demande.', 'Choose the contact channel that fits your request.') }}</h2>
 
                     <div class="mt-6 space-y-3">
                         @foreach($contactItems as $item)
@@ -152,14 +152,14 @@
 
                     <div class="mt-6 rounded-2xl bg-purple-50 px-5 py-4">
                         <p class="text-sm font-semibold text-purple-700">
-                            {{ $t('La réservation directe n’est plus affichée ici. La page vol sert à lancer une demande encadrée par le service client.', 'Direct booking is no longer shown here. The flight page now starts a request handled by customer service.') }}
+                            {{ $t('Le conseiller centralise horaires, compagnies, formalités et options premium avant de revenir vers vous.', 'The advisor centralizes schedules, carriers, formalities and premium options before coming back to you.') }}
                         </p>
                     </div>
                 </aside>
 
                 <div class="rounded-3xl bg-white p-6 shadow-xl shadow-gray-100 ring-1 ring-gray-100 md:p-8">
                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-purple-600">{{ $t('Demande de vol', 'Flight request') }}</p>
-                    <h2 class="mt-3 text-2xl font-black text-gray-900 md:text-3xl">{{ $t('Envoyez votre besoin directement depuis cette page.', 'Send your request directly from this page.') }}</h2>
+                    <h2 class="mt-3 text-2xl font-black text-gray-900 md:text-3xl">{{ $t('Décrivez votre trajet et vos attentes.', 'Describe your itinerary and what you expect.') }}</h2>
                     <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
                         {{ $t('Si vous préférez ne pas appeler tout de suite, laissez votre demande ici. Notre équipe reviendra vers vous avec les options adaptées.', 'If you prefer not to call right away, leave your request here. Our team will come back to you with suitable options.') }}
                     </p>
@@ -279,7 +279,7 @@
             <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1.05fr)_360px]">
                 <div class="rounded-3xl bg-white p-6 shadow-lg shadow-gray-100 ring-1 ring-gray-100 md:p-8">
                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-purple-600">{{ $t('Comment ça marche', 'How it works') }}</p>
-                    <h2 class="mt-3 text-2xl font-black text-gray-900 md:text-3xl">{{ $t('Un parcours plus net et plus crédible.', 'A cleaner and more credible flow.') }}</h2>
+                    <h2 class="mt-3 text-2xl font-black text-gray-900 md:text-3xl">{{ $t('Comment votre demande est traitée.', 'How your request is handled.') }}</h2>
 
                     <div class="mt-8 grid gap-4 md:grid-cols-2">
                         @foreach($processSteps as $step)
@@ -310,7 +310,7 @@
                     </div>
 
                     <div class="rounded-3xl border border-purple-200 bg-purple-50 p-6">
-                        <p class="text-xs font-bold uppercase tracking-[0.22em] text-purple-600">{{ $t('Pourquoi ce format', 'Why this format') }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.22em] text-purple-600">{{ $t('Pourquoi choisir ce service', 'Why choose this service') }}</p>
                         <ul class="mt-4 space-y-3">
                             @foreach($serviceReasons as $reason)
                                 <li class="flex items-start gap-3 text-sm leading-7 text-gray-700">

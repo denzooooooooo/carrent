@@ -11,11 +11,11 @@
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
     $updatedAt = '29 mars 2026';
     $sections = [
-        ['title' => $t('1. Objet', '1. Scope'), 'body' => $t('Les présentes conditions encadrent l’utilisation du site, la consultation des offres et les parcours de réservation proposés par Carré Premium.', 'These terms govern the use of the site, the browsing of offers and the booking journeys offered by Carré Premium.')],
+        ['title' => $t('1. Objet', '1. Scope'), 'body' => $t('Les présentes conditions encadrent l’utilisation du site, la consultation des offres et les réservations proposées par Carré Premium.', 'These terms govern the use of the site, the browsing of offers and the bookings offered by Carré Premium.')],
         ['title' => $t('2. Réservations', '2. Bookings'), 'body' => $t('Toute réservation reste soumise à disponibilité, validation des informations transmises et confirmation effective du paiement ou du mode de règlement retenu.', 'Any booking remains subject to availability, validation of the provided information and effective confirmation of payment or the chosen payment method.')],
         ['title' => $t('3. Tarifs et paiements', '3. Pricing and payments'), 'body' => $t('Les prix affichés peuvent dépendre du service, de la devise et du mode de paiement. La réservation n’est considérée comme finalisée qu’après validation du règlement.', 'Displayed prices may depend on the service, currency and payment method. A booking is only considered finalized after payment validation.')],
         ['title' => $t('4. Modifications et annulations', '4. Changes and cancellations'), 'body' => $t('Les possibilités de modification ou d’annulation varient selon le type de service, le fournisseur concerné et l’état d’avancement du dossier.', 'Change and cancellation options vary depending on the service type, the relevant provider and the stage of the booking.')],
-        ['title' => $t('5. Responsabilités', '5. Liability'), 'body' => $t('Carré Premium organise et structure le parcours client mais certaines prestations dépendent de partenaires, fournisseurs ou organisateurs externes.', 'Carré Premium structures the customer journey, but some services depend on external partners, providers or organizers.')],
+        ['title' => $t('5. Responsabilités', '5. Liability'), 'body' => $t('Carré Premium organise la réservation, mais certaines prestations dépendent de partenaires, fournisseurs ou organisateurs externes.', 'Carré Premium organizes the booking, but some services depend on external partners, providers or organizers.')],
         ['title' => $t('6. Données et sécurité', '6. Data and security'), 'body' => $t('L’usage du service implique le traitement de certaines données personnelles et le respect des règles de sécurité décrites dans notre politique de confidentialité.', 'Using the service implies the processing of personal data and compliance with the security rules described in our privacy policy.')],
     ];
 @endphp
@@ -29,7 +29,7 @@
                         <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
                         <span>{{ $t('Conditions générales', 'Terms') }}</span>
                     </div>
-                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Le cadre de réservation doit rester lisible avant, pendant et après l’achat.', 'The booking framework should stay readable before, during and after purchase.') }}</h1>
+                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Les conditions applicables à vos réservations Carré Premium.', 'The terms that apply to your Carré Premium bookings.') }}</h1>
                     <p class="mt-4 text-sm leading-7 text-white/84 sm:text-base">{{ $t('Dernière mise à jour :', 'Last updated:') }} {{ $updatedAt }}</p>
                 </div>
             </div>

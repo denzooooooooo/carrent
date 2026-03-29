@@ -30,7 +30,7 @@
                     </div>
                     <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Créer des partenariats utiles, crédibles et directement exploitables.', 'Build partnerships that are useful, credible and directly actionable.') }}</h1>
                     <p class="mt-4 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
-                        {{ $t('Hôtels, restaurants, agences, opérateurs, lieux ou prestataires premium: cette page pose un cadre clair pour soumettre une collaboration.', 'Hotels, restaurants, agencies, operators, venues or premium providers: this page offers a clear framework to submit a collaboration.') }}
+                        {{ $t('Hôtels, restaurants, agences, opérateurs, lieux ou prestataires premium: présentez votre offre et la manière dont elle peut enrichir l’expérience Carré Premium.', 'Hotels, restaurants, agencies, operators, venues or premium providers: present your offer and how it can enrich the Carré Premium experience.') }}
                     </p>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                     <div class="grid gap-5 md:grid-cols-3">
                         @foreach([
                             ['title' => $t('Visibilité qualifiée', 'Qualified visibility'), 'text' => $t('Présenter votre offre à une audience déjà orientée premium.', 'Present your offer to an audience already oriented toward premium services.')],
-                            ['title' => $t('Parcours plus clair', 'Clearer journey'), 'text' => $t('Des offres mieux reliées aux besoins réels et à la conversion.', 'Offers better tied to actual customer needs and conversion.')],
+                            ['title' => $t('Mise en avant premium', 'Premium exposure'), 'text' => $t('Des offres présentées dans un univers cohérent avec une clientèle à forte attente.', 'Offers showcased in a coherent environment built for a high-expectation clientele.')],
                             ['title' => $t('Relation directe', 'Direct relationship'), 'text' => $t('Un échange rapide avec l’équipe pour qualifier la collaboration.', 'A direct exchange with the team to qualify the collaboration.')],
                         ] as $benefit)
                             <div class="cp-panel rounded-[1.8rem] p-6">

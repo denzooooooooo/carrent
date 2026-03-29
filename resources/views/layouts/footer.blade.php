@@ -65,10 +65,10 @@
                             <span>Support premium</span>
                         </div>
                         <h2 class="mt-4 max-w-2xl text-3xl font-black leading-tight sm:text-4xl">
-                            Un client doit comprendre l’offre, trouver l’action suivante et nous contacter sans friction.
+                            Réservez un événement, un voyage ou une mobilité premium avec une équipe joignable à tout moment.
                         </h2>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                            Réservation accompagnée, tunnel de paiement clarifié et support humain visible sur chaque parcours.
+                            Billetterie VIP, packages signature, transferts premium et demandes sur mesure depuis Abidjan et à l’international.
                         </p>
                     </div>
 
@@ -99,7 +99,7 @@
                         </div>
 
                         <p class="mt-5 max-w-sm text-sm leading-7 text-white/70">
-                            Billetterie événementielle, packages, location et demandes de vols traitées avec un accompagnement plus clair pour vos clients.
+                            Conciergerie privée pour événements VIP, séjours signature, mobilité premium et accompagnement sur mesure.
                         </p>
 
                         <div class="mt-6 grid gap-3">
@@ -149,11 +149,11 @@
                         <h3 class="text-sm font-black uppercase tracking-[0.24em] text-white/60">Adresse & disponibilité</h3>
                         <div class="mt-5 space-y-4 text-sm leading-7 text-white/80">
                             <p>{{ $companyAddress }}<br>{{ $companyCity }}, {{ $companyCountry }}</p>
-                            <p>Support commercial visible et joignable tous les jours.</p>
+                            <p>Disponibles tous les jours pour les demandes privées, corporate et les réservations urgentes.</p>
                             <div class="rounded-[1.4rem] border border-white/10 bg-white/10 px-4 py-4">
                                 <p class="text-xs font-black uppercase tracking-[0.18em] text-white/50">Canal recommandé</p>
                                 <p class="mt-2 text-base font-black text-white">WhatsApp ou appel direct</p>
-                                <p class="mt-1 text-sm text-white/70">Pour une demande urgente, un montant élevé ou un besoin sur mesure.</p>
+                                <p class="mt-1 text-sm text-white/70">Pour une demande urgente, un voyage sur mesure ou une réservation à forte valeur.</p>
                             </div>
                         </div>
                     </div>

@@ -17,7 +17,7 @@
         ],
         [
             'title' => $t('2. Finalités', '2. Purposes'),
-            'body' => $t('Ces données servent à créer un dossier, encaisser un paiement, générer des documents, communiquer sur votre réservation, sécuriser la plateforme et améliorer le parcours client.', 'This data is used to create a booking record, process payment, generate documents, communicate about your booking, secure the platform and improve the customer journey.'),
+            'body' => $t('Ces données servent à créer un dossier, encaisser un paiement, générer des documents, communiquer sur votre réservation, sécuriser la plateforme et améliorer le service rendu.', 'This data is used to create a booking record, process payment, generate documents, communicate about your booking, secure the platform and improve the service provided.'),
         ],
         [
             'title' => $t('3. Partage', '3. Sharing'),
@@ -43,7 +43,7 @@
                         <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
                         <span>{{ $t('Confidentialité', 'Privacy') }}</span>
                     </div>
-                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Vos données doivent être compréhensibles, protégées et limitées à ce qui sert réellement.', 'Your data should be understandable, protected and limited to what actually serves the service.') }}</h1>
+                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Vos données sont utilisées uniquement pour exécuter, sécuriser et suivre votre réservation.', 'Your data is used only to execute, secure and monitor your booking.') }}</h1>
                     <p class="mt-4 text-sm leading-7 text-white/84 sm:text-base">{{ $t('Dernière mise à jour :', 'Last updated:') }} {{ $updatedAt }}</p>
                 </div>
             </div>

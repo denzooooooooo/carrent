@@ -33,9 +33,9 @@
                             <span class="h-2.5 w-2.5 rounded-full bg-current"></span>
                             Paiement assisté
                         </span>
-                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Le dossier est prêt. Il reste à effectuer le virement avec la bonne référence.</h1>
+                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Le virement peut être effectué dès maintenant avec la référence ci-dessous.</h1>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            Cette page centralise le compte bénéficiaire, la référence exacte et l’envoi de preuve afin d’éviter les allers-retours manuels.
+                            Retrouvez ici les coordonnées bancaires, le libellé exact à reprendre et l’envoi de preuve de paiement.
                         </p>
                     </div>
 
@@ -76,11 +76,11 @@
                         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
                             <div>
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">Référence obligatoire</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Copiez exactement cette référence avant de quitter la page.</h2>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Utilisez exactement cette référence pour le virement.</h2>
                                 <div class="mt-5 rounded-[1.6rem] border border-amber-200 bg-amber-50 px-5 py-5">
                                     <p class="text-xs font-black uppercase tracking-[0.18em] text-amber-700">Libellé de virement</p>
                                     <code class="mt-3 block text-2xl font-black text-amber-900">{{ $bankReference }}</code>
-                                    <p class="mt-3 text-sm leading-7 text-amber-800">Sans cette référence exacte, la réconciliation du paiement devient manuelle et ralentit la validation du dossier.</p>
+                                    <p class="mt-3 text-sm leading-7 text-amber-800">Cette référence permet d’associer le règlement à votre réservation sans délai inutile.</p>
                                 </div>
                             </div>
                             <div class="rounded-[1.6rem] border border-[color:var(--cp-border)] bg-[rgba(255,249,242,0.88)] p-5">
@@ -160,7 +160,7 @@
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">Actions rapides</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Gardez le bon cheminement jusqu’à la validation.</h2>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Finalisez le règlement puis transmettez la preuve.</h2>
                             </div>
                             <button type="button" onclick="copyTransferDetails(this)" class="cp-secondary-button !px-4 !py-3">
                                 <i class="fa-solid fa-copy text-sm"></i>
@@ -187,7 +187,7 @@
                         <div class="cp-panel rounded-[2rem] p-6 sm:p-7">
                             <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Aide immédiate</p>
                             <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">Un doute sur le virement ou la preuve ?</h2>
-                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">Utilisez le canal le plus direct pour accélérer la validation de votre dossier.</p>
+                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">Choisissez le canal le plus direct pour confirmer le virement ou poser une question sur la facturation.</p>
 
                             <div class="mt-5 space-y-3">
                                 <a href="{{ $mobilePhoneLink }}" class="flex items-center justify-between gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/85 px-4 py-4 text-sm font-semibold text-[color:var(--cp-plum-950)] transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">

@@ -45,7 +45,7 @@
                     </h1>
 
                     <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                        {{ $t('L’inscription pose les bases du parcours client: identité, contact et suivi. Le formulaire reste volontairement simple, mobile-first et directement relié à la vérification du compte.', 'Registration sets the customer journey up properly: identity, contact and tracking. The form stays intentionally simple, mobile-first and tied directly to account verification.') }}
+                        {{ $t('Créez votre espace pour réserver plus vite, conserver vos préférences et retrouver vos billets, factures et confirmations.', 'Create your account to book faster, keep your preferences and retrieve your tickets, invoices and confirmations.') }}
                     </p>
 
                     <div class="mt-7 grid gap-3 sm:grid-cols-3">
@@ -164,7 +164,7 @@
 
                     <div class="mt-6 rounded-[1.35rem] bg-[#f7f1ff] px-4 py-4 text-sm text-[color:var(--cp-ink-soft)]">
                         <p class="font-bold text-[color:var(--cp-plum-950)]">{{ $t('Déjà client ?', 'Already a client?') }}</p>
-                        <p class="mt-1 leading-6">{{ $t('Connectez-vous pour récupérer vos réservations et continuer votre parcours là où vous l’avez laissé.', 'Sign in to retrieve your bookings and continue where you left off.') }}</p>
+                        <p class="mt-1 leading-6">{{ $t('Connectez-vous pour retrouver vos réservations, vos documents et vos paiements en attente.', 'Sign in to retrieve your bookings, documents and pending payments.') }}</p>
                         <a href="{{ route('login') }}" class="mt-3 inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-800)] hover:text-[color:var(--cp-plum-700)]">
                             <span>{{ $t('Me connecter', 'Sign in') }}</span>
                             <i class="fa-solid fa-arrow-right text-xs"></i>

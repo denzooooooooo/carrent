@@ -13,8 +13,8 @@
             'title' => $t('Réservations', 'Bookings'),
             'items' => [
                 ['q' => $t('Comment réserver un événement ?', 'How do I book an event?'), 'a' => $t('Ouvrez la fiche événement, choisissez votre offre ou votre zone, renseignez les coordonnées demandées puis poursuivez vers le paiement.', 'Open the event page, select your offer or zone, fill in the requested details and continue to payment.')],
-                ['q' => $t('Puis-je réserver sans créer de compte ?', 'Can I book without creating an account?'), 'a' => $t('Oui sur plusieurs parcours, mais créer un compte simplifie fortement le suivi des documents et paiements.', 'Yes on several flows, but creating an account makes tracking documents and payments much easier.')],
-                ['q' => $t('Comment retrouver une réservation déjà commencée ?', 'How do I recover a started booking?'), 'a' => $t('Si le dossier a été créé, reconnectez-vous ou repassez par le lien reçu par email pour reprendre le parcours.', 'If the booking record exists, sign in or use the link received by email to resume the flow.')],
+                ['q' => $t('Puis-je réserver sans créer de compte ?', 'Can I book without creating an account?'), 'a' => $t('Oui pour plusieurs services, mais créer un compte facilite le suivi des documents, des paiements et des confirmations.', 'Yes for several services, but creating an account makes it easier to track documents, payments and confirmations.')],
+                ['q' => $t('Comment retrouver une réservation déjà commencée ?', 'How do I recover a started booking?'), 'a' => $t('Si le dossier a déjà été créé, reconnectez-vous ou utilisez le lien reçu par email pour reprendre votre réservation.', 'If the booking record already exists, sign in or use the link received by email to resume your booking.')],
             ],
         ],
         [
@@ -22,7 +22,7 @@
             'items' => [
                 ['q' => $t('Quels moyens de paiement sont proposés ?', 'Which payment methods are available?'), 'a' => $t('Selon le service, le site peut proposer CinetPay, Mobile Money, carte bancaire ou virement bancaire.', 'Depending on the service, the site may offer CinetPay, Mobile Money, card payment or bank transfer.')],
                 ['q' => $t('Que se passe-t-il si le paiement échoue ?', 'What happens if payment fails?'), 'a' => $t('Le dossier reste généralement en attente. Vous pouvez relancer le paiement depuis votre espace ou contacter un conseiller.', 'The booking usually stays pending. You can restart payment from your account or contact an advisor.')],
-                ['q' => $t('Comment envoyer une preuve de virement ?', 'How do I send bank transfer proof?'), 'a' => $t('Lorsque le parcours passe en virement, la page d’instructions vous permet d’envoyer le justificatif directement.', 'When the flow switches to bank transfer, the instruction page lets you upload proof directly.')],
+                ['q' => $t('Comment envoyer une preuve de virement ?', 'How do I send bank transfer proof?'), 'a' => $t('Lorsque le règlement se fait par virement, vous pouvez envoyer le justificatif directement depuis les instructions de paiement.', 'When payment is made by bank transfer, you can upload the proof directly from the payment instructions.')],
             ],
         ],
         [
@@ -36,7 +36,7 @@
         [
             'title' => $t('Support', 'Support'),
             'items' => [
-                ['q' => $t('Comment contacter l’équipe rapidement ?', 'How do I contact the team quickly?'), 'a' => $t('Le plus direct reste la page contact, le téléphone ou WhatsApp selon l’urgence de votre demande.', 'The fastest route remains the contact page, phone or WhatsApp depending on urgency.')],
+                ['q' => $t('Comment contacter l’équipe rapidement ?', 'How do I contact the team quickly?'), 'a' => $t('Le plus direct reste le téléphone, WhatsApp ou le formulaire contact selon l’urgence de votre demande.', 'The fastest route remains phone, WhatsApp or the contact form depending on the urgency of your request.')],
                 ['q' => $t('Proposez-vous du sur-mesure ?', 'Do you offer bespoke services?'), 'a' => $t('Oui. Décrivez votre besoin dans le formulaire contact ou contactez un conseiller pour être orienté.', 'Yes. Describe your need in the contact form or contact an advisor for guidance.')],
             ],
         ],
@@ -69,9 +69,9 @@
                         <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
                         <span>{{ $t('FAQ', 'FAQ') }}</span>
                     </div>
-                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Les réponses essentielles, structurées par vrai besoin client.', 'The essential answers, structured around real client needs.') }}</h1>
+                    <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{{ $t('Les réponses utiles avant de réserver, payer ou récupérer vos documents.', 'Useful answers before you book, pay or retrieve your documents.') }}</h1>
                     <p class="mt-4 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
-                        {{ $t('Cette page doit vous aider à agir vite: comprendre un paiement, récupérer un document ou savoir quel canal utiliser.', 'This page should help you act fast: understand a payment, recover a document or know which support channel to use.') }}
+                        {{ $t('Retrouvez les informations essentielles sur les réservations, les paiements, les billets, les factures et les échanges avec l’équipe.', 'Find the key information about bookings, payments, tickets, invoices and exchanges with the team.') }}
                     </p>
                 </div>
             </div>
@@ -114,7 +114,7 @@
 
                 <div id="faq-empty-state" class="mt-6 hidden rounded-[1.8rem] border border-dashed border-[color:var(--cp-border-strong)] bg-[#faf6ff] px-6 py-10 text-center">
                     <p class="text-xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Aucun résultat pour cette recherche.', 'No result for this search.') }}</p>
-                    <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Essayez un mot plus large ou passez directement par la page contact.', 'Try a broader term or use the contact page directly.') }}</p>
+                    <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Essayez un mot plus large ou contactez directement l’équipe.', 'Try a broader term or contact the team directly.') }}</p>
                     <a href="{{ route('contact') }}" class="cp-primary-button !mt-5">{{ $t('Contacter l’équipe', 'Contact the team') }}</a>
                 </div>
             </div>

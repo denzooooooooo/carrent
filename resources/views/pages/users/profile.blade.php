@@ -25,9 +25,9 @@
                                     <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
                                     <span>{{ $t('Profil client', 'Client profile') }}</span>
                                 </div>
-                                <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">{{ $t('Un espace plus propre pour gérer vos informations et vos préférences.', 'A cleaner area to manage your details and preferences.') }}</h1>
+                                <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">{{ $t('Votre espace personnel Carré Premium.', 'Your personal Carré Premium area.') }}</h1>
                                 <p class="mt-4 text-sm leading-7 text-white/82 sm:text-base">
-                                    {{ $t('Les informations utiles au parcours sont regroupées ici: identité, coordonnées, préférences et sécurité du compte.', 'Useful account details now live in one place: identity, contact details, preferences and account security.') }}
+                                    {{ $t('Retrouvez ici vos coordonnées, vos préférences de voyage, vos informations d’identité et la sécurité de votre compte.', 'Find your contact details, travel preferences, identity information and account security here.') }}
                                 </p>
                             </div>
 

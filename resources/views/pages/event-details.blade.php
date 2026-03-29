@@ -55,8 +55,8 @@
     ];
     $availability = $availabilityMap[$event->availability_state] ?? $availabilityMap['available'];
     $supportText = $t(
-        'Un conseiller peut vous orienter avant la commande si vous hésitez entre plusieurs formules ou zones.',
-        'An advisor can guide you before checkout if you hesitate between several packages or seat zones.'
+        'Un conseiller peut vous aider à choisir la formule, la zone ou le niveau d’expérience le plus adapté.',
+        'An advisor can help you choose the package, seating area or level of experience that fits best.'
     );
     $defaultName = old('name', trim((auth()->user()?->first_name ?? '') . ' ' . (auth()->user()?->last_name ?? '')));
     $defaultEmail = old('email', auth()->user()?->email ?? '');
@@ -91,13 +91,13 @@
         [
             'number' => '03',
             'title' => $t('Finaliser le paiement', 'Complete payment'),
-            'description' => $t('Le site envoie vers le bon mode de paiement selon le total.', 'The site sends you to the right payment mode according to the total.'),
+            'description' => $t('Le mode de règlement proposé dépend du montant final et du service réservé.', 'The payment method offered depends on the final amount and the service booked.'),
         ],
     ];
     $heroSignals = [
-        $t('Boutons visibles', 'Visible buttons'),
-        $t('Réservation guidée', 'Guided booking'),
-        $t('Paiement adapté', 'Adaptive payment'),
+        $t('Places officielles', 'Official inventory'),
+        $t('Support dédié', 'Dedicated support'),
+        $t('Paiement sécurisé', 'Secure payment'),
     ];
     $initialOfferTab = old('zone_id')
         ? 'zones'
@@ -112,7 +112,7 @@
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <p class="text-[11px] font-black uppercase tracking-[0.18em] text-red-700">{{ $t('Vérification requise', 'Review required') }}</p>
-                            <p class="mt-2 text-lg font-black text-red-900">{{ $t('La réservation doit être corrigée avant validation.', 'The booking needs corrections before it can continue.') }}</p>
+                            <p class="mt-2 text-lg font-black text-red-900">{{ $t('Merci de corriger les informations de réservation avant de continuer.', 'Please correct the booking information before continuing.') }}</p>
                         </div>
                         <button type="button" data-open-booking-errors class="cp-secondary-button !w-full !justify-center !border-red-200 !bg-white !text-red-800 sm:!w-auto">
                             <i class="fa-solid fa-pen-to-square text-sm"></i>
@@ -219,7 +219,7 @@
 
                     <div class="event-surface cp-fade-up rounded-[2rem] p-5 sm:p-6" style="animation-delay: 0.12s">
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Réservation', 'Booking') }}</p>
-                        <h2 class="mt-3 text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $t('Un parcours simple jusqu’à la commande', 'A simple path to checkout') }}</h2>
+                        <h2 class="mt-3 text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $t('Réserver votre place', 'Reserve your place') }}</h2>
                         <div class="mt-4 grid gap-2">
                             @foreach($bookingSteps as $step)
                                 <div class="flex items-center gap-3 rounded-[1.15rem] bg-[#faf6ff] px-4 py-3">
@@ -587,7 +587,7 @@
                                     <summary class="flex items-center justify-between gap-4 px-5 py-4">
                                         <div>
                                             <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Programme', 'Program') }}</p>
-                                            <p class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $t('Déroulé de l’expérience', 'Experience flow') }}</p>
+                                            <p class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $t('Programme complet', 'Full program') }}</p>
                                         </div>
                                         <i class="fa-solid fa-chevron-down text-xs text-[color:var(--cp-ink-muted)]"></i>
                                     </summary>

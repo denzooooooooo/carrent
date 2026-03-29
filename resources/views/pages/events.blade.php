@@ -152,11 +152,11 @@
                     </p>
 
                     <h1 class="mt-5 text-3xl font-black leading-tight text-white sm:text-4xl md:text-5xl">
-                        {{ $t('Tous vos événements premium dans une page plus claire, plus élégante et plus simple à parcourir.', 'All your premium events in a clearer, more elegant and easier page to browse.') }}
+                        {{ $t('Sports, culture et grands rendez-vous à vivre depuis les meilleures places.', 'Sports, culture and major moments to experience from the best seats.') }}
                     </h1>
 
                     <p class="mt-4 max-w-3xl text-sm text-white/85 sm:text-base md:text-lg">
-                        {{ $t('Retrouvez les expériences sportives et culturelles avec une navigation plus proche du reste du site: hero marque, filtres lisibles, cartes premium et calendrier mieux intégré.', 'Find sports and cultural experiences with a flow that matches the rest of the site: branded hero, readable filters, premium cards and a better integrated calendar.') }}
+                        {{ $t('Grand Prix, concerts, tennis, football ou expériences privées: retrouvez les dates, les villes et les offres premium disponibles en un seul endroit.', 'Grand Prix, concerts, tennis, football or private experiences: find the dates, cities and premium offers available in one place.') }}
                     </p>
                 </div>
 
@@ -196,7 +196,7 @@
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-purple-600">{{ $t('Explorer les événements', 'Browse events') }}</p>
                         <h2 class="mt-2 text-2xl font-black text-gray-900 md:text-3xl">{{ $t('Filtres et modes d’affichage', 'Filters and display modes') }}</h2>
                         <p class="mt-2 text-sm text-gray-500 md:text-base">
-                            {{ $t('La page garde maintenant une présentation cohérente avec le reste du site, sans perdre la logique de filtres ni la bascule liste/calendrier.', 'The page now matches the rest of the site without losing the filter logic or the list/calendar switch.') }}
+                            {{ $t('Passez d’une vue liste à un calendrier, puis affinez par famille, ville ou date pour trouver le bon événement au bon moment.', 'Switch between list and calendar, then refine by family, city or date to find the right event at the right moment.') }}
                         </p>
                     </div>
 
@@ -243,7 +243,7 @@
                                                 {{ $activeFilterCount }}
                                                 {{ $activeFilterCount > 1 ? $t('filtres sont déjà actifs. Touchez ici pour les modifier.', 'filters are already active. Tap here to adjust them.') : $t('filtre est déjà actif. Touchez ici pour le modifier.', 'filter is already active. Tap here to adjust it.') }}
                                             @else
-                                                {{ $t('La page reste plus légère au premier regard. Touchez l’icône pour afficher tous les critères.', 'The page stays lighter at first glance. Tap the icon to reveal all criteria.') }}
+                                                {{ $t('Touchez l’icône pour afficher la liste complète des critères disponibles.', 'Tap the icon to display the full list of available criteria.') }}
                                             @endif
                                         </p>
                                     </div>

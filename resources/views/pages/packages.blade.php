@@ -76,11 +76,11 @@
                         </div>
 
                         <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                            {{ $t('Des packages premium plus faciles à comparer, comprendre et réserver.', 'Premium packages that are easier to compare, understand and book.') }}
+                            {{ $t('Des séjours signature choisis pour leur destination, leur rythme et leur intensité.', 'Signature escapes chosen for their destination, rhythm and sense of occasion.') }}
                         </h1>
 
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                            {{ $t('Destination, durée, niveau d’expérience et prix de départ doivent être visibles sans effort. Cette page recentre cette lecture pour aider le client à choisir plus vite.', 'Destination, duration, experience level and starting price should be visible without effort. This page refocuses that reading so clients can choose faster.') }}
+                            {{ $t('Week-ends exclusifs, circuits premium, city breaks et expériences rares à réserver selon votre envie d’évasion, votre durée de séjour et votre budget.', 'Exclusive weekends, premium circuits, city breaks and rare experiences to book according to your appetite for escape, travel length and budget.') }}
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -126,10 +126,10 @@
             <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
                 <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Lecture rapide', 'Fast reading') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Filtres et tri cohérents', 'Consistent filters and sorting') }}</h2>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Affiner la collection', 'Refine the collection') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Destination, durée et style de séjour', 'Destination, duration and travel style') }}</h2>
                         <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                            {{ $t('Utilisez ces filtres pour réduire la sélection sans perdre de vue l’essentiel: destination, durée, type d’expérience et niveau de prix.', 'Use these filters to reduce the list without losing sight of what matters: destination, duration, experience type and price level.') }}
+                            {{ $t('Affinez la sélection par destination, type d’expérience ou durée pour trouver le séjour qui correspond à votre prochaine escapade.', 'Filter by destination, experience type or duration to find the escape that fits your next journey.') }}
                         </p>
                     </div>
 

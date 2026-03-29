@@ -20,9 +20,9 @@
                             <span class="h-2.5 w-2.5 rounded-full bg-current"></span>
                             CinetPay
                         </span>
-                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Finalisez le paiement sur le canal sécurisé CinetPay.</h1>
+                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Finalisez votre règlement sur le canal sécurisé CinetPay.</h1>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            Cette page propose une version compacte du parcours si vous arrivez ici directement depuis un lien ou une relance.
+                            Vous pouvez régler ce montant immédiatement via Mobile Money ou laisser CinetPay afficher l’ensemble des moyens compatibles.
                         </p>
                     </div>
 
@@ -44,7 +44,7 @@
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">Canal express</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Choisissez le groupe de paiement, puis laissez CinetPay prendre le relais.</h2>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Choisissez votre mode de règlement, puis laissez CinetPay prendre le relais.</h2>
                             </div>
                             <a href="{{ route('payment.checkout', $booking) }}" class="cp-secondary-button !px-4 !py-3">
                                 <i class="fa-solid fa-arrow-left text-sm"></i>

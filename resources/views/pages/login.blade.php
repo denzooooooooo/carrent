@@ -27,7 +27,7 @@
                     </h1>
 
                     <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                        {{ $t('La connexion doit être immédiate à comprendre: récupérer un dossier, payer ce qui reste, puis télécharger les justificatifs sans se perdre.', 'Signing in should feel immediate: recover a booking, complete payment, then download documents without friction.') }}
+                        {{ $t('Accédez à vos réservations, reprenez un règlement en attente et retrouvez vos factures ou billets depuis un seul espace.', 'Access your bookings, resume a pending payment and retrieve your invoices or tickets from one place.') }}
                     </p>
 
                     <div class="mt-7 grid gap-3 sm:grid-cols-3">
@@ -150,7 +150,7 @@
 
                     <div class="mt-6 rounded-[1.35rem] bg-[#f7f1ff] px-4 py-4 text-sm text-[color:var(--cp-ink-soft)]">
                         <p class="font-bold text-[color:var(--cp-plum-950)]">{{ $t('Pas encore de compte ?', 'No account yet?') }}</p>
-                        <p class="mt-1 leading-6">{{ $t('Créez votre espace client pour suivre vos demandes, réservations et paiements sur mobile comme sur desktop.', 'Create your account to track requests, bookings and payments on mobile and desktop.') }}</p>
+                        <p class="mt-1 leading-6">{{ $t('Créez votre espace client pour conserver vos coordonnées, suivre vos réservations et retrouver vos documents.', 'Create your client account to keep your details, track your bookings and retrieve your documents.') }}</p>
                         <a href="{{ route('register') }}" class="mt-3 inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-plum-800)] hover:text-[color:var(--cp-plum-700)]">
                             <span>{{ $t('Créer mon compte', 'Create my account') }}</span>
                             <i class="fa-solid fa-arrow-right text-xs"></i>

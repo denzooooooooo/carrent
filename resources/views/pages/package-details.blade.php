@@ -155,8 +155,8 @@
                     <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
                         <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
                             <div class="max-w-3xl">
-                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Vue d ensemble', 'Overview') }}</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Ce que le client doit comprendre tout de suite', 'What the client should understand immediately') }}</h2>
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Vue d’ensemble', 'Overview') }}</p>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('L’essentiel du séjour', 'The essentials of the stay') }}</h2>
                             </div>
                             <div class="cp-pill">
                                 <i class="fa-solid fa-wallet text-xs"></i>

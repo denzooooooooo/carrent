@@ -4,7 +4,7 @@
 @section('meta_description', __('Découvrez nos véhicules premium en Côte d’Ivoire. Chauffeur, location privée et solutions sur mesure avec Carré Premium.'))
 @section('meta_keywords', __('location de véhicules, voiture premium, transport privé, Côte d’Ivoire, Carré Premium'))
 @section('og_title', __('Location de véhicules premium') . ' - Carré Premium')
-@section('og_description', __('Réservez un véhicule premium avec un parcours plus clair, plus fiable et mieux structuré pour vos clients.'))
+@section('og_description', __('Réservez un véhicule premium avec chauffeur ou en mise à disposition pour vos arrivées, rendez-vous et séjours.'))
 
 @section('content')
 @php
@@ -62,11 +62,11 @@
                         </div>
 
                         <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                            {{ $t('Une flotte premium plus lisible, plus cohérente et plus simple à réserver.', 'A premium fleet that is clearer, more coherent and easier to book.') }}
+                            {{ $t('Une flotte premium pour vos arrivées, rendez-vous et déplacements sur mesure.', 'A premium fleet for arrivals, appointments and bespoke mobility.') }}
                         </h1>
 
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                            {{ $t('Le client doit comprendre immédiatement le type de véhicule, la capacité, le tarif journalier et la prochaine action. Cette page remet ces repères au premier plan.', 'Clients should immediately understand vehicle type, seating capacity, daily rate and the next action. This page brings those cues to the front.') }}
+                            {{ $t('Berlines, SUV, vans et véhicules avec chauffeur pour accueillir un client, assurer un transfert aéroport ou accompagner un séjour haut de gamme.', 'Sedans, SUVs, vans and chauffeur-driven vehicles to welcome a client, handle an airport transfer or support a high-end stay.') }}
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -112,10 +112,10 @@
             <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
                 <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Parcours clarifié', 'Clearer flow') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Vrais filtres, lecture plus nette', 'Real filters, sharper reading') }}</h2>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Sélection flotte', 'Fleet selection') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Catégorie, capacité et style de conduite', 'Category, capacity and driving style') }}</h2>
                         <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                            {{ $t('Réduisez la flotte par catégorie, type ou capacité sans perdre de vue le prix journalier et le service attendu.', 'Filter the fleet by category, type or capacity without losing sight of daily pricing and expected service.') }}
+                            {{ $t('Choisissez le véhicule selon la catégorie, le nombre de passagers et le type de trajet à assurer, tout en gardant le tarif journalier en repère.', 'Choose the vehicle by category, passenger count and trip type while keeping daily pricing as a clear reference.') }}
                         </p>
                     </div>
 
@@ -353,7 +353,7 @@
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Demande spécifique', 'Specific request') }}</p>
                         <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d’un modèle précis, d’un chauffeur ou d’un trajet sur mesure ?', 'Need a precise model, a driver or a bespoke route?') }}</h2>
                         <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
-                            {{ $t('L’équipe peut vous orienter vers une solution plus claire que la simple liste: disponibilité réelle, conditions et besoin client réunis dans la même discussion.', 'The team can guide you to a clearer solution than a simple list: real availability, conditions and customer need gathered in the same conversation.') }}
+                            {{ $t('L’équipe peut vous proposer la bonne configuration selon le niveau de service attendu, la durée de mise à disposition et la disponibilité réelle.', 'The team can recommend the right setup according to service level, rental duration and real availability.') }}
                         </p>
                     </div>
 

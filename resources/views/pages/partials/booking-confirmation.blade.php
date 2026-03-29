@@ -79,7 +79,7 @@
                     @include('pages.payment._booking-summary', ['booking' => $booking, 'heading' => 'Dossier enregistré'])
 
                     <div class="cp-panel rounded-[2rem] p-6 sm:p-7">
-                        <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Suite du parcours</p>
+                        <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Prochaines étapes</p>
                         <div class="mt-5 grid gap-4 md:grid-cols-3">
                             @foreach($nextSteps as $step)
                                 <div class="rounded-[1.5rem] border border-[color:var(--cp-border)] bg-[rgba(255,255,255,0.78)] p-5">

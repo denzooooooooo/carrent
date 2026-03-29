@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Accueil - Carré Premium')
-@section('meta_description', 'Carré Premium donne accès à des événements VIP, packages signature, mobilité premium et accompagnement humain dans une vitrine visuelle, premium et pensée mobile.')
+@section('meta_description', 'Carré Premium réunit événements VIP, packages signature, mobilité premium et accompagnement humain pour vivre, voyager et arriver autrement.')
 @section('meta_keywords', 'conciergerie premium, événements VIP, packages luxe, location premium, vols accompagnés, Carré Premium, Abidjan')
 @section('og_title', 'Accueil - Carré Premium')
-@section('og_description', 'Une home premium, visuelle et mobile-first pour découvrir les événements VIP, packages signature, mobilité premium et vols accompagnés.')
+@section('og_description', 'Découvrez les événements VIP, packages signature, solutions de mobilité premium et vols accompagnés de Carré Premium.')
 
 @push('styles')
 <style>
@@ -142,8 +142,8 @@
         $heroSlides = collect([
             [
                 'type' => $t('Carré Premium', 'Carré Premium'),
-                'title' => $t('Des expériences premium pensées comme une vraie vitrine.', 'Premium experiences staged as a true visual showcase.'),
-                'subtitle' => $t('Événements VIP, packages signature, mobilité premium et accompagnement humain.', 'VIP events, signature packages, premium mobility and human guidance.'),
+                'title' => $t('Des expériences premium à vivre, offrir ou réserver.', 'Premium experiences to live, gift or book.'),
+                'subtitle' => $t('Événements VIP, voyages signature, mobilité premium et accompagnement humain.', 'VIP events, signature journeys, premium mobility and human guidance.'),
                 'image' => 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1400&h=900&fit=crop',
                 'url' => route('contact'),
                 'meta' => $t('Conseiller dédié', 'Dedicated advisor'),
@@ -214,11 +214,11 @@
                         </div>
 
                         <h1 class="mt-5 text-3xl font-black leading-tight sm:text-4xl xl:text-[4rem] xl:leading-[1.02]">
-                            {{ $t('Une vitrine premium qui donne envie avant même le premier clic.', 'A premium storefront that creates desire before the first click.') }}
+                            {{ $t('Des expériences premium à vivre en grand, de l’événement VIP au voyage signature.', 'Premium experiences to live at full scale, from VIP events to signature journeys.') }}
                         </h1>
 
                         <p class="mt-5 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            {{ $t('Événements VIP, packages signature, mobilité premium et vols accompagnés dans une home plus visuelle, plus désirable et plus simple à parcourir sur mobile.', 'VIP events, signature packages, premium mobility and supported flights in a homepage that is more visual, more desirable and easier to navigate on mobile.') }}
+                            {{ $t('Billetterie événementielle, séjours exclusifs, flotte premium et demandes de vols accompagnées par une équipe qui connaît les attentes du voyage haut de gamme.', 'Event ticketing, exclusive escapes, premium mobility and flight requests handled by a team that understands high-end travel expectations.') }}
                         </p>
 
                         <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -284,7 +284,7 @@
 
                             <div class="absolute inset-x-0 top-0 flex items-center justify-between p-4">
                                 <div class="rounded-full border border-white/14 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/78 backdrop-blur">
-                                    {{ $t('Sélection en mouvement', 'Curated motion') }}
+                                    {{ $t('À la une', 'Featured now') }}
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <button type="button" data-home-prev class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white backdrop-blur transition hover:bg-white/18">
@@ -322,7 +322,7 @@
                 <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
                         <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Univers', 'Universes') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Quatre entrées, quatre ambiances, un seul niveau de service.', 'Four entry points, four moods, one level of service.') }}</h2>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Événements, voyages, mobilité et vols accompagnés.', 'Events, travel, mobility and assisted flights.') }}</h2>
                     </div>
                     <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !self-start lg:!self-auto">
                         <i class="fa-brands fa-whatsapp text-sm"></i>
@@ -358,7 +358,7 @@
             <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-3xl">
                     <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Sélections signature', 'Signature selections') }}</p>
-                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Un flux visuel pour sentir l’offre sans lire un catalogue entier.', 'A visual flow to feel the offer without reading an entire catalog.') }}</h2>
+                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Des sélections qui donnent déjà le ton du départ.', 'Selections that already set the tone for departure.') }}</h2>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" class="cp-icon-button" data-carousel-prev="moments">
@@ -409,7 +409,7 @@
                 <div class="space-y-6">
                     <div class="mb-2">
                         <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('En ce moment', 'Right now') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Deux collections qui doivent donner envie immédiatement.', 'Two collections that should create desire instantly.') }}</h2>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Deux sélections pour prolonger le voyage dès le premier regard.', 'Two selections to extend the journey from the very first glance.') }}</h2>
                     </div>
 
                     <div class="grid gap-6 lg:grid-cols-2">
@@ -468,10 +468,10 @@
                 </div>
 
                 <aside class="cp-panel rounded-[2rem] p-6 sm:p-7 xl:sticky xl:top-28">
-                    <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Accompagnement', 'Guidance') }}</p>
-                    <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Quand un client hésite, il doit pouvoir agir immédiatement.', 'When a client hesitates, action should stay immediate.') }}</h2>
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Conciergerie', 'Concierge') }}</p>
+                    <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Un conseiller dédié pour les demandes urgentes, corporate ou sur mesure.', 'A dedicated advisor for urgent, corporate or bespoke requests.') }}</h2>
                     <p class="mt-4 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                        {{ $t('Un conseiller visible, un canal WhatsApp direct et un lien simple vers les demandes accompagnées. C’est ce qui rassure vraiment sur mobile.', 'A visible advisor, direct WhatsApp and a simple path to assisted requests. That is what truly reassures on mobile.') }}
+                        {{ $t('Appelez, écrivez sur WhatsApp ou transmettez votre demande de vol: l’équipe reprend la main dès qu’un besoin demande plus qu’une simple réservation.', 'Call, message on WhatsApp or submit a flight request: the team steps in as soon as your need requires more than a simple booking.') }}
                     </p>
 
                     <div class="mt-6 space-y-3">
@@ -504,14 +504,14 @@
             <div class="overflow-hidden rounded-[2.4rem] bg-[linear-gradient(135deg,#231332_0%,#4b2870_54%,#d9a441_100%)] px-5 py-8 text-white shadow-[0_24px_74px_rgba(34,18,52,0.22)] sm:px-8 sm:py-10">
                 <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                     <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-gold-300)]">{{ $t('Dernier écran', 'Final call') }}</p>
-                        <h2 class="mt-3 text-3xl font-black sm:text-4xl">{{ $t('Donner envie, orienter vite, puis faire convertir sans bruit.', 'Create desire, orient quickly, then convert without noise.') }}</h2>
-                        <p class="mt-4 text-sm leading-7 text-white/82 sm:text-base">{{ $t('La nouvelle home doit lancer le bon parcours et laisser le détail aux pages produit. C’est la logique retenue ici.', 'The new homepage should launch the right journey and leave details to product pages. That is the direction used here.') }}</p>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-gold-300)]">{{ $t('Prêt à partir', 'Ready to begin') }}</p>
+                        <h2 class="mt-3 text-3xl font-black sm:text-4xl">{{ $t('Choisissez votre prochaine expérience premium.', 'Choose your next premium experience.') }}</h2>
+                        <p class="mt-4 text-sm leading-7 text-white/82 sm:text-base">{{ $t('Commencez par la collection qui vous ressemble le plus, puis laissez Carré Premium vous accompagner jusqu’à la confirmation.', 'Start with the collection that fits you best, then let Carré Premium guide you through to confirmation.') }}</p>
                     </div>
                     <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
                         <a href="{{ route('events') }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e4ae54]">
                             <i class="fa-solid fa-arrow-right text-sm"></i>
-                            <span>{{ $t('Entrer sur le site', 'Enter the site') }}</span>
+                            <span>{{ $t('Découvrir les expériences', 'Discover the experiences') }}</span>
                         </a>
                         <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/18 !bg-white/10 !text-white hover:!bg-white/14">
                             <i class="fa-solid fa-headset text-sm"></i>

@@ -29,9 +29,9 @@
                             <span class="h-2.5 w-2.5 rounded-full bg-current"></span>
                             Étape paiement
                         </span>
-                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Choisissez un moyen de paiement clair, puis finalisez sans friction.</h1>
+                        <h1 class="mt-4 text-3xl font-black sm:text-4xl">Choisissez votre moyen de paiement et confirmez votre réservation.</h1>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            Votre dossier existe déjà. Il reste à sélectionner le bon canal et à être redirigé vers la page de paiement sécurisée.
+                            Votre réservation est prête. Sélectionnez simplement le canal qui vous convient pour régler le montant indiqué.
                         </p>
 
                         <div class="mt-6 grid gap-3 sm:grid-cols-3">
@@ -80,7 +80,7 @@
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">Moyens disponibles</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Sélectionnez le canal que le client utilisera maintenant.</h2>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">Choisissez le moyen de règlement disponible maintenant.</h2>
                             </div>
                             <a href="javascript:history.back()" class="cp-secondary-button !px-4 !py-3">
                                 <i class="fa-solid fa-arrow-left text-sm"></i>
@@ -129,11 +129,11 @@
                                     </div>
                                     <div>
                                         <p class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Sécurité</p>
-                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">La suite se fait sur une page de paiement sécurisée, sans stockage bancaire côté site.</p>
+                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">Le règlement se fait sur une page sécurisée, sans stockage bancaire côté Carré Premium.</p>
                                     </div>
                                     <div>
                                         <p class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Support</p>
-                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">Si un canal échoue, l’équipe peut reprendre la main rapidement.</p>
+                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">Si un canal ne passe pas, l’équipe peut vous proposer une autre solution rapidement.</p>
                                     </div>
                                 </div>
                             </div>
@@ -155,7 +155,7 @@
                         </div>
                         <div class="cp-panel rounded-[1.7rem] p-5">
                             <p class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Pas de perte de dossier</p>
-                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">La référence et le parcours restent reliés à votre réservation existante.</p>
+                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">La référence de paiement reste attachée à votre réservation jusqu’à la confirmation finale.</p>
                         </div>
                         <div class="cp-panel rounded-[1.7rem] p-5">
                             <p class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">Assistance directe</p>
@@ -171,7 +171,7 @@
                         <div class="cp-panel rounded-[2rem] p-6 sm:p-7">
                             <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Assistance paiement</p>
                             <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">Un doute pendant le règlement ?</h2>
-                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">L’équipe peut vous orienter vers le bon canal ou basculer sur un traitement assisté si nécessaire.</p>
+                            <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">L’équipe peut vous orienter vers le canal le plus adapté ou reprendre le dossier si nécessaire.</p>
 
                             <div class="mt-5 space-y-3">
                                 <a href="{{ $supportPhoneLink }}" class="flex items-center justify-between gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/85 px-4 py-4 text-sm font-semibold text-[color:var(--cp-plum-950)] transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
         submitBtn.disabled = false;
         submitBtn.classList.remove('opacity-60');
         submitText.textContent = `Payer avec ${label}`;
-        selectionLabel.textContent = `${label} sélectionné. Vous allez être redirigé vers la page sécurisée.`;
+        selectionLabel.textContent = `${label} sélectionné. Vous allez être redirigé vers le paiement sécurisé.`;
     }
 
     radios.forEach((radio) => {

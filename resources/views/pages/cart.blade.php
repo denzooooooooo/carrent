@@ -16,7 +16,7 @@
                         <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-gold-300)]">{{ $t('Panier', 'Cart') }}</p>
                         <h1 class="mt-3 text-3xl font-black sm:text-4xl">{{ $t('Votre panier est vide pour le moment.', 'Your cart is empty for now.') }}</h1>
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            {{ $t('Le site ne mélange plus les parcours. Vous ajoutez une réservation depuis une fiche service, puis vous revenez ici seulement si un vrai panier est alimenté.', 'The site no longer mixes journeys. You add a booking from a service page, then come back here only when a real cart is populated.') }}
+                            {{ $t('Choisissez d’abord un événement, un package ou un véhicule. Dès qu’une réservation est créée, elle apparaîtra ici avec son montant et ses prochaines actions.', 'Choose an event, a package or a vehicle first. As soon as a booking is created, it will appear here with its amount and next actions.') }}
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3 sm:flex-row">
