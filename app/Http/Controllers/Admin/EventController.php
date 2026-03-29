@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -350,8 +351,8 @@ class EventController extends Controller
             'event_date' => ['required', 'date'],
             'event_time' => ['required', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/'],
             'end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
-            'end_time' => ['nullable', 'date_format:H:i', 'required_with:end_date'],
-            'image' => ['nullable', 'image', 'max:2048'], // 2MB max
+            'end_time' => ['nullable', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/', 'required_with:end_date'],
+            'image' => ['nullable', 'image', 'max:5120'], // 5MB max
             'min_price' => ['required', 'numeric', 'min:0'],
             'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
             'total_seats' => ['required', 'integer', 'min:1'],
@@ -403,8 +404,9 @@ class EventController extends Controller
             'event_time.required' => 'L\'heure de l\'événement est obligatoire.',
             'event_time.regex' => 'L\'heure de l\'événement doit être au format HH:MM.',
             'end_date.after_or_equal' => 'La date de fin doit être égale ou postérieure à la date de début.',
+            'end_time.regex' => 'Le champ heure de fin ne correspond pas au format H:i.',
             'image.image' => 'Le fichier doit être une image.',
-            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'image.max' => 'L\'image ne doit pas dépasser 5 Mo.',
             'min_price.required' => 'Le prix minimum est obligatoire.',
             'min_price.numeric' => 'Le prix minimum doit être un nombre.',
             'min_price.min' => 'Le prix minimum doit être supérieur ou égal à 0.',
@@ -431,6 +433,8 @@ class EventController extends Controller
         $validated['conditions_en'] = $validated['conditions_en'] ?? ($validated['conditions_fr'] ?? null);
         $validated['meta_title_en'] = $validated['meta_title_en'] ?? ($validated['meta_title_fr'] ?? null);
         $validated['meta_description_en'] = $validated['meta_description_en'] ?? ($validated['meta_description_fr'] ?? null);
+        $validated['event_time'] = $this->normalizeTimeValue($validated['event_time'] ?? null);
+        $validated['end_time'] = $this->normalizeTimeValue($validated['end_time'] ?? null);
 
         // Ajout/Mise à jour du slug
         $validated['slug'] = Str::slug($validated['title_fr']);
@@ -454,6 +458,25 @@ class EventController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         return $validated;
+    }
+
+    protected function normalizeTimeValue(?string $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        foreach (['H:i:s', 'H:i'] as $format) {
+            try {
+                return Carbon::createFromFormat($format, $value)->format('H:i:s');
+            } catch (\Throwable $exception) {
+                continue;
+            }
+        }
+
+        return $value;
     }
 
     /**

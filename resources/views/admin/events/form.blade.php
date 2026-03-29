@@ -6,6 +6,15 @@
     @php
         $isEdit = $event->exists;
         $route = $isEdit ? route('admin.events.update', $event) : route('admin.events.store');
+        $formatAdminTime = static function ($value): string {
+            if (blank($value)) {
+                return '';
+            }
+
+            $stringValue = $value instanceof \DateTimeInterface ? $value->format('H:i') : trim((string) $value);
+
+            return preg_match('/^\d{2}:\d{2}:\d{2}$/', $stringValue) ? substr($stringValue, 0, 5) : $stringValue;
+        };
 
         $packageDefaults = [
             [
@@ -103,7 +112,7 @@
         $coverUrl = $isEdit ? $event->getFirstMediaUrl('avatar', 'small') : null;
         $previewTitle = old('title_fr', $event->title_fr) ?: 'Titre à renseigner';
         $previewDate = old('event_date', $event->event_date ? $event->event_date->format('Y-m-d') : '');
-        $previewTime = old('event_time', $event->event_time);
+        $previewTime = $formatAdminTime(old('event_time', $event->event_time));
         $previewVenue = old('venue_name', $event->venue_name) ?: 'Lieu à renseigner';
         $previewCity = old('city', $event->city) ?: 'Ville';
         $previewCountry = old('country', $event->country) ?: 'Pays';
@@ -318,7 +327,7 @@
                                 </div>
                                 <div>
                                     <label for="event_time" class="mb-2 block text-sm font-semibold text-slate-700">Heure début *</label>
-                                    <input type="time" name="event_time" id="event_time" required value="{{ old('event_time', $event->event_time) }}" class="w-full px-4 py-3 text-sm">
+                                    <input type="time" name="event_time" id="event_time" required value="{{ $formatAdminTime(old('event_time', $event->event_time)) }}" class="w-full px-4 py-3 text-sm">
                                 </div>
                                 <div>
                                     <label for="end_date" class="mb-2 block text-sm font-semibold text-slate-700">Date fin</label>
@@ -326,7 +335,7 @@
                                 </div>
                                 <div>
                                     <label for="end_time" class="mb-2 block text-sm font-semibold text-slate-700">Heure fin</label>
-                                    <input type="time" name="end_time" id="end_time" value="{{ old('end_time', $event->end_time) }}" class="w-full px-4 py-3 text-sm">
+                                    <input type="time" name="end_time" id="end_time" value="{{ $formatAdminTime(old('end_time', $event->end_time)) }}" class="w-full px-4 py-3 text-sm">
                                 </div>
 
                                 <div class="md:col-span-2">
@@ -696,7 +705,7 @@
                         <div class="mt-4">
                             <label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Téléverser une image</label>
                             <input type="file" name="image" id="image" accept="image/*" class="w-full px-4 py-3 text-sm">
-                            <p class="mt-2 text-xs text-slate-500">Format image, 2 MB max.</p>
+                            <p class="mt-2 text-xs text-slate-500">Format image, 5 MB max.</p>
                         </div>
 
                         @if ($isEdit && $coverUrl)
