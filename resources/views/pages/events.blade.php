@@ -6,6 +6,18 @@
 @section('og_title', __('Événements sportifs et culturels VIP') . ' - Carré Premium')
 @section('og_description', 'Réservez vos places pour les meilleurs événements sportifs et culturels en Côte d\'Ivoire avec Carré Premium. Service VIP exclusif.')
 
+@push('styles')
+<style>
+    .event-filters-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    details[open] .event-filters-chevron {
+        transform: rotate(180deg);
+    }
+</style>
+@endpush
+
 @section('content')
 @php
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
@@ -215,242 +227,286 @@
                 </div>
 
                 <div class="space-y-6 px-5 py-6 md:px-8 md:py-8">
-                    <div class="grid gap-4 lg:grid-cols-3">
-                        @foreach($familyTabs as $tab)
-                            @php
-                                $isAllTab = $tab['value'] === 'all';
-                                $tabUrl = $isAllTab
-                                    ? $eventsUrl(
-                                        ['view' => $viewMode, 'month' => $viewMode === 'calendar' ? $calendarMonth->format('Y-m') : null],
-                                        ['family', 'type', 'category']
-                                    )
-                                    : $eventsUrl([
-                                        'family' => $tab['value'],
-                                        'type' => null,
-                                        'category' => null,
-                                        'view' => $viewMode,
-                                        'month' => $viewMode === 'calendar' ? $calendarMonth->format('Y-m') : null,
-                                    ]);
-                            @endphp
+                    <details class="overflow-hidden rounded-[32px] border border-gray-200 bg-white shadow-sm" @if($activeFilterCount > 0) open @endif>
+                        <summary class="event-filters-summary cursor-pointer list-none p-4 md:p-5">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div class="flex items-start gap-4">
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-lg shadow-purple-100">
+                                        <i class="fa-solid fa-sliders text-lg"></i>
+                                    </span>
 
-                            <a
-                                href="{{ $tabUrl }}"
-                                @class([
-                                    'group rounded-3xl border p-5 transition-all duration-300',
-                                    'border-transparent bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-xl shadow-purple-100' => $selectedFamily === $tab['value'],
-                                    'border-gray-200 bg-white hover:-translate-y-1 hover:border-purple-200 hover:shadow-lg' => $selectedFamily !== $tab['value'],
-                                ])
-                            >
-                                <div class="flex items-start justify-between gap-4">
                                     <div>
-                                        <p class="text-xs font-bold uppercase tracking-[0.24em] {{ $selectedFamily === $tab['value'] ? 'text-white/70' : 'text-purple-600' }}">
-                                            {{ $t('Famille', 'Family') }}
-                                        </p>
-                                        <div class="mt-2 flex items-center gap-2">
-                                            <h3 class="text-xl font-black">{{ $tab['label'] }}</h3>
-                                            <span class="inline-flex min-w-10 items-center justify-center rounded-full px-2.5 py-1 text-xs font-black {{ $selectedFamily === $tab['value'] ? 'bg-white/15 text-white' : 'bg-purple-50 text-purple-700' }}">
-                                                {{ number_format($familyCounts[$tab['value']] ?? 0, 0, ',', ' ') }}
-                                            </span>
-                                        </div>
-                                        <p class="mt-2 text-sm {{ $selectedFamily === $tab['value'] ? 'text-white/85' : 'text-gray-500' }}">
-                                            {{ $tab['description'] }}
+                                        <p class="text-xs font-bold uppercase tracking-[0.28em] text-purple-600">{{ $t('Filtres', 'Filters') }}</p>
+                                        <h3 class="mt-1 text-xl font-black text-gray-900 md:text-2xl">{{ $t('Ouvrir le panneau de filtres', 'Open the filter panel') }}</h3>
+                                        <p class="mt-2 text-sm text-gray-500">
+                                            @if($activeFilterCount > 0)
+                                                {{ $activeFilterCount }}
+                                                {{ $activeFilterCount > 1 ? $t('filtres sont déjà actifs. Touchez ici pour les modifier.', 'filters are already active. Tap here to adjust them.') : $t('filtre est déjà actif. Touchez ici pour le modifier.', 'filter is already active. Tap here to adjust it.') }}
+                                            @else
+                                                {{ $t('La page reste plus légère au premier regard. Touchez l’icône pour afficher tous les critères.', 'The page stays lighter at first glance. Tap the icon to reveal all criteria.') }}
+                                            @endif
                                         </p>
                                     </div>
+                                </div>
 
-                                    <span class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $selectedFamily === $tab['value'] ? 'bg-white/15 text-white' : 'bg-purple-50 text-purple-600' }}">
-                                        <i class="fa-solid {{ $tab['icon'] }}"></i>
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-gray-700">
+                                        <i class="fa-solid fa-filter text-xs text-purple-600"></i>
+                                        <span>
+                                            @if($activeFilterCount > 0)
+                                                {{ $activeFilterCount }} {{ $activeFilterCount > 1 ? $t('actifs', 'active') : $t('actif', 'active') }}
+                                            @else
+                                                {{ $t('Afficher', 'Show') }}
+                                            @endif
+                                        </span>
+                                    </span>
+
+                                    <span class="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-transform duration-300 event-filters-chevron">
+                                        <i class="fa-solid fa-chevron-down text-sm"></i>
                                     </span>
                                 </div>
-                            </a>
-                        @endforeach
-                    </div>
+                            </div>
+                        </summary>
 
-                    <div class="flex flex-wrap gap-3">
-                        @foreach($quickPresets as $preset)
-                            @php
-                                $presetUrl = $eventsUrl(array_merge(
-                                    $preset['filters'],
-                                    [
-                                        'view' => $viewMode,
-                                        'family' => $selectedFamily !== 'all' ? $selectedFamily : null,
-                                        'month' => $viewMode === 'calendar'
-                                            ? ($preset['filters']['month'] ?? $calendarMonth->format('Y-m'))
-                                            : null,
-                                    ]
-                                ));
-                            @endphp
-                            <a
-                                href="{{ $presetUrl }}"
-                                @class([
-                                    'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-all',
-                                    'border-transparent bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-lg shadow-purple-100' => $preset['is_active'],
-                                    'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:text-purple-600' => !$preset['is_active'],
-                                ])
-                            >
-                                <i class="fa-solid {{ $preset['icon'] }} text-xs"></i>
-                                <span>{{ $preset['label'] }}</span>
-                            </a>
-                        @endforeach
-                    </div>
+                        <div class="space-y-6 border-t border-gray-100 px-4 py-5 md:px-5 md:py-6">
+                            <div class="grid gap-4 lg:grid-cols-3">
+                                @foreach($familyTabs as $tab)
+                                    @php
+                                        $isAllTab = $tab['value'] === 'all';
+                                        $tabUrl = $isAllTab
+                                            ? $eventsUrl(
+                                                ['view' => $viewMode, 'month' => $viewMode === 'calendar' ? $calendarMonth->format('Y-m') : null],
+                                                ['family', 'type', 'category']
+                                            )
+                                            : $eventsUrl([
+                                                'family' => $tab['value'],
+                                                'type' => null,
+                                                'category' => null,
+                                                'view' => $viewMode,
+                                                'month' => $viewMode === 'calendar' ? $calendarMonth->format('Y-m') : null,
+                                            ]);
+                                    @endphp
 
-                    <form method="GET" action="{{ route('events') }}" class="rounded-3xl bg-gray-50 p-4 md:p-6">
-                        <input type="hidden" name="view" value="{{ $viewMode }}">
-                        @if($viewMode === 'calendar')
-                            <input type="hidden" name="month" value="{{ $calendarMonth->format('Y-m') }}">
-                        @endif
-                        @if($selectedFamily !== 'all')
-                            <input type="hidden" name="family" value="{{ $selectedFamily }}">
-                        @endif
-
-                        <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Recherche', 'Search') }}</label>
-                                <div class="relative">
-                                    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-purple-500">
-                                        <i class="fa-solid fa-magnifying-glass"></i>
-                                    </span>
-                                    <input
-                                        type="search"
-                                        name="q"
-                                        value="{{ request('q') }}"
-                                        placeholder="{{ $t('Artiste, événement, salle, ville...', 'Artist, event, venue, city...') }}"
-                                        class="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
+                                    <a
+                                        href="{{ $tabUrl }}"
+                                        @class([
+                                            'group rounded-3xl border p-5 transition-all duration-300',
+                                            'border-transparent bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-xl shadow-purple-100' => $selectedFamily === $tab['value'],
+                                            'border-gray-200 bg-white hover:-translate-y-1 hover:border-purple-200 hover:shadow-lg' => $selectedFamily !== $tab['value'],
+                                        ])
                                     >
-                                </div>
-                            </div>
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div>
+                                                <p class="text-xs font-bold uppercase tracking-[0.24em] {{ $selectedFamily === $tab['value'] ? 'text-white/70' : 'text-purple-600' }}">
+                                                    {{ $t('Famille', 'Family') }}
+                                                </p>
+                                                <div class="mt-2 flex items-center gap-2">
+                                                    <h3 class="text-xl font-black">{{ $tab['label'] }}</h3>
+                                                    <span class="inline-flex min-w-10 items-center justify-center rounded-full px-2.5 py-1 text-xs font-black {{ $selectedFamily === $tab['value'] ? 'bg-white/15 text-white' : 'bg-purple-50 text-purple-700' }}">
+                                                        {{ number_format($familyCounts[$tab['value']] ?? 0, 0, ',', ' ') }}
+                                                    </span>
+                                                </div>
+                                                <p class="mt-2 text-sm {{ $selectedFamily === $tab['value'] ? 'text-white/85' : 'text-gray-500' }}">
+                                                    {{ $tab['description'] }}
+                                                </p>
+                                            </div>
 
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Catégorie', 'Category') }}</label>
-                                <select name="category" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                                    <option value="">{{ $t('Toutes les catégories', 'All categories') }}</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>
-                                            {{ $category->name_fr }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Tri', 'Sort') }}</label>
-                                <select name="sort" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                                    @foreach($sortOptions as $sortValue => $sortLabel)
-                                        <option value="{{ $sortValue }}" {{ $selectedSort === $sortValue ? 'selected' : '' }}>
-                                            {{ $sortLabel }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Ville', 'City') }}</label>
-                                <select name="city" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                                    <option value="">{{ $t('Toutes les villes', 'All cities') }}</option>
-                                    @foreach($cities as $city)
-                                        <option value="{{ $city }}" {{ request('city') === $city ? 'selected' : '' }}>
-                                            {{ $city }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 grid gap-4 lg:grid-cols-4">
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Pays', 'Country') }}</label>
-                                <select name="country" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                                    <option value="">{{ $t('Tous les pays', 'All countries') }}</option>
-                                    @foreach($countries as $country)
-                                        <option value="{{ $country }}" {{ request('country') === $country ? 'selected' : '' }}>
-                                            {{ $country }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Lieu', 'Venue') }}</label>
-                                <select name="venue" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                                    <option value="">{{ $t('Tous les lieux', 'All venues') }}</option>
-                                    @foreach($venues as $venue)
-                                        <option value="{{ $venue }}" {{ request('venue') === $venue ? 'selected' : '' }}>
-                                            {{ $venue }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Date précise', 'Specific date') }}</label>
-                                <input type="date" name="date" value="{{ request('date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Du', 'From') }}</label>
-                                <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Au', 'To') }}</label>
-                                <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Budget min', 'Min budget') }}</label>
-                                <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="0" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                            </div>
-
-                            <div>
-                                <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Budget max', 'Max budget') }}</label>
-                                <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="0" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
-                            </div>
-                        </div>
-
-                        <div class="mt-4 grid gap-3 md:grid-cols-2">
-                            <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-purple-300">
-                                <input type="checkbox" name="featured" value="1" {{ request()->boolean('featured') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                                <span>{{ $t('Afficher seulement les événements mis en avant', 'Show featured events only') }}</span>
-                            </label>
-
-                            <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-purple-300">
-                                <input type="checkbox" name="available_only" value="1" {{ request()->boolean('available_only') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                                <span>{{ $t('Masquer les événements complets', 'Hide sold out events') }}</span>
-                            </label>
-                        </div>
-
-                        <div class="mt-5 flex flex-col gap-4 border-t border-gray-200 pt-5 lg:flex-row lg:items-center lg:justify-between">
-                            <p class="max-w-3xl text-sm text-gray-500">
-                                {{ $t('Commencez par choisir une famille, puis affinez par ville, salle, date ou budget. Le calendrier reprend exactement les mêmes filtres que la liste.', 'Start with a family, then refine by city, venue, date or budget. The calendar uses exactly the same filters as the list.') }}
-                            </p>
-
-                            <div class="flex flex-col gap-3 sm:flex-row">
-                                @if($activeFilters->isNotEmpty())
-                                    <a href="{{ $resetUrl }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-300 px-5 py-3 text-sm font-bold text-gray-700 transition hover:border-purple-400 hover:text-purple-600">
-                                        <i class="fa-solid fa-rotate-left text-xs"></i>
-                                        <span>{{ $t('Réinitialiser', 'Reset') }}</span>
+                                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $selectedFamily === $tab['value'] ? 'bg-white/15 text-white' : 'bg-purple-50 text-purple-600' }}">
+                                                <i class="fa-solid {{ $tab['icon'] }}"></i>
+                                            </span>
+                                        </div>
                                     </a>
+                                @endforeach
+                            </div>
+
+                            <div class="flex flex-wrap gap-3">
+                                @foreach($quickPresets as $preset)
+                                    @php
+                                        $presetUrl = $eventsUrl(array_merge(
+                                            $preset['filters'],
+                                            [
+                                                'view' => $viewMode,
+                                                'family' => $selectedFamily !== 'all' ? $selectedFamily : null,
+                                                'month' => $viewMode === 'calendar'
+                                                    ? ($preset['filters']['month'] ?? $calendarMonth->format('Y-m'))
+                                                    : null,
+                                            ]
+                                        ));
+                                    @endphp
+                                    <a
+                                        href="{{ $presetUrl }}"
+                                        @class([
+                                            'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-all',
+                                            'border-transparent bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-lg shadow-purple-100' => $preset['is_active'],
+                                            'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:text-purple-600' => !$preset['is_active'],
+                                        ])
+                                    >
+                                        <i class="fa-solid {{ $preset['icon'] }} text-xs"></i>
+                                        <span>{{ $preset['label'] }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+
+                            <form method="GET" action="{{ route('events') }}" class="rounded-3xl bg-gray-50 p-4 md:p-6">
+                                <input type="hidden" name="view" value="{{ $viewMode }}">
+                                @if($viewMode === 'calendar')
+                                    <input type="hidden" name="month" value="{{ $calendarMonth->format('Y-m') }}">
+                                @endif
+                                @if($selectedFamily !== 'all')
+                                    <input type="hidden" name="family" value="{{ $selectedFamily }}">
                                 @endif
 
-                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-amber-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-purple-100 transition hover:scale-[1.01]">
-                                    <i class="fa-solid fa-sliders text-xs"></i>
-                                    <span>{{ $t('Appliquer les filtres', 'Apply filters') }}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                                <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Recherche', 'Search') }}</label>
+                                        <div class="relative">
+                                            <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-purple-500">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </span>
+                                            <input
+                                                type="search"
+                                                name="q"
+                                                value="{{ request('q') }}"
+                                                placeholder="{{ $t('Artiste, événement, salle, ville...', 'Artist, event, venue, city...') }}"
+                                                class="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
+                                            >
+                                        </div>
+                                    </div>
 
-                    @if($activeFilters->isNotEmpty())
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($activeFilters as $filter)
-                                <span class="inline-flex items-center gap-2 rounded-full border border-purple-100 bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700">
-                                    <span class="uppercase tracking-[0.2em] text-[10px] text-purple-500">{{ $filter['label'] }}</span>
-                                    <span>{{ $filter['value'] }}</span>
-                                </span>
-                            @endforeach
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Catégorie', 'Category') }}</label>
+                                        <select name="category" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                            <option value="">{{ $t('Toutes les catégories', 'All categories') }}</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name_fr }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Tri', 'Sort') }}</label>
+                                        <select name="sort" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                            @foreach($sortOptions as $sortValue => $sortLabel)
+                                                <option value="{{ $sortValue }}" {{ $selectedSort === $sortValue ? 'selected' : '' }}>
+                                                    {{ $sortLabel }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Ville', 'City') }}</label>
+                                        <select name="city" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                            <option value="">{{ $t('Toutes les villes', 'All cities') }}</option>
+                                            @foreach($cities as $city)
+                                                <option value="{{ $city }}" {{ request('city') === $city ? 'selected' : '' }}>
+                                                    {{ $city }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid gap-4 lg:grid-cols-4">
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Pays', 'Country') }}</label>
+                                        <select name="country" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                            <option value="">{{ $t('Tous les pays', 'All countries') }}</option>
+                                            @foreach($countries as $country)
+                                                <option value="{{ $country }}" {{ request('country') === $country ? 'selected' : '' }}>
+                                                    {{ $country }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Lieu', 'Venue') }}</label>
+                                        <select name="venue" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                            <option value="">{{ $t('Tous les lieux', 'All venues') }}</option>
+                                            @foreach($venues as $venue)
+                                                <option value="{{ $venue }}" {{ request('venue') === $venue ? 'selected' : '' }}>
+                                                    {{ $venue }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Date précise', 'Specific date') }}</label>
+                                        <input type="date" name="date" value="{{ request('date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Du', 'From') }}</label>
+                                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Au', 'To') }}</label>
+                                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Budget min', 'Min budget') }}</label>
+                                        <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="0" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-gray-500">{{ $t('Budget max', 'Max budget') }}</label>
+                                        <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="0" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid gap-3 md:grid-cols-2">
+                                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-purple-300">
+                                        <input type="checkbox" name="featured" value="1" {{ request()->boolean('featured') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                        <span>{{ $t('Afficher seulement les événements mis en avant', 'Show featured events only') }}</span>
+                                    </label>
+
+                                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-purple-300">
+                                        <input type="checkbox" name="available_only" value="1" {{ request()->boolean('available_only') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                        <span>{{ $t('Masquer les événements complets', 'Hide sold out events') }}</span>
+                                    </label>
+                                </div>
+
+                                <div class="mt-5 flex flex-col gap-4 border-t border-gray-200 pt-5 lg:flex-row lg:items-center lg:justify-between">
+                                    <p class="max-w-3xl text-sm text-gray-500">
+                                        {{ $t('Commencez par choisir une famille, puis affinez par ville, salle, date ou budget. Le calendrier reprend exactement les mêmes filtres que la liste.', 'Start with a family, then refine by city, venue, date or budget. The calendar uses exactly the same filters as the list.') }}
+                                    </p>
+
+                                    <div class="flex flex-col gap-3 sm:flex-row">
+                                        @if($activeFilters->isNotEmpty())
+                                            <a href="{{ $resetUrl }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-300 px-5 py-3 text-sm font-bold text-gray-700 transition hover:border-purple-400 hover:text-purple-600">
+                                                <i class="fa-solid fa-rotate-left text-xs"></i>
+                                                <span>{{ $t('Réinitialiser', 'Reset') }}</span>
+                                            </a>
+                                        @endif
+
+                                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-amber-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-purple-100 transition hover:scale-[1.01]">
+                                            <i class="fa-solid fa-sliders text-xs"></i>
+                                            <span>{{ $t('Appliquer les filtres', 'Apply filters') }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            @if($activeFilters->isNotEmpty())
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($activeFilters as $filter)
+                                        <span class="inline-flex items-center gap-2 rounded-full border border-purple-100 bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700">
+                                            <span class="uppercase tracking-[0.2em] text-[10px] text-purple-500">{{ $filter['label'] }}</span>
+                                            <span>{{ $filter['value'] }}</span>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </details>
                 </div>
             </div>
         </div>
