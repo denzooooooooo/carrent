@@ -314,8 +314,9 @@ class PaymentController extends Controller
             // ✅ MEILLEUR MESSAGE D'ERREUR
             $errorMsg = $result['message'] ?? 'Erreur paiement';
             if (strpos($errorMsg, 'TOO_HIGH') !== false || strpos($errorMsg, '1500000') !== false) {
-                $errorMsg = '❌ Montant trop élevé pour paiement en ligne (max 1.5M XOF). 
-                Contactez-nous pour paiement VIP: +225 07 07 07 07 07 ou admin@carrepremium.ci';
+                $supportPhone = config('carre_premium.contact.mobile_display');
+                $supportEmail = config('carre_premium.contact.support_email');
+                $errorMsg = "Montant trop élevé pour le paiement en ligne (max 1,5M XOF). Contactez l’équipe Carré Premium au {$supportPhone} ou par email via {$supportEmail}.";
             }
 
             Log::error('CinetPay: Erreur initialisation', [

@@ -1,267 +1,316 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Acceuil')
+@section('title', 'Dashboard')
 
 @section('content')
-        <div class="space-y-8">
-            <section class="admin-page-header" id="overview">
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Pilotage</p>
-                    <h1 class="mt-2 text-3xl font-black text-gray-900">Dashboard administrateur</h1>
-                    <p class="mt-3 max-w-2xl text-gray-600">Vue d'ensemble des réservations, revenus, opérations en attente et alertes prioritaires.</p>
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <a href="#stats" class="admin-btn-primary px-5 py-3 text-sm">Statistiques clés</a>
-                    <a href="#charts" class="admin-btn-ghost px-5 py-3 text-sm">Graphiques</a>
-                    <div class="admin-btn-ghost px-5 py-3 text-sm">
-                        <i class="fas fa-clock"></i>
-                        Mise à jour: {{ now()->format('H:i') }}
-                    </div>
-                </div>
-            </section>
-
-            <div class="space-y-6">
-            <!-- Statistiques Principales - Ligne 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full" id="stats">
-                <!-- Réservations Aujourd'hui -->
-                <div class="admin-kpi p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-purple-600 mb-2">Réservations Aujourd'hui</p>
-                            <h3 class="text-4xl font-black text-gray-900" id="bookings-today">{{ $stats['bookings_today'] }}
-                            </h3>
-                        </div>
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-purple-100 text-purple-700">
-                            <i class="fas fa-calendar-check text-3xl"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-center text-sm">
-                        <span class="rounded-full bg-purple-50 px-3 py-1 font-semibold text-purple-700">{{ $stats['bookings_week'] }}
-                            cette semaine</span>
-                    </div>
-                </div>
-
-                <!-- Revenus Aujourd'hui -->
-                <div class="admin-kpi admin-kpi-accent p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700 mb-2">Revenus Aujourd'hui</p>
-                            <h3 class="text-4xl font-black text-gray-900" id="revenue-today">
-                                {{ number_format($stats['revenue_today'], 0, ',', ' ') }}
-                            </h3>
-                            <p class="text-xs text-gray-500">XOF</p>
-                        </div>
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-amber-100 text-amber-700">
-                            <i class="fas fa-money-bill-wave text-3xl"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-center text-sm">
-                        <span
-                            class="rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-700">{{ number_format($stats['revenue_month'], 0, ',', ' ') }}
-                            ce mois</span>
-                    </div>
-                </div>
-
-                <!-- Nouveaux Utilisateurs -->
-                <div class="admin-kpi p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-purple-600 mb-2">Nouveaux Utilisateurs</p>
-                            <h3 class="text-4xl font-black text-gray-900">{{ $stats['new_users_today'] }}</h3>
-                        </div>
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-purple-100 text-purple-700">
-                            <i class="fas fa-user-plus text-3xl"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-center text-sm">
-                        <span class="rounded-full bg-purple-50 px-3 py-1 font-semibold text-purple-700">{{ $stats['total_users'] }}
-                            total</span>
-                    </div>
-                </div>
-
-                <!-- En Attente -->
-                <div class="admin-kpi admin-kpi-accent p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700 mb-2">En Attente</p>
-                            <h3 class="text-4xl font-black text-gray-900" id="pending-bookings">
-                                {{ $stats['pending_bookings'] }}
-                            </h3>
-                        </div>
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-amber-100 text-amber-700">
-                            <i class="fas fa-clock text-3xl"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-center text-sm">
-                        <span class="rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-700">{{ $stats['pending_reviews'] }}
-                            avis</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistiques Secondaires - Ligne 2 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full">
-                <div class="admin-panel p-6 border-l-4 border-purple-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-600">Vols Réservés</p>
-                            <h4 class="text-2xl font-black text-gray-800">{{ $stats['flight_bookings_total'] }}
-                            </h4>
-                        </div>
-                        <i class="fas fa-plane text-3xl text-purple-500"></i>
-                    </div>
-                </div>
-
-                <div class="admin-panel p-6 border-l-4 border-amber-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-600">Billets Événements</p>
-                            <h4 class="text-2xl font-black text-gray-800">{{ $stats['event_tickets_sold'] }}
-                            </h4>
-                        </div>
-                        <i class="fas fa-ticket-alt text-3xl text-amber-600"></i>
-                    </div>
-                </div>
-
-                <div class="admin-panel p-6 border-l-4 border-green-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-600">Packages Vendus</p>
-                            <h4 class="text-2xl font-black text-gray-800">{{ $stats['package_bookings_total'] }}
-                            </h4>
-                        </div>
-                        <i class="fas fa-suitcase text-3xl text-green-500"></i>
-                    </div>
-                </div>
-
-                <div class="admin-panel p-6 border-l-4 border-purple-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-600">Note Moyenne</p>
-                            <h4 class="text-2xl font-black text-gray-800">
-                                {{ $stats['average_rating'] ?? '0.0' }}/5
-                            </h4>
-                        </div>
-                        <i class="fas fa-star text-3xl text-purple-600"></i>
-                    </div>
-                </div>
-
-                <div class="admin-panel p-6 border-l-4 border-red-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-600">Annulations</p>
-                            <h4 class="text-2xl font-black text-gray-800">{{ $stats['cancelled_bookings'] }}
-                            </h4>
-                        </div>
-                        <i class="fas fa-times-circle text-3xl text-red-500"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Alertes Importantes -->
-            @if($alerts['low_stock_events'] > 0 || $alerts['low_stock_packages'] > 0 || $alerts['failed_payments'] > 0)
-                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-xl">
-                    <div class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mr-4 mt-1"></i>
-                        <div class="flex-1">
-                            <h3 class="text-lg font-bold text-red-800 mb-3">Alertes Importantes</h3>
-                            <div class="space-y-2">
-                                @if($alerts['low_stock_events'] > 0)
-                                    <p class="text-red-700"><i
-                                            class="fas fa-circle text-xs mr-2"></i>{{ $alerts['low_stock_events'] }}
-                                        événement(s) avec stock faible</p>
-                                @endif
-                                @if($alerts['low_stock_packages'] > 0)
-                                    <p class="text-red-700"><i
-                                            class="fas fa-circle text-xs mr-2"></i>{{ $alerts['low_stock_packages'] }}
-                                        package(s) avec stock faible</p>
-                                @endif
-                                @if($alerts['failed_payments'] > 0)
-                                    <p class="text-red-700"><i
-                                            class="fas fa-circle text-xs mr-2"></i>{{ $alerts['failed_payments'] }}
-                                        paiement(s) échoué(s) cette semaine</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Graphiques -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full" id="charts">
-                <!-- Graphique Revenus -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-black text-gray-800">
-                            <i class="fas fa-chart-line text-purple-600 mr-2"></i>
-                            Évolution des Revenus
-                        </h3>
-                        <span class="text-sm text-gray-500">12 derniers mois</span>
-                    </div>
-                    <div class="h-80">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Graphique Réservations -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-black text-gray-800">
-                            <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
-                            Évolution des Réservations
-                        </h3>
-                        <span class="text-sm text-gray-500">12 derniers mois</span>
-                    </div>
-                    <div class="h-80">
-                        <canvas id="bookingsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Graphiques Circulaires -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Réservations par Type -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <h3 class="text-lg font-black text-gray-800 mb-6">
-                        <i class="fas fa-chart-pie text-purple-600 mr-2"></i>
-                        Par Type
-                    </h3>
-                    <div class="h-64">
-                        <canvas id="typeChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Réservations par Statut -->
-                <div class="glass rounded-2xl shadow-lg p-8">
-                    <h3 class="text-lg font-black text-gray-800 mb-6">
-                        <i class="fas fa-chart-pie text-green-600 mr-2"></i>
-                        Par Statut
-                    </h3>
-                    <div class="h-64">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistiques 7 Derniers Jours -->
-            <div class="glass rounded-2xl shadow-lg p-8 w-full" id="reports">
-                <h3 class="text-xl font-black text-gray-800 mb-6">
-                    <i class="fas fa-calendar-week text-purple-600 mr-2"></i>
-                    Activité des 7 Derniers Jours
-                </h3>
-                <div class="h-80">
-                    <canvas id="dailyStatsChart"></canvas>
-                </div>
-            </div>
-
+<div class="space-y-8">
+    <section class="admin-page-header">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Pilotage</p>
+            <h1 class="mt-2 text-3xl font-black text-gray-900">Dashboard administrateur</h1>
+            <p class="mt-3 max-w-2xl text-gray-600">Vue d’ensemble des réservations, du revenu, des alertes et des opérations qui demandent une action immédiate.</p>
         </div>
-    </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('admin.bookings.index') }}" class="admin-btn-primary px-5 py-3 text-sm">
+                <i class="fas fa-calendar-check"></i>
+                Réservations
+            </a>
+            <a href="{{ route('admin.users.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                <i class="fas fa-users"></i>
+                Utilisateurs
+            </a>
+            <div class="admin-btn-ghost px-5 py-3 text-sm">
+                <i class="fas fa-clock"></i>
+                Mise à jour {{ now()->format('d/m/Y H:i') }}
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <article class="admin-kpi p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-purple-600">Réservations aujourd’hui</p>
+            <div class="mt-5 flex items-end justify-between gap-4">
+                <div>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['bookings_today'] }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ $stats['bookings_week'] }} cette semaine</p>
+                </div>
+                <div class="flex h-15 w-15 items-center justify-center rounded-2xl bg-purple-100 text-purple-700">
+                    <i class="fas fa-calendar-check text-2xl"></i>
+                </div>
+            </div>
+        </article>
+
+        <article class="admin-kpi admin-kpi-accent p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700">Revenu du mois</p>
+            <div class="mt-5 flex items-end justify-between gap-4">
+                <div>
+                    <p class="text-4xl font-black text-gray-900">{{ number_format($stats['revenue_month'], 0, ',', ' ') }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ number_format($stats['revenue_today'], 0, ',', ' ') }} aujourd’hui</p>
+                </div>
+                <div class="flex h-15 w-15 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                    <i class="fas fa-money-bill-wave text-2xl"></i>
+                </div>
+            </div>
+        </article>
+
+        <article class="admin-kpi p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-purple-600">Base clients</p>
+            <div class="mt-5 flex items-end justify-between gap-4">
+                <div>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['total_users'] }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ $stats['new_users_today'] }} nouveaux aujourd’hui</p>
+                </div>
+                <div class="flex h-15 w-15 items-center justify-center rounded-2xl bg-purple-100 text-purple-700">
+                    <i class="fas fa-user-plus text-2xl"></i>
+                </div>
+            </div>
+        </article>
+
+        <article class="admin-kpi admin-kpi-accent p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700">File d’attente</p>
+            <div class="mt-5 flex items-end justify-between gap-4">
+                <div>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['pending_bookings'] }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ $stats['cancelled_bookings'] }} annulations</p>
+                </div>
+                <div class="flex h-15 w-15 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <div class="admin-panel p-6 border-l-4 border-purple-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Vols</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ $stats['flight_bookings_total'] }}</p>
+            <p class="mt-2 text-sm text-gray-600">Réservations cumulées</p>
+        </div>
+        <div class="admin-panel p-6 border-l-4 border-amber-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Événements</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ $stats['event_tickets_sold'] }}</p>
+            <p class="mt-2 text-sm text-gray-600">Dossiers billetterie</p>
+        </div>
+        <div class="admin-panel p-6 border-l-4 border-green-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Packages</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ $stats['package_bookings_total'] }}</p>
+            <p class="mt-2 text-sm text-gray-600">Dossiers voyage</p>
+        </div>
+        <div class="admin-panel p-6 border-l-4 border-purple-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Avis moyen</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ number_format($stats['average_rating'] ?? 0, 1) }}/5</p>
+            <p class="mt-2 text-sm text-gray-600">Expérience client</p>
+        </div>
+        <div class="admin-panel p-6 border-l-4 border-red-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Paiements échoués</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ $alerts['failed_payments'] }}</p>
+            <p class="mt-2 text-sm text-gray-600">Sur les 7 derniers jours</p>
+        </div>
+    </section>
+
+    @if($alerts['low_stock_events'] > 0 || $alerts['low_stock_packages'] > 0 || $alerts['failed_payments'] > 0)
+        <section class="admin-panel border border-red-200 bg-red-50/80 p-6">
+            <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600">
+                    <i class="fas fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-red-600">Alertes prioritaires</p>
+                    <div class="mt-4 grid gap-3 md:grid-cols-3">
+                        @if($alerts['low_stock_events'] > 0)
+                            <div class="rounded-2xl border border-red-200 bg-white px-4 py-4 text-sm font-semibold text-gray-800">
+                                {{ $alerts['low_stock_events'] }} événement(s) avec stock faible
+                            </div>
+                        @endif
+                        @if($alerts['low_stock_packages'] > 0)
+                            <div class="rounded-2xl border border-red-200 bg-white px-4 py-4 text-sm font-semibold text-gray-800">
+                                {{ $alerts['low_stock_packages'] }} package(s) proches de la saturation
+                            </div>
+                        @endif
+                        @if($alerts['failed_payments'] > 0)
+                            <div class="rounded-2xl border border-red-200 bg-white px-4 py-4 text-sm font-semibold text-gray-800">
+                                {{ $alerts['failed_payments'] }} paiement(s) échoué(s) à traiter
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-2" id="charts">
+        <div class="admin-panel p-6 sm:p-8">
+            <div class="mb-6 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">Performance</p>
+                    <h2 class="mt-2 text-2xl font-black text-gray-900">Évolution des revenus</h2>
+                </div>
+                <span class="rounded-full bg-purple-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-purple-700">12 mois</span>
+            </div>
+            <div class="h-80">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <div class="admin-panel p-6 sm:p-8">
+            <div class="mb-6 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-600">Volume</p>
+                    <h2 class="mt-2 text-2xl font-black text-gray-900">Évolution des réservations</h2>
+                </div>
+                <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-amber-700">12 mois</span>
+            </div>
+            <div class="h-80">
+                <canvas id="bookingsChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="admin-panel p-6 sm:p-8">
+            <div class="mb-6 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">Mix produit</p>
+                    <h2 class="mt-2 text-xl font-black text-gray-900">Répartition par type</h2>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="typeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="admin-panel p-6 sm:p-8">
+            <div class="mb-6 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-green-600">Traitement</p>
+                    <h2 class="mt-2 text-xl font-black text-gray-900">Répartition par statut</h2>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="admin-panel p-6 sm:p-8">
+            <div class="mb-6 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">7 jours</p>
+                    <h2 class="mt-2 text-xl font-black text-gray-900">Activité récente</h2>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="dailyStatsChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="admin-panel overflow-hidden">
+            <div class="border-b border-gray-100 px-6 py-5">
+                <p class="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">Flux</p>
+                <h2 class="mt-2 text-2xl font-black text-gray-900">Dernières réservations</h2>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($recentBookings as $booking)
+                    <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+                        <div>
+                            <p class="text-sm font-black text-gray-900">{{ $booking->booking_number }}</p>
+                            <p class="mt-1 text-sm text-gray-600">{{ $booking->user->name }}</p>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p class="font-semibold text-gray-900">{{ ucfirst($booking->booking_type) }}</p>
+                            <p>{{ number_format($booking->final_amount, 0, ',', ' ') }} XOF</p>
+                        </div>
+                        <div class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] {{ $booking->status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' : ($booking->status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700') }}">
+                            {{ $booking->status }}
+                        </div>
+                    </div>
+                @empty
+                    <div class="px-6 py-10 text-sm text-gray-500">Aucune réservation récente à afficher.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="admin-panel overflow-hidden">
+            <div class="border-b border-gray-100 px-6 py-5">
+                <p class="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">Communauté</p>
+                <h2 class="mt-2 text-2xl font-black text-gray-900">Derniers utilisateurs</h2>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($recentUsers as $user)
+                    <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+                        <div>
+                            <p class="text-sm font-black text-gray-900">{{ $user->name }}</p>
+                            <p class="mt-1 text-sm text-gray-600">{{ $user->email }}</p>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-700">
+                            {{ $user->created_at->format('d/m/Y') }}
+                        </div>
+                    </div>
+                @empty
+                    <div class="px-6 py-10 text-sm text-gray-500">Aucun nouvel utilisateur récent.</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="admin-panel overflow-hidden">
+            <div class="border-b border-gray-100 px-6 py-5">
+                <h2 class="text-xl font-black text-gray-900">Top événements</h2>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($topEvents as $event)
+                    <div class="flex items-center justify-between gap-4 px-6 py-4 text-sm">
+                        <span class="font-semibold text-gray-900">{{ $event->title }}</span>
+                        <span class="rounded-full bg-purple-50 px-3 py-1 font-bold text-purple-700">{{ $event->tickets_count }}</span>
+                    </div>
+                @empty
+                    <div class="px-6 py-10 text-sm text-gray-500">Aucun événement remonté.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="admin-panel overflow-hidden">
+            <div class="border-b border-gray-100 px-6 py-5">
+                <h2 class="text-xl font-black text-gray-900">Top packages</h2>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($topPackages as $package)
+                    <div class="flex items-center justify-between gap-4 px-6 py-4 text-sm">
+                        <span class="font-semibold text-gray-900">{{ $package->title }}</span>
+                        <span class="rounded-full bg-amber-50 px-3 py-1 font-bold text-amber-700">{{ $package->bookings_count }}</span>
+                    </div>
+                @empty
+                    <div class="px-6 py-10 text-sm text-gray-500">Aucun package remonté.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="admin-panel overflow-hidden">
+            <div class="border-b border-gray-100 px-6 py-5">
+                <h2 class="text-xl font-black text-gray-900">Top destinations</h2>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($topDestinations as $destination)
+                    <div class="flex items-center justify-between gap-4 px-6 py-4 text-sm">
+                        <span class="font-semibold text-gray-900">{{ $destination->destination }}</span>
+                        <span class="rounded-full bg-green-50 px-3 py-1 font-bold text-green-700">{{ $destination->count }}</span>
+                    </div>
+                @empty
+                    <div class="px-6 py-10 text-sm text-gray-500">Aucune destination disponible.</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+</div>
+@endsection
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Revenue Chart
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    const revenueChart = new Chart(revenueCtx, {
+    new Chart(revenueCtx, {
         type: 'line',
         data: {
             labels: @json($revenueData->pluck('month')),
@@ -270,105 +319,58 @@
                 data: @json($revenueData->pluck('total')),
                 borderColor: 'rgb(91, 33, 182)',
                 backgroundColor: 'rgba(91, 33, 182, 0.12)',
-                tension: 0.1
+                fill: true,
+                tension: 0.28
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Évolution des Revenus'
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // Bookings Chart
     const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
-    const bookingsChart = new Chart(bookingsCtx, {
+    new Chart(bookingsCtx, {
         type: 'bar',
         data: {
             labels: @json($bookingsData->pluck('month')),
             datasets: [{
                 label: 'Réservations',
                 data: @json($bookingsData->pluck('total')),
-                backgroundColor: 'rgba(200, 138, 42, 0.35)',
+                backgroundColor: 'rgba(200, 138, 42, 0.38)',
                 borderColor: 'rgb(200, 138, 42)',
-                borderWidth: 1
+                borderWidth: 1,
+                borderRadius: 10
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Évolution des Réservations'
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // Type Chart
     const typeCtx = document.getElementById('typeChart').getContext('2d');
-    const typeChart = new Chart(typeCtx, {
-        type: 'pie',
+    new Chart(typeCtx, {
+        type: 'doughnut',
         data: {
             labels: ['Vols', 'Événements', 'Packages'],
             datasets: [{
                 data: @json($bookingsByType->pluck('count')),
-                backgroundColor: [
-                    'rgb(91, 33, 182)',
-                    'rgb(200, 138, 42)',
-                    'rgb(31, 122, 91)'
-                ]
+                backgroundColor: ['rgb(91, 33, 182)', 'rgb(200, 138, 42)', 'rgb(31, 122, 91)']
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
     });
 
-    // Status Chart
     const statusCtx = document.getElementById('statusChart').getContext('2d');
-    const statusChart = new Chart(statusCtx, {
-        type: 'pie',
+    new Chart(statusCtx, {
+        type: 'doughnut',
         data: {
             labels: ['Confirmé', 'En attente', 'Annulé', 'Terminé'],
             datasets: [{
                 data: @json($bookingsByStatus->pluck('count')),
-                backgroundColor: [
-                    'rgb(31, 122, 91)',
-                    'rgb(184, 106, 22)',
-                    'rgb(180, 35, 24)',
-                    'rgb(91, 33, 182)'
-                ]
+                backgroundColor: ['rgb(31, 122, 91)', 'rgb(184, 106, 22)', 'rgb(180, 35, 24)', 'rgb(91, 33, 182)']
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
     });
 
-    // Daily Stats Chart
     const dailyStatsCtx = document.getElementById('dailyStatsChart').getContext('2d');
-    const dailyStatsChart = new Chart(dailyStatsCtx, {
+    new Chart(dailyStatsCtx, {
         type: 'line',
         data: {
             labels: @json(collect($dailyStats)->pluck('date')),
@@ -376,30 +378,19 @@
                 label: 'Réservations',
                 data: @json(collect($dailyStats)->pluck('bookings')),
                 borderColor: 'rgb(91, 33, 182)',
-                backgroundColor: 'rgba(91, 33, 182, 0.12)',
-                tension: 0.1
+                backgroundColor: 'rgba(91, 33, 182, 0.08)',
+                fill: true,
+                tension: 0.25
             }, {
                 label: 'Utilisateurs',
                 data: @json(collect($dailyStats)->pluck('users')),
                 borderColor: 'rgb(200, 138, 42)',
-                backgroundColor: 'rgba(200, 138, 42, 0.12)',
-                tension: 0.1
+                backgroundColor: 'rgba(200, 138, 42, 0.08)',
+                fill: true,
+                tension: 0.25
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Activité des 7 Derniers Jours'
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
     });
 </script>
 @endpush
-
-@endsection

@@ -39,17 +39,27 @@ class UserController extends Controller
             $query->where('country', $request->country);
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate(15);
+        $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         // Statistiques
+        $totalUsers = User::count();
+        $activeUsers = User::where('is_active', true)->count();
         $stats = [
-            'total' => User::count(),
-            'active' => User::where('is_active', true)->count(),
+            'total' => $totalUsers,
+            'active' => $activeUsers,
+            'inactive' => max($totalUsers - $activeUsers, 0),
             'new' => User::where('created_at', '>=', Carbon::now()->subDays(30))->count(),
             'total_points' => User::sum('loyalty_points'),
         ];
 
-        return view('admin.users.index', compact('users', 'stats'));
+        $countries = User::query()
+            ->whereNotNull('country')
+            ->where('country', '!=', '')
+            ->distinct()
+            ->orderBy('country')
+            ->pluck('country');
+
+        return view('admin.users.index', compact('users', 'stats', 'countries'));
     }
 
     /**

@@ -59,6 +59,13 @@ class PackageController extends Controller
         $packages = $query->paginate(12)->withQueryString();
         $categories = Category::all();
 
+        $stats = [
+            'total' => TourPackage::count(),
+            'active' => TourPackage::where('is_active', true)->count(),
+            'featured' => TourPackage::where('is_featured', true)->count(),
+            'average_price' => (float) TourPackage::avg('price'),
+        ];
+
         $packageTypes = [
             'sport_event' => 'Événement Sportif',
             'motorsport'  => 'Motorsport / F1',
@@ -72,7 +79,7 @@ class PackageController extends Controller
             'luxury'      => 'Luxe',
         ];
 
-        return view('admin.packages.index', compact('packages', 'categories', 'packageTypes'));
+        return view('admin.packages.index', compact('packages', 'categories', 'packageTypes', 'stats'));
     }
 
     /**

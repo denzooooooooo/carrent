@@ -13,11 +13,54 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $locations = Location::orderBy('created_at', 'desc')->paginate(15);
+        $query = Location::query();
 
-        return view('admin.locations.index', compact('locations'));
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name_fr', 'like', "%{$search}%")
+                    ->orWhere('name_en', 'like', "%{$search}%")
+                    ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->boolean('is_active'));
+        }
+
+        $locations = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+
+        $stats = [
+            'total' => Location::count(),
+            'active' => Location::where('is_active', true)->count(),
+            'inactive' => Location::where('is_active', false)->count(),
+            'average_daily_rate' => (float) Location::avg('price_per_day'),
+        ];
+
+        $categories = Location::query()
+            ->whereNotNull('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        $types = Location::query()
+            ->whereNotNull('type')
+            ->where('type', '!=', '')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type');
+
+        return view('admin.locations.index', compact('locations', 'stats', 'categories', 'types'));
     }
 
     /**
