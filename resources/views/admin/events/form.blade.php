@@ -207,36 +207,30 @@
                 @method('PUT')
             @endif
 
-            <section class="admin-panel sticky top-4 z-20 border border-[#eadfce] bg-white/95 p-4 backdrop-blur sm:p-5">
-                <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-900">Édition guidée</p>
-                        <p class="mt-1 text-sm text-slate-600">Les actions importantes restent visibles. Les champs secondaires sont séparés.</p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" @click="tab = 'essentials'" :class="tab === 'essentials' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+            <section class="admin-panel border border-[#eadfce] bg-white p-3 sm:p-4">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="-mx-1 overflow-x-auto px-1">
+                        <div class="flex min-w-max flex-nowrap gap-2">
+                            <button type="button" @click="tab = 'essentials'" :class="tab === 'essentials' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
                             <i class="fas fa-pen-ruler"></i>
                             Essentiel
-                        </button>
-                        <button type="button" @click="tab = 'content'" :class="tab === 'content' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            </button>
+                            <button type="button" @click="tab = 'content'" :class="tab === 'content' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
                             <i class="fas fa-align-left"></i>
                             Contenu
-                        </button>
-                        <button type="button" @click="tab = 'offers'" :class="tab === 'offers' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            </button>
+                            <button type="button" @click="tab = 'offers'" :class="tab === 'offers' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
                             <i class="fas fa-box-open"></i>
                             Offres
-                        </button>
-                        <button type="button" @click="tab = 'advanced'" :class="tab === 'advanced' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            </button>
+                            <button type="button" @click="tab = 'advanced'" :class="tab === 'advanced' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
                             <i class="fas fa-sliders"></i>
                             Avancé
-                        </button>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('admin.events.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
-                            Annuler
-                        </a>
+                    <div class="flex flex-wrap gap-3 lg:justify-end">
                         <button type="submit" class="admin-btn-primary px-6 py-3 text-sm">
                             <i class="fas fa-floppy-disk"></i>
                             {{ $isEdit ? 'Enregistrer' : 'Créer l’événement' }}
