@@ -20,6 +20,7 @@
         "meilisearch/meilisearch-php": "^1.16",
         "mews/captcha": "^3.4",
         "phpmailer/phpmailer": "^7.0",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-medialibrary": "^11.17"
     },

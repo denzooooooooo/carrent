@@ -4,176 +4,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion Admin - Carré Premium</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Connexion Admin | Carré Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        display: ['Sora', 'sans-serif'],
+                    },
                     colors: {
-                        // Définition d'une palette plus cohérente pour le côté 'premium'
-                        'primary': {
-                            DEFAULT: '#4c1d95', // Un violet plus profond (purple-800)
-                            'light': '#a78bfa', // purple-400
-                            'dark': '#312e81', // indigo-900
+                        brand: {
+                            50: '#f4efff',
+                            100: '#ece3ff',
+                            500: '#6d28d9',
+                            600: '#5b21b6',
+                            700: '#4c1d95',
+                            900: '#24123b',
                         },
-                        'secondary': '#f59e0b', // L'ambre reste pour le contraste
+                        sand: {
+                            50: '#f9f5ef',
+                            100: '#f2e7d6',
+                            300: '#dbc19a',
+                            500: '#c88a2a',
+                        },
                     },
                     boxShadow: {
-                        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
-                    }
+                        admin: '0 30px 80px rgba(24, 12, 44, 0.18)',
+                    },
                 }
             }
-        }
+        };
     </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(109, 40, 217, 0.22), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(200, 138, 42, 0.2), transparent 28%),
+                linear-gradient(160deg, #f9f5ef 0%, #f4efff 48%, #fff 100%);
+            min-height: 100vh;
+        }
+
+        .admin-auth-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.48), transparent 35%),
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.4), transparent 24%);
+            pointer-events: none;
+        }
+
+        .admin-auth-glow {
+            box-shadow: 0 32px 90px rgba(76, 29, 149, 0.18);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
-    <div class="min-h-screen flex antialiased">
-        <div
-            class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-secondary items-center justify-center p-12 shadow-2xl">
-            <div class="max-w-md text-center transform transition-all duration-500 hover:scale-[1.02]">
-                <div class="mb-10">
-                    <i class="fas fa-crown text-8xl text-white drop-shadow-lg"></i>
-                </div>
-                <h1 class="text-5xl font-extrabold text-white mb-4 tracking-tight"> Carré Premium
-                </h1>
-                <p class="text-white/80 text-xl mb-12 font-light italic">
-                    « L'accès à l'excellence en toute sécurité. »
-                </p>
-                <div class="grid grid-cols-2 gap-4 text-white/90">
-                    <div
-                        class="text-center p-4 border border-white/20 rounded-lg backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all">
-                        <div class="text-3xl font-extrabold">24/7</div>
-                        <div class="text-sm tracking-wider">SUPPORT & SURVEILLANCE</div>
+<body class="text-slate-900 antialiased">
+    <div class="relative min-h-screen overflow-hidden">
+        <div class="admin-auth-shell relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:items-stretch lg:gap-6 lg:px-8">
+            <section class="relative hidden overflow-hidden rounded-[2rem] bg-[linear-gradient(150deg,#24123b_0%,#4c1d95_48%,#7c3aed_100%)] p-10 text-white shadow-admin lg:flex lg:w-[46%] lg:flex-col lg:justify-between">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(200,138,42,0.2),transparent_35%)]"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold tracking-[0.22em] uppercase text-white/75">
+                        <i class="fas fa-shield-halved text-sand-300"></i>
+                        Console sécurisée
                     </div>
-                    <div
-                        class="text-center p-4 border border-white/20 rounded-lg backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all">
-                        <div class="text-3xl font-extrabold">100%</div>
-                        <div class="text-sm tracking-wider">SÉCURITÉ GARANTIE</div>
+                    <div class="mt-8 max-w-xl">
+                        <p class="font-display text-5xl font-semibold leading-tight">
+                            Pilote l’activité premium avec une interface plus claire et plus sûre.
+                        </p>
+                        <p class="mt-6 text-lg leading-8 text-white/78">
+                            Réservations, événements, paiements et contenus sont centralisés ici. Cette console est réservée aux administrateurs autorisés.
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-md w-full space-y-10 p-8 sm:p-10 bg-white rounded-xl shadow-2xl border border-gray-200">
-                <div>
-                    <div
-                        class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg">
-                        <i class="fas fa-user-shield text-white text-3xl"></i>
+                <div class="relative z-10 grid gap-4 sm:grid-cols-3">
+                    <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+                        <p class="text-xs uppercase tracking-[0.24em] text-white/55">Accès</p>
+                        <p class="mt-3 font-display text-3xl font-semibold">24/7</p>
+                        <p class="mt-2 text-sm text-white/72">Interface disponible pour l’équipe opérationnelle.</p>
                     </div>
-                    <h2 class="mt-6 text-center text-4xl font-extrabold text-gray-900 tracking-tight">
-                        Authentification Requise
-                    </h2>
-                    <p class="mt-2 text-center text-md text-gray-500">
-                        Veuillez entrer vos identifiants administrateur.
-                    </p>
+                    <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+                        <p class="text-xs uppercase tracking-[0.24em] text-white/55">Protection</p>
+                        <p class="mt-3 font-display text-3xl font-semibold">Token</p>
+                        <p class="mt-2 text-sm text-white/72">Session régénérée et accès cloisonné par rôle.</p>
+                    </div>
+                    <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+                        <p class="text-xs uppercase tracking-[0.24em] text-white/55">Support</p>
+                        <p class="mt-3 font-display text-3xl font-semibold">Ops</p>
+                        <p class="mt-2 text-sm text-white/72">Gestion rapide des demandes et des réservations clients.</p>
+                    </div>
                 </div>
+            </section>
 
-                <form class="space-y-6" action="{{ route('admin.login') }}" method="POST">
-                    @csrf
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <label for="email" class="sr-only">Adresse email</label>
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-envelope text-gray-400"></i>
+            <section class="flex flex-1 items-center justify-center">
+                <div class="admin-auth-glow w-full max-w-xl rounded-[2rem] border border-white/70 bg-white/90 p-6 backdrop-blur-xl sm:p-10">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#5b21b6,#c88a2a)] text-white shadow-lg">
+                                <i class="fas fa-user-shield text-2xl"></i>
                             </div>
-                            <input id="email" name="email" type="email" autocomplete="email" required
-                                class="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition duration-150 sm:text-sm"
-                                placeholder="Adresse email administrateur" value="{{ old('email') }}" />
+                            <p class="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-brand-600">Connexion admin</p>
+                            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-slate-950">
+                                Accéder au cockpit Carré Premium
+                            </h1>
+                            <p class="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+                                Connecte-toi avec ton compte administrateur pour gérer les catalogues, paiements et opérations.
+                            </p>
                         </div>
-                        <div class="relative">
-                            <label for="password" class="sr-only">Mot de passe</label>
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
-                            </div>
-                            <input id="password" name="password" type="password" autocomplete="current-password"
-                                required
-                                class="appearance-none block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition duration-150 sm:text-sm"
-                                placeholder="Mot de passe" />
-                            <!-- Bouton/Icône pour basculer la visibilité du mot de passe -->
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                                onclick="togglePasswordVisibility()" title="Afficher/Cacher le mot de passe">
-                                <i id="password-toggle-icon"
-                                    class="fas fa-eye text-gray-400 hover:text-primary transition-colors"
-                                    aria-label="Afficher le mot de passe"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="remember_me" name="remember" type="checkbox"
-                                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
-                            <label for="remember_me" class="ml-2 block text-sm text-gray-900">
-                                Se souvenir de moi
-                            </label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a href="#" class="font-medium text-primary hover:text-secondary transition-colors">
-                                Mot de passe oublié ?
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button type="submit"
-                            class="group relative w-full flex items-center justify-center py-3 px-4 border border-transparent text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary/50">
-                            <i class="fas fa-sign-in-alt mr-2 group-hover:animate-pulse"></i>
-                            Se connecter
-                        </button>
+                        <a href="{{ route('home') }}"
+                            class="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-brand-200 hover:text-brand-700 sm:inline-flex sm:items-center sm:gap-2">
+                            <i class="fas fa-arrow-left"></i>
+                            Site public
+                        </a>
                     </div>
 
                     @if ($errors->any())
-                        <div class="rounded-lg bg-red-50 p-4 border border-red-200">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 pt-0.5">
-                                    <i class="fas fa-exclamation-triangle text-red-500"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-bold text-red-800">
-                                        Échec de l'authentification
-                                    </h3>
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <ul role="list" class="list-disc pl-5 space-y-1">
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
+                        <div class="mt-8 rounded-[1.5rem] border border-red-200 bg-red-50/90 px-5 py-4 text-sm text-red-700">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-circle-exclamation mt-0.5 text-base"></i>
+                                <div>
+                                    <p class="font-semibold text-red-800">Connexion refusée</p>
+                                    <ul class="mt-2 space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     @endif
 
                     @if (session('error'))
-                        <div class="rounded-lg bg-red-50 p-4 border border-red-200">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 pt-0.5">
-                                    <i class="fas fa-exclamation-triangle text-red-500"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
-                                </div>
-                            </div>
+                        <div class="mt-8 rounded-[1.5rem] border border-red-200 bg-red-50/90 px-5 py-4 text-sm font-medium text-red-700">
+                            {{ session('error') }}
                         </div>
                     @endif
-                </form>
 
-                <div class="text-center pt-4 border-t border-gray-100">
-                    <a href="{{ route('home') }}"
-                        class="text-sm font-medium text-gray-500 hover:text-primary transition-colors hover:underline">
-                        <i class="fas fa-arrow-left mr-1"></i>
-                        Retourner au site public
-                    </a>
+                    <form class="mt-8 space-y-6" action="{{ route('admin.login') }}" method="POST">
+                        @csrf
+
+                        <div class="grid gap-5">
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-semibold text-slate-700">Adresse email</span>
+                                <span class="relative block">
+                                    <i class="fas fa-envelope pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input id="email" name="email" type="email" autocomplete="email" required
+                                        value="{{ old('email') }}"
+                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 text-base text-slate-900 outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+                                        placeholder="admin@carrepremium.com">
+                                </span>
+                            </label>
+
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-semibold text-slate-700">Mot de passe</span>
+                                <span class="relative block">
+                                    <i class="fas fa-lock pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                                        class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 pr-14 text-base text-slate-900 outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+                                        placeholder="Votre mot de passe">
+                                    <button type="button" id="toggle-password"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-brand-600"
+                                        aria-label="Afficher ou masquer le mot de passe">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <label class="inline-flex items-center gap-3 text-sm text-slate-600">
+                                <input id="remember_me" name="remember" type="checkbox"
+                                    class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                Rester connecté
+                            </label>
+                            <span class="text-sm text-slate-500">
+                                Accès réservé aux profils autorisés.
+                            </span>
+                        </div>
+
+                        <button type="submit"
+                            class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(135deg,#5b21b6,#7c3aed)] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-brand-200 transition hover:-translate-y-0.5 hover:shadow-xl">
+                            <i class="fas fa-arrow-right-to-bracket"></i>
+                            Se connecter
+                        </button>
+                    </form>
+
+                    <div class="mt-8 flex items-center justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-slate-50/80 px-5 py-4 text-sm text-slate-600">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+                                <i class="fas fa-headset"></i>
+                            </span>
+                            <div>
+                                <p class="font-semibold text-slate-800">Besoin d’un accès ou d’un support ?</p>
+                                <p>Contacte le super administrateur ou l’équipe ops.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('home') }}"
+                            class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 px-4 py-2 font-semibold text-slate-600 transition hover:border-brand-200 hover:text-brand-700 sm:hidden">
+                            <i class="fas fa-arrow-left"></i>
+                            Site
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
+
+    <script>
+        const passwordField = document.getElementById('password');
+        const toggleButton = document.getElementById('toggle-password');
+
+        toggleButton?.addEventListener('click', () => {
+            const isPassword = passwordField.type === 'password';
+            passwordField.type = isPassword ? 'text' : 'password';
+            toggleButton.innerHTML = `<i class="fas fa-${isPassword ? 'eye-slash' : 'eye'}"></i>`;
+        });
+    </script>
 </body>
 
 </html>

@@ -15,7 +15,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::get('/admin/login', [AuthController::class, 'loginAdmin'])->name('api.admin.login');
 Route::get('/users/login', [AuthController::class, 'loginUser'])->name('api.user.login');
-Route::post('/admin/register', [AuthController::class, 'registerAdmin'])->name('api.admin.register');
 Route::post('/user/register', [AuthController::class, 'register'])->name('api.user.register');
 
 Route::post('/duffel/search', [FlightSearchController::class, 'search'])->name('duffel.search');
@@ -53,6 +52,7 @@ Route::prefix('flights')->controller(FlightController::class)->group(function ()
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/admin/register', [AuthController::class, 'registerAdmin'])->name('api.admin.register');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
 

@@ -279,6 +279,15 @@ class AuthController extends Controller
      */
     public function registerAdmin(Request $request)
     {
+        $authenticatedAdmin = $request->user();
+
+        if (!$authenticatedAdmin instanceof Admin || $authenticatedAdmin->role !== 'super_admin') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Accès refusé. Seul un super administrateur authentifié peut créer un autre administrateur.',
+            ], 403);
+        }
+
         // 1️⃣ Validation des données
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -314,7 +323,7 @@ class AuthController extends Controller
         // 4️⃣ Réponse JSON
         return response()->json([
             'status' => true,
-            'message' => 'Inscription du Super-Admin réussie',
+            'message' => 'Administrateur créé avec succès',
             'admin' => $admin,
             'token' => $token,
         ], 201);

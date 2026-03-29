@@ -131,6 +131,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('events.import.form');
         Route::post('/events/import-packages', [App\Http\Controllers\Admin\EventController::class, 'importPackages'])
             ->name('events.import-packages');
+        Route::post('/events/import-pdf', [App\Http\Controllers\Admin\EventController::class, 'importPdf'])
+            ->name('events.import-pdf');
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::post('/event-categories/quick-store', [EventController::class, 'quickStoreCat'])
             ->name('event-categories.quick-store');

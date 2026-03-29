@@ -1,205 +1,179 @@
-<!-- Sidebar -->
-<aside id="sidebar" class="w-72 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out border-r border-white/10 bg-[linear-gradient(180deg,#26163f_0%,#2f1c55_48%,#36215e_100%)] text-white shadow-2xl">
-    <!-- Logo -->
-    <div
-        class="h-20 flex items-center justify-center border-b border-white/10 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_45%),linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0))] relative overflow-hidden">
-        <div
-            class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse-slow">
-        </div>
-        <div class="relative z-10 flex items-center">
-            <i class="fas fa-crown text-secondary text-2xl mr-3"></i>
-            <div>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">Admin Console</p>
-                <h1 class="text-lg font-bold text-white font-montserrat">Carré Premium</h1>
+@php
+    $admin = auth('admin')->user();
+
+    $groups = [
+        [
+            'title' => 'Pilotage',
+            'items' => [
+                [
+                    'route' => 'admin.dashboard',
+                    'label' => 'Dashboard',
+                    'icon' => 'fa-chart-line',
+                    'active' => request()->routeIs('admin.dashboard'),
+                    'badge' => null,
+                ],
+                [
+                    'route' => 'admin.bookings.index',
+                    'label' => 'Réservations',
+                    'icon' => 'fa-ticket',
+                    'active' => request()->routeIs('admin.bookings.*'),
+                    'badge' => \App\Models\Booking::count(),
+                ],
+            ],
+        ],
+        [
+            'title' => 'Catalogue',
+            'items' => [
+                [
+                    'route' => 'admin.events.index',
+                    'label' => 'Événements',
+                    'icon' => 'fa-calendar-days',
+                    'active' => request()->routeIs('admin.events.*'),
+                    'badge' => \App\Models\Event::count(),
+                ],
+                [
+                    'route' => 'admin.packages.index',
+                    'label' => 'Packages',
+                    'icon' => 'fa-suitcase',
+                    'active' => request()->routeIs('admin.packages.*'),
+                    'badge' => \App\Models\TourPackage::count(),
+                ],
+                [
+                    'route' => 'admin.locations.index',
+                    'label' => 'Locations',
+                    'icon' => 'fa-car-side',
+                    'active' => request()->routeIs('admin.locations.*'),
+                    'badge' => \App\Models\Location::count(),
+                ],
+                [
+                    'route' => 'admin.categories.index',
+                    'label' => 'Catégories',
+                    'icon' => 'fa-folder-open',
+                    'active' => request()->routeIs('admin.categories.*'),
+                    'badge' => \App\Models\Category::count(),
+                ],
+            ],
+        ],
+        [
+            'title' => 'Audience',
+            'items' => [
+                [
+                    'route' => 'admin.users.index',
+                    'label' => 'Utilisateurs',
+                    'icon' => 'fa-users',
+                    'active' => request()->routeIs('admin.users.*'),
+                    'badge' => \App\Models\User::count(),
+                ],
+                [
+                    'route' => 'admin.members.index',
+                    'label' => 'Administrateurs',
+                    'icon' => 'fa-user-shield',
+                    'active' => request()->routeIs('admin.members.*'),
+                    'badge' => \App\Models\Admin::count(),
+                ],
+                [
+                    'route' => 'admin.carousels.index',
+                    'label' => 'Carrousels',
+                    'icon' => 'fa-images',
+                    'active' => request()->routeIs('admin.carousels.*'),
+                    'badge' => null,
+                ],
+            ],
+        ],
+    ];
+
+    if ($admin->isAccountant() || $admin->isAdmin() || $admin->isSuperAdmin()) {
+        $groups[] = [
+            'title' => 'Finance',
+            'items' => [
+                [
+                    'route' => 'admin.accountant.reports',
+                    'label' => 'Rapports',
+                    'icon' => 'fa-chart-pie',
+                    'active' => request()->routeIs('admin.accountant.reports'),
+                    'badge' => null,
+                ],
+            ],
+        ];
+    }
+@endphp
+
+<aside id="sidebar"
+    class="w-80 flex-shrink-0 flex-col border-r border-white/10 bg-[linear-gradient(180deg,#231631_0%,#2d1948_38%,#38205f_100%)] text-white shadow-2xl transition-all duration-300 ease-in-out md:flex">
+    <div class="flex h-24 items-center justify-between border-b border-white/10 px-6">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-sand-300 backdrop-blur">
+                <i class="fas fa-crown text-xl"></i>
+            </span>
+            <span>
+                <span class="block text-[11px] font-semibold uppercase tracking-[0.3em] text-white/45">Admin console</span>
+                <span class="mt-1 block text-lg font-semibold tracking-tight text-white">Carré Premium</span>
+            </span>
+        </a>
+        <span class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/65">
+            {{ strtoupper(str_replace('_', ' ', $admin->role)) }}
+        </span>
+    </div>
+
+    <div class="px-4 pt-5">
+        <div class="rounded-[1.5rem] border border-white/10 bg-white/8 p-4 backdrop-blur">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/45">Raccourcis</p>
+            <div class="mt-4 grid gap-3">
+                <a href="{{ route('admin.events.create') }}"
+                    class="flex items-center justify-between rounded-2xl border border-white/8 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/16">
+                    <span class="flex items-center gap-3">
+                        <i class="fas fa-plus"></i>
+                        Nouvel événement
+                    </span>
+                    <i class="fas fa-arrow-right text-white/50"></i>
+                </a>
+                <a href="{{ route('admin.events.import.form') }}"
+                    class="flex items-center justify-between rounded-2xl border border-white/8 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/16">
+                    <span class="flex items-center gap-3">
+                        <i class="fas fa-file-pdf"></i>
+                        Import PDF / tableur
+                    </span>
+                    <i class="fas fa-arrow-right text-white/50"></i>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-4 px-3">
-        <a href="{{ route('admin.dashboard') }}"
-            class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-gray-700' }}">
-            <i class="fas fa-chart-line w-5 text-lg"></i>
-            <span class="ml-3 font-medium">Dashboard</span>
-        </a>
-
-        <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-grip-horizontal mr-2"></i>
-                Gestion
-            </p>
-
-            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
-            <a href="{{ route('admin.members.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.members.*') ? 'active' : '' }}">
-                <i class="fas fa-users w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Membres</span>
-                <span
-                    class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\Admin::count() }}</span>
-            </a>
-
-            <a href="{{ route('admin.users.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <i class="fas fa-users w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Utilisateurs</span>
-                <span
-                    class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\User::count() }}</span>
-            </a>
-            @endif
-
-            <a href="{{ route('admin.bookings.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
-                <i class="fas fa-ticket-alt w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Réservations</span>
-                <span class="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">{{ \App\Models\Booking::count() }}</span>
-            </a>
-        </div>
-
-        <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-box mr-2"></i>
-                Produits
-            </p>
-
-            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
-            <!-- <a href="{{ route('admin.flights.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.flights.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-plane w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Vols</span>
-            </a> -->
-
-            <a href="{{ route('admin.events.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
-                <i class="fas fa-calendar-alt w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Événements</span>
-            </a>
-
-            <a href="{{ route('admin.packages.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
-                <i class="fas fa-suitcase w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Packages</span>
-            </a>
-
-            <a href="{{ route('admin.categories.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                <i class="fas fa-folder w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Catégories</span>
-            </a>
-
-            <a href="{{ route('admin.locations.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
-                <i class="fas fa-car w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Locations</span>
-            </a>
-            @endif
-        </div>
-
-        <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-palette mr-2"></i>
-                Contenu
-            </p>
-
-            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin())
-            <a href="{{ route('admin.carousels.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.carousels.*') ? 'active' : '' }}">
-                <i class="fas fa-images w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Carrousels</span>
-            </a>
-            @endif
-        </div>
-
-        @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isAdmin() || auth('admin')->user()->isAccountant())
-        <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-calculator mr-2"></i>
-                Comptabilité
-            </p>
-
-            <a href="{{ route('admin.accountant.reports') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-2xl {{ request()->routeIs('admin.accountant.reports') ? 'active' : '' }}">
-                <i class="fas fa-file-alt w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Rapports</span>
-            </a>
-
-            <!-- <a href="{{ route('admin.accountant.payment-gateways') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.accountant.payment-gateways') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-credit-card w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Paiements</span>
-            </a> -->
-        </div>
-        @endif
-
-        <!-- <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-store mr-2"></i>
-                Marketing
-            </p>
-
-            <a href="{{ route('admin.reviews.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.reviews.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-star w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Avis Clients</span>
-                <span class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">0</span>
-            </a>
-
-            <a href="{{ route('admin.promo-codes.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.promo-codes.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-tags w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Codes Promo</span>
-                <span class="ml-auto bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded-full">New</span>
-            </a>
-        </div>
-
-        <div class="mt-6">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                <i class="fas fa-cogs mr-2"></i>
-                Configuration
-            </p>
-
-            <a href="{{ route('admin.settings.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.settings.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-sliders-h w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Paramètres</span>
-            </a>
-
-            <a href="{{ route('admin.pricing-rules.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.pricing-rules.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-percentage w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Règles de Prix</span>
-            </a>
-
-            <a href="{{ route('admin.api-config.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.api-config.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-plug w-5 text-lg"></i>
-                <span class="ml-3 font-medium">APIs</span>
-            </a>
-
-            <a href="{{ route('admin.payment-gateways.index') }}"
-                class="sidebar-link flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.payment-gateways.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-credit-card w-5 text-lg"></i>
-                <span class="ml-3 font-medium">Paiements</span>
-            </a>
-        </div> -->
-
+    <nav class="flex-1 overflow-y-auto px-4 py-5">
+        @foreach ($groups as $group)
+            <section class="{{ !$loop->first ? 'mt-6' : '' }}">
+                <p class="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/38">
+                    {{ $group['title'] }}
+                </p>
+                <div class="space-y-1.5">
+                    @foreach ($group['items'] as $item)
+                        <a href="{{ route($item['route']) }}"
+                            class="sidebar-link flex items-center gap-3 rounded-2xl px-4 py-3 {{ $item['active'] ? 'active' : '' }}">
+                            <i class="fas {{ $item['icon'] }} w-5 text-center text-base"></i>
+                            <span class="font-medium">{{ $item['label'] }}</span>
+                            @if (!is_null($item['badge']))
+                                <span class="ml-auto rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-white/80">
+                                    {{ number_format((int) $item['badge'], 0, ',', ' ') }}
+                                </span>
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+        @endforeach
     </nav>
 
-    <!-- User Info -->
-    <div class="border-t border-white/10 p-4 bg-white/5">
+    <div class="border-t border-white/10 bg-white/5 p-4">
         <a href="{{ route('admin.profile') }}"
-            class="flex items-center hover:bg-white/10 p-3 rounded-2xl transition-all duration-300 group">
-            <div class="relative">
-                <div
-                    class="w-11 h-11 rounded-full bg-[linear-gradient(135deg,#ffffff_0%,#f0e7ff_100%)] flex items-center justify-center text-[#4b2386] font-bold shadow-lg group-hover:shadow-xl transition-shadow">
-                    {{ substr(auth('admin')->user()->name, 0, 1) }}
-                </div>
-                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
-            <div class="ml-3 flex-1">
-                <p class="text-sm font-semibold text-white">{{ auth('admin')->user()->name }}</p>
-                <p class="text-xs text-white/55">{{ ucfirst(str_replace('_', ' ', auth('admin')->user()->role)) }}</p>
-            </div>
-            <i class="fas fa-chevron-right text-white/35 group-hover:text-white transition-colors"></i>
+            class="group flex items-center gap-3 rounded-[1.4rem] border border-white/8 bg-white/6 p-3 transition hover:bg-white/10">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#ffffff_0%,#f0e7ff_100%)] text-sm font-bold uppercase text-[#4b2386] shadow-lg">
+                {{ \Illuminate\Support\Str::substr($admin->name, 0, 1) }}
+            </span>
+            <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-white">{{ $admin->name }}</span>
+                <span class="block truncate text-xs uppercase tracking-[0.18em] text-white/45">{{ str_replace('_', ' ', $admin->role) }}</span>
+            </span>
+            <i class="fas fa-chevron-right text-white/30 transition group-hover:text-white/60"></i>
         </a>
     </div>
 </aside>

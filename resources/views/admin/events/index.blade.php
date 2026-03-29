@@ -1,141 +1,239 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Gestion des Événements')
+@section('title', 'Gestion des événements')
 
 @section('content')
+    @php
+        $status = request('status');
+        $featured = request('featured');
+        $search = request('search');
+        $selectedCategory = request('category_id');
+    @endphp
 
-    <div class="max-w-8xl mx-auto py-8">
-        <div class="admin-page-header mb-8">
-            <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-purple-600">Catalogue</p>
-                <h1 class="mt-2 text-3xl font-bold text-dark gradient-text">Événements ({{ $events->total() }})</h1>
-                <p class="mt-3 text-gray-600">Supervisez les événements publiés, leur statut, leur lieu et leurs tarifs depuis une seule vue.</p>
+    <div class="mx-auto max-w-8xl space-y-8 py-2">
+        <section class="admin-page-header">
+            <div class="max-w-3xl">
+                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--admin-brand)]">Catalogue premium</p>
+                <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                    Pilotage des événements
+                </h1>
+                <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+                    Gère le catalogue, l’état de publication, les prix, les packages et la création rapide depuis PDF depuis une seule interface.
+                </p>
             </div>
+
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('admin.events.import.form') }}"
-                    class="admin-btn-ghost px-5 py-3 text-sm">
-                    <i class="fas fa-file-import mr-2"></i> Importer Packages
+                <a href="{{ route('admin.events.import.form') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                    <i class="fas fa-file-import"></i>
+                    Import PDF / tableur
                 </a>
-                <a href="{{ route('admin.events.create') }}"
-                    class="admin-btn-primary px-5 py-3 text-sm">
-                    <i class="fas fa-plus-circle mr-2"></i> Ajouter un nouvel Événement
+                <a href="{{ route('admin.events.create') }}" class="admin-btn-primary px-5 py-3 text-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    Créer un événement
                 </a>
             </div>
-        </div>
+        </section>
 
-        {{-- Messages de Session --}}
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Succès!</strong>
-                <span class="block sm:inline">{!! session('success') !!}</span>
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Erreur!</strong>
-                <span class="block sm:inline">{!! session('error') !!}</span>
-            </div>
-        @endif
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Total événements</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ number_format($stats['total'], 0, ',', ' ') }}</p>
+                <p class="mt-3 text-sm text-slate-600">Tous statuts confondus.</p>
+            </article>
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Actifs</p>
+                <p class="mt-4 text-3xl font-bold text-[var(--admin-success)]">{{ number_format($stats['active'], 0, ',', ' ') }}</p>
+                <p class="mt-3 text-sm text-slate-600">Événements visibles côté client.</p>
+            </article>
+            <article class="admin-kpi admin-kpi-accent p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">En vedette</p>
+                <p class="mt-4 text-3xl font-bold text-[var(--admin-accent)]">{{ number_format($stats['featured'], 0, ',', ' ') }}</p>
+                <p class="mt-3 text-sm text-slate-600">Mises en avant marketing.</p>
+            </article>
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Brouillons</p>
+                <p class="mt-4 text-3xl font-bold text-[var(--admin-brand)]">{{ number_format($stats['drafts'], 0, ',', ' ') }}</p>
+                <p class="mt-3 text-sm text-slate-600">Catalogues à compléter avant publication.</p>
+            </article>
+        </section>
 
-        {{-- GRILLE D'AFFICHAGE DES ÉVÉNEMENTS (Cartes) --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @forelse ($events as $event)
-                <div
-                    class="admin-panel overflow-hidden transform hover:scale-[1.01] transition duration-300 relative">
-
-                    {{-- Image de l'Événement --}}
-                    <a href="{{ route('admin.events.show', $event) }}" class="block h-48 overflow-hidden group">
-                        @php
-                            // Utilisation de la méthode de Spatie pour récupérer l'URL de l'image 'normal'
-                            $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
-                            $placeholder = 'https://placehold.co/800x480/4c1d95/ffffff?text=Image+Event';
-                        @endphp
-                        <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}"
-                            class="w-full h-full object-cover transition duration-500 group-hover:opacity-90 group-hover:scale-105"
-                            onerror="this.onerror=null;this.src='{{ $placeholder }}';">
-                    </a>
-
-                    {{-- Contenu de la Carte --}}
-                    <div class="p-5">
-
-                        {{-- Statut et Catégorie --}}
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full 
-                                @if($event->is_active) bg-green-100 text-green-800 @else bg-red-100 text-red-800 @endif">
-                                {{ $event->is_active ? 'Actif' : 'Inactif' }}
-                            </span>
-                            <span class="text-xs font-medium text-gray-600 border border-gray-200 px-3 py-1 rounded-full">
-                                {{ $event->category->name_fr ?? 'Non Catégorisé' }}
-                            </span>
-                        </div>
-
-                        {{-- Titre --}}
-                        <h2 class="text-xl font-bold text-gray-900 mb-2 truncate" title="{{ $event->title_fr }}">
-                            {{ $event->title_fr }}
-                        </h2>
-
-                        {{-- Infos Clés --}}
-                        <div class="text-sm text-gray-600 space-y-1 mt-3 border-t pt-3">
-                            <p class="flex items-center"><i class="fas fa-calendar-alt w-5 text-primary mr-2"></i>
-                                {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }} à {{ $event->event_time }}
-                            </p>
-                            <p class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-primary mr-2"></i>
-                                {{ $event->venue_name }}, {{ $event->city }}
-                            </p>
-                            <p class="flex items-center"><i class="fas fa-tag w-5 text-primary mr-2"></i>
-                                À partir de <span class="font-bold text-gray-900">{{ number_format($event->min_price, 2, ',', ' ') }} FCFA</span>
-                            </p>
-                        </div>
-
-                    </div>
-
-                    {{-- Bloc d'Actions --}}
-                    <div class="p-5 pt-0 flex justify-between items-center border-t mt-3">
-                        <a href="{{ route('admin.events.show', $event) }}"
-                            class="text-sm font-semibold text-primary hover:text-purple-700 transition duration-150 flex items-center">
-                            <i class="fas fa-eye mr-2"></i> Voir Détails
-                        </a>
-                        <div class="flex space-x-2">
-                            <a href="{{ route('admin.events.edit', $event) }}" title="Modifier"
-                                class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-100 transition duration-150">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            {{-- Formulaire de suppression --}}
-                            <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" title="Supprimer"
-                                    class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition duration-150">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    {{-- Badge "Featured" --}}
-                    @if ($event->is_featured)
-                        <div
-                            class="absolute top-0 right-0 mt-3 mr-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-3">
-                            EN VEDETTE
-                        </div>
-                    @endif
+        <section class="admin-panel p-5 sm:p-6">
+            <form method="GET" action="{{ route('admin.events.index') }}" class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] lg:items-end">
+                <div>
+                    <label for="search" class="mb-2 block text-sm font-semibold text-slate-700">Recherche</label>
+                    <input type="text" id="search" name="search" value="{{ $search }}"
+                        placeholder="Titre, slug, ville, lieu..."
+                        class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
                 </div>
+
+                <div>
+                    <label for="category_id" class="mb-2 block text-sm font-semibold text-slate-700">Catégorie</label>
+                    <select id="category_id" name="category_id" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        <option value="">Toutes</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>
+                                {{ $category->name_fr }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="status" class="mb-2 block text-sm font-semibold text-slate-700">Statut</label>
+                    <select id="status" name="status" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        <option value="">Tous</option>
+                        <option value="active" @selected($status === 'active')>Actifs</option>
+                        <option value="draft" @selected($status === 'draft')>Brouillons</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="featured" class="mb-2 block text-sm font-semibold text-slate-700">Mise en avant</label>
+                    <select id="featured" name="featured" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        <option value="">Toutes</option>
+                        <option value="1" @selected($featured === '1')>Featured</option>
+                        <option value="0" @selected($featured === '0')>Standard</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="sort" class="mb-2 block text-sm font-semibold text-slate-700">Tri</label>
+                    <select id="sort" name="sort" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        <option value="newest" @selected($sort === 'newest')>Plus récents</option>
+                        <option value="soonest" @selected($sort === 'soonest')>Plus proches</option>
+                        <option value="title" @selected($sort === 'title')>Titre A-Z</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 lg:justify-end">
+                    <button type="submit" class="admin-btn-primary px-5 py-3 text-sm">
+                        <i class="fas fa-sliders"></i>
+                        Filtrer
+                    </button>
+                    <a href="{{ route('admin.events.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                        Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <section class="grid gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+            @forelse ($events as $event)
+                <article class="admin-panel card-hover overflow-hidden">
+                    <div class="grid h-full md:grid-cols-[220px_minmax(0,1fr)]">
+                        <a href="{{ route('admin.events.show', $event) }}" class="relative block min-h-[220px] overflow-hidden bg-slate-100">
+                            @php
+                                $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
+                                $placeholder = 'https://placehold.co/900x700/4c1d95/ffffff?text=Event';
+                            @endphp
+                            <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title_fr }}"
+                                class="h-full w-full object-cover transition duration-500 hover:scale-105"
+                                onerror="this.onerror=null;this.src='{{ $placeholder }}';">
+                            <div class="absolute inset-x-0 top-0 flex items-center justify-between gap-3 p-4">
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $event->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                                    {{ $event->is_active ? 'Publié' : 'Brouillon' }}
+                                </span>
+                                @if ($event->is_featured)
+                                    <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--admin-brand)]">
+                                        Featured
+                                    </span>
+                                @endif
+                            </div>
+                        </a>
+
+                        <div class="flex flex-col p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                        {{ $event->category->name_fr ?? 'Sans catégorie' }}
+                                    </p>
+                                    <h2 class="mt-2 text-xl font-bold tracking-tight text-slate-950">
+                                        {{ $event->title_fr }}
+                                    </h2>
+                                    <p class="mt-3 text-sm leading-6 text-slate-600">
+                                        {{ $event->venue_name }}, {{ $event->city }} · {{ $event->country }}
+                                    </p>
+                                </div>
+                                <span class="rounded-full border border-[#eadfce] bg-white px-3 py-1 text-xs font-semibold text-slate-500">
+                                    {{ $event->type->name_fr ?? 'Type libre' }}
+                                </span>
+                            </div>
+
+                            <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                                <div class="rounded-2xl bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Date</p>
+                                    <p class="mt-2 text-sm font-semibold text-slate-900">
+                                        {{ $event->event_date?->translatedFormat('d M Y') ?? 'À définir' }}
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">{{ $event->event_time }}</p>
+                                </div>
+                                <div class="rounded-2xl bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tarifs</p>
+                                    <p class="mt-2 text-sm font-semibold text-slate-900">
+                                        {{ number_format((float) $event->min_price, 0, ',', ' ') }} FCFA
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        Max {{ number_format((float) ($event->max_price ?: $event->min_price), 0, ',', ' ') }} FCFA
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Inventaire</p>
+                                    <p class="mt-2 text-sm font-semibold text-slate-900">
+                                        {{ number_format((int) $event->available_seats, 0, ',', ' ') }} places
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $event->packages_count }} package(s) · {{ $event->seat_zones_count }} zone(s)
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <a href="{{ route('admin.events.show', $event) }}" class="admin-btn-ghost px-4 py-2.5 text-sm">
+                                    <i class="fas fa-eye"></i>
+                                    Voir
+                                </a>
+                                <a href="{{ route('admin.events.edit', $event) }}" class="admin-btn-primary px-4 py-2.5 text-sm">
+                                    <i class="fas fa-pen"></i>
+                                    Modifier
+                                </a>
+                                <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
+                                    onsubmit="return confirm('Supprimer cet événement ? Cette action est irréversible.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100">
+                                        <i class="fas fa-trash"></i>
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </article>
             @empty
-                <div class="col-span-full bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-                    <p class="text-xl text-gray-500">Aucun événement n'a été trouvé.</p>
-                    <a href="{{ route('admin.events.create') }}" class="text-primary hover:underline mt-2 inline-block">Créer le
-                        premier événement</a>
+                <div class="admin-panel col-span-full px-6 py-16 text-center">
+                    <span class="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--admin-brand-soft)] text-[var(--admin-brand)]">
+                        <i class="fas fa-calendar-days text-2xl"></i>
+                    </span>
+                    <h2 class="mt-6 text-2xl font-bold text-slate-950">Aucun événement trouvé</h2>
+                    <p class="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
+                        Ajuste les filtres ou crée un nouvel événement. Tu peux aussi importer un catalogue PDF pour générer automatiquement une première fiche brouillon.
+                    </p>
+                    <div class="mt-6 flex flex-wrap justify-center gap-3">
+                        <a href="{{ route('admin.events.create') }}" class="admin-btn-primary px-5 py-3 text-sm">
+                            Créer un événement
+                        </a>
+                        <a href="{{ route('admin.events.import.form') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                            Importer un PDF
+                        </a>
+                    </div>
                 </div>
             @endforelse
-        </div>
+        </section>
 
-        {{-- Pagination --}}
-        <div class="mt-8">
-            {{ $events->links() }}
-        </div>
-
-
+        @if ($events->hasPages())
+            <div class="pt-2">
+                {{ $events->links() }}
+            </div>
+        @endif
     </div>
-
 @endsection

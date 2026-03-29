@@ -1,83 +1,199 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Importer des Packages')
+@section('title', 'Import événements')
 
 @section('content')
-
-    <div class="max-w-4xl mx-auto py-8">
-        <div class="flex justify-between items-center mb-8 border-b pb-2">
-            <h1 class="text-3xl font-bold text-dark gradient-text">Importer des Packages depuis Excel</h1>
-            <a href="{{ route('admin.events.index') }}"
-                class="py-2 px-4 rounded-lg text-white font-semibold bg-gray-600 hover:bg-gray-700 transition duration-300 shadow-md flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i> Retour
-            </a>
-        </div>
-
-        {{-- Messages de Session --}}
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Succès!</strong>
-                <span class="block sm:inline">{!! session('success') !!}</span>
+    <div class="mx-auto max-w-7xl space-y-8 py-2">
+        <section class="admin-page-header">
+            <div class="max-w-3xl">
+                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--admin-brand)]">Automatisation catalogue</p>
+                <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                    Importer depuis PDF ou tableur
+                </h1>
+                <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+                    Crée un brouillon d’événement depuis un PDF texte ou ajoute des packages depuis un fichier CSV/XLSX. Après import, tu peux finaliser la fiche, l’image et la publication.
+                </p>
             </div>
-        @endif
-        @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Erreur!</strong>
-                <span class="block sm:inline">{!! session('error') !!}</span>
+
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('admin.events.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour aux événements
+                </a>
+                <a href="{{ route('admin.events.create') }}" class="admin-btn-primary px-5 py-3 text-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    Création manuelle
+                </a>
             </div>
-        @endif
+        </section>
 
-        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-            <form action="{{ route('admin.events.import-packages') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                <div class="mb-6">
-                    <label for="event_id" class="block text-sm font-medium text-gray-700 mb-2">Événement (Optionnel)</label>
-                    <select name="event_id" id="event_id" class="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
-                        <option value="">-- Sélectionner un événement (laisser vide pour détection auto) --</option>
-                        @foreach(\App\Models\Event::all() as $event)
-                            <option value="{{ $event->id }}">{{ $event->title_fr }} ({{ $event->city }})</option>
-                        @endforeach
-                    </select>
-                    <p class="text-sm text-gray-500 mt-1">Si laissé vide, l'événement sera détecté automatiquement depuis le fichier CSV</p>
+        <section class="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+            <article class="admin-panel p-6 sm:p-7">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-red-500">Import intelligent</p>
+                        <h2 class="mt-2 text-2xl font-bold text-slate-950">Créer un événement depuis un PDF</h2>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">
+                            Le fichier est analysé, les titres, dates, ville et packages sont détectés puis un brouillon éditable est généré automatiquement.
+                        </p>
+                    </div>
+                    <span class="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-red-50 text-red-500">
+                        <i class="fas fa-file-pdf text-2xl"></i>
+                    </span>
                 </div>
 
-                <div class="mb-6">
-                    <label for="excel_file" class="block text-sm font-medium text-gray-700 mb-2">Fichier Excel ou CSV (.xlsx, .xls, .csv) *</label>
-                    <input type="file" name="excel_file" id="excel_file"
-                        class="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
-                        accept=".xlsx,.xls,.csv,text/csv" required>
-                    <p class="text-sm text-gray-500 mt-1">Formats acceptés : .xlsx, .xls, .csv — Taille maximale : 10 MB</p>
-                </div>
+                <form action="{{ route('admin.events.import-pdf') }}" method="POST" enctype="multipart/form-data" class="mt-8 space-y-6">
+                    @csrf
 
-                <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 class="font-semibold text-blue-800 mb-2">Format du fichier attendu (1ère ligne = en-têtes) :</h3>
-                    <ul class="text-sm text-blue-700 space-y-1">
-                        <li><strong>event_title</strong> ou <strong>event</strong> : Titre de l'événement</li>
-                        <li><strong>city</strong> : Ville de l'événement (alternative si event_title non trouvé)</li>
-                        <li><strong>package_name_fr</strong> ou <strong>package_name</strong> : Nom du package <span class="text-red-600">(obligatoire)</span></li>
-                        <li><strong>package_name_en</strong> : Nom en anglais</li>
-                        <li><strong>package_code</strong> ou <strong>code</strong> : Code du package</li>
-                        <li><strong>description_fr</strong> ou <strong>description</strong> : Description</li>
-                        <li><strong>included</strong> ou <strong>inclus</strong> : Ce qui est inclus</li>
-                        <li><strong>price</strong> ou <strong>prix</strong> : Prix <span class="text-red-600">(obligatoire)</span></li>
-                        <li><strong>currency</strong> ou <strong>devise</strong> : Devise (défaut : XOF)</li>
-                        <li><strong>available_quantity</strong> ou <strong>quantite</strong> : Quantité disponible</li>
-                        <li><strong>max_per_order</strong> ou <strong>max_order</strong> : Maximum par commande</li>
-                    </ul>
-                    <p class="text-xs text-blue-600 mt-3">💡 Exemple de première ligne : <code>event_title,package_name_fr,price,currency,available_quantity</code></p>
-                </div>
+                    <div>
+                        <label for="pdf_file" class="mb-2 block text-sm font-semibold text-slate-700">Catalogue PDF *</label>
+                        <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required
+                            class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        <p class="mt-2 text-xs leading-6 text-slate-500">
+                            PDF texte recommandé. Les scans image bruts ne sont pas fiables sans OCR.
+                        </p>
+                    </div>
 
-                <div class="flex justify-end">
-                    <button type="submit" 
-                        class="py-2 px-6 rounded-lg text-white font-semibold bg-primary hover:bg-purple-700 transition duration-300 shadow-md flex items-center">
-                        <i class="fas fa-file-import mr-2"></i> Importer les Packages
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label for="category_id" class="mb-2 block text-sm font-semibold text-slate-700">Catégorie forcée</label>
+                            <select name="category_id" id="category_id" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                                <option value="">Détection automatique</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @selected((string) old('category_id') === (string) $category->id)>{{ $category->name_fr }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="type_id" class="mb-2 block text-sm font-semibold text-slate-700">Type forcé</label>
+                            <select name="type_id" id="type_id" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                                <option value="">Détection automatique</option>
+                                @foreach ($types as $type)
+                                    <option value="{{ $type->id }}" @selected((string) old('type_id') === (string) $type->id)>{{ $type->name_fr }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="city" class="mb-2 block text-sm font-semibold text-slate-700">Ville</label>
+                            <input type="text" name="city" id="city" value="{{ old('city') }}" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm"
+                                placeholder="Optionnel si le PDF est incomplet">
+                        </div>
+                        <div>
+                            <label for="country" class="mb-2 block text-sm font-semibold text-slate-700">Pays</label>
+                            <input type="text" name="country" id="country" value="{{ old('country') }}" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm"
+                                placeholder="Optionnel">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="organizer" class="mb-2 block text-sm font-semibold text-slate-700">Organisateur</label>
+                            <input type="text" name="organizer" id="organizer" value="{{ old('organizer') }}" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm"
+                                placeholder="Carré Premium par défaut">
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <label class="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-slate-50 px-4 py-4">
+                            <input type="checkbox" name="is_featured" value="1"
+                                class="h-4 w-4 rounded border-slate-300 text-[var(--admin-brand)] focus:ring-[var(--admin-brand)]"
+                                {{ old('is_featured') ? 'checked' : '' }}>
+                            <span>
+                                <span class="block text-sm font-semibold text-slate-900">Marquer en vedette</span>
+                                <span class="block text-xs text-slate-500">Active le flag marketing dès la création.</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-slate-50 px-4 py-4">
+                            <input type="checkbox" name="publish_immediately" value="1"
+                                class="h-4 w-4 rounded border-slate-300 text-[var(--admin-brand)] focus:ring-[var(--admin-brand)]"
+                                {{ old('publish_immediately') ? 'checked' : '' }}>
+                            <span>
+                                <span class="block text-sm font-semibold text-slate-900">Publier immédiatement</span>
+                                <span class="block text-xs text-slate-500">Sinon l’événement reste en brouillon.</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="rounded-[1.5rem] border border-red-100 bg-red-50/70 px-5 py-4 text-sm text-red-700">
+                        <p class="font-semibold text-red-800">Ce que fait l’import PDF</p>
+                        <ul class="mt-2 space-y-1 leading-6">
+                            <li>Détecte automatiquement le titre, les dates, la localisation et plusieurs packages si le texte est exploitable.</li>
+                            <li>Crée un brouillon éditable sans publier par défaut.</li>
+                            <li>Te redirige ensuite vers la fiche complète pour correction manuelle.</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="admin-btn-primary w-full px-6 py-4 text-sm sm:w-auto">
+                        <i class="fas fa-wand-magic"></i>
+                        Générer un brouillon depuis le PDF
                     </button>
-                </div>
-            </form>
-        </div>
+                </form>
+            </article>
 
+            <div class="space-y-6">
+                <article class="admin-panel p-6 sm:p-7">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--admin-accent)]">Import ciblé</p>
+                            <h2 class="mt-2 text-2xl font-bold text-slate-950">Ajouter des packages par tableur</h2>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">
+                                Utilise cette option pour enrichir un événement existant avec une grille tarifaire structurée.
+                            </p>
+                        </div>
+                        <span class="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-amber-50 text-[var(--admin-accent)]">
+                            <i class="fas fa-file-excel text-2xl"></i>
+                        </span>
+                    </div>
+
+                    <form action="{{ route('admin.events.import-packages') }}" method="POST" enctype="multipart/form-data" class="mt-8 space-y-6">
+                        @csrf
+
+                        <div>
+                            <label for="event_id" class="mb-2 block text-sm font-semibold text-slate-700">Événement cible</label>
+                            <select name="event_id" id="event_id" class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                                <option value="">Détection automatique depuis le fichier</option>
+                                @foreach ($events as $event)
+                                    <option value="{{ $event->id }}" @selected((string) old('event_id') === (string) $event->id)>{{ $event->title_fr }} · {{ $event->city }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-2 text-xs text-slate-500">Si renseigné, l’import est forcé sur cet événement.</p>
+                        </div>
+
+                        <div>
+                            <label for="excel_file" class="mb-2 block text-sm font-semibold text-slate-700">Fichier CSV / Excel *</label>
+                            <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls,.csv,.txt" required
+                                class="w-full rounded-2xl border border-[#ddcfbb] bg-white px-4 py-3 text-sm">
+                        </div>
+
+                        <div class="rounded-[1.5rem] border border-sky-100 bg-sky-50/70 px-5 py-4 text-sm text-sky-800">
+                            <p class="font-semibold">Colonnes acceptées</p>
+                            <p class="mt-2 leading-6">
+                                `event_title`, `city`, `package_name_fr`, `package_name_en`, `package_code`, `description_fr`, `included`, `price`, `currency`, `available_quantity`, `max_per_order`
+                            </p>
+                        </div>
+
+                        <button type="submit" class="admin-btn-secondary w-full px-6 py-4 text-sm sm:w-auto">
+                            <i class="fas fa-file-import"></i>
+                            Importer la grille tarifaire
+                        </button>
+                    </form>
+                </article>
+
+                <article class="admin-panel p-6 sm:p-7">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Bonnes pratiques</p>
+                    <div class="mt-4 space-y-4 text-sm leading-7 text-slate-600">
+                        <div class="rounded-2xl bg-slate-50 px-4 py-4">
+                            <p class="font-semibold text-slate-900">1. Importe, puis vérifie</p>
+                            <p class="mt-1">Le PDF crée une base de travail. Vérifie systématiquement les dates, prix, inventaires et descriptions avant publication.</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-4 py-4">
+                            <p class="font-semibold text-slate-900">2. Ajoute l’image et les CTA</p>
+                            <p class="mt-1">L’import ne suffit pas pour une page premium. Complète l’image principale, les messages et le SEO dans la fiche événement.</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-4 py-4">
+                            <p class="font-semibold text-slate-900">3. Contrôle la vente</p>
+                            <p class="mt-1">Vérifie la cohérence entre packages, zones, stock et prix avant d’activer la publication côté client.</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
     </div>
-
 @endsection
-

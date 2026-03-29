@@ -8,6 +8,7 @@ use App\Models\EventCategory;
 use App\Models\EventType;
 use App\Models\EventPackage;
 use App\Imports\EventPackagesImport;
+use App\Services\PdfEventDraftImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -18,11 +19,60 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // On charge la catégorie pour l'affichage dans la carte.
-        $events = Event::with('category', 'type')->latest()->paginate(12);
-        return view('admin.events.index', compact('events'));
+        $query = Event::query()
+            ->with(['category', 'type'])
+            ->withCount(['allPackages as packages_count', 'seatZones as seat_zones_count']);
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+
+            $query->where(function ($builder) use ($search) {
+                $builder
+                    ->where('title_fr', 'like', '%' . $search . '%')
+                    ->orWhere('title_en', 'like', '%' . $search . '%')
+                    ->orWhere('slug', 'like', '%' . $search . '%')
+                    ->orWhere('venue_name', 'like', '%' . $search . '%')
+                    ->orWhere('city', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->integer('category_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->input('status') === 'active');
+        }
+
+        if ($request->filled('featured')) {
+            $query->where('is_featured', $request->input('featured') === '1');
+        }
+
+        $sort = $request->input('sort', 'newest');
+
+        match ($sort) {
+            'soonest' => $query->orderBy('event_date')->orderBy('event_time'),
+            'title' => $query->orderBy('title_fr'),
+            default => $query->latest(),
+        };
+
+        $events = $query->paginate(12)->withQueryString();
+
+        $stats = [
+            'total' => Event::query()->count(),
+            'active' => Event::query()->where('is_active', true)->count(),
+            'featured' => Event::query()->where('is_featured', true)->count(),
+            'drafts' => Event::query()->where('is_active', false)->count(),
+        ];
+
+        $categories = EventCategory::query()
+            ->where('is_active', true)
+            ->orderBy('name_fr')
+            ->get();
+
+        return view('admin.events.index', compact('events', 'stats', 'categories', 'sort'));
     }
 
     /**
@@ -30,7 +80,22 @@ class EventController extends Controller
      */
     public function importForm()
     {
-        return view('admin.events.import');
+        $categories = EventCategory::query()
+            ->where('is_active', true)
+            ->orderBy('name_fr')
+            ->get();
+
+        $types = EventType::query()
+            ->where('is_active', true)
+            ->orderBy('name_fr')
+            ->get();
+
+        $events = Event::query()
+            ->latest('event_date')
+            ->limit(100)
+            ->get();
+
+        return view('admin.events.import', compact('categories', 'types', 'events'));
     }
 
     /**
@@ -38,9 +103,9 @@ class EventController extends Controller
      */
     public function create()
     {
-        $categories = EventCategory::where('is_active', true)->pluck('name_fr', 'id');
-        $types = EventType::where('is_active', true)->pluck('name_fr', 'id');
-        $event = new Event(); // Crée une instance vide pour le formulaire
+        $categories = EventCategory::query()->where('is_active', true)->orderBy('name_fr')->get();
+        $types = EventType::query()->where('is_active', true)->orderBy('name_fr')->get();
+        $event = new Event();
         $pageTitle = 'Créer un nouvel Événement';
 
         return view('admin.events.form', compact('event', 'categories', 'types', 'pageTitle'));
@@ -71,11 +136,16 @@ class EventController extends Controller
                       ->toMediaCollection('avatar');
             }
 
-            // Gestion des packages (grilles tarifaires)
             $packagesSkipped = false;
             if ($request->has('packages')) {
-                $packagesSkipped = !$this->storePackages($event, $request->input('packages'));
+                $packagesSkipped = !$this->storePackages($event, $request->input('packages', []));
             }
+
+            if ($request->has('seat_zones')) {
+                $this->storeSeatZones($event, $request->input('seat_zones', []));
+            }
+
+            $this->refreshPricingAndInventory($event);
 
             DB::commit();
 
@@ -122,7 +192,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load('category', 'type'); // Charge les relations pour l'affichage
+        $event->load(['category', 'type', 'seatZones', 'allPackages']);
         return view('admin.events.show', compact('event'));
     }
 
@@ -131,9 +201,9 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        $event->load('seatZones', 'packages'); // Load seat zones and packages for the form
-        $categories = EventCategory::where('is_active', true)->pluck('name_fr', 'id');
-        $types = EventType::where('is_active', true)->pluck('name_fr', 'id');
+        $event->load('seatZones', 'allPackages');
+        $categories = EventCategory::query()->where('is_active', true)->orderBy('name_fr')->get();
+        $types = EventType::query()->where('is_active', true)->orderBy('name_fr')->get();
         $pageTitle = 'Modifier l\'Événement : ' . $event->title_fr;
 
         return view('admin.events.form', compact('event', 'categories', 'types', 'pageTitle'));
@@ -171,11 +241,16 @@ class EventController extends Controller
                 $event->clearMediaCollection('avatar');
             }
 
-            // Gestion des packages (grilles tarifaires)
             $packagesSkipped = false;
             if ($request->has('packages')) {
-                $packagesSkipped = !$this->updatePackages($event, $request->input('packages'));
+                $packagesSkipped = !$this->updatePackages($event, $request->input('packages', []));
             }
+
+            if ($request->has('seat_zones')) {
+                $this->updateSeatZones($event, $request->input('seat_zones', []));
+            }
+
+            $this->refreshPricingAndInventory($event);
 
             DB::commit();
 
@@ -239,20 +314,35 @@ class EventController extends Controller
      */
     protected function validateEvent(Request $request, ?Event $event = null)
     {
-        // Filter out empty packages before validation
+        // Filter out empty packages and zones before validation
         $packages = $request->input('packages', []);
         $filteredPackages = array_filter($packages, function($package) {
             return !empty($package['package_name_fr']);
         });
-        $request->merge(['packages' => $filteredPackages]);
+        $seatZones = $request->input('seat_zones', []);
+        $filteredSeatZones = array_filter($seatZones, function ($zone) {
+            return !empty($zone['zone_name_fr']);
+        });
+        $request->merge([
+            'packages' => $filteredPackages,
+            'seat_zones' => $filteredSeatZones,
+        ]);
 
         $rules = [
             'category_id' => ['required', 'exists:event_categories,id'],
-            'type_id' => ['nullable', 'exists:event_types,id'], // Ajouté 'type_id' si vous utilisez EventType
+            'type_id' => ['nullable', 'exists:event_types,id'],
+            'family' => ['nullable', 'in:sportif,culturel'],
             'title_fr' => ['required', 'string', 'max:255'],
             'title_en' => ['required', 'string', 'max:255'],
+            'tagline_fr' => ['nullable', 'string', 'max:255'],
+            'tagline_en' => ['nullable', 'string', 'max:255'],
             'description_fr' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
+            'program_fr' => ['nullable', 'string'],
+            'program_en' => ['nullable', 'string'],
+            'conditions_fr' => ['nullable', 'string'],
+            'conditions_en' => ['nullable', 'string'],
+            'source_catalog' => ['nullable', 'string', 'max:255'],
             'venue_name' => ['required', 'string', 'max:255'],
             'venue_address' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
@@ -277,13 +367,27 @@ class EventController extends Controller
             'packages.*.package_name_en' => ['nullable', 'string', 'max:255'],
             'packages.*.package_code' => ['nullable', 'string', 'max:50'],
             'packages.*.description_fr' => ['nullable', 'string'],
+            'packages.*.venue_details_fr' => ['nullable', 'string', 'max:255'],
             'packages.*.description_included_fr' => ['nullable', 'string'],
             'packages.*.price' => ['required', 'numeric', 'min:0'],
             'packages.*.currency' => ['nullable', 'string', 'max:10'],
+            'packages.*.minimum_quantity' => ['nullable', 'integer', 'min:1'],
             'packages.*.available_quantity' => ['nullable', 'integer', 'min:0'],
             'packages.*.max_per_order' => ['nullable', 'integer', 'min:1'],
             'packages.*.is_active' => ['nullable', 'boolean'],
             'packages.*.sort_order' => ['nullable', 'integer', 'min:0'],
+            'seat_zones' => ['nullable', 'array'],
+            'seat_zones.*.id' => ['nullable', 'integer'],
+            'seat_zones.*.zone_name_fr' => ['required', 'string', 'max:255'],
+            'seat_zones.*.zone_name_en' => ['nullable', 'string', 'max:255'],
+            'seat_zones.*.zone_code' => ['nullable', 'string', 'max:50'],
+            'seat_zones.*.zone_type' => ['nullable', 'string', 'max:50'],
+            'seat_zones.*.price' => ['required', 'numeric', 'min:0'],
+            'seat_zones.*.total_seats' => ['required', 'integer', 'min:0'],
+            'seat_zones.*.available_seats' => ['nullable', 'integer', 'min:0'],
+            'seat_zones.*.description_fr' => ['nullable', 'string'],
+            'seat_zones.*.description_en' => ['nullable', 'string'],
+            'seat_zones.*.is_active' => ['nullable', 'boolean'],
         ];
 
         $messages = [
@@ -324,6 +428,14 @@ class EventController extends Controller
         // Ajout/Mise à jour du slug
         $validated['slug'] = Str::slug($validated['title_fr']);
 
+        if ($event && $event->slug !== $validated['slug']) {
+            $validated['slug'] = $this->makeUniqueSlug($validated['slug'], $event->id);
+        }
+
+        if (!$event) {
+            $validated['slug'] = $this->makeUniqueSlug($validated['slug']);
+        }
+
         // Le champ 'available_seats' devrait être géré par un système d'inventaire. 
         // Pour l'instant, on le définit égal à total_seats à la création (si non défini)
         if (!$event) {
@@ -343,17 +455,17 @@ class EventController extends Controller
     protected function storeSeatZones(Event $event, array $seatZonesData)
     {
         foreach ($seatZonesData as $zoneData) {
-            if (!empty($zoneData['zone_name_fr']) && !empty($zoneData['zone_name_en'])) {
+            if (!empty($zoneData['zone_name_fr'])) {
                 $event->seatZones()->create([
                     'zone_name_fr' => $zoneData['zone_name_fr'],
-                    'zone_name_en' => $zoneData['zone_name_en'],
+                    'zone_name_en' => $zoneData['zone_name_en'] ?? $zoneData['zone_name_fr'],
                     'zone_code' => $zoneData['zone_code'] ?? null,
                     'zone_type' => $zoneData['zone_type'] ?? 'standard',
                     'price' => $zoneData['price'] ?? 0,
                     'total_seats' => $zoneData['total_seats'] ?? 0,
-                    'available_seats' => $zoneData['total_seats'] ?? 0,
+                    'available_seats' => $zoneData['available_seats'] ?? ($zoneData['total_seats'] ?? 0),
                     'description_fr' => $zoneData['description_fr'] ?? null,
-                    'description_en' => $zoneData['description_en'] ?? null,
+                    'description_en' => $zoneData['description_en'] ?? ($zoneData['description_fr'] ?? null),
                     'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
                 ]);
             }
@@ -365,41 +477,38 @@ class EventController extends Controller
      */
     protected function updateSeatZones(Event $event, array $seatZonesData)
     {
-        // Delete existing zones not in the new data
         $existingIds = collect($seatZonesData)->pluck('id')->filter()->toArray();
         $event->seatZones()->whereNotIn('id', $existingIds)->delete();
 
         foreach ($seatZonesData as $zoneData) {
-            if (!empty($zoneData['zone_name_fr']) && !empty($zoneData['zone_name_en'])) {
+            if (!empty($zoneData['zone_name_fr'])) {
                 if (isset($zoneData['id']) && $zoneData['id']) {
-                    // Update existing zone
                     $zone = $event->seatZones()->find($zoneData['id']);
                     if ($zone) {
                         $zone->update([
                             'zone_name_fr' => $zoneData['zone_name_fr'],
-                            'zone_name_en' => $zoneData['zone_name_en'],
+                            'zone_name_en' => $zoneData['zone_name_en'] ?? $zoneData['zone_name_fr'],
                             'zone_code' => $zoneData['zone_code'] ?? null,
                             'zone_type' => $zoneData['zone_type'] ?? 'standard',
                             'price' => $zoneData['price'] ?? 0,
                             'total_seats' => $zoneData['total_seats'] ?? 0,
-                            'available_seats' => $zoneData['total_seats'] ?? 0,
+                            'available_seats' => $zoneData['available_seats'] ?? ($zoneData['total_seats'] ?? 0),
                             'description_fr' => $zoneData['description_fr'] ?? null,
-                            'description_en' => $zoneData['description_en'] ?? null,
+                            'description_en' => $zoneData['description_en'] ?? ($zoneData['description_fr'] ?? null),
                             'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
                         ]);
                     }
                 } else {
-                    // Create new zone
                     $event->seatZones()->create([
                         'zone_name_fr' => $zoneData['zone_name_fr'],
-                        'zone_name_en' => $zoneData['zone_name_en'],
+                        'zone_name_en' => $zoneData['zone_name_en'] ?? $zoneData['zone_name_fr'],
                         'zone_code' => $zoneData['zone_code'] ?? null,
                         'zone_type' => $zoneData['zone_type'] ?? 'standard',
                         'price' => $zoneData['price'] ?? 0,
                         'total_seats' => $zoneData['total_seats'] ?? 0,
-                        'available_seats' => $zoneData['total_seats'] ?? 0,
+                        'available_seats' => $zoneData['available_seats'] ?? ($zoneData['total_seats'] ?? 0),
                         'description_fr' => $zoneData['description_fr'] ?? null,
-                        'description_en' => $zoneData['description_en'] ?? null,
+                        'description_en' => $zoneData['description_en'] ?? ($zoneData['description_fr'] ?? null),
                         'is_active' => isset($zoneData['is_active']) ? (bool)$zoneData['is_active'] : true,
                     ]);
                 }
@@ -427,9 +536,13 @@ class EventController extends Controller
                     'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
                     'package_code' => $packageData['package_code'] ?? null,
                     'description_fr' => $packageData['description_fr'] ?? null,
+                    'venue_details_fr' => $packageData['venue_details_fr'] ?? null,
+                    'venue_details_en' => $packageData['venue_details_en'] ?? ($packageData['venue_details_fr'] ?? null),
                     'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                    'description_included_en' => $packageData['description_included_en'] ?? ($packageData['description_included_fr'] ?? null),
                     'price' => $packageData['price'] ?? 0,
                     'currency' => $packageData['currency'] ?? 'XOF',
+                    'minimum_quantity' => $packageData['minimum_quantity'] ?? 1,
                     'available_quantity' => $packageData['available_quantity'] ?? 100,
                     'max_per_order' => $packageData['max_per_order'] ?? 10,
                     'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
@@ -469,9 +582,13 @@ class EventController extends Controller
                             'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
                             'package_code' => $packageData['package_code'] ?? null,
                             'description_fr' => $packageData['description_fr'] ?? null,
+                            'venue_details_fr' => $packageData['venue_details_fr'] ?? null,
+                            'venue_details_en' => $packageData['venue_details_en'] ?? ($packageData['venue_details_fr'] ?? null),
                             'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                            'description_included_en' => $packageData['description_included_en'] ?? ($packageData['description_included_fr'] ?? null),
                             'price' => $packageData['price'] ?? 0,
                             'currency' => $packageData['currency'] ?? 'XOF',
+                            'minimum_quantity' => $packageData['minimum_quantity'] ?? 1,
                             'available_quantity' => $packageData['available_quantity'] ?? 100,
                             'max_per_order' => $packageData['max_per_order'] ?? 10,
                             'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
@@ -485,9 +602,13 @@ class EventController extends Controller
                         'package_name_en' => $packageData['package_name_en'] ?? $packageData['package_name_fr'],
                         'package_code' => $packageData['package_code'] ?? null,
                         'description_fr' => $packageData['description_fr'] ?? null,
+                        'venue_details_fr' => $packageData['venue_details_fr'] ?? null,
+                        'venue_details_en' => $packageData['venue_details_en'] ?? ($packageData['venue_details_fr'] ?? null),
                         'description_included_fr' => $packageData['description_included_fr'] ?? null,
+                        'description_included_en' => $packageData['description_included_en'] ?? ($packageData['description_included_fr'] ?? null),
                         'price' => $packageData['price'] ?? 0,
                         'currency' => $packageData['currency'] ?? 'XOF',
+                        'minimum_quantity' => $packageData['minimum_quantity'] ?? 1,
                         'available_quantity' => $packageData['available_quantity'] ?? 100,
                         'max_per_order' => $packageData['max_per_order'] ?? 10,
                         'is_active' => isset($packageData['is_active']) ? (bool)$packageData['is_active'] : true,
@@ -564,6 +685,7 @@ class EventController extends Controller
             $extension = $file->getClientOriginalExtension();
 
             $import = new EventPackagesImport();
+            $import->setEventId($request->integer('event_id'));
             $import->import($filePath, $extension);
 
             $count  = $import->getRowCount();
@@ -584,5 +706,93 @@ class EventController extends Controller
             \Log::error('Import CSV Error: ' . $e->getMessage());
             return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
         }
+    }
+
+    public function importPdf(Request $request, PdfEventDraftImportService $pdfEventDraftImportService)
+    {
+        $validated = $request->validate([
+            'pdf_file' => 'required|file|mimes:pdf|max:15360',
+            'category_id' => 'nullable|exists:event_categories,id',
+            'type_id' => 'nullable|exists:event_types,id',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'organizer' => 'nullable|string|max:255',
+            'is_featured' => 'nullable|boolean',
+            'publish_immediately' => 'nullable|boolean',
+        ]);
+
+        $result = $pdfEventDraftImportService->import($request->file('pdf_file'), [
+            'category_id' => $validated['category_id'] ?? null,
+            'type_id' => $validated['type_id'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'country' => $validated['country'] ?? null,
+            'organizer' => $validated['organizer'] ?? null,
+            'is_featured' => $request->boolean('is_featured'),
+            'publish_immediately' => $request->boolean('publish_immediately'),
+        ]);
+
+        $message = 'Événement importé depuis PDF : ' . $result['event']->title_fr . '.';
+        $message .= ' ' . $result['summary']['packages_count'] . ' package(s) détecté(s).';
+
+        if (!empty($result['summary']['warnings'])) {
+            $message .= ' Vérifications manuelles conseillées : ' . implode(' ', $result['summary']['warnings']);
+        }
+
+        return redirect()
+            ->route('admin.events.edit', $result['event'])
+            ->with('success', $message);
+    }
+
+    protected function refreshPricingAndInventory(Event $event): void
+    {
+        $event->loadMissing(['allPackages', 'seatZones']);
+
+        $prices = [];
+        $totalSeats = 0;
+        $availableSeats = 0;
+
+        foreach ($event->allPackages as $package) {
+            if ((float) $package->price > 0) {
+                $prices[] = (float) $package->price;
+            }
+
+            $totalSeats += max(0, (int) $package->available_quantity);
+            $availableSeats += max(0, (int) $package->available_quantity);
+        }
+
+        foreach ($event->seatZones as $zone) {
+            if ((float) $zone->price > 0) {
+                $prices[] = (float) $zone->price;
+            }
+
+            $totalSeats += max(0, (int) $zone->total_seats);
+            $availableSeats += max(0, (int) $zone->available_seats);
+        }
+
+        $event->forceFill([
+            'min_price' => !empty($prices) ? min($prices) : ($event->min_price ?? 0),
+            'max_price' => !empty($prices) ? max($prices) : ($event->max_price ?? 0),
+            'total_seats' => $totalSeats > 0 ? $totalSeats : ($event->total_seats ?? 0),
+            'available_seats' => $availableSeats > 0 ? $availableSeats : ($event->available_seats ?? 0),
+        ])->save();
+    }
+
+    protected function makeUniqueSlug(string $slug, ?int $ignoreEventId = null): string
+    {
+        $baseSlug = $slug !== '' ? $slug : 'event';
+        $candidate = $baseSlug;
+        $counter = 2;
+
+        while (
+            Event::query()
+                ->when($ignoreEventId, fn ($query) => $query->where('id', '!=', $ignoreEventId))
+                ->where('slug', $candidate)
+                ->exists()
+        ) {
+            $candidate = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $candidate;
     }
 }
