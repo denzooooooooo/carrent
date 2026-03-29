@@ -38,7 +38,7 @@ class HomeController extends Controller
 
     public function packages()
     {
-        return view('pages.packages');
+        return app(PackageController::class)->index(request());
     }
 
     public function location(Request $request)

@@ -40,6 +40,8 @@
         ($selectedSort ?? 'featured') !== 'featured' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
     ])->filter()->values();
 
+    $featuredPackagesCount = isset($featuredPackagesCount) ? (int) $featuredPackagesCount : 0;
+    $startingPrice = $startingPrice ?? null;
     $resetUrl = route('packages');
 @endphp
 
