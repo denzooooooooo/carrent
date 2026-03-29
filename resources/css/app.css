@@ -410,6 +410,10 @@
         animation: cp-mobile-drawer-in 0.24s ease;
     }
 
+    .cp-mobile-drawer-panel {
+        overscroll-behavior: contain;
+    }
+
     .cp-page {
         min-height: 100vh;
         padding-bottom: var(--cp-page-bottom);
@@ -620,6 +624,37 @@
 
     .cp-page-overlap {
         margin-top: -1.5rem;
+    }
+}
+
+@media (max-width: 639px) {
+    :root {
+        --cp-header-height: 4.25rem;
+    }
+
+    .cp-header-shell {
+        padding: 0.6rem 0.7rem;
+        border-radius: 1.2rem;
+    }
+
+    .cp-header-brand-mark {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.8rem;
+    }
+
+    .cp-header-brand-title {
+        letter-spacing: 0.03em;
+    }
+
+    .cp-mobile-toolbar .cp-icon-button-compact {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .cp-mobile-drawer {
+        border-radius: 1.25rem;
+        box-shadow: 0 22px 54px rgba(32, 20, 47, 0.16);
     }
 }
 

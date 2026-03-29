@@ -1,10 +1,12 @@
 @php
-    $companyName = config('carre_premium.company.name');
-// $cartItemsCount provided from layout
-    $supportEmail = config('carre_premium.contact.support_email');
-    $mobileDisplay = config('carre_premium.contact.mobile_display');
-    $mobileLink = config('carre_premium.contact.mobile_link');
-    $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
+    $companyName = filled(config('carre_premium.company.name')) ? config('carre_premium.company.name') : 'Carré Premium';
+    // $cartItemsCount provided from layout
+    $supportEmail = filled(config('carre_premium.contact.support_email'))
+        ? config('carre_premium.contact.support_email')
+        : (filled(config('carre_premium.contact.email')) ? config('carre_premium.contact.email') : 'infos@carrepremium.com');
+    $mobileDisplay = filled(config('carre_premium.contact.mobile_display')) ? config('carre_premium.contact.mobile_display') : '+225 01 01 22 15 15';
+    $mobileLink = filled(config('carre_premium.contact.mobile_link')) ? config('carre_premium.contact.mobile_link') : 'tel:+2250101221515';
+    $whatsAppUrl = filled(config('carre_premium.contact.whatsapp_url')) ? config('carre_premium.contact.whatsapp_url') : 'https://wa.me/2250101221515';
     $currentLocale = strtoupper(session('locale', 'fr'));
     $currentCurrency = session('currency', 'XOF');
     $userName = $user?->name ?: trim(($user?->first_name ?? '') . ' ' . ($user?->last_name ?? ''));
@@ -44,10 +46,10 @@
                 <div class="flex items-center gap-3">
                     <a href="{{ route('home') }}" class="cp-header-brand flex min-w-0 flex-1 items-center gap-2.5 lg:flex-none">
                         <span class="cp-header-brand-mark">
-                            <img src="{{ asset('logos/logo2.jpg') }}" alt="{{ $companyName }}" class="h-12 w-12 object-contain lg:h-16 lg:w-16" loading="lazy">
+                            <img src="{{ asset('logos/logo2.jpg') }}" alt="{{ $companyName }}" class="h-11 w-11 object-contain sm:h-12 sm:w-12 lg:h-16 lg:w-16" loading="lazy">
                         </span>
                         <span class="min-w-0">
-                            <span class="block truncate text-sm font-black tracking-[0.08em] text-[color:var(--cp-plum-950)] sm:text-[0.95rem]">{{ strtoupper($companyName) }}</span>
+                            <span class="cp-header-brand-title block truncate text-[0.82rem] font-black tracking-[0.05em] text-[color:var(--cp-plum-950)] sm:text-[0.95rem]">{{ strtoupper($companyName) }}</span>
                             <span class="hidden truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)] xl:block">Events · Travel · Concierge</span>
                         </span>
                     </a>
@@ -76,6 +78,7 @@
                                 </span>
                             @endif
                         </a>
+                    </nav>
 
                     <div class="hidden items-center gap-2 lg:flex">
                         <a href="{{ route('contact') }}" class="cp-primary-button !px-4 !py-2.5 text-sm">
@@ -238,8 +241,8 @@
                         @endif
                     </div>
 
-                    <div class="flex items-center gap-2 lg:hidden">
-                        <a href="{{ route('cart') }}" class="relative cp-icon-button" aria-label="Panier">
+                    <div class="cp-mobile-toolbar flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
+                        <a href="{{ route('cart') }}" class="relative cp-icon-button cp-icon-button-compact" aria-label="Panier">
                             <i class="fa-solid fa-bag-shopping text-sm"></i>
                             @if($cartItemsCount > 0)
                                 <span class="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
@@ -247,14 +250,11 @@
                                 </span>
                             @endif
                         </a>
-                        <a href="{{ route('contact') }}" class="cp-icon-button" aria-label="Contacter un conseiller">
-                            <i class="fa-solid fa-headset text-sm"></i>
-                        </a>
 
                         <button
                             type="button"
                             data-header-toggle="mobile-main-menu"
-                            class="cp-icon-button"
+                            class="cp-icon-button cp-icon-button-compact"
                             aria-expanded="false"
                             aria-controls="mobile-main-menu"
                             aria-label="Ouvrir le menu principal"
@@ -278,7 +278,7 @@
         <div
             id="mobile-main-menu"
             data-header-panel
-            class="cp-mobile-drawer relative mt-3 hidden max-h-[calc(100vh-6rem)] overflow-y-auto p-4"
+            class="cp-mobile-drawer cp-mobile-drawer-panel relative mt-2 hidden w-full max-h-[calc(100dvh-var(--cp-header-height)-1rem)] overflow-y-auto p-3 sm:p-4"
         >
             <div class="rounded-[1.25rem] bg-gradient-to-br from-[#241233] via-[#4b2870] to-[#d89b43] px-4 py-4 text-white">
                 <p class="text-xs font-black uppercase tracking-[0.2em] text-white/65">Navigation</p>
@@ -319,7 +319,7 @@
                 </a>
             </div>
 
-            <div class="mt-4 grid grid-cols-2 gap-2">
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
                 @foreach($secondaryNavigation as $item)
                     <a href="{{ route($item['route']) }}" data-header-close class="cp-secondary-button !justify-start !rounded-[1rem] !px-4 !py-3 text-sm">
                         <i class="fa-solid {{ $item['icon'] }} text-xs"></i>

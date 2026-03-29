@@ -1,14 +1,16 @@
 @php
-    $companyName = config('carre_premium.company.name');
-    $companyAddress = config('carre_premium.company.address');
-    $companyCity = config('carre_premium.company.city');
-    $companyCountry = config('carre_premium.company.country');
-    $supportEmail = config('carre_premium.contact.support_email');
-    $landlineDisplay = config('carre_premium.contact.landline_display');
-    $landlineLink = config('carre_premium.contact.landline_link');
-    $mobileDisplay = config('carre_premium.contact.mobile_display');
-    $mobileLink = config('carre_premium.contact.mobile_link');
-    $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
+    $companyName = filled(config('carre_premium.company.name')) ? config('carre_premium.company.name') : 'Carré Premium';
+    $companyAddress = filled(config('carre_premium.company.address')) ? config('carre_premium.company.address') : "Abidjan Marcory Biétry Boulevard de Marseille";
+    $companyCity = filled(config('carre_premium.company.city')) ? config('carre_premium.company.city') : 'Abidjan';
+    $companyCountry = filled(config('carre_premium.company.country')) ? config('carre_premium.company.country') : "Côte d'Ivoire";
+    $supportEmail = filled(config('carre_premium.contact.support_email'))
+        ? config('carre_premium.contact.support_email')
+        : (filled(config('carre_premium.contact.email')) ? config('carre_premium.contact.email') : 'infos@carrepremium.com');
+    $landlineDisplay = filled(config('carre_premium.contact.landline_display')) ? config('carre_premium.contact.landline_display') : '+225 27 21 59 42 58';
+    $landlineLink = filled(config('carre_premium.contact.landline_link')) ? config('carre_premium.contact.landline_link') : 'tel:+2252721594258';
+    $mobileDisplay = filled(config('carre_premium.contact.mobile_display')) ? config('carre_premium.contact.mobile_display') : '+225 01 01 22 15 15';
+    $mobileLink = filled(config('carre_premium.contact.mobile_link')) ? config('carre_premium.contact.mobile_link') : 'tel:+2250101221515';
+    $whatsAppUrl = filled(config('carre_premium.contact.whatsapp_url')) ? config('carre_premium.contact.whatsapp_url') : 'https://wa.me/2250101221515';
 
     $serviceLinks = [
         ['label' => 'Événements', 'url' => route('events')],
@@ -28,6 +30,27 @@
         ['label' => 'Mentions & CGU', 'url' => route('terms')],
         ['label' => 'Confidentialité', 'url' => route('privacy')],
         ['label' => 'Cookies', 'url' => route('cookies')],
+    ];
+
+    $contactChannels = [
+        [
+            'icon' => 'fa-phone-volume',
+            'label' => 'Ligne fixe',
+            'value' => $landlineDisplay,
+            'href' => $landlineLink,
+        ],
+        [
+            'icon' => 'fa-mobile-screen',
+            'label' => 'Mobile',
+            'value' => $mobileDisplay,
+            'href' => $mobileLink,
+        ],
+        [
+            'icon' => 'fa-envelope',
+            'label' => 'Email support',
+            'value' => $supportEmail,
+            'href' => 'mailto:' . $supportEmail,
+        ],
     ];
 @endphp
 
@@ -80,18 +103,17 @@
                         </p>
 
                         <div class="mt-6 grid gap-3">
-                            <a href="{{ $landlineLink }}" class="flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/10 px-4 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/15">
-                                <i class="fa-solid fa-phone-volume text-[color:var(--cp-gold-300)]"></i>
-                                <span>{{ $landlineDisplay }}</span>
-                            </a>
-                            <a href="{{ $mobileLink }}" class="flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/10 px-4 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/15">
-                                <i class="fa-solid fa-mobile-screen text-[color:var(--cp-gold-300)]"></i>
-                                <span>{{ $mobileDisplay }}</span>
-                            </a>
-                            <a href="mailto:{{ $supportEmail }}" class="flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/10 px-4 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/15">
-                                <i class="fa-regular fa-envelope text-[color:var(--cp-gold-300)]"></i>
-                                <span>{{ $supportEmail }}</span>
-                            </a>
+                            @foreach($contactChannels as $channel)
+                                <a href="{{ $channel['href'] }}" class="flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/10 px-4 py-3 text-left text-white/90 transition hover:bg-white/15">
+                                    <span class="inline-flex h-10 w-10 flex-none items-center justify-center rounded-full bg-white/10">
+                                        <i class="fa-solid {{ $channel['icon'] }} text-[color:var(--cp-gold-300)]"></i>
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block text-[11px] font-black uppercase tracking-[0.18em] text-white/50">{{ $channel['label'] }}</span>
+                                        <span class="mt-1 block truncate text-sm font-semibold text-white">{{ $channel['value'] }}</span>
+                                    </span>
+                                </a>
+                            @endforeach
                         </div>
                     </div>
 
