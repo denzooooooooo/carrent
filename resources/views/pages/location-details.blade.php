@@ -14,8 +14,8 @@
     $pricePerDay = (float) ($location->price_per_day ?? 0);
 @endphp
 
-<div class="min-h-screen pb-24 sm:pb-28">
-    <section class="pt-4 sm:pt-6">
+<div class="cp-page">
+    <section class="cp-page-hero">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1d2239] via-[#234c7b] to-[#d49a46] text-white shadow-[0_30px_90px_rgba(20,34,59,0.24)]">
                 <div class="grid gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
@@ -101,7 +101,7 @@
         </div>
     </section>
 
-    <section class="-mt-6 pt-0">
+    <section class="cp-page-overlap">
         <div class="cp-shell">
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,420px)]">
                 <div class="space-y-6">
@@ -332,7 +332,7 @@
         </div>
     </section>
 
-    <section class="pt-10 sm:pt-12">
+    <section class="cp-page-section-lg">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#19304a] via-[#226695] to-[#d49a46] px-5 py-8 text-white shadow-[0_24px_70px_rgba(24,37,67,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

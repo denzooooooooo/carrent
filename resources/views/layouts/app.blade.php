@@ -46,8 +46,6 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- Theme CSS - MUST be loaded first -->
-    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
     <link rel="stylesheet" href="{{ asset('css/separate-tickets.css') }}">
 
     <!-- Favicon -->
@@ -89,7 +87,7 @@
         'currentCurrency' => $currentCurrency
     ])
 
-    <main class="pt-[5rem] lg:pt-[5.75rem]">
+    <main class="cp-site-main">
     @yield('content')
 </main>
 
@@ -101,7 +99,7 @@
     
     <!-- Theme JavaScript -->
     <script src="{{ asset('js/theme.js') }}"></script>
-           <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
     @stack('scripts')   
 
     @yield('scripts')

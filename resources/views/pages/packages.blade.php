@@ -43,8 +43,8 @@
     $resetUrl = route('packages');
 @endphp
 
-<div class="min-h-screen pb-14 sm:pb-16">
-    <section class="pt-4 sm:pt-6">
+<div class="cp-page">
+    <section class="cp-page-hero">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#241233] via-[#4c2872] to-[#d89b43] text-white shadow-[0_28px_90px_rgba(41,20,58,0.24)]">
                 <div class="grid gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
@@ -100,7 +100,7 @@
         </div>
     </section>
 
-    <section id="packages-filters" class="-mt-6 pt-0">
+    <section id="packages-filters" class="cp-page-overlap">
         <div class="cp-shell">
             <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
                 <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
@@ -207,7 +207,7 @@
         </div>
     </section>
 
-    <section class="pt-8 sm:pt-10">
+    <section class="cp-page-section">
         <div class="cp-shell">
             <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -352,7 +352,7 @@
         </div>
     </section>
 
-    <section class="pt-10 sm:pt-12">
+    <section class="cp-page-section-lg">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

@@ -137,13 +137,13 @@
     $featuredEventFamilyLabel = $featuredEvent ? ($familyLabels[$featuredEvent->family] ?? ucfirst($featuredEvent->family)) : null;
 @endphp
 
-<div class="min-h-screen">
+<div class="cp-page">
     <section class="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-amber-500">
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="absolute -left-20 top-12 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
         <div class="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-amber-300/20 blur-3xl"></div>
 
-        <div class="cp-shell relative z-10 py-14 md:py-20">
+        <div class="cp-shell relative z-10 py-12 md:py-16">
             <div class="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,420px)] lg:items-end">
                 <div class="max-w-4xl">
                     <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-white/90 backdrop-blur">

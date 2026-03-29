@@ -31,9 +31,9 @@
     ];
 @endphp
 
-<footer class="theme-shell-footer px-3 pb-4 pt-12 sm:px-4 sm:pt-16">
-    <div class="cp-shell">
-        <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#211130] via-[#3a1f57] to-[#7a492d] text-white shadow-[0_30px_90px_rgba(33,17,48,0.28)]">
+<footer class="cp-footer w-full bg-transparent">
+    <div class="w-full mx-auto max-w-none px-0">
+        <div class="overflow-hidden bg-gradient-to-br from-[#211130] via-[#3a1f57] to-[#7a492d] text-white shadow-[0_30px_90px_rgba(33,17,48,0.28)] w-full">
             <div class="border-b border-white/10 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
                 <div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
                     <div>
