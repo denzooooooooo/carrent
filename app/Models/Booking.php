@@ -262,6 +262,19 @@ class Booking extends Model
         return $date?->format('d/m/Y');
     }
 
+    public function getEventSelectionLabelAttribute(): string
+    {
+        return $this->eventBooking?->selection_label
+            ?? $this->seatZone?->zone_name
+            ?? 'N/A';
+    }
+
+    public function getEventSelectionTypeLabelAttribute(): string
+    {
+        return $this->eventBooking?->selection_type_label
+            ?? ($this->seatZone ? 'Zone' : 'Formule');
+    }
+
     protected function flightRouteLabel(): string
     {
         if ($this->flightBooking) {

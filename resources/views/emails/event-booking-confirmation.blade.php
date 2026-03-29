@@ -42,8 +42,8 @@
                     </div>
 
                     <div class="flex justify-between">
-                        <span class="text-gray-600">Zone:</span>
-                        <span class="font-semibold text-gray-900">{{ $booking->zone->zone_name }}</span>
+                        <span class="text-gray-600">{{ $booking->selection_type_label }}:</span>
+                        <span class="font-semibold text-gray-900">{{ $booking->selection_label }}</span>
                     </div>
 
                     <div class="flex justify-between">
@@ -109,7 +109,7 @@
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Date:</span>
-                        <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->event->event_date)->format('l d F Y') }}</span>
+                        <span class="font-semibold text-gray-900">{{ optional($booking->packageOption?->option_date ?? $booking->event->event_date)->format('d/m/Y') }}</span>
                     </div>
 
                     <div class="flex justify-between">

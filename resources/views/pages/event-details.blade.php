@@ -3,505 +3,544 @@
 @section('title', $event->title . ' - Carré Premium')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
-  {{-- Hero Section --}}
-  <section class="relative">
-    <div class="h-80 sm:h-96 md:h-[500px] lg:h-[600px] relative overflow-hidden">
-      @php
-          $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
-          $placeholder = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&h=600&fit=crop';
-      @endphp
-      <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+@php
+    $imageUrl = $event->getFirstMediaUrl('avatar', 'normal');
+    $placeholder = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&h=600&fit=crop';
+    $hasPackages = \Illuminate\Support\Facades\Schema::hasTable('event_packages') && $event->packages->count() > 0;
+    $hasSeatZones = $event->seatZones->count() > 0;
+    $hasInventory = $hasPackages || $hasSeatZones;
+@endphp
 
-      {{-- Floating Action Button --}}
-      <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
-        <button class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all">
-          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    {{-- Event Info Overlay --}}
-    <div class="absolute bottom-0 left-0 right-0 z-10">
-      <div class="container mx-auto px-4 pb-6 sm:pb-8">
-        <div class="max-w-4xl">
-          <div class="bg-white rounded-t-2xl sm:rounded-t-3xl shadow-2xl p-4 sm:p-6 md:p-8">
-            {{-- Categories --}}
-            <div class="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <span class="px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100 text-purple-800 text-xs sm:text-sm font-semibold rounded-full">
-                {{ $event->category->name_fr ?? 'Événement' }}
-              </span>
-              <span class="px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold rounded-full">
-                {{ $event->type->name_fr ?? 'Spectacle' }}
-              </span>
-            </div>
-
-            {{-- Title --}}
-            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-3 sm:mb-4 leading-tight mt-4 sm:mt-0">
-              {{ $event->title }}
-            </h1>
-
-            {{-- Date & Location --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div class="flex items-center space-x-2 sm:space-x-3">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-xs sm:text-sm text-gray-500 font-medium">DATE & HEURE</p>
-                  <p class="text-gray-900 font-semibold text-sm sm:text-base">{{ \Carbon\Carbon::parse($event->event_date)->format('l d F Y') }}</p>
-                  <p class="text-gray-600 text-sm">{{ $event->event_time }}</p>
-                </div>
-              </div>
-
-              <div class="flex items-center space-x-2 sm:space-x-3">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-xs sm:text-sm text-gray-500 font-medium">LIEU</p>
-                  <p class="text-gray-900 font-semibold text-sm sm:text-base">{{ $event->venue_name }}</p>
-                  <p class="text-gray-600 text-sm">{{ $event->city }}, {{ $event->country }}</p>
-                </div>
-              </div>
-            </div>
-
-            {{-- Action Buttons --}}
-            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button onclick="scrollToTickets()" class="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 text-center text-sm sm:text-base">
-                {{ __('Book now') }}
-              </button>
-              <button class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg sm:rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all duration-300 text-sm sm:text-base">
-                {{ __('Share') }}
-              </button>
-            </div>
-          </div>
+<div class="min-h-screen bg-stone-50">
+    <section class="relative overflow-hidden">
+        <div class="h-[420px] md:h-[520px]">
+            <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $event->title }}" class="h-full w-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  {{-- Main Content --}}
-  <div class="container mx-auto px-4 py-6 sm:py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-      {{-- Left Column --}}
-      <div class="lg:col-span-2 space-y-6 sm:space-y-8">
-        {{-- About Section --}}
-        <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('About the event') }}</h2>
-          <div class="prose prose-base sm:prose-lg max-w-none text-gray-700 leading-relaxed">
-            {!! nl2br(e($event->description_fr)) !!}
-          </div>
-        </section>
-
-        {{-- Organizer Section --}}
-        @if($event->organizer)
-        <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Organizer') }}</h2>
-          <div class="flex items-center space-x-3 sm:space-x-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-gray-900">{{ $event->organizer }}</p>
-              <p class="text-gray-600 text-sm">{{ __('Official organizer') }}</p>
-            </div>
-          </div>
-        </section>
-        @endif
-
-        {{-- Venue Details --}}
-        <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Event venue') }}</h2>
-          <div class="flex items-start space-x-3 sm:space-x-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-2">{{ $event->venue_name }}</h3>
-              <p class="text-gray-600 mb-1 text-sm sm:text-base">{{ $event->venue_address }}</p>
-              <p class="text-gray-600 text-sm sm:text-base">{{ $event->city }}, {{ $event->country }}</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {{-- Right Column - Tickets & Packages --}}
-      <div class="lg:col-span-1">
-        <div class="sticky top-6 sm:top-8">
-          <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">{{ __('Choose your tickets') }}</h3>
-
-            {{-- Afficher les Packages (Grilles Tarifaires) --}}
-            @if(\Illuminate\Support\Facades\Schema::hasTable('event_packages') && $event->packages->count() > 0)
-              <div class="mb-6">
-                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ __('Packages & VIP Offers') }}</h4>
-                <div class="space-y-3 sm:space-y-4">
-                  @foreach($event->packages as $package)
-                    <div class="border-2 border-purple-200 bg-purple-50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-400 hover:shadow-md transition-all duration-200">
-                      <div class="flex justify-between items-start mb-2 sm:mb-3">
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $package->package_name_fr }}</h4>
-                          <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $package->package_code }}</p>
-                        </div>
-                        <div class="text-right ml-2">
-                          <div class="text-xl sm:text-2xl font-bold text-purple-600">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</div>
-                          <div class="text-xs text-gray-500">{{ __('per person') }}</div>
-                        </div>
-                      </div>
-
-                      @if($package->description_fr)
-                        <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ $package->description_fr }}</p>
-                      @endif
-
-                      @if($package->description_included_fr)
-                        <div class="text-xs text-gray-500 mb-2 sm:mb-3">
-                          <span class="font-medium">{{ __('Included') }}:</span> {{ $package->description_included_fr }}
-                        </div>
-                      @endif
-
-                      <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
-                        <span>{{ $package->available_quantity }} {{ __('available') }}</span>
-                        <span class="text-xs">/ {{ $package->available_quantity }}</span>
-                      </div>
-
-                      @if($package->available_quantity > 0)
-                        <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-package-btn"
-                                data-package-id="{{ $package->id }}"
-                                data-package-name="{{ $package->package_name_fr }}"
-                                data-price="{{ $package->price }}"
-                                data-available="{{ $package->available_quantity }}">
-                          {{ __('Select Package') }}
-                        </button>
-                      @else
-                        <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
-                          {{ __('Sold out') }}
-                        </button>
-                      @endif
+        <div class="absolute inset-x-0 bottom-0">
+            <div class="container mx-auto px-4 pb-8">
+                <div class="max-w-4xl rounded-3xl bg-white/95 p-6 shadow-2xl backdrop-blur md:p-8">
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-800">
+                            {{ $event->category->name_fr ?? 'Événement' }}
+                        </span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">
+                            {{ $event->type->name_fr ?? 'Sport' }}
+                        </span>
+                        @if($event->tagline)
+                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                                Catalogue PDF
+                            </span>
+                        @endif
                     </div>
-                  @endforeach
-                </div>
-              </div>
-            @endif
 
-            {{-- Afficher les Seat Zones (Zones de places) --}}
-            @if($event->seatZones->count() > 0)
-              <div class="@if($event->packages->count() > 0) pt-6 border-t border-gray-200 @endif">
-                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ __('Seat Zones') }}</h4>
-                <div class="space-y-3 sm:space-y-4">
-                  @foreach($event->seatZones as $zone)
-                    <div class="border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-300 hover:shadow-md transition-all duration-200">
-                      <div class="flex justify-between items-start mb-2 sm:mb-3">
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $zone->zone_name }}</h4>
-                          <p class="text-xs sm:text-sm text-purple-600 font-medium">{{ $zone->zone_code }}</p>
+                    <h1 class="max-w-3xl text-3xl font-black leading-tight text-slate-950 md:text-5xl">
+                        {{ $event->title }}
+                    </h1>
+
+                    @if($event->tagline)
+                        <p class="mt-3 max-w-3xl text-sm font-medium text-slate-600 md:text-lg">
+                            {{ $event->tagline }}
+                        </p>
+                    @endif
+
+                    <div class="mt-6 grid gap-4 md:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Dates</p>
+                            <p class="mt-2 text-lg font-bold text-slate-900">{{ $event->date_range_label ?? $event->short_date_label }}</p>
+                            <p class="text-sm text-slate-600">
+                                {{ $event->event_time }}
+                                @if($event->end_time && $event->end_date && $event->end_date->isSameDay($event->event_date))
+                                    - {{ $event->end_time }}
+                                @endif
+                            </p>
                         </div>
-                        <div class="text-right ml-2">
-                          <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</div>
-                          <div class="text-xs text-gray-500">{{ __('per person') }}</div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Lieu</p>
+                            <p class="mt-2 text-lg font-bold text-slate-900">{{ $event->venue_name }}</p>
+                            <p class="text-sm text-slate-600">{{ $event->city }}, {{ $event->country }}</p>
                         </div>
-                      </div>
-
-                      @if($zone->description)
-                        <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ $zone->description }}</p>
-                      @endif
-
-                      <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
-                        <span>{{ $zone->available_seats }} {{ __('remaining') }}</span>
-                        <span class="text-xs">/ {{ $zone->total_seats }}</span>
-                      </div>
-
-                      @if($zone->available_seats > 0)
-                        <button class="w-full bg-purple-600 text-white font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base select-seat-btn"
-                                data-zone-id="{{ $zone->id }}"
-                                data-zone-name="{{ $zone->zone_name }}"
-                                data-price="{{ $zone->price }}"
-                                data-available="{{ $zone->available_seats }}">
-                          {{ __('Select') }}
-                        </button>
-                      @else
-                        <button class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg cursor-not-allowed text-sm sm:text-base" disabled>
-                          {{ __('Sold out') }}
-                        </button>
-                      @endif
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">À partir de</p>
+                            <p class="mt-2 text-lg font-bold text-slate-900">{{ \App\Helpers\CurrencyHelper::format($event->min_price) }}</p>
+                            <p class="text-sm text-slate-600">Tarif catalogue selon disponibilité</p>
+                        </div>
                     </div>
-                  @endforeach
-                </div>
-              </div>
-            @endif
 
-            @if( ! \Illuminate\Support\Facades\Schema::hasTable('event_packages') || $event->packages->count() == 0 && $event->seatZones->count() == 0)
-              <div class="text-center py-6 sm:py-8"> 
-                <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p class="text-gray-500 font-medium text-sm sm:text-base">{{ __('Tickets coming soon') }}</p>
-                <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ __('Come back later') }}</p>
-              </div>
-            @endif
-          </div>
+                    <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                        @if($hasInventory)
+                            <button onclick="document.getElementById('reservation-panel').scrollIntoView({ behavior: 'smooth' })" class="rounded-2xl bg-slate-950 px-6 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:bg-slate-800">
+                                Choisir une formule
+                            </button>
+                        @endif
+                        <a href="{{ route('contact') }}" class="rounded-2xl border border-slate-300 px-6 py-4 text-center text-sm font-bold uppercase tracking-[0.2em] text-slate-700 transition hover:border-slate-950 hover:text-slate-950">
+                            Besoin d’aide
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  {{-- CTA Section --}}
-  <section class="bg-gradient-to-r from-purple-600 to-amber-600 py-12 sm:py-16">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">{{ __('Do you have questions?') }}</h2>
-      <p class="text-lg sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
-        {{ __('Our team is here to help you choose the best seats.') }}
-      </p>
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-        <a href="{{ route('contact') }}" class="bg-white text-purple-600 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl hover:shadow-lg transition-all duration-300 inline-block text-sm sm:text-base">
-          {{ __('Contact us') }}
-        </a>
-        <a href="tel:+225XXXXXXXXX" class="border-2 border-white text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl hover:bg-white hover:text-purple-600 transition-all duration-300 inline-block text-sm sm:text-base">
-          {{ __('Call now') }}
-        </a>
-      </div>
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(340px,0.9fr)]">
+            <div class="space-y-6">
+                <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
+                    <h2 class="text-2xl font-black text-slate-950">Présentation</h2>
+                    <div class="prose mt-4 max-w-none text-slate-700">
+                        {!! nl2br(e($event->description_fr)) !!}
+                    </div>
+                </section>
+
+                @if($event->program)
+                    <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
+                        <h2 class="text-2xl font-black text-slate-950">Programme</h2>
+                        <div class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700 md:text-base">
+                            {{ $event->program }}
+                        </div>
+                    </section>
+                @endif
+
+                <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
+                    <h2 class="text-2xl font-black text-slate-950">Lieu et organisation</h2>
+                    <div class="mt-5 grid gap-4 md:grid-cols-2">
+                        <div class="rounded-2xl bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Site</p>
+                            <p class="mt-2 text-lg font-bold text-slate-900">{{ $event->venue_name }}</p>
+                            @if($event->venue_address)
+                                <p class="mt-1 text-sm text-slate-600">{{ $event->venue_address }}</p>
+                            @endif
+                            <p class="mt-1 text-sm text-slate-600">{{ $event->city }}, {{ $event->country }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Organisateur</p>
+                            <p class="mt-2 text-lg font-bold text-slate-900">{{ $event->organizer ?: 'Carré Premium' }}</p>
+                            @if($event->source_catalog)
+                                <p class="mt-1 text-sm text-slate-600">Source: {{ $event->source_catalog }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </section>
+
+                @if($event->conditions)
+                    <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
+                        <h2 class="text-2xl font-black text-slate-950">Conditions</h2>
+                        <div class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700 md:text-base">
+                            {{ $event->conditions }}
+                        </div>
+                    </section>
+                @endif
+            </div>
+
+            <aside id="reservation-panel" class="lg:sticky lg:top-6 lg:self-start">
+                <div class="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm md:p-6">
+                    <div class="mb-5 border-b border-stone-200 pb-5">
+                        <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Réservation</p>
+                        <h3 class="mt-2 text-2xl font-black text-slate-950">Choisissez votre formule</h3>
+                        <p class="mt-2 text-sm text-slate-600">
+                            Les disponibilités et minimums affichés correspondent au catalogue chargé depuis les PDF.
+                        </p>
+                    </div>
+
+                    @if($hasPackages)
+                        <div class="space-y-5">
+                            @foreach($event->packages as $package)
+                                @php
+                                    $includedLines = collect(preg_split('/\r\n|\r|\n/', (string) $package->description_included_fr))->filter();
+                                @endphp
+                                <article class="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                                    <div class="flex flex-col gap-4">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-600">
+                                                        {{ $package->package_code }}
+                                                    </span>
+                                                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">
+                                                        Minimum {{ max(1, $package->minimum_quantity ?? 1) }}
+                                                    </span>
+                                                </div>
+                                                <h4 class="mt-3 text-xl font-black text-slate-950">{{ $package->name }}</h4>
+                                                @if($package->venue_details)
+                                                    <p class="mt-1 text-sm font-medium text-slate-500">{{ $package->venue_details }}</p>
+                                                @endif
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">À partir de</p>
+                                                <p class="mt-2 text-2xl font-black text-slate-950">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</p>
+                                            </div>
+                                        </div>
+
+                                        @if($package->description_fr)
+                                            <p class="text-sm leading-6 text-slate-700">{{ $package->description_fr }}</p>
+                                        @endif
+
+                                        @if($includedLines->isNotEmpty())
+                                            <div class="rounded-2xl bg-white p-4">
+                                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Inclus dans l’offre</p>
+                                                <ul class="mt-3 space-y-2 text-sm text-slate-700">
+                                                    @foreach($includedLines as $line)
+                                                        <li class="flex gap-2">
+                                                            <span class="mt-1 h-1.5 w-1.5 rounded-full bg-slate-950"></span>
+                                                            <span>{{ $line }}</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+
+                                        @if($package->has_options)
+                                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                                                <div class="border-b border-slate-200 px-4 py-3">
+                                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Options tarifaires</p>
+                                                </div>
+                                                <div class="divide-y divide-slate-200">
+                                                    @foreach($package->options as $option)
+                                                        <div class="px-4 py-4">
+                                                            <div class="flex flex-col gap-3">
+                                                                <div class="flex items-start justify-between gap-4">
+                                                                    <div>
+                                                                        <p class="font-bold text-slate-900">{{ $option->label }}</p>
+                                                                        @if($option->context)
+                                                                            <p class="mt-1 text-sm text-slate-600">{{ $option->context }}</p>
+                                                                        @endif
+                                                                        <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                                                                            {{ $option->available_quantity }} disponibles
+                                                                        </p>
+                                                                    </div>
+                                                                    <p class="text-lg font-black text-slate-950">{{ \App\Helpers\CurrencyHelper::format($option->price) }}</p>
+                                                                </div>
+                                                                <button
+                                                                    class="select-package-btn rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-slate-800"
+                                                                    data-package-id="{{ $package->id }}"
+                                                                    data-package-option-id="{{ $option->id }}"
+                                                                    data-package-name="{{ $package->name }}"
+                                                                    data-selection-label="{{ $option->full_label }}"
+                                                                    data-price="{{ $option->price }}"
+                                                                    data-available="{{ $option->available_quantity }}"
+                                                                    data-max-per-order="{{ $option->max_per_order }}"
+                                                                    data-minimum-quantity="{{ max(1, $package->minimum_quantity ?? 1) }}"
+                                                                >
+                                                                    Sélectionner cette option
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="flex items-center justify-between gap-4 rounded-2xl bg-white p-4">
+                                                <div>
+                                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Disponibilité</p>
+                                                    <p class="mt-1 text-sm text-slate-700">{{ $package->available_quantity }} disponibles</p>
+                                                </div>
+                                                <button
+                                                    class="select-package-btn rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-slate-800"
+                                                    data-package-id="{{ $package->id }}"
+                                                    data-package-option-id=""
+                                                    data-package-name="{{ $package->name }}"
+                                                    data-selection-label="{{ $package->name }}"
+                                                    data-price="{{ $package->price }}"
+                                                    data-available="{{ $package->available_quantity }}"
+                                                    data-max-per-order="{{ $package->max_per_order }}"
+                                                    data-minimum-quantity="{{ max(1, $package->minimum_quantity ?? 1) }}"
+                                                >
+                                                    Réserver
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if($hasSeatZones)
+                        <div class="@if($hasPackages) mt-6 border-t border-stone-200 pt-6 @endif space-y-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Zones de sièges</p>
+                            @foreach($event->seatZones as $zone)
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h4 class="text-lg font-black text-slate-950">{{ $zone->zone_name }}</h4>
+                                            @if($zone->description)
+                                                <p class="mt-1 text-sm text-slate-600">{{ $zone->description }}</p>
+                                            @endif
+                                            <p class="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">{{ $zone->available_seats }} restantes</p>
+                                        </div>
+                                        <p class="text-lg font-black text-slate-950">{{ \App\Helpers\CurrencyHelper::format($zone->price) }}</p>
+                                    </div>
+                                    <button
+                                        class="select-seat-btn mt-4 w-full rounded-2xl border border-slate-950 px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-950 transition hover:bg-slate-950 hover:text-white"
+                                        data-zone-id="{{ $zone->id }}"
+                                        data-zone-name="{{ $zone->zone_name }}"
+                                        data-selection-label="{{ $zone->zone_name }}"
+                                        data-price="{{ $zone->price }}"
+                                        data-available="{{ $zone->available_seats }}"
+                                        data-max-per-order="{{ $zone->available_seats }}"
+                                        data-minimum-quantity="1"
+                                    >
+                                        Sélectionner cette zone
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @unless($hasInventory)
+                        <div class="rounded-3xl border border-dashed border-stone-300 bg-stone-50 px-4 py-8 text-center">
+                            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Bientôt disponible</p>
+                            <p class="mt-2 text-sm text-slate-600">Les formules de réservation ne sont pas encore publiées pour cet événement.</p>
+                        </div>
+                    @endunless
+                </div>
+            </aside>
+        </div>
     </div>
-  </section>
 </div>
 
-{{-- Seat/Package Selection Modal --}}
-<div id="seatModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-  <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold text-gray-900" id="modalTitle">{{ __('Select your seats') }}</h3>
-          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+<div id="bookingModal" class="fixed inset-0 z-50 hidden bg-black/60 p-4">
+    <div class="flex min-h-full items-center justify-center">
+        <div class="w-full max-w-lg rounded-3xl bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b border-stone-200 px-6 py-5">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Réservation</p>
+                    <h3 id="modalTitle" class="mt-1 text-xl font-black text-slate-950">Confirmer la sélection</h3>
+                </div>
+                <button id="closeModal" type="button" class="rounded-full border border-stone-200 p-2 text-slate-600 transition hover:border-slate-950 hover:text-slate-950">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="px-6 py-5">
+                <div class="rounded-2xl bg-slate-50 p-4">
+                    <p id="selectedItemType" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Formule</p>
+                    <p id="selectedItemName" class="mt-2 text-lg font-black text-slate-950"></p>
+                    <p id="selectedItemMeta" class="mt-1 text-sm text-slate-600"></p>
+                </div>
+
+                <div class="mt-5 rounded-2xl border border-stone-200 p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-600">Prix unitaire</span>
+                        <span id="unitPrice" class="text-base font-bold text-slate-950"></span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-sm text-slate-600">Minimum requis</span>
+                        <span id="minRequired" class="text-base font-bold text-slate-950">1</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-sm text-slate-600">Maximum par commande</span>
+                        <span id="maxAllowed" class="text-base font-bold text-slate-950">1</span>
+                    </div>
+                    <div class="mt-4 flex items-center gap-3">
+                        <button id="decreaseQty" type="button" class="rounded-full bg-slate-100 p-3 text-slate-700 transition hover:bg-slate-200">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                        </button>
+                        <div class="min-w-[72px] text-center">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Quantité</p>
+                            <p id="quantity" class="mt-1 text-2xl font-black text-slate-950">1</p>
+                        </div>
+                        <button id="increaseQty" type="button" class="rounded-full bg-slate-100 p-3 text-slate-700 transition hover:bg-slate-200">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mt-4 border-t border-stone-200 pt-4">
+                        <div class="flex items-center justify-between text-lg font-black">
+                            <span class="text-slate-700">Total</span>
+                            <span id="totalPrice" class="text-slate-950"></span>
+                        </div>
+                    </div>
+                    <div id="paymentModeHint" class="mt-4 hidden rounded-2xl bg-amber-100 px-4 py-3 text-sm font-medium text-amber-900">
+                        Montant supérieur à 1,5 M XOF : la réservation sera créée avec paiement par virement bancaire.
+                    </div>
+                </div>
+
+                <form id="bookingForm" method="POST" action="{{ route('event.book', $event) }}" class="mt-5 space-y-4">
+                    @csrf
+                    <input type="hidden" name="zone_id" id="zoneIdInput">
+                    <input type="hidden" name="package_id" id="packageIdInput">
+                    <input type="hidden" name="package_option_id" id="packageOptionIdInput">
+                    <input type="hidden" name="quantity" id="quantityInput" value="1">
+
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-slate-700">Nom complet</label>
+                        <input type="text" name="name" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950">
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">Email</label>
+                            <input type="email" name="email" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">Téléphone</label>
+                            <input type="tel" name="phone" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-2xl bg-slate-950 px-5 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-slate-800">
+                        Confirmer la réservation
+                    </button>
+                </form>
+            </div>
         </div>
-
-        <div id="modalContent">
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-900 mb-2" id="selectedZoneName"></h4>
-            <p class="text-gray-600 text-sm mb-4" id="selectedZonePrice"></p>
-          </div>
-
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2" id="quantityLabel">{{ __('Number of seats') }}</label>
-            <div class="flex items-center space-x-3">
-              <button id="decreaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                </svg>
-              </button>
-              <span id="quantity" class="text-xl font-bold text-gray-900 min-w-[3rem] text-center">1</span>
-              <button id="increaseQty" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-              </button>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">{{ __('Maximum:') }} <span id="maxAvailable"></span></p>
-          </div>
-
-          <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-gray-600" id="pricePerItemLabel">{{ __('Price per seat:') }}</span>
-              <span id="unitPrice" class="font-semibold"></span>
-            </div>
-            <div class="flex justify-between items-center text-lg font-bold">
-              <span>{{ __('Total:') }}</span>
-              <span id="totalPrice" class="text-purple-600"></span>
-            </div>
-          </div>
-
-          <form id="bookingForm" method="POST" action="{{ route('event.book', $event) }}">
-            @csrf
-            <input type="hidden" name="zone_id" id="zoneIdInput" value="">
-            <input type="hidden" name="package_id" id="packageIdInput" value="">
-            <input type="hidden" name="quantity" id="quantityInput" value="1">
-
-            <div class="space-y-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Full name') }}</label>
-                <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Email') }}</label>
-                <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Phone') }}</label>
-                <input type="tel" name="phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-              </div>
-            </div>
-
-            <button type="submit" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-              {{ __('Confirm booking') }}
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
-window.currentCurrency = '{{ session('currency', 'XOF') }}';
+window.currentCurrency = 'XOF';
 
-document.addEventListener('DOMContentLoaded', function() {
-  const modal = document.getElementById('seatModal');
-  const closeModal = document.getElementById('closeModal');
-  const selectSeatButtons = document.querySelectorAll('.select-seat-btn');
-  const selectPackageButtons = document.querySelectorAll('.select-package-btn');
-  const decreaseBtn = document.getElementById('decreaseQty');
-  const increaseBtn = document.getElementById('increaseQty');
-  const quantitySpan = document.getElementById('quantity');
-  const quantityInput = document.getElementById('quantityInput');
-  const zoneIdInput = document.getElementById('zoneIdInput');
-  const packageIdInput = document.getElementById('packageIdInput');
-  const modalTitle = document.getElementById('modalTitle');
-  const selectedItemName = document.getElementById('selectedZoneName');
-  const selectedItemPrice = document.getElementById('selectedZonePrice');
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('bookingModal');
+    const closeModal = document.getElementById('closeModal');
+    const quantitySpan = document.getElementById('quantity');
+    const quantityInput = document.getElementById('quantityInput');
+    const zoneIdInput = document.getElementById('zoneIdInput');
+    const packageIdInput = document.getElementById('packageIdInput');
+    const packageOptionIdInput = document.getElementById('packageOptionIdInput');
+    const unitPriceEl = document.getElementById('unitPrice');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const selectedItemTypeEl = document.getElementById('selectedItemType');
+    const selectedItemNameEl = document.getElementById('selectedItemName');
+    const selectedItemMetaEl = document.getElementById('selectedItemMeta');
+    const minRequiredEl = document.getElementById('minRequired');
+    const maxAllowedEl = document.getElementById('maxAllowed');
+    const paymentModeHint = document.getElementById('paymentModeHint');
+    const decreaseBtn = document.getElementById('decreaseQty');
+    const increaseBtn = document.getElementById('increaseQty');
 
-  let currentItem = null;
-  let currentQuantity = 1;
-  let maxAvailable = 0;
-  let isPackage = false;
+    let currentItem = null;
+    let currentQuantity = 1;
+    let minRequired = 1;
+    let maxAllowed = 1;
 
-  // Open modal for Seat Zones
-  selectSeatButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const zoneId = this.dataset.zoneId;
-      const zoneName = this.dataset.zoneName;
-      const price = parseFloat(this.dataset.price);
-      maxAvailable = parseInt(this.dataset.available);
+    const openModalForSelection = (item) => {
+        minRequired = item.minimumQuantity;
+        maxAllowed = Math.min(item.available, item.maxPerOrder);
 
-      isPackage = false;
-      currentItem = { id: zoneId, name: zoneName, price: price, type: 'seat' };
-      currentQuantity = 1;
+        if (maxAllowed < minRequired) {
+            alert('Cette offre n’est plus disponible pour la quantité minimale requise.');
+            return;
+        }
 
-      // Update modal for seat
-      modalTitle.textContent = '{{ __("Select your seats") }}';
-      selectedItemName.textContent = zoneName;
-      selectedItemPrice.textContent = formatPrice(price) + ' {{ __("per place") }}';
-      document.getElementById('unitPrice').textContent = formatPrice(price);
-      document.getElementById('maxAvailable').textContent = maxAvailable;
-      document.getElementById('quantityLabel').textContent = '{{ __("Number of seats") }}';
-      updateTotal();
+        currentItem = item;
+        currentQuantity = minRequired;
 
-      // Set form inputs
-      zoneIdInput.value = zoneId;
-      packageIdInput.value = '';
-      quantityInput.value = currentQuantity;
+        selectedItemTypeEl.textContent = item.typeLabel;
+        selectedItemNameEl.textContent = item.name;
+        selectedItemMetaEl.textContent = item.meta || '';
+        unitPriceEl.textContent = formatPrice(item.price);
+        minRequiredEl.textContent = minRequired;
+        maxAllowedEl.textContent = maxAllowed;
 
-      modal.classList.remove('hidden');
+        quantitySpan.textContent = currentQuantity;
+        quantityInput.value = currentQuantity;
+
+        zoneIdInput.value = item.type === 'seat' ? item.id : '';
+        packageIdInput.value = item.type === 'package' ? item.packageId : '';
+        packageOptionIdInput.value = item.type === 'package' ? (item.packageOptionId || '') : '';
+
+        updateTotal();
+        modal.classList.remove('hidden');
+    };
+
+    document.querySelectorAll('.select-seat-btn').forEach((button) => {
+        button.addEventListener('click', function () {
+            openModalForSelection({
+                type: 'seat',
+                id: this.dataset.zoneId,
+                packageId: '',
+                packageOptionId: '',
+                name: this.dataset.zoneName,
+                meta: this.dataset.selectionLabel,
+                price: parseFloat(this.dataset.price),
+                available: parseInt(this.dataset.available, 10),
+                maxPerOrder: parseInt(this.dataset.maxPerOrder, 10),
+                minimumQuantity: parseInt(this.dataset.minimumQuantity, 10),
+                typeLabel: 'Zone de sièges',
+            });
+        });
     });
-  });
 
-  // Open modal for Packages
-  selectPackageButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const packageId = this.dataset.packageId;
-      const packageName = this.dataset.packageName;
-      const price = parseFloat(this.dataset.price);
-      maxAvailable = parseInt(this.dataset.available);
-
-      // ✅ NOUVEAU: Limite CinetPay 1.5M → Quantity max basée sur prix
-      const maxCinetpayAmount = 1500000;
-      const maxQuantityCinetpay = Math.floor(maxCinetpayAmount / price);
-      maxAvailable = Math.min(maxAvailable, maxQuantityCinetpay);
-
-      if (maxQuantityCinetpay < 1) {
-        alert(`Package ${packageName} trop cher pour paiement en ligne (max 1.5M XOF). Contactez admin@carrepremium.ci`);
-        return;
-      }
-
-      isPackage = true;
-      currentItem = { id: packageId, name: packageName, price: price, type: 'package' };
-      currentQuantity = 1;
-
-      // Update modal for package
-      modalTitle.textContent = '{{ __("Select Package") }}';
-      selectedItemName.textContent = packageName;
-      selectedItemPrice.textContent = formatPrice(price) + ' {{ __("per person") }}';
-      document.getElementById('unitPrice').textContent = formatPrice(price);
-      document.getElementById('maxAvailable').textContent = maxAvailable;
-      if (maxQuantityCinetpay < parseInt(this.dataset.available)) {
-        document.getElementById('maxAvailable').innerHTML = `<span title="Limite paiement en ligne">${maxAvailable}</span> (paiement en ligne)`;
-      }
-      document.getElementById('quantityLabel').textContent = '{{ __("Number of packages") }}';
-      updateTotal();
-
-      // Set form inputs
-      packageIdInput.value = packageId;
-      zoneIdInput.value = '';
-      quantityInput.value = currentQuantity;
-
-      modal.classList.remove('hidden');
+    document.querySelectorAll('.select-package-btn').forEach((button) => {
+        button.addEventListener('click', function () {
+            openModalForSelection({
+                type: 'package',
+                id: this.dataset.packageId,
+                packageId: this.dataset.packageId,
+                packageOptionId: this.dataset.packageOptionId,
+                name: this.dataset.packageName,
+                meta: this.dataset.selectionLabel,
+                price: parseFloat(this.dataset.price),
+                available: parseInt(this.dataset.available, 10),
+                maxPerOrder: parseInt(this.dataset.maxPerOrder, 10),
+                minimumQuantity: parseInt(this.dataset.minimumQuantity, 10),
+                typeLabel: 'Formule VIP',
+            });
+        });
     });
-  });
 
-  // Close modal
-  closeModal.addEventListener('click', function() {
-    modal.classList.add('hidden');
-  });
+    const closeModalWindow = () => {
+        modal.classList.add('hidden');
+    };
 
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
+    closeModal.addEventListener('click', closeModalWindow);
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeModalWindow();
+        }
+    });
+
+    decreaseBtn.addEventListener('click', function () {
+        if (currentQuantity > minRequired) {
+            currentQuantity--;
+            syncQuantity();
+        }
+    });
+
+    increaseBtn.addEventListener('click', function () {
+        if (currentQuantity < maxAllowed) {
+            currentQuantity++;
+            syncQuantity();
+        }
+    });
+
+    function syncQuantity() {
+        quantitySpan.textContent = currentQuantity;
+        quantityInput.value = currentQuantity;
+        updateTotal();
     }
-  });
 
-  // Quantity controls
-  decreaseBtn.addEventListener('click', function() {
-    if (currentQuantity > 1) {
-      currentQuantity--;
-      updateQuantity();
+    function updateTotal() {
+        if (!currentItem) {
+            return;
+        }
+
+        const total = currentItem.price * currentQuantity;
+        totalPriceEl.textContent = formatPrice(total);
+
+        if (currentItem.type === 'package' && total > 1500000) {
+            paymentModeHint.classList.remove('hidden');
+        } else {
+            paymentModeHint.classList.add('hidden');
+        }
     }
-  });
 
-  increaseBtn.addEventListener('click', function() {
-    if (currentQuantity < maxAvailable) {
-      currentQuantity++;
-      updateQuantity();
+    function formatPrice(price) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: window.currentCurrency,
+            minimumFractionDigits: 0,
+        }).format(price);
     }
-  });
-
-  function updateQuantity() {
-    quantitySpan.textContent = currentQuantity;
-    quantityInput.value = currentQuantity;
-    updateTotal();
-  }
-
-  function updateTotal() {
-    if (currentItem) {
-      const total = currentItem.price * currentQuantity;
-      document.getElementById('totalPrice').textContent = formatPrice(total);
-    }
-  }
-
-  function formatPrice(price) {
-    const currency = window.currentCurrency || 'XOF';
-    const locale = 'fr-FR';
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: currency === 'XOF' ? 0 : 2
-    }).format(price);
-  }
 });
 </script>
-
 @endsection

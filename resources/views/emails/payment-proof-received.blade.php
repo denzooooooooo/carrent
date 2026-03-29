@@ -32,9 +32,9 @@
 
                 @if($booking->booking_type === 'event')
                     <p><strong>Événement :</strong> {{ $booking->event->title_fr }}</p>
-                    <p><strong>Zone :</strong> {{ $booking->seatZone->zone_name_fr }}</p>
+                    <p><strong>{{ $booking->event_selection_type_label }} :</strong> {{ $booking->event_selection_label }}</p>
                     <p><strong>Nombre de places :</strong> {{ $booking->number_of_passengers }}</p>
-                    <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($booking->event->event_date)->format('d/m/Y') }}</p>
+                    <p><strong>Date :</strong> {{ $booking->travel_date_label }}</p>
                 @elseif($booking->booking_type === 'location')
                     <p><strong>Location :</strong> {{ $booking->location->name }}</p>
                     <p><strong>Période :</strong> {{ \Carbon\Carbon::parse($booking->travel_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($booking->locationBooking->end_date)->format('d/m/Y') }}</p>

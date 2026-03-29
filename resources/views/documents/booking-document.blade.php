@@ -136,7 +136,7 @@
                 </tr>
                 <tr>
                     <th>Zone / Package</th>
-                    <td>{{ $booking->eventBooking->zone?->zone_name ?? $booking->eventBooking->package?->name ?? 'N/A' }}</td>
+                    <td>{{ $booking->eventBooking->selection_label }}</td>
                 </tr>
                 <tr>
                     <th>Quantité</th>

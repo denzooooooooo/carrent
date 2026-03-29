@@ -160,11 +160,15 @@
                                                     </div>
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Date:</span>
-                                                        <span class="font-medium">{{ $booking->event->start_date ?? 'N/A' }}</span>
+                                                        <span class="font-medium">{{ $booking->travel_date_label ?? 'N/A' }}</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-600">{{ $booking->event_selection_type_label }}:</span>
+                                                        <span class="font-medium">{{ $booking->event_selection_label }}</span>
                                                     </div>
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Lieu:</span>
-                                                        <span class="font-medium">{{ $booking->event->location ?? 'N/A' }}</span>
+                                                        <span class="font-medium">{{ $booking->event?->location_label ?? 'N/A' }}</span>
                                                     </div>
                                                 @elseif($booking->booking_type === 'package')
                                                     <div class="flex justify-between">

@@ -10,6 +10,7 @@ class EventBooking extends Model
         'event_id',
         'zone_id',
         'package_id',
+        'package_option_id',
         'user_name',
         'user_email',
         'user_phone',
@@ -40,5 +41,34 @@ class EventBooking extends Model
     public function package()
     {
         return $this->belongsTo(EventPackage::class, 'package_id');
+    }
+
+    public function packageOption()
+    {
+        return $this->belongsTo(EventPackageOption::class, 'package_option_id');
+    }
+
+    public function getSelectionLabelAttribute(): string
+    {
+        if ($this->zone) {
+            return $this->zone->zone_name;
+        }
+
+        if ($this->package && $this->packageOption) {
+            return collect([$this->package->name, $this->packageOption->full_label])
+                ->filter()
+                ->implode(' - ');
+        }
+
+        if ($this->package) {
+            return $this->package->name;
+        }
+
+        return 'N/A';
+    }
+
+    public function getSelectionTypeLabelAttribute(): string
+    {
+        return $this->zone ? 'Zone' : 'Formule';
     }
 }

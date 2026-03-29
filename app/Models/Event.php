@@ -33,10 +33,17 @@ class Event extends Model implements HasMedia
         'is_home_team_match',
         'title_fr',
         'title_en',
+        'tagline_fr',
+        'tagline_en',
         'slug',
         'family',
         'description_fr',
         'description_en',
+        'program_fr',
+        'program_en',
+        'conditions_fr',
+        'conditions_en',
+        'source_catalog',
         'venue_name',
         'venue_address',
         'city',
@@ -173,6 +180,15 @@ class Event extends Model implements HasMedia
         return $this->hasMany(EventPackage::class)->orderBy('sort_order');
     }
 
+    public function getTaglineAttribute(): ?string
+    {
+        $locale = app()->getLocale();
+
+        return $locale === 'fr'
+            ? ($this->tagline_fr ?? $this->tagline_en)
+            : ($this->tagline_en ?? $this->tagline_fr);
+    }
+
     /**
      * Retourne le titre localisé selon la langue actuelle.
      */
@@ -234,6 +250,37 @@ class Event extends Model implements HasMedia
     public function getShortDateLabelAttribute(): ?string
     {
         return $this->event_date?->translatedFormat('d M Y');
+    }
+
+    public function getProgramAttribute(): ?string
+    {
+        $locale = app()->getLocale();
+
+        return $locale === 'fr'
+            ? ($this->program_fr ?? $this->program_en)
+            : ($this->program_en ?? $this->program_fr);
+    }
+
+    public function getConditionsAttribute(): ?string
+    {
+        $locale = app()->getLocale();
+
+        return $locale === 'fr'
+            ? ($this->conditions_fr ?? $this->conditions_en)
+            : ($this->conditions_en ?? $this->conditions_fr);
+    }
+
+    public function getDateRangeLabelAttribute(): ?string
+    {
+        if (!$this->event_date) {
+            return null;
+        }
+
+        if ($this->end_date && !$this->event_date->isSameDay($this->end_date)) {
+            return $this->event_date->translatedFormat('d M Y') . ' - ' . $this->end_date->translatedFormat('d M Y');
+        }
+
+        return $this->event_date->translatedFormat('d M Y');
     }
 
     public function scopeCatalog(Builder $query): Builder

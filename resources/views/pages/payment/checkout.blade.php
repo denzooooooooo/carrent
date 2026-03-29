@@ -32,8 +32,8 @@
                 <span class="font-semibold text-gray-900">{{ $booking->event->title_fr }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Zone:</span>
-                <span class="font-semibold text-gray-900">{{ $booking->seatZone->zone_name_fr }}</span>
+                <span class="text-gray-600">{{ $booking->event_selection_type_label }}:</span>
+                <span class="font-semibold text-gray-900">{{ $booking->event_selection_label }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Nombre de places:</span>
@@ -41,7 +41,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Date:</span>
-                <span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($booking->event->event_date)->format('d/m/Y') }}</span>
+                <span class="font-semibold text-gray-900">{{ $booking->travel_date_label }}</span>
               </div>
             </div>
           @elseif($booking->booking_type === 'flight')

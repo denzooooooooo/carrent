@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\EventBooking;
 use App\Models\Event;
 use App\Services\EventDiscoveryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
@@ -32,6 +36,12 @@ class EventController extends Controller
         if (Schema::hasTable('event_packages')) {
             $relations['packages'] = function($query) {
                 $query->where('is_active', true)->orderBy('sort_order');
+
+                if (Schema::hasTable('event_package_options')) {
+                    $query->with(['options' => function ($optionsQuery) {
+                        $optionsQuery->where('is_active', true)->orderBy('sort_order')->orderBy('option_date');
+                    }]);
+                }
             };
         }
 
@@ -53,6 +63,9 @@ class EventController extends Controller
             'quantity' => 'required|integer|min:1',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
+            'zone_id' => 'nullable|exists:event_seat_zones,id',
+            'package_id' => 'nullable|exists:event_packages,id',
+            'package_option_id' => 'nullable|exists:event_package_options,id',
         ]);
 
         // Determiner si c'est une reservation de siege ou de package
@@ -66,6 +79,10 @@ class EventController extends Controller
 
         if (!$hasZone && !$hasPackage) {
             return back()->withErrors(['error' => 'Veuillez sélectionner une zone de places ou un package.']);
+        }
+
+        if ($hasZone && $hasPackage) {
+            return back()->withErrors(['error' => 'Veuillez sélectionner soit une zone de places, soit une formule, mais pas les deux.']);
         }
 
         // Traiter le nom complet en first_name et last_name
@@ -86,127 +103,173 @@ class EventController extends Controller
             return back()->withErrors(['name' => 'Le nom est requis.']);
         }
 
-        $unitPrice = 0;
-        $totalPrice = 0;
-        $bookingReference = 'EVT-' . strtoupper(uniqid());
-        $zoneId = null;
-        $packageId = null;
+        [$eventBooking, $booking, $requiresBankTransfer] = DB::transaction(function () use (
+            $event,
+            $request,
+            $hasZone,
+            $hasPackage,
+            $firstName,
+            $lastName
+        ) {
+            $quantity = (int) $request->quantity;
+            $bookingReference = 'EVT-' . strtoupper(uniqid());
+            $unitPrice = 0;
+            $totalPrice = 0;
+            $zoneId = null;
+            $packageId = null;
+            $packageOptionId = null;
+            $travelDate = $event->event_date;
 
-        // Cas 1: Reservation de siege (zone)
-        if ($hasZone) {
-            $request->validate([
-                'zone_id' => 'required|exists:event_seat_zones,id',
+            if ($hasZone) {
+                $zone = $event->seatZones()
+                    ->where('is_active', true)
+                    ->lockForUpdate()
+                    ->findOrFail($request->zone_id);
+
+                if ($quantity > $zone->available_seats) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Nombre de places demande superieur a la disponibilite.',
+                    ]);
+                }
+
+                $unitPrice = (float) $zone->price;
+                $totalPrice = $unitPrice * $quantity;
+                $zoneId = $zone->id;
+
+                $zone->decrement('available_seats', $quantity);
+            }
+
+            if ($hasPackage) {
+                $package = $event->allPackages()
+                    ->where('is_active', true)
+                    ->lockForUpdate()
+                    ->findOrFail($request->package_id);
+
+                $packageId = $package->id;
+                $minimumQuantity = max(1, (int) ($package->minimum_quantity ?? 1));
+                $maxPerOrder = max(1, (int) ($package->max_per_order ?? 1));
+
+                if ($quantity < $minimumQuantity) {
+                    throw ValidationException::withMessages([
+                        'quantity' => "La quantite minimale pour {$package->name} est de {$minimumQuantity}.",
+                    ]);
+                }
+
+                if ($quantity > $maxPerOrder) {
+                    throw ValidationException::withMessages([
+                        'quantity' => "La quantite maximale pour {$package->name} est de {$maxPerOrder}.",
+                    ]);
+                }
+
+                if ($quantity > $package->available_quantity) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Nombre de formules demande superieur a la disponibilite.',
+                    ]);
+                }
+
+                $packageHasOptions = Schema::hasTable('event_package_options')
+                    && $package->allOptions()->where('is_active', true)->exists();
+
+                if ($packageHasOptions) {
+                    if (!$request->filled('package_option_id')) {
+                        throw ValidationException::withMessages([
+                            'package_option_id' => 'Veuillez selectionner une option tarifaire precise.',
+                        ]);
+                    }
+
+                    $packageOption = $package->allOptions()
+                        ->where('is_active', true)
+                        ->lockForUpdate()
+                        ->find($request->package_option_id);
+
+                    if (!$packageOption) {
+                        throw ValidationException::withMessages([
+                            'package_option_id' => 'L’option selectionnee est invalide pour cette formule.',
+                        ]);
+                    }
+
+                    $optionMaxPerOrder = max(1, (int) ($packageOption->max_per_order ?? $maxPerOrder));
+                    if ($quantity > $optionMaxPerOrder) {
+                        throw ValidationException::withMessages([
+                            'quantity' => "La quantite maximale pour cette option est de {$optionMaxPerOrder}.",
+                        ]);
+                    }
+
+                    if ($quantity > $packageOption->available_quantity) {
+                        throw ValidationException::withMessages([
+                            'quantity' => 'Nombre d’options demande superieur a la disponibilite.',
+                        ]);
+                    }
+
+                    $unitPrice = (float) $packageOption->price;
+                    $packageOptionId = $packageOption->id;
+                    $travelDate = $packageOption->option_date ?? $travelDate;
+
+                    $packageOption->decrement('available_quantity', $quantity);
+                } else {
+                    $unitPrice = (float) $package->price;
+                }
+
+                $totalPrice = $unitPrice * $quantity;
+                $package->decrement('available_quantity', $quantity);
+            }
+
+            $event->decrement('available_seats', $quantity);
+
+            $requiresBankTransfer = $totalPrice > 1500000;
+
+            $eventBooking = EventBooking::create([
+                'event_id' => $event->id,
+                'zone_id' => $zoneId,
+                'package_id' => $packageId,
+                'package_option_id' => $packageOptionId,
+                'user_name' => trim($firstName . ' ' . $lastName),
+                'user_email' => $request->email,
+                'user_phone' => $request->phone,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $totalPrice,
+                'status' => 'pending',
+                'booking_reference' => $bookingReference,
+                'booking_date' => now(),
             ]);
 
-            $zone = $event->seatZones()->findOrFail($request->zone_id);
-
-            // Verifier la disponibilite
-            if ($request->quantity > $zone->available_seats) {
-                return back()->withErrors(['quantity' => 'Nombre de places demande superieur a la disponibilite.']);
-            }
-
-            $unitPrice = $zone->price;
-            $totalPrice = $zone->price * $request->quantity;
-            $zoneId = $zone->id;
-
-            // Mettre a jour les places disponibles
-            $zone->decrement('available_seats', $request->quantity);
-        }
- 
-// Cas 2: Reservation de package
-        if ($hasPackage) {
-            $request->validate([
-                'package_id' => 'required|exists:event_packages,id',
-            ]);
-
-            $package = $event->packages()->findOrFail($request->package_id);
-
-            // Verifier la disponibilite
-            if ($request->quantity > $package->available_quantity) {
-                return back()->withErrors(['quantity' => 'Nombre de packages demandé supérieur à la disponibilité.']);
-            }
-
-            $unitPrice = $package->price;
-            $totalPrice = $package->price * $request->quantity;
-            
-            // ✅ SOLUTION GROS MONTANTS: Virement bancaire pour >1.5M XOF
-            if ($totalPrice > 1500000) {
-                // Créer booking avec payment_method='bank_transfer'
-                $booking = \App\Models\Booking::create([
-                    'booking_number' => $bookingReference,
-                    'user_id' => auth()->check() ? auth()->id() : null,
-                    'booking_type' => 'event',
-                    'event_id' => $event->id,
-                    'event_booking_id' => $eventBooking->id ?? null,
-                    'seat_zone_id' => $zoneId,
-                    'booking_date' => now(),
-                    'travel_date' => $event->event_date,
-                    'number_of_passengers' => $request->quantity,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
-                    'passenger_details' => [[
-                        'first_name' => $firstName, 'last_name' => $lastName,
-                        'email' => $request->email, 'phone' => $request->phone, 'type' => 'adult'
-                    ]],
-                    'total_amount' => $totalPrice, 'currency' => 'XOF', 'final_amount' => $totalPrice,
-                    'status' => 'pending_payment', 'payment_status' => 'pending',
-                    'payment_method' => 'bank_transfer', // ✅ Virement pour gros montants
-                    'notes' => "VIP Package >1.5M XOF. Paiement par virement bancaire.\nRIB: [INSÉRER RIB COMPTE]\nRéf: {$bookingReference}"
-                ]);
-                
-                return redirect()->route('payment.instructions', $booking)
-                    ->with('info', 'Réservation VIP créée! Suivez les instructions de virement bancaire.');
-            }
-
-            $packageId = $package->id;
-
-            // Mettre a jour la quantite disponible
-            $package->decrement('available_quantity', $request->quantity);
-        }
-
-        // Creer la reservation d'evenement
-        $eventBooking = \App\Models\EventBooking::create([
-            'event_id' => $event->id,
-            'zone_id' => $zoneId,
-            'package_id' => $packageId,
-            'user_name' => $firstName . ' ' . $lastName,
-            'user_email' => $request->email,
-            'user_phone' => $request->phone,
-            'quantity' => $request->quantity,
-            'unit_price' => $unitPrice,
-            'total_price' => $totalPrice,
-            'status' => 'pending',
-            'booking_reference' => $bookingReference,
-        ]);
-
-        // Creer l'enregistrement general de reservation pour l'admin
-        $booking = \App\Models\Booking::create([
-            'booking_number' => $bookingReference,
-            'user_id' => auth()->check() ? auth()->id() : null,
-            'booking_type' => 'event',
-            'event_id' => $event->id,
-            'event_booking_id' => $eventBooking->id,
-            'seat_zone_id' => $zoneId,
-            'booking_date' => now(),
-            'travel_date' => $event->event_date,
-            'number_of_passengers' => $request->quantity,
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'passenger_details' => [
-                [
+            $booking = Booking::create([
+                'booking_number' => $bookingReference,
+                'user_id' => auth()->check() ? auth()->id() : null,
+                'booking_type' => 'event',
+                'event_id' => $event->id,
+                'event_booking_id' => $eventBooking->id,
+                'seat_zone_id' => $zoneId,
+                'booking_date' => now(),
+                'travel_date' => $travelDate,
+                'number_of_passengers' => $quantity,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'passenger_details' => [[
                     'first_name' => $firstName,
                     'last_name' => $lastName,
                     'email' => $request->email,
                     'phone' => $request->phone,
-                    'type' => 'adult'
-                ]
-            ],
-            'total_amount' => $totalPrice,
-            'currency' => 'XOF',
-            'final_amount' => $totalPrice,
-            'status' => 'pending',
-            'payment_status' => 'pending',
-        ]);
+                    'type' => 'adult',
+                ]],
+                'total_amount' => $totalPrice,
+                'currency' => 'XOF',
+                'final_amount' => $totalPrice,
+                'status' => $requiresBankTransfer ? 'pending_payment' : 'pending',
+                'payment_status' => 'pending',
+                'payment_method' => $requiresBankTransfer ? 'bank_transfer' : null,
+                'notes' => $requiresBankTransfer
+                    ? "Reservation evenement > 1.5M XOF. Paiement par virement bancaire.\nReference: {$bookingReference}"
+                    : null,
+            ]);
+
+            return [
+                $eventBooking->load(['event', 'zone', 'package', 'packageOption']),
+                $booking,
+                $requiresBankTransfer,
+            ];
+        });
 
         // Envoyer l'email de confirmation
         try {
@@ -220,6 +283,11 @@ class EventController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
 
+        if ($requiresBankTransfer) {
+            return redirect()->route('payment.instructions', $booking)
+                ->with('info', 'Votre reservation a ete creee. Suivez les instructions de virement bancaire pour finaliser le paiement.');
+        }
+
         return redirect()->route('payment.cinetpay.redirect', $booking)
             ->with('success', 'Votre réservation a été créée. Redirection vers le paiement sécurisé...');
     }
@@ -229,7 +297,7 @@ class EventController extends Controller
      */
     public function bookingConfirmation(\App\Models\Booking $booking)
     {
-        $booking->load(['event', 'eventBooking.zone']);
+        $booking->load(['event', 'eventBooking.zone', 'eventBooking.package', 'eventBooking.packageOption']);
         return view('pages.event-booking-confirmation', compact('booking'));
     }
 }

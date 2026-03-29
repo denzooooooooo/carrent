@@ -192,8 +192,8 @@
                   <p class="font-semibold text-gray-900">{{ $booking->event->title_fr }}</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">{{ __('Zone') }}</p>
-                  <p class="font-semibold text-gray-900">{{ $booking->seatZone->zone_name_fr }}</p>
+                  <p class="text-sm text-gray-600">{{ $booking->event_selection_type_label }}</p>
+                  <p class="font-semibold text-gray-900">{{ $booking->event_selection_label }}</p>
                 </div>
                 <div>
                   <p class="text-sm text-gray-600">{{ __('Tickets') }}</p>
