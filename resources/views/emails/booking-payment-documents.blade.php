@@ -73,7 +73,13 @@
     <div class="wrapper">
         <div class="header">
             <h1>Paiement confirme</h1>
-            <p style="margin: 0;">Votre facture et votre recu sont joints a cet email.</p>
+            <p style="margin: 0;">
+                @if($booking->booking_type === 'event')
+                    Votre facture, votre recu et vos billets sont joints a cet email.
+                @else
+                    Votre facture et votre recu sont joints a cet email.
+                @endif
+            </p>
         </div>
 
         <div class="content">
@@ -109,6 +115,12 @@
                     <span class="label">Recu</span>
                     <span class="value">{{ $booking->receipt_number ?? 'En cours de generation' }}</span>
                 </div>
+                @if($booking->booking_type === 'event')
+                    <div class="row">
+                        <span class="label">Billets</span>
+                        <span class="value">{{ $booking->eventTickets->count() }} fichier(s) joint(s)</span>
+                    </div>
+                @endif
             </div>
 
             <p class="note">
@@ -119,7 +131,7 @@
 
         <div class="footer">
             Carré Premium<br>
-            support@carrepremium.ci<br>
+            {{ config('carre_premium.contact.support_email') }}<br>
             Cet email est envoye automatiquement, merci de ne pas y repondre directement.
         </div>
     </div>

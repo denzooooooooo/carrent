@@ -113,4 +113,21 @@ class EventTicket extends Model
     {
         $this->update(['ticket_status' => 'cancelled']);
     }
+
+    public function getDocumentFilenameAttribute(): string
+    {
+        $extension = pathinfo((string) $this->ticket_pdf_path, PATHINFO_EXTENSION) ?: 'html';
+
+        return strtolower($this->ticket_number) . '.' . $extension;
+    }
+
+    public function getDocumentMimeTypeAttribute(): string
+    {
+        $extension = pathinfo((string) $this->ticket_pdf_path, PATHINFO_EXTENSION) ?: 'html';
+
+        return match ($extension) {
+            'pdf' => 'application/pdf',
+            default => 'text/html',
+        };
+    }
 }

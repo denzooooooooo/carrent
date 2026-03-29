@@ -74,7 +74,7 @@
                         Cliquez sur votre moyen de paiement pour être redirigé directement vers la page de paiement.
                     </p>
 
-                    <form id="paymentForm" action="{{ route('payment.cinetpay.process', $booking) }}" method="POST">
+                    <form id="paymentForm" action="{{ $paymentProcessUrl ?? route('payment.cinetpay.process', $booking) }}" method="POST">
                         @csrf
                         
                         <!-- Mobile Money Section -->

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\BookingPaymentDocumentsMail;
 use App\Models\Booking;
+use App\Models\EventTicket;
 use App\Models\User;
 use App\Services\BookingAccessService;
+use App\Services\BookingFulfillmentService;
 use App\Services\DocumentGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -314,6 +316,22 @@ class AuthController extends Controller
         return Storage::disk('public')->download($path, $downloadName);
     }
 
+    public function downloadEventTicket(Request $request, Booking $booking, EventTicket $ticket)
+    {
+        $this->authorizeBookingAccess($request, $booking);
+
+        abort_unless((int) $ticket->booking_id === (int) $booking->id, 404);
+
+        $booking = $this->ensureBillingDocuments($booking);
+        $ticket = $booking->eventTickets()->findOrFail($ticket->id);
+
+        if (!$ticket->ticket_pdf_path || !Storage::disk('public')->exists($ticket->ticket_pdf_path)) {
+            return back()->with('error', 'Le billet demande est introuvable.');
+        }
+
+        return Storage::disk('public')->download($ticket->ticket_pdf_path, $ticket->document_filename);
+    }
+
     /**
      * Cancel a booking
      */
@@ -332,6 +350,22 @@ class AuthController extends Controller
 
         // Update booking status
         $booking->update(['status' => 'cancelled']);
+
+        if ($booking->eventBooking) {
+            $booking->eventBooking->update(['status' => 'cancelled']);
+        }
+
+        if ($booking->packageBooking) {
+            $booking->packageBooking->update(['status' => 'cancelled']);
+        }
+
+        if ($booking->locationBooking) {
+            $booking->locationBooking->update(['status' => 'cancelled']);
+        }
+
+        if ($booking->eventTickets()->exists()) {
+            $booking->eventTickets()->update(['ticket_status' => 'cancelled']);
+        }
 
         // TODO: Handle refund if payment was made
 
@@ -365,62 +399,7 @@ class AuthController extends Controller
 
     protected function ensureBillingDocuments(Booking $booking): Booking
     {
-        $booking->loadMissing([
-            'user',
-            'event',
-            'eventBooking.zone',
-            'eventBooking.event',
-            'package',
-            'packageBooking.package',
-            'location',
-            'locationBooking',
-            'flightBooking',
-            'payment',
-            'payments',
-        ]);
-
-        $documents = app(DocumentGeneratorService::class);
-        $updates = [];
-
-        if (blank($booking->invoice_number)) {
-            $booking->invoice_number = $documents->makeInvoiceNumber($booking);
-            $updates['invoice_number'] = $booking->invoice_number;
-        }
-
-        if (blank($booking->receipt_number)) {
-            $booking->receipt_number = $documents->makeReceiptNumber($booking);
-            $updates['receipt_number'] = $booking->receipt_number;
-        }
-
-        if (blank($booking->invoice_pdf_path) || !Storage::disk('public')->exists($booking->invoice_pdf_path)) {
-            $updates['invoice_pdf_path'] = $documents->generateInvoice($booking);
-            $booking->invoice_pdf_path = $updates['invoice_pdf_path'];
-        }
-
-        if (blank($booking->receipt_pdf_path) || !Storage::disk('public')->exists($booking->receipt_pdf_path)) {
-            $updates['receipt_pdf_path'] = $documents->generatePaymentReceipt($booking);
-            $booking->receipt_pdf_path = $updates['receipt_pdf_path'];
-        }
-
-        if ($updates !== []) {
-            $updates['documents_generated_at'] = now();
-            $booking->update($updates);
-            $booking->refresh();
-        }
-
-        return $booking->loadMissing([
-            'user',
-            'event',
-            'eventBooking.zone',
-            'eventBooking.event',
-            'package',
-            'packageBooking.package',
-            'location',
-            'locationBooking',
-            'flightBooking',
-            'payment',
-            'payments',
-        ]);
+        return app(BookingFulfillmentService::class)->ensureDocuments($booking);
     }
 
     /**

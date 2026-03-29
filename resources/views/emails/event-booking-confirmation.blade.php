@@ -5,8 +5,14 @@
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         {{-- Header --}}
         <div class="bg-gradient-to-r from-purple-600 to-amber-600 px-6 py-8 text-white text-center">
-            <h1 class="text-2xl font-bold mb-2">Confirmation de réservation</h1>
-            <p class="text-purple-100">Votre réservation d'événement a été confirmée</p>
+            <h1 class="text-2xl font-bold mb-2">
+                {{ $booking->status === 'confirmed' ? 'Confirmation de réservation' : 'Réservation enregistrée' }}
+            </h1>
+            <p class="text-purple-100">
+                {{ $booking->status === 'confirmed'
+                    ? 'Votre réservation d\'événement a été confirmée'
+                    : 'Votre demande est enregistrée. Le paiement finalisera la confirmation.' }}
+            </p>
         </div>
 
         {{-- Content --}}
@@ -21,7 +27,11 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold text-green-800">Réservation confirmée !</h3>
-                        <p class="text-green-700">Votre réservation a été créée avec succès.</p>
+                        <p class="text-green-700">
+                            {{ $booking->status === 'confirmed'
+                                ? 'Votre réservation a été confirmée avec succès.'
+                                : 'Votre réservation a été créée avec succès.' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -135,7 +145,11 @@
                     <div>
                         <h4 class="text-sm font-semibold text-blue-800 mb-1">Informations importantes</h4>
                         <p class="text-sm text-blue-700">
-                            Conservez cette référence de réservation. Pour toute question, contactez-nous au +225 XX XX XX XX.
+                            @if($booking->status === 'confirmed')
+                                Conservez cette référence de réservation. Vos documents définitifs sont envoyés après validation du paiement.
+                            @else
+                                Conservez cette référence de réservation. Vous recevrez vos documents définitifs dès validation du paiement.
+                            @endif
                         </p>
                     </div>
                 </div>

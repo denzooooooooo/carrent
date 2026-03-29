@@ -133,7 +133,7 @@
                             </label>
                             <input type="tel" name="passengers[{{ $passengerIndex }}][phone]" required
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                placeholder="+225 XX XX XX XX XX">
+                                placeholder="{{ config('carre_premium.contact.mobile_display') }}">
                         </div>
                     </div>
 
@@ -300,7 +300,7 @@
                             </label>
                             <input type="tel" name="passengers[{{ $passengerIndex }}][phone]"
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                placeholder="+225 XX XX XX XX XX (optionnel)">
+                                placeholder="{{ config('carre_premium.contact.mobile_display') }} (optionnel)">
                         </div>
                     </div>
 

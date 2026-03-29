@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Booking;
@@ -10,6 +9,7 @@ use App\Models\FlightBooking;
 use App\Models\EventTicket;
 use App\Models\PackageBooking;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Service de génération de documents PDF
@@ -43,13 +43,7 @@ class DocumentGeneratorService
             'segments' => json_decode($flightBooking->flight_segments, true),
             'passengers' => json_decode($booking->passenger_details, true),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
         // Générer le QR code de vérification
@@ -87,31 +81,20 @@ class DocumentGeneratorService
     {
         $booking = $eventTicket->booking;
         $event = $eventTicket->event;
-        $user = $booking->user;
         $seatZone = $eventTicket->seatZone;
-
-        // Générer le QR code unique
+        $holderName = app(BookingAccessService::class)->contactName($booking);
         $qrData = json_encode([
             'ticket_id' => $eventTicket->id,
             'ticket_number' => $eventTicket->ticket_number,
             'event_id' => $event->id,
-            'event_name' => $event->title_fr,
-            'holder_name' => $user->first_name . ' ' . $user->last_name,
-            'seat' => $seatZone ? $seatZone->zone_name_fr . ' - ' . $eventTicket->seat_number : 'Général',
-            'date' => $event->event_date,
-            'time' => $event->event_time,
+            'holder_name' => $holderName,
             'validation_code' => md5($eventTicket->ticket_number . $event->id),
-            'issued_at' => Carbon::now()->toIso8601String()
+            'issued_at' => Carbon::now()->toIso8601String(),
         ]);
 
-        // Sauvegarder le QR code
-        $qrCodePath = 'qrcodes/event_' . $eventTicket->ticket_number . '.png';
-        QrCode::format('png')->size(300)->generate($qrData, storage_path('app/public/' . $qrCodePath));
-        
-        // Mettre à jour le chemin du QR code dans la base
         $eventTicket->update([
-            'qr_code' => $qrCodePath,
-            'qr_data' => $qrData
+            'qr_code' => $eventTicket->qr_code ?: 'not-generated',
+            'qr_data' => $qrData,
         ]);
 
         // Données pour le template
@@ -119,27 +102,21 @@ class DocumentGeneratorService
             'ticket' => $eventTicket,
             'booking' => $booking,
             'event' => $event,
-            'user' => $user,
             'seat_zone' => $seatZone,
-            'qr_code_path' => storage_path('app/public/' . $qrCodePath),
+            'holder_name' => $holderName,
+            'customer_email' => app(BookingAccessService::class)->contactEmail($booking),
+            'customer_phone' => $this->customerPhone($booking),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com'
-            ]
+            'validation_code' => md5($eventTicket->ticket_number . $event->id),
+            'company' => $this->companyProfile(),
         ];
 
-        // Générer le PDF
-        $pdf = Pdf::loadView('pdf.event_ticket', $data);
-        $pdf->setPaper('a4', 'portrait');
-        
-        // Sauvegarder le PDF
-        $filename = 'tickets/event_' . $eventTicket->ticket_number . '_' . time() . '.pdf';
-        $pdfPath = storage_path('app/public/' . $filename);
-        $pdf->save($pdfPath);
+        $filename = $this->storeRenderedDocument(
+            'tickets',
+            'event_' . strtolower($eventTicket->ticket_number),
+            'documents.event-ticket',
+            $data
+        );
 
         // Mettre à jour le chemin du PDF
         $eventTicket->update(['ticket_pdf_path' => $filename]);
@@ -171,14 +148,7 @@ class DocumentGeneratorService
             'included_services' => json_decode($package->included_services_fr, true),
             'excluded_services' => json_decode($package->excluded_services_fr, true),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'emergency_phone' => '+225 XX XX XX XX XX'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
         // Générer le QR code de confirmation
@@ -255,26 +225,15 @@ class DocumentGeneratorService
             'customer_email' => $this->customerEmail($booking),
             'customer_phone' => $this->customerPhone($booking),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'tax_id' => 'CI-XXXXXXXXX' // Numéro fiscal
-            ]
+            'company' => $this->companyProfile(),
         ];
 
-        // Générer le PDF
-        $pdf = Pdf::loadView('pdf.payment_receipt', $data);
-        $pdf->setPaper('a4', 'portrait');
-        
-        // Sauvegarder le PDF
-        Storage::disk('public')->makeDirectory('receipts');
-        $filename = 'receipts/receipt_' . strtolower($receiptNumber) . '_' . time() . '.pdf';
-        $pdf->save(storage_path('app/public/' . $filename));
-
-        return $filename;
+        return $this->storeRenderedDocument(
+            'receipts',
+            'receipt_' . strtolower($receiptNumber),
+            'pdf.payment_receipt',
+            $data
+        );
     }
 
     /**
@@ -316,29 +275,18 @@ class DocumentGeneratorService
             'customer_phone' => $this->customerPhone($booking),
             'invoice_date' => Carbon::now()->format('d/m/Y'),
             'due_date' => Carbon::now()->addDays(30)->format('d/m/Y'),
-            'company' => [
-                'name' => 'Carré Premium SARL',
-                'address' => 'Abidjan, Cocody Riviera',
-                'city' => 'Abidjan',
-                'country' => 'Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'facturation@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'tax_id' => 'CI-XXXXXXXXX',
-                'registration' => 'CI-ABJ-XXXXXXXXX'
-            ]
+            'company' => $this->companyProfile([
+                'name' => config('carre_premium.company.legal_name', config('carre_premium.company.name')),
+                'email' => config('carre_premium.contact.billing_email'),
+            ]),
         ];
 
-        // Générer le PDF
-        $pdf = Pdf::loadView('pdf.invoice', $data);
-        $pdf->setPaper('a4', 'portrait');
-        
-        // Sauvegarder le PDF
-        Storage::disk('public')->makeDirectory('invoices');
-        $filename = 'invoices/invoice_' . strtolower($invoiceNumber) . '_' . time() . '.pdf';
-        $pdf->save(storage_path('app/public/' . $filename));
-
-        return $filename;
+        return $this->storeRenderedDocument(
+            'invoices',
+            'invoice_' . strtolower($invoiceNumber),
+            'pdf.invoice',
+            $data
+        );
     }
 
     public function makeReceiptNumber(Booking $booking): string
@@ -460,14 +408,7 @@ class DocumentGeneratorService
             'breakdown' => $breakdown,
             'receipt_number' => 'REC-' . $booking->booking_number,
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'tax_id' => 'CI-XXXXXXXXX'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
         // Générer le PDF
@@ -490,6 +431,45 @@ class DocumentGeneratorService
     protected function customerPhone(Booking $booking): ?string
     {
         return $booking->customer_phone;
+    }
+
+    protected function companyProfile(array $overrides = []): array
+    {
+        return array_merge([
+            'name' => config('carre_premium.company.name'),
+            'address' => config('carre_premium.company.address'),
+            'city' => config('carre_premium.company.city'),
+            'country' => config('carre_premium.company.country'),
+            'phone' => config('carre_premium.contact.landline_display'),
+            'email' => config('carre_premium.contact.email'),
+            'support_email' => config('carre_premium.contact.support_email'),
+            'billing_email' => config('carre_premium.contact.billing_email'),
+            'website' => config('carre_premium.company.website'),
+            'tax_id' => config('carre_premium.company.tax_id'),
+            'registration' => config('carre_premium.company.registration'),
+            'emergency_phone' => config('carre_premium.contact.mobile_display'),
+        ], $overrides);
+    }
+
+    protected function storeRenderedDocument(string $directory, string $basename, string $view, array $data): string
+    {
+        Storage::disk('public')->makeDirectory($directory);
+
+        $suffix = time() . '_' . Str::lower(Str::random(6));
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $path = $directory . '/' . $basename . '_' . $suffix . '.pdf';
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, $data);
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->save(storage_path('app/public/' . $path));
+
+            return $path;
+        }
+
+        $path = $directory . '/' . $basename . '_' . $suffix . '.html';
+        Storage::disk('public')->put($path, view($view, $data)->render());
+
+        return $path;
     }
 
     /**
@@ -517,13 +497,7 @@ class DocumentGeneratorService
             'segments' => json_decode($flightBooking->flight_segments, true),
             'passengers' => json_decode($booking->passenger_details, true),
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
         // Générer le QR code de vérification
@@ -583,14 +557,7 @@ class DocumentGeneratorService
             'item_details' => $itemDetails,
             'confirmation_number' => $booking->booking_number,
             'issued_date' => Carbon::now()->format('d/m/Y H:i'),
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'support_email' => 'support@carrepremium.com'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
         // Générer le QR code de confirmation

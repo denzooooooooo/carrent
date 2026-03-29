@@ -52,8 +52,8 @@
 
             <p>Si vous avez des questions, n'hésitez pas à nous contacter :</p>
             <ul>
-                <li>Email : support@carrepremium.ci</li>
-                <li>Téléphone : +225 27 21 59 42 58</li>
+                <li>Email : {{ config('carre_premium.contact.support_email') }}</li>
+                <li>Téléphone : {{ config('carre_premium.contact.landline_display') }}</li>
             </ul>
 
             <p>Cordialement,<br>
@@ -62,7 +62,7 @@
 
         <div class="footer">
             <p>Cette adresse email est surveillée 24/7. Ne pas répondre directement à cet email.</p>
-            <p>&copy; 2024 Carré Premium - Tous droits réservés</p>
+            <p>&copy; {{ date('Y') }} Carré Premium - Tous droits réservés</p>
         </div>
     </div>
 </body>

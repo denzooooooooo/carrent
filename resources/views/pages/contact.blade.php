@@ -7,6 +7,18 @@
 @section('og_description', 'Notre équipe est disponible 24/7 pour vous accompagner dans vos projets de voyages de luxe et événements exclusifs en Côte d\'Ivoire.')
 
 @section('content')
+@php
+  $supportEmail = config('carre_premium.contact.support_email');
+  $landlineDisplay = config('carre_premium.contact.landline_display');
+  $mobileDisplay = config('carre_premium.contact.mobile_display');
+  $companyAddress = trim(
+    collect([
+      config('carre_premium.company.address'),
+      config('carre_premium.company.city'),
+      config('carre_premium.company.country'),
+    ])->filter()->implode(', ')
+  );
+@endphp
 <div class="min-h-screen bg-white">
   {{-- Hero --}}
   <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
@@ -26,25 +38,25 @@
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>',
               'title' => __('Phone'),
-              'info' => __('Landline: +225 27 21 59 42 58<br>Mobile: +225 01 01 22 15 15'),
+              'info' => __('Landline: :landline<br>Mobile: :mobile', ['landline' => $landlineDisplay, 'mobile' => $mobileDisplay]),
               'subinfo' => __('Mon-Sun: 24/7')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>',
               'title' => __('Email'),
-              'info' => 'infos@carrepremium.com',
+              'info' => $supportEmail,
               'subinfo' => __('Response within 24h')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>',
               'title' => __('Address'),
-              'info' => 'Abidjan Marcory Biétry Boulevard de Marseille, Côte d\'Ivoire',
+              'info' => $companyAddress,
               'subinfo' => __('Ivory Coast')
             ],
             [
               'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" /><path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" /></svg>',
               'title' => 'WhatsApp',
-              'info' => '+225 01 01 22 15 15',
+              'info' => $mobileDisplay,
               'subinfo' => __('Live chat')
             ]
           ];
@@ -78,6 +90,17 @@
             </div>
           @endif
 
+          @if(session('error'))
+            <div class="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl">
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-4a1 1 0 00-.894.553l-2 4A1 1 0 008 12h4a1 1 0 00.894-1.447l-2-4A1 1 0 0010 6zm0 8a1.25 1.25 0 100 2.5A1.25 1.25 0 0010 14z" clip-rule="evenodd" />
+                </svg>
+                <p class="font-bold text-red-700">{{ session('error') }}</p>
+              </div>
+            </div>
+          @endif
+
           <form method="POST" action="{{ route('contact.store') }}" class="space-y-6">
             @csrf
             <div>
@@ -102,7 +125,7 @@
                   type="email"
                   name="email"
                   value="{{ old('email') }}"
-                  placeholder="infos@carrepremium.com"
+                  placeholder="{{ $supportEmail }}"
                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
                   required
                 />

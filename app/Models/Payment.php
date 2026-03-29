@@ -46,4 +46,16 @@ class Payment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getPaymentMethodLabelAttribute(): string
+    {
+        return match ($this->payment_method) {
+            'credit_card' => 'Carte bancaire',
+            'mobile_money' => 'Mobile Money',
+            'bank_transfer' => 'Virement bancaire',
+            'paypal' => 'PayPal',
+            'stripe' => 'Stripe',
+            default => $this->payment_method ? ucfirst(str_replace('_', ' ', $this->payment_method)) : 'Non renseigne',
+        };
+    }
 }

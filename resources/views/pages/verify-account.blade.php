@@ -203,9 +203,9 @@
                         <p>
                             {{ __('If you encounter difficulties, contact our support:') }}
                             <br>
-                            <a href="mailto:support@carrepremium.ci" class="font-medium underline">support@carrepremium.ci</a>
+                            <a href="mailto:{{ config('carre_premium.contact.support_email') }}" class="font-medium underline">{{ config('carre_premium.contact.support_email') }}</a>
                             <br>
-                            <a href="tel:+2252721594258" class="font-medium underline">+225 27 21 59 42 58</a>
+                            <a href="{{ config('carre_premium.contact.landline_link') }}" class="font-medium underline">{{ config('carre_premium.contact.landline_display') }}</a>
                         </p>
                     </div>
                 </div>

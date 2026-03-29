@@ -43,7 +43,7 @@
             </div>
             
             <div class="p-6">
-              <form id="payment-form" action="{{ route('payment.cinetpay.process', $booking) }}" method="POST">
+              <form id="payment-form" action="{{ $paymentProcessUrl ?? route('payment.cinetpay.process', $booking) }}" method="POST">
                 @csrf
                 
                 <div class="space-y-4">

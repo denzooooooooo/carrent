@@ -126,7 +126,7 @@
                                 <input type="text" name="phone" id="phone"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150 @error('phone') border-red-500 @enderror"
                                     value="{{ old('phone', $admin->phone) }}"
-                                    placeholder="+225 XX XX XX XX XX">
+                                    placeholder="{{ config('carre_premium.contact.mobile_display') }}">
                                 @error('phone')
                                     <p class="text-red-500 text-xs mt-1">
                                         <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}

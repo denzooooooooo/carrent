@@ -1,272 +1,444 @@
 @extends('layouts.app')
 
-@section('title', __('Book this vehicle') . ' - ' . $location->name . ' - Carré Premium')
+@section('title', (($location->name ?? __('Vehicle')) . ' - Carré Premium'))
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                {{ __('Book this vehicle') }}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">{{ $location->name }}</p>
-        </div>
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $locationName = $location->name;
+    $locationDescription = $location->description;
+    $locationImage = $location->image_url ?: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&h=800&fit=crop';
+    $features = collect($location->features ?? [])->filter()->values();
+    $categoryLabel = $location->category ? ucfirst((string) $location->category) : $t('Sur demande', 'On request');
+    $typeLabel = $location->type ? ucfirst((string) $location->type) : $t('Sur demande', 'On request');
+    $pricePerDay = (float) ($location->price_per_day ?? 0);
+@endphp
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Formulaire de réservation -->
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
-                    <form action="{{ route('location.book', $location) }}" method="POST" class="space-y-6">
-                        @csrf
-                        
-                        <!-- Informations personnelles -->
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                {{ __('Personal Information') }}
-                            </h2>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Prénom -->
-                                <div>
-                                    <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('First Name') }} *
-                                    </label>
-                                    <input type="text" 
-                                           id="first_name" 
-                                           name="first_name" 
-                                           required
-                                           value="{{ old('first_name', auth()->user()->first_name ?? '') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white"
-                                           placeholder="{{ __('First Name') }}">
-                                    @error('first_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                
-                                <!-- Nom -->
-                                <div>
-                                    <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('Last Name') }} *
-                                    </label>
-                                    <input type="text" 
-                                           id="last_name" 
-                                           name="last_name" 
-                                           required
-                                           value="{{ old('last_name', auth()->user()->last_name ?? '') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white"
-                                           placeholder="{{ __('Last Name') }}">
-                                    @error('last_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
+<div class="min-h-screen pb-24 sm:pb-28">
+    <section class="pt-4 sm:pt-6">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1d2239] via-[#234c7b] to-[#d49a46] text-white shadow-[0_30px_90px_rgba(20,34,59,0.24)]">
+                <div class="grid gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
+                    <div class="max-w-3xl">
+                        <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                            <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                            <span>{{ $t('Location detail', 'Rental detail') }}</span>
+                        </div>
+
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/90">
+                                {{ $categoryLabel }}
+                            </span>
+                            <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/90">
+                                {{ $typeLabel }}
+                            </span>
+                            <span class="rounded-full bg-[color:var(--cp-gold-400)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#17304a]">
+                                {{ $location->capacity }} {{ $t('passagers', 'passengers') }}
+                            </span>
+                        </div>
+
+                        <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                            {{ $locationName }}
+                        </h1>
+
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+                            {{ \Illuminate\Support\Str::limit($locationDescription, 260) }}
+                        </p>
+
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <div class="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Tarif indicatif', 'Indicative fare') }}</p>
+                                <p class="mt-1 text-sm font-bold text-white">{{ \App\Helpers\CurrencyHelper::format($pricePerDay) }} / {{ $t('jour', 'day') }}</p>
+                            </div>
+                            <div class="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Capacite', 'Capacity') }}</p>
+                                <p class="mt-1 text-sm font-bold text-white">{{ $location->capacity }} {{ $t('passagers', 'passengers') }}</p>
+                            </div>
+                            <div class="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Reservation', 'Booking') }}</p>
+                                <p class="mt-1 text-sm font-bold text-white">{{ $t('Paiement securise apres recapitulatif', 'Secure payment after summary') }}</p>
                             </div>
                         </div>
 
-                        <!-- Coordonnées -->
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                                {{ __('Contact Information') }}
-                            </h2>
-                            
-                            <div class="space-y-4">
-                                <!-- Email -->
-                                <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('Email') }} *
-                                    </label>
-                                    <input type="email" 
-                                           id="email" 
-                                           name="email" 
-                                           required
-                                           value="{{ old('email', auth()->user()->email ?? '') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white"
-                                           placeholder="email@example.com">
-                                    @error('email')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                
-                                <!-- Téléphone -->
-                                <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('Phone') }} *
-                                    </label>
-                                    <input type="tel" 
-                                           id="phone" 
-                                           name="phone" 
-                                           required
-                                           value="{{ old('phone', auth()->user()->phone ?? '') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white"
-                                           placeholder="+225 XX XX XX XX XX">
-                                    @error('phone')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
+                        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <a href="#booking-form" class="cp-primary-button !w-full sm:!w-auto">
+                                <i class="fa-solid fa-calendar-check text-sm"></i>
+                                <span>{{ $t('Reserver ce vehicule', 'Book this vehicle') }}</span>
+                            </a>
+                            <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                                <i class="fa-solid fa-headset text-sm"></i>
+                                <span>{{ $t("Parler a l'equipe", 'Talk to the team') }}</span>
+                            </a>
                         </div>
-
-                        <!-- Dates de location -->
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                {{ __('Rental Dates') }}
-                            </h2>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Date de début -->
-                                <div>
-                                    <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('Start Date') }} *
-                                    </label>
-                                    <input type="date" 
-                                           id="start_date" 
-                                           name="start_date" 
-                                           required
-                                           min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                                           value="{{ old('start_date') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                    @error('start_date')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                
-                                <!-- Date de fin -->
-                                <div>
-                                    <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {{ __('End Date') }} *
-                                    </label>
-                                    <input type="date" 
-                                           id="end_date" 
-                                           name="end_date" 
-                                           required
-                                           min="{{ date('Y-m-d', strtotime('+2 days')) }}"
-                                           value="{{ old('end_date') }}"
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                    @error('end_date')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Demandes spéciales -->
-                        <div>
-                            <label for="special_requests" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                {{ __('Special Requests') }}
-                            </label>
-                            <textarea id="special_requests" 
-                                      name="special_requests" 
-                                      rows="3"
-                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-600 focus:outline-none dark:bg-gray-700 dark:text-white"
-                                      placeholder="{{ __('Any special requests or requirements?') }}">{{ old('special_requests') }}</textarea>
-                        </div>
-
-                        <!-- Bouton de soumission -->
-                        <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>{{ __('Continue to Payment') }}</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Récapitulatif -->
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sticky top-8">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Summary') }}</h2>
-                    
-                    <!-- Image et nom -->
-                    <div class="mb-6">
-                        <img src="{{ $location->image_url ?: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=250&fit=crop' }}" 
-                             alt="{{ $location->name }}"
-                             class="w-full h-32 object-cover rounded-xl mb-4">
-                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ $location->name }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ ucfirst($location->category) }} - {{ ucfirst($location->type) }}</p>
                     </div>
 
-                    <!-- Caractéristiques -->
-                    <div class="space-y-3 mb-6">
-                        <div class="flex items-center text-gray-600 dark:text-gray-400">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                            <span class="text-sm">{{ $location->capacity }} {{ __('passengers') }}</span>
+                    <div class="rounded-[1.9rem] border border-white/15 bg-white/10 p-4 backdrop-blur sm:p-5">
+                        <div class="overflow-hidden rounded-[1.5rem]">
+                            <img src="{{ $locationImage }}" alt="{{ $locationName }}" class="h-64 w-full object-cover sm:h-72">
                         </div>
-                        @if($location->features && count($location->features) > 0)
-                            <div class="flex flex-wrap gap-1">
-                                @foreach(array_slice($location->features, 0, 3) as $feature)
-                                    <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">{{ $feature }}</span>
+
+                        <div class="mt-4 grid grid-cols-2 gap-3">
+                            <div class="rounded-[1.2rem] bg-white/12 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Categorie', 'Category') }}</p>
+                                <p class="mt-2 text-sm font-bold text-white">{{ $categoryLabel }}</p>
+                            </div>
+                            <div class="rounded-[1.2rem] bg-white/12 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Type', 'Type') }}</p>
+                                <p class="mt-2 text-sm font-bold text-white">{{ $typeLabel }}</p>
+                            </div>
+                            <div class="rounded-[1.2rem] bg-white/12 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Capacite', 'Capacity') }}</p>
+                                <p class="mt-2 text-sm font-bold text-white">{{ $location->capacity }} {{ $t('places', 'seats') }}</p>
+                            </div>
+                            <div class="rounded-[1.2rem] bg-white/12 px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Support', 'Support') }}</p>
+                                <p class="mt-2 text-sm font-bold text-white">{{ $t('Equipe humaine disponible', 'Human team available') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="-mt-6 pt-0">
+        <div class="cp-shell">
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,420px)]">
+                <div class="space-y-6">
+                    <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
+                        <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
+                            <div class="max-w-3xl">
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Lecture rapide', 'Quick reading') }}</p>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Ce que le client doit savoir avant de reserver', 'What the client should know before booking') }}</h2>
+                            </div>
+                            <div class="cp-pill">
+                                <i class="fa-solid fa-wallet text-xs"></i>
+                                <span>{{ \App\Helpers\CurrencyHelper::format($pricePerDay) }} / {{ $t('jour', 'day') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 grid gap-4 md:grid-cols-3">
+                            <div class="rounded-[1.35rem] bg-[#eef7ff] px-4 py-4">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Categorie', 'Category') }}</p>
+                                <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $categoryLabel }}</p>
+                            </div>
+                            <div class="rounded-[1.35rem] bg-[#eef7ff] px-4 py-4">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Type', 'Type') }}</p>
+                                <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $typeLabel }}</p>
+                            </div>
+                            <div class="rounded-[1.35rem] bg-[#eef7ff] px-4 py-4">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Capacite', 'Capacity') }}</p>
+                                <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $location->capacity }} {{ $t('passagers', 'passengers') }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 prose max-w-none text-[color:var(--cp-ink-soft)]">
+                            {!! nl2br(e($locationDescription)) !!}
+                        </div>
+                    </section>
+
+                    @if($features->isNotEmpty())
+                        <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
+                            <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Equipements', 'Features') }}</p>
+                            <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Ce vehicule inclut', 'What this vehicle includes') }}</h2>
+
+                            <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                                @foreach($features as $feature)
+                                    <div class="flex items-start gap-3 rounded-[1.35rem] bg-[#f3f8fc] px-4 py-4">
+                                        <span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#d7ebfb] text-[11px] font-black text-[#1e507b]">+</span>
+                                        <span class="text-sm leading-6 text-[#274765]">{{ $feature }}</span>
+                                    </div>
                                 @endforeach
                             </div>
+                        </section>
+                    @endif
+
+                    <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Processus', 'Process') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Reservation plus claire', 'Clearer booking flow') }}</h2>
+
+                        <div class="mt-6 grid gap-4 md:grid-cols-3">
+                            <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
+                                <p class="text-sm font-black text-[color:var(--cp-plum-950)]">1. {{ $t('Choisir les dates', 'Choose the dates') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Le client saisit simplement le debut et la fin de location.', 'The client simply enters rental start and end dates.') }}</p>
+                            </div>
+                            <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
+                                <p class="text-sm font-black text-[color:var(--cp-plum-950)]">2. {{ $t('Voir le montant estime', 'See the estimated amount') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Le recapitulatif calcule les jours et le total sans ambiguite.', 'The summary calculates days and total without ambiguity.') }}</p>
+                            </div>
+                            <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
+                                <p class="text-sm font-black text-[color:var(--cp-plum-950)]">3. {{ $t('Payer puis confirmer', 'Pay then confirm') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('La reservation passe ensuite vers le paiement securise et la confirmation.', 'The booking then proceeds to secure payment and confirmation.') }}</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <aside id="booking-form" class="lg:sticky lg:top-6 lg:self-start">
+                    <div class="cp-panel rounded-[2rem] p-5 sm:p-6">
+                        <div class="border-b border-[color:var(--cp-border)] pb-5">
+                            <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Reservation', 'Booking') }}</p>
+                            <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Demande de location', 'Rental request') }}</h2>
+                            <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                {{ $t('On garde le tunnel simple: coordonnees, dates, recapitulatif, puis paiement.', 'The funnel stays simple: contact details, dates, summary, then payment.') }}
+                            </p>
+                        </div>
+
+                        @if($errors->any())
+                            <div class="mt-5 rounded-[1.4rem] border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">
+                                <p class="font-bold">{{ $t('Le formulaire contient des erreurs.', 'The form contains errors.') }}</p>
+                                <ul class="mt-2 space-y-1">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
+
+                        <form action="{{ route('location.book', $location) }}" method="POST" class="mt-5 space-y-5">
+                            @csrf
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="first_name" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Prenoms', 'First name') }} *</label>
+                                    <input
+                                        type="text"
+                                        id="first_name"
+                                        name="first_name"
+                                        required
+                                        value="{{ old('first_name', auth()->user()->first_name ?? '') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                                <div>
+                                    <label for="last_name" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Nom', 'Last name') }} *</label>
+                                    <input
+                                        type="text"
+                                        id="last_name"
+                                        name="last_name"
+                                        required
+                                        value="{{ old('last_name', auth()->user()->last_name ?? '') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="email" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">Email *</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        required
+                                        value="{{ old('email', auth()->user()->email ?? '') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                                <div>
+                                    <label for="phone" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Telephone', 'Phone') }} *</label>
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        name="phone"
+                                        required
+                                        value="{{ old('phone', auth()->user()->phone ?? '') }}"
+                                        placeholder="{{ config('carre_premium.contact.mobile_display') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="start_date" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Date de debut', 'Start date') }} *</label>
+                                    <input
+                                        type="date"
+                                        id="start_date"
+                                        name="start_date"
+                                        required
+                                        min="{{ now()->addDay()->format('Y-m-d') }}"
+                                        value="{{ old('start_date') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                                <div>
+                                    <label for="end_date" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Date de fin', 'End date') }} *</label>
+                                    <input
+                                        type="date"
+                                        id="end_date"
+                                        name="end_date"
+                                        required
+                                        min="{{ now()->addDays(2)->format('Y-m-d') }}"
+                                        value="{{ old('end_date') }}"
+                                        class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    >
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="special_requests" class="mb-2 block text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $t('Demandes speciales', 'Special requests') }}</label>
+                                <textarea
+                                    id="special_requests"
+                                    name="special_requests"
+                                    rows="4"
+                                    class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm text-[color:var(--cp-plum-950)] outline-none transition focus:border-[#1e507b]"
+                                    placeholder="{{ $t('Chauffeur, point de prise en charge, attente, accessibilite, etc.', 'Driver, pick-up point, waiting time, accessibility, etc.') }}"
+                                >{{ old('special_requests') }}</textarea>
+                            </div>
+
+                            <div class="rounded-[1.5rem] bg-[#eef7ff] px-4 py-4 sm:px-5">
+                                <div class="flex items-center justify-between gap-4">
+                                    <span class="text-sm text-[color:var(--cp-ink-soft)]">{{ $t('Prix par jour', 'Price per day') }}</span>
+                                    <span class="text-base font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($pricePerDay) }}</span>
+                                </div>
+                                <div class="mt-3 flex items-center justify-between gap-4">
+                                    <span class="text-sm text-[color:var(--cp-ink-soft)]">{{ $t('Nombre de jours', 'Number of days') }}</span>
+                                    <span id="days-count" class="text-base font-black text-[color:var(--cp-plum-950)]">0</span>
+                                </div>
+                                <div class="mt-4 border-t border-[color:var(--cp-border)] pt-4">
+                                    <div class="flex items-center justify-between gap-4 text-lg font-black">
+                                        <span class="text-[color:var(--cp-plum-950)]">{{ $t('Total estime', 'Estimated total') }}</span>
+                                        <span id="total-price" class="text-[#1e507b]">0 XAF</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="cp-primary-button !w-full !justify-center !bg-[#1e507b] hover:!bg-[#194668]">
+                                <i class="fa-solid fa-lock text-sm"></i>
+                                <span>{{ $t('Continuer vers le paiement', 'Continue to payment') }}</span>
+                            </button>
+                        </form>
+
+                        <div class="mt-5 border-t border-[color:var(--cp-border)] pt-5">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Support', 'Support') }}</p>
+                            <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                {{ $t('Si le client hesite sur les dates ou le vehicule exact, l equipe peut clarifier avant validation.', 'If the client is unsure about dates or the exact vehicle, the team can clarify before validation.') }}
+                            </p>
+                            <div class="mt-4 flex flex-col gap-3">
+                                <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !justify-center">
+                                    <i class="fa-solid fa-phone text-sm"></i>
+                                    <span>{{ config('carre_premium.contact.mobile_display') }}</span>
+                                </a>
+                                <a href="mailto:{{ config('carre_premium.contact.support_email') }}" class="cp-secondary-button !justify-center">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
+                                    <span>{{ config('carre_premium.contact.support_email') }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-10 sm:pt-12">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#19304a] via-[#226695] to-[#d49a46] px-5 py-8 text-white shadow-[0_24px_70px_rgba(24,37,67,0.18)] sm:px-8">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Besoin specifique', 'Specific need') }}</p>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d un autre modele, d un chauffeur ou d une solution sur mesure ?', 'Need another model, a driver or a bespoke solution?') }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
+                            {{ $t('La page aide a comprendre l offre, mais l equipe peut encore ajuster le vehicule, le timing et le mode d accompagnement.', 'The page helps users understand the offer, but the team can still adjust the vehicle, timing and support mode.') }}
+                        </p>
                     </div>
 
-                    <!-- Prix -->
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-600 dark:text-gray-400">{{ __('Price per day') }}</span>
-                            <span class="font-semibold text-gray-900 dark:text-white">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</span>
-                        </div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-600 dark:text-gray-400">{{ __('Number of days') }}</span>
-                            <span class="font-semibold text-gray-900 dark:text-white" id="days-count">0</span>
-                        </div>
-                    </div>
-
-                    <!-- Total -->
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Total') }}</span>
-                            <span class="text-xl font-bold text-green-600" id="total-price">0 XAF</span>
-                        </div>
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#17304a] hover:!bg-[#e2aa54]">
+                            <i class="fa-regular fa-envelope text-sm"></i>
+                            <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
+                        </a>
+                        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                            <i class="fa-solid fa-phone text-sm"></i>
+                            <span>{{ $t('Appeler maintenant', 'Call now') }}</span>
+                        </a>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <div class="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--cp-border)] bg-white/95 px-4 py-3 shadow-[0_-16px_40px_rgba(24,37,67,0.12)] backdrop-blur lg:hidden">
+        <div class="mx-auto flex max-w-3xl items-center justify-between gap-4">
+            <div>
+                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('A partir de', 'Starting at') }}</p>
+                <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($pricePerDay) }}</p>
+            </div>
+            <a href="#booking-form" class="cp-primary-button !w-auto !px-5 !bg-[#1e507b] hover:!bg-[#194668]">
+                <span>{{ $t('Reserver', 'Book now') }}</span>
+            </a>
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const startDateInput = document.getElementById('start_date');
     const endDateInput = document.getElementById('end_date');
     const daysCountSpan = document.getElementById('days-count');
     const totalPriceSpan = document.getElementById('total-price');
-    const pricePerDay = {{ $location->price_per_day }};
-    
-    function updatePrice() {
+
+    if (!startDateInput || !endDateInput || !daysCountSpan || !totalPriceSpan) {
+        return;
+    }
+
+    const pricePerDay = {{ json_encode($pricePerDay) }};
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XAF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
+    function updateMinEndDate() {
+        if (!startDateInput.value) {
+            return;
+        }
+
         const startDate = new Date(startDateInput.value);
-        const endDate = new Date(endDateInput.value);
-        
-        if (startDateInput.value && endDateInput.value && endDate >= startDate) {
-            const diffTime = Math.abs(endDate - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            const total = diffDays * pricePerDay;
-            
-            daysCountSpan.textContent = diffDays;
-            totalPriceSpan.textContent = new Intl.NumberFormat('fr-FR').format(total) + ' XAF';
-        } else {
-            daysCountSpan.textContent = '0';
-            totalPriceSpan.textContent = '0 XAF';
+        startDate.setDate(startDate.getDate() + 1);
+        endDateInput.min = startDate.toISOString().split('T')[0];
+
+        if (endDateInput.value && endDateInput.value < endDateInput.min) {
+            endDateInput.value = endDateInput.min;
         }
     }
-    
+
+    function updatePrice() {
+        updateMinEndDate();
+
+        if (!startDateInput.value || !endDateInput.value) {
+            daysCountSpan.textContent = '0';
+            totalPriceSpan.textContent = '0 XAF';
+            return;
+        }
+
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate < startDate) {
+            daysCountSpan.textContent = '0';
+            totalPriceSpan.textContent = '0 XAF';
+            return;
+        }
+
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const total = diffDays * pricePerDay;
+
+        daysCountSpan.textContent = diffDays;
+        totalPriceSpan.textContent = formatCurrency(total);
+    }
+
     startDateInput.addEventListener('change', updatePrice);
     endDateInput.addEventListener('change', updatePrice);
+    updatePrice();
 });
 </script>
 @endpush
 @endsection
-

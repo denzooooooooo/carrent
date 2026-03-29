@@ -6,6 +6,7 @@ use App\Models\TourPackage;
 use App\Models\Booking;
 use App\Models\PackageBooking;
 use App\Mail\PackageBookingConfirmation;
+use App\Services\BookingAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -19,6 +20,20 @@ class PackageController extends Controller
     {
         $query = TourPackage::where('is_active', true)
             ->with(['category']);
+
+        if ($request->filled('q')) {
+            $search = '%' . trim($request->input('q')) . '%';
+
+            $query->where(function ($builder) use ($search) {
+                $builder
+                    ->where('title_fr', 'like', $search)
+                    ->orWhere('title_en', 'like', $search)
+                    ->orWhere('description_fr', 'like', $search)
+                    ->orWhere('description_en', 'like', $search)
+                    ->orWhere('destination', 'like', $search)
+                    ->orWhere('package_type', 'like', $search);
+            });
+        }
 
         // Filtre par type de package
         if ($request->filled('type')) {
@@ -48,9 +63,24 @@ class PackageController extends Controller
             }
         }
 
-        $packages = $query->orderBy('is_featured', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        if ($request->boolean('featured')) {
+            $query->where('is_featured', true);
+        }
+
+        $selectedSort = $request->input('sort', 'featured');
+
+        match ($selectedSort) {
+            'price_low' => $query->orderByRaw('COALESCE(discount_price, price) asc'),
+            'price_high' => $query->orderByRaw('COALESCE(discount_price, price) desc'),
+            'duration_short' => $query->orderBy('duration'),
+            'duration_long' => $query->orderByDesc('duration'),
+            'newest' => $query->orderByDesc('created_at'),
+            default => $query->orderByDesc('is_featured')->orderByDesc('created_at'),
+        };
+
+        $packages = $query
+            ->paginate(12)
+            ->appends($request->query());
 
         // Récupérer les types de packages distincts pour les filtres
         $packageTypes = TourPackage::where('is_active', true)
@@ -66,7 +96,31 @@ class PackageController extends Controller
             ->filter()
             ->values();
 
-        return view('pages.packages', compact('packages', 'packageTypes', 'destinations'));
+        $sortOptions = [
+            'featured' => 'Sélection Carré Premium',
+            'price_low' => 'Prix croissant',
+            'price_high' => 'Prix décroissant',
+            'duration_short' => 'Durée courte',
+            'duration_long' => 'Durée longue',
+            'newest' => 'Nouveautés',
+        ];
+
+        $totalPackagesCount = TourPackage::where('is_active', true)->count();
+        $featuredPackagesCount = TourPackage::where('is_active', true)->where('is_featured', true)->count();
+        $startingPrice = TourPackage::where('is_active', true)
+            ->selectRaw('MIN(COALESCE(discount_price, price)) as starting_price')
+            ->value('starting_price');
+
+        return view('pages.packages', compact(
+            'packages',
+            'packageTypes',
+            'destinations',
+            'selectedSort',
+            'sortOptions',
+            'totalPackagesCount',
+            'featuredPackagesCount',
+            'startingPrice'
+        ));
     }
 
     /**
@@ -177,15 +231,17 @@ class PackageController extends Controller
             \Log::error('Failed to send package booking confirmation email: ' . $e->getMessage());
         }
 
-        return redirect()->route('payment.cinetpay.redirect', $booking)
+        return redirect(app(BookingAccessService::class)->bookingRoute('payment.cinetpay.redirect', $booking))
             ->with('success', 'Votre réservation a été créée. Redirection vers le paiement sécurisé...');
     }
 
     /**
      * Display booking confirmation page.
      */
-    public function bookingConfirmation(Booking $booking)
+    public function bookingConfirmation(Request $request, Booking $booking)
     {
+        app(BookingAccessService::class)->authorize($request, $booking);
+
         // Ensure this is a package booking
         if ($booking->booking_type !== 'package' || !$booking->package) {
             abort(404);

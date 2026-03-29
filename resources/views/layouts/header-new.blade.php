@@ -1,697 +1,428 @@
 @php
-    // Navigation structure with submenus
-    $navigation = [
-        [
-            'name' => __('Home'),
-            'name_fr' => 'Accueil',
-            'path' => '#',
-            'icon' => 'fa-home',
-            'color' => 'purple',
-            'submenu' => [
-                ['name' => __('About Us'), 'name_fr' => 'À propos', 'path' => '/about', 'icon' => 'fa-info-circle'],
-                ['name' => __('Contact Us'), 'name_fr' => 'Nous contacter', 'path' => '/contact', 'icon' => 'fa-envelope'],
-            ]
-        ],
-        [
-            'name' => __('Ticketing'),
-            'name_fr' => 'Billetterie Voyages',
-            'path' => '#',
-            'icon' => 'fa-ticket-alt',
-            'color' => 'blue',
-            'submenu' => [
-                ['name' => __('Travel'), 'name_fr' => 'Voyage', 'path' => '/flights', 'icon' => 'fa-plane'],
-                ['name' => __('packages'), 'name_fr' => 'Packages touristiques', 'path' => '/packages', 'icon' => 'fa-shopping-bag'],
+    $companyName = config('carre_premium.company.name');
+    $supportEmail = config('carre_premium.contact.support_email');
+    $mobileDisplay = config('carre_premium.contact.mobile_display');
+    $mobileLink = config('carre_premium.contact.mobile_link');
+    $landlineDisplay = config('carre_premium.contact.landline_display');
+    $landlineLink = config('carre_premium.contact.landline_link');
+    $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
+    $currentLocale = strtoupper(session('locale', 'fr'));
+    $currentCurrency = session('currency', 'XOF');
+    $searchQuery = request('q', '');
+    $userName = $user?->name ?: trim(($user?->first_name ?? '') . ' ' . ($user?->last_name ?? ''));
+    $userName = $userName !== '' ? $userName : __('My Account');
+    $userInitial = strtoupper(substr($userName, 0, 1));
 
-            ]
+    $mainNavigation = [
+        [
+            'label' => 'Accueil',
+            'route' => 'home',
+            'patterns' => ['home'],
+            'summary' => 'Vue d’ensemble de nos services premium',
         ],
         [
-            'name' => __('Event Ticketing'),
-            'name_fr' => 'Billeterie Event',
-            'path' => '#',
-            'icon' => 'fa-calendar-star',
-            'color' => 'pink',
-            'submenu' => [
-                ['name' => __('See all events'), 'name_fr' => 'Voir tout', 'path' => '/events', 'icon' => 'fa-layer-group'],
-                ['name' => __('Cultural'), 'name_fr' => 'Culturel', 'path' => '/events?family=culturel', 'icon' => 'fa-theater-masks'],
-                ['name' => __('Sports'), 'name_fr' => 'Sportif', 'path' => '/events?family=sportif', 'icon' => 'fa-futbol'],
-            ]
+            'label' => 'Événements',
+            'route' => 'events',
+            'patterns' => ['events', 'events.*'],
+            'summary' => 'Billets sportifs et culturels',
         ],
         [
-            'name' => __('Concierge'),
-            'name_fr' => 'Conciergerie',
-            'path' => '#',
-            'icon' => 'fa-concierge-bell',
-            'color' => 'orange',
-            'submenu' => [
-                ['name' => __('Luxury'), 'name_fr' => 'Luxe', 'path' => '/concierge/luxury', 'icon' => 'fa-gem'],
-                ['name' => __('Vehicle Rental'), 'name_fr' => 'Location de véhicule', 'path' => '/location', 'icon' => 'fa-car'],
-                ['name' => __('Personal Shopper'), 'name_fr' => 'Personal Shopper', 'path' => '/concierge/personal-shopper', 'icon' => 'fa-shopping-bag'],
-
-            ]
+            'label' => 'Packages',
+            'route' => 'packages',
+            'patterns' => ['packages', 'packages.*'],
+            'summary' => 'Séjours et expériences organisées',
+        ],
+        [
+            'label' => 'Location',
+            'route' => 'location',
+            'patterns' => ['location'],
+            'summary' => 'Véhicules premium et sur mesure',
+        ],
+        [
+            'label' => 'Vols accompagnés',
+            'route' => 'flights.index',
+            'patterns' => ['flights.*'],
+            'summary' => 'Demandes traitées avec un conseiller',
         ],
     ];
-    // Function to check if a navigation item is active
-    function isActive($path) {
-        if ($path === '/') {
-            return request()->is('/');
+
+    $secondaryNavigation = [
+        ['label' => 'À propos', 'route' => 'about'],
+        ['label' => 'Contact', 'route' => 'contact'],
+        ['label' => 'FAQ', 'route' => 'faq'],
+        ['label' => 'Partenariat', 'route' => 'partnership'],
+    ];
+
+    $isRouteActive = function (array $patterns): bool {
+        foreach ($patterns as $pattern) {
+            if (request()->routeIs($pattern)) {
+                return true;
+            }
         }
-        return request()->is(ltrim($path, '/')) || request()->is(ltrim($path, '/').'/*');
-    }
+
+        return false;
+    };
 @endphp
 
-<div class="fixed top-0 left-0 right-0 z-50">
-    {{-- Top Bar with Register and B2B Partnership Buttons --}}
-    <div class="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-end h-8 space-x-2">
-                <a href="{{ route('register') }}" class="flex items-center space-x-2 px-2 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors whitespace-nowrap">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Inscription</span>
-                </a>
-                <span class="text-gray-300 dark:text-gray-600">|</span>
-                <a href="{{ route('partnership') }}" class="flex items-center space-x-2 px-2 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors whitespace-nowrap">
-                    <i class="fas fa-handshake"></i>
-                    <span>Partenariat</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    {{-- Main Header --}}
-    <header 
-        x-data="{
-            mobileMenuOpen: false,
-            activeDropdown: null,
-            darkMode: false,
-            init() {
-                // Initialize dark mode from localStorage - DEFAULT IS FALSE (light mode)
-                const savedTheme = localStorage.getItem('theme');
-                this.darkMode = (savedTheme === 'dark');
-                
-                // Ensure light mode by default
-                if (!savedTheme || savedTheme === 'light') {
-                    this.darkMode = false;
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                } else if (savedTheme === 'dark') {
-                    this.darkMode = true;
-                    document.documentElement.classList.add('dark');
-                }
-            },
-            toggleTheme() {
-                this.darkMode = !this.darkMode;
-                const theme = this.darkMode ? 'dark' : 'light';
-                localStorage.setItem('theme', theme);
-                
-                if (this.darkMode) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-                
-                // Save to server
-                fetch('/theme/change', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                    },
-                    body: JSON.stringify({ theme })
-                });
-            },
-            toggleDropdown(index) {
-                this.activeDropdown = this.activeDropdown === index ? null : index;
-            },
-            closeDropdowns() {
-                this.activeDropdown = null;
-            }
-        }"
-        @click.away="closeDropdowns()"
-        class="bg-white dark:bg-gray-900 shadow-md transition-colors duration-300"
-    >
-    <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between h-16 gap-4">
-             
-            {{-- Logo --}}
-            <a href="/" class="flex items-center space-x-3 group whitespace-nowrap flex-shrink-0 min-w-fit">
-                <img
-                    src="{{ asset('logos/logo2.jpg') }}"
-                    alt="Carré Premium"
-                    class="h-12 w-auto max-h-12 flex-shrink-0"
-                />
-                <div class="flex flex-col">
-                    <span class="text-base font-bold text-gray-900 dark:text-white leading-tight">Carré Premium</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 leading-tight">Conciergerie</span>
-                </div>
-            </a>
-
-            {{-- Desktop Navigation --}}
-            <nav class="hidden lg:flex items-center space-x-1 flex-nowrap text-sm flex-1 justify-center">
-                @foreach($navigation as $index => $item)
-                    <div class="relative" x-data="{ open: false }">
-                        @if(isset($item['submenu']))
-                            {{-- Menu with dropdown --}}
-                            <button
-                                @click="toggleDropdown({{ $index }})"
-                                @class([
-                                    'flex items-center space-x-2 px-2 py-1 font-medium transition-all duration-200 relative group whitespace-nowrap',
-                                    'text-'.$item['color'].'-600 dark:text-'.$item['color'].'-400' => isActive($item['path']),
-                                    'text-gray-700 dark:text-gray-300' => !isActive($item['path'])
-                                ])
-                            >
-                                <i class="fas {{ $item['icon'] }} text-xs"></i>
-                                <span>{{ $item['name_fr'] ?? $item['name'] }}</span>
-                                <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': activeDropdown === {{ $index }} }"></i>
-                                {{-- Underline on hover --}}
-                                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-{{ $item['color'] }}-600 transition-all duration-300 group-hover:w-full"></span>
-                            </button>
-
-                            {{-- Dropdown Menu --}}
-                            <div
-                                x-show="activeDropdown === {{ $index }}"
-                                x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-150"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2"
-                                style="display: none;"
-                            >
-                                @foreach($item['submenu'] as $subitem)
-                                    <a 
-                                        href="{{ $subitem['path'] }}"
-                                        @click="closeDropdowns()"
-                                        class="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 hover:pl-6 whitespace-nowrap"
-                                    >
-                                        <i class="fas {{ $subitem['icon'] }} w-5"></i>
-                                        <span>{{ $subitem['name_fr'] ?? $subitem['name'] }}</span>
-                                    </a>
-                                @endforeach
-                            </div>
-                        @else
-                            {{-- Simple menu item - Text with underline on hover --}}
-                            <a
-                                href="{{ $item['path'] }}"
-                                @class([
-                                    'flex items-center space-x-2 px-2 py-1 font-medium transition-all duration-200 relative group whitespace-nowrap',
-                                    'text-'.$item['color'].'-600 dark:text-'.$item['color'].'-400' => isActive($item['path']),
-                                    'text-gray-700 dark:text-gray-300' => !isActive($item['path'])
-                                ])
-                            >
-                                <i class="fas {{ $item['icon'] }} text-xs"></i>
-                                <span>{{ $item['name_fr'] ?? $item['name'] }}</span>
-                                {{-- Underline on hover --}}
-                                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-{{ $item['color'] }}-600 transition-all duration-300 group-hover:w-full"></span>
-                                {{-- Active indicator --}}
-                                @if(isActive($item['path']))
-                                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-{{ $item['color'] }}-600"></span>
-                                @endif
-                            </a>
-                        @endif
-                    </div>
-                @endforeach
-            </nav>
-
-            {{-- Right Actions --}}
-            <div class="flex items-center space-x-2">
-
-                {{-- Enhanced Search form (site-wide) --}}
-                <div class="hidden md:flex items-center relative">
-                    <div class="relative">
-                        <input
-                            id="site-search"
-                            name="q"
-                            type="search"
-                            placeholder="Rechercher..."
-                            class="bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 pr-10 pl-10 outline-none text-gray-700 dark:text-gray-300 w-48 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all"
-                            aria-label="Recherche"
-                            autocomplete="off"
-                        />
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <div id="search-loading" class="hidden">
-                                <div class="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full"></div>
-                            </div>
-                        </div>
-                        <div id="search-suggestions" class="absolute left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden hidden z-50 max-h-96 overflow-y-auto">
-                            <div id="search-suggestions-header" class="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Suggestions</p>
-                            </div>
-                            <ul id="search-suggestions-list" class="divide-y divide-gray-100 dark:divide-gray-700">
-                                {{-- Suggestions will be populated here --}}
-                            </ul>
-                            <div id="search-suggestions-footer" class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 hidden">
-                                <form action="/search" method="GET" class="flex items-center justify-between">
-                                    <input type="hidden" name="q" id="search-full-query">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Voir tous les résultats pour "<span id="search-query-display"></span>"</span>
-                                    <button type="submit" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium text-sm">
-                                        Voir tout <i class="fas fa-arrow-right ml-1"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Mobile Search Button --}}
-                <button 
-                    id="mobile-search-toggle"
-                    class="md:hidden p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                    title="Rechercher"
-                >
-                    <i class="fas fa-search"></i>
-                </button>
-                
-                {{-- Theme Toggle Button - Uses CSS Variables System --}}
-                <button id="theme-toggle" class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
-                    <i class="fas fa-adjust"></i>
-                    <span class="text-xs font-medium hidden md:inline">Thème</span>
-                </button>
-
-                {{-- Language Selector --}}
-                <div class="relative hidden md:block" x-data="{ open: false }">
-                    <button
-                        @click="open = !open"
-                        class="flex items-center space-x-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                    >
-                        <i class="fas fa-globe"></i>
-                        <span class="text-sm font-medium">{{ strtoupper(session('locale', 'fr')) }}</span>
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </button>
-
-                    <div
-                        x-show="open"
-                        @click.away="open = false"
-                        x-transition
-                        class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2"
-                        style="display: none;"
-                    >
-                        <button
-                            onclick="changeLanguage('fr')"
-                            class="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                            <i class="fas fa-flag"></i>
-                            <span>Français</span>
-                        </button>
-                        <button
-                            onclick="changeLanguage('en')"
-                            class="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                            <i class="fas fa-flag-usa"></i>
-                            <span>English</span>
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Currency Selector --}}
-                <div class="relative hidden md:block" x-data="{ open: false }">
-                    <button
-                        @click="open = !open"
-                        class="flex items-center space-x-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                    >
-                        <span class="text-sm font-medium">{{ session('currency', 'XOF') }}</span>
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </button>
-
-                    <div
-                        x-show="open"
-                        @click.away="open = false"
-                        x-transition
-                        class="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2"
-                        style="display: none;"
-                    >
-                        <button onclick="changeCurrency('XOF')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">XOF</button>
-                        <button onclick="changeCurrency('EUR')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">EUR</button>
-                        <button onclick="changeCurrency('USD')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">USD</button>
-                        <button onclick="changeCurrency('GBP')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">GBP</button>
-                    </div>
-                </div>
-
-                {{-- Auth Buttons --}}
-                @if(!$isAuthenticated)
-                    <a href="{{ route('login') }}" class="hidden md:flex items-center px-4 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium transition-all">
-                        <i class="fas fa-sign-in-alt"></i>
+<div
+    x-data="{ mobileMenuOpen: false }"
+    @keydown.escape.window="mobileMenuOpen = false"
+    class="fixed inset-x-0 top-0 z-50"
+>
+    <header class="theme-shell-header px-3 pt-3 lg:px-4 lg:pt-4">
+        <div class="cp-shell hidden lg:block">
+            <div class="cp-glass flex items-center justify-between rounded-[1.75rem] px-5 py-3">
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                    <a href="{{ $landlineLink }}" class="cp-pill">
+                        <i class="fa-solid fa-phone-volume text-[0.7rem]"></i>
+                        <span>{{ $landlineDisplay }}</span>
                     </a>
-                @else
-                    {{-- User Menu --}}
-                    <div class="relative" x-data="{ open: false }">
-                        <button
-                            @click="open = !open"
-                            class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                        >
-                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
-                                {{ strtoupper(substr($user->first_name ?? 'U', 0, 1)) }}
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-700 dark:text-gray-300"></i>
-                        </button>
+                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-pill">
+                        <i class="fa-brands fa-whatsapp text-[0.8rem]"></i>
+                        <span>WhatsApp</span>
+                    </a>
+                    <span class="text-sm font-medium text-[color:var(--cp-ink-muted)]">
+                        Vols accompagnés, événements VIP, packages et location premium
+                    </span>
+                </div>
 
-                        <div
-                            x-show="open"
-                            @click.away="open = false"
-                            x-transition
-                            class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2"
-                            style="display: none;"
+                <div class="flex items-center gap-2">
+                    @foreach($secondaryNavigation as $item)
+                        <a href="{{ route($item['route']) }}" class="cp-link-muted rounded-full px-3 py-2 text-sm font-semibold">
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
+
+                    <div x-data="{ open: false }" class="relative">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="cp-icon-button w-auto gap-2 px-3 text-sm font-semibold"
+                            aria-label="Changer la langue"
                         >
-                            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">{{ $user->email }}</p>
-                            </div>
-                            <a href="{{ route('profile') }}" class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-user w-5"></i>
-                                <span>{{ __('My Profile') }}</span>
-                            </a>
-                            <a href="{{ route('bookings') }}" class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-ticket-alt w-5"></i>
-                                <span>{{ __('My Bookings') }}</span>
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <i class="fas fa-sign-out-alt w-5"></i>
-                                    <span>{{ __('Logout') }}</span>
-                                </button>
-                            </form>
+                            <i class="fa-solid fa-globe text-xs"></i>
+                            <span>{{ $currentLocale }}</span>
+                        </button>
+                        <div
+                            x-cloak
+                            x-show="open"
+                            @click.outside="open = false"
+                            x-transition
+                            class="absolute right-0 mt-3 w-44 rounded-3xl border border-[color:var(--cp-border)] bg-white p-2 shadow-2xl"
+                        >
+                            <button type="button" onclick="changeLanguage('fr')" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
+                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe2ff] text-[color:var(--cp-plum-800)]">FR</span>
+                                <span>Français</span>
+                            </button>
+                            <button type="button" onclick="changeLanguage('en')" class="mt-1 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
+                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe2ff] text-[color:var(--cp-plum-800)]">EN</span>
+                                <span>English</span>
+                            </button>
                         </div>
                     </div>
-                @endif
 
-                {{-- Mobile Menu Button --}}
-                <button
-                    @click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                    <i class="fas fa-bars text-xl" x-show="!mobileMenuOpen"></i>
-                    <i class="fas fa-times text-xl" x-show="mobileMenuOpen"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    {{-- Mobile Menu --}}
-    <div
-        x-show="mobileMenuOpen"
-        x-transition
-        class="lg:hidden border-t"
-        style="display: none;"
-    >
-        <div class="container mx-auto px-4 py-4 space-y-2">
-            {{-- Navigation Links --}}
-            @foreach($navigation as $item)
-                @if(isset($item['submenu']))
-                    <div x-data="{ open: false }">
+                    <div x-data="{ open: false }" class="relative">
                         <button
+                            type="button"
                             @click="open = !open"
-                            class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium"
+                            class="cp-icon-button w-auto gap-2 px-3 text-sm font-semibold"
+                            aria-label="Changer la devise"
                         >
-                            <div class="flex items-center space-x-3">
-                                <i class="fas {{ $item['icon'] }}"></i>
-                                <span>{{ $item['name'] }}</span>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
+                            <i class="fa-solid fa-wallet text-xs"></i>
+                            <span>{{ $currentCurrency }}</span>
                         </button>
-                        <div x-show="open" x-transition class="ml-8 mt-2 space-y-1">
-                            @foreach($item['submenu'] as $subitem)
-                                <a href="{{ $subitem['path'] }}" class="flex items-center space-x-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                                    <i class="fas {{ $subitem['icon'] }}"></i>
-                                    <span>{{ $subitem['name'] }}</span>
-                                </a>
+                        <div
+                            x-cloak
+                            x-show="open"
+                            @click.outside="open = false"
+                            x-transition
+                            class="absolute right-0 mt-3 w-40 rounded-3xl border border-[color:var(--cp-border)] bg-white p-2 shadow-2xl"
+                        >
+                            @foreach(['XOF', 'EUR', 'USD', 'GBP'] as $currency)
+                                <button type="button" onclick="changeCurrency('{{ $currency }}')" class="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
+                                    <span>{{ $currency }}</span>
+                                    @if($currentCurrency === $currency)
+                                        <i class="fa-solid fa-check text-[color:var(--cp-plum-800)]"></i>
+                                    @endif
+                                </button>
                             @endforeach
                         </div>
                     </div>
-                @else
-                    <a href="{{ $item['path'] }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium">
-                        <i class="fas {{ $item['icon'] }}"></i>
-                        <span>{{ $item['name'] }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cp-shell mt-3">
+            <div class="cp-glass rounded-[2rem] px-4 py-4 lg:px-6">
+                <div class="flex items-center gap-3 lg:gap-5">
+                    <a href="{{ route('home') }}" class="flex min-w-0 flex-1 items-center gap-3 sm:flex-none">
+                        <span class="inline-flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white shadow-lg">
+                            <img src="{{ asset('logos/logo2.jpg') }}" alt="{{ $companyName }}" class="h-full w-full object-cover">
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block truncate text-base font-black tracking-[0.08em] text-[color:var(--cp-plum-950)] sm:text-lg">{{ strtoupper($companyName) }}</span>
+                            <span class="block truncate text-xs font-semibold uppercase tracking-[0.24em] text-[color:var(--cp-ink-muted)]">Travel, Events, Concierge</span>
+                        </span>
                     </a>
-                @endif
-            @endforeach
 
-            {{-- Settings Section --}}
-            <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                <p class="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Settings') }}</p>
-                
-                {{-- Theme Toggle --}}
-                <button
-                    id="theme-toggle-mobile"
-                    class="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium"
-                >
-                    <div class="flex items-center space-x-3">
-                        <i class="fas fa-adjust"></i>
-                        <span>{{ __('Theme') }}</span>
+                    <nav class="hidden lg:flex flex-1 items-center justify-center gap-2">
+                        @foreach($mainNavigation as $item)
+                            @php($active = $isRouteActive($item['patterns']))
+                            <a
+                                href="{{ route($item['route']) }}"
+                                class="{{ $active ? 'bg-[color:var(--cp-plum-900)] text-white shadow-lg' : 'text-[color:var(--cp-ink-soft)] hover:bg-white/70 hover:text-[color:var(--cp-plum-900)]' }} rounded-full px-4 py-3 text-sm font-extrabold transition"
+                                @if($active) aria-current="page" @endif
+                            >
+                                {{ $item['label'] }}
+                            </a>
+                        @endforeach
+                    </nav>
+
+                    <form action="{{ route('search') }}" method="GET" class="hidden xl:flex min-w-[18rem] max-w-[24rem] flex-1 items-center gap-3 rounded-full border border-[color:var(--cp-border)] bg-white/80 px-4 py-3">
+                        <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ $searchQuery }}"
+                            placeholder="Rechercher un événement, un service ou un package"
+                            class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
+                        >
+                    </form>
+
+                    <div class="hidden sm:flex items-center gap-2">
+                        <button
+                            id="theme-toggle"
+                            type="button"
+                            class="cp-icon-button"
+                            aria-label="Changer le thème"
+                            title="Changer le thème"
+                        >
+                            🌙
+                        </button>
+
+                        <a href="{{ route('contact') }}" class="cp-primary-button hidden md:inline-flex">
+                            <i class="fa-solid fa-headset text-sm"></i>
+                            <span>Parler à un conseiller</span>
+                        </a>
+
+                        @if(!$isAuthenticated)
+                            <a href="{{ route('login') }}" class="cp-secondary-button hidden md:inline-flex">Connexion</a>
+                        @else
+                            <div x-data="{ open: false }" class="relative">
+                                <button
+                                    type="button"
+                                    @click="open = !open"
+                                    class="flex items-center gap-3 rounded-full border border-[color:var(--cp-border)] bg-white/90 px-3 py-2 text-left shadow-sm transition hover:border-[color:var(--cp-border-strong)]"
+                                >
+                                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--cp-plum-900)] text-sm font-black text-white">
+                                        {{ $userInitial }}
+                                    </span>
+                                    <span class="hidden xl:block">
+                                        <span class="block max-w-[11rem] truncate text-sm font-extrabold text-[color:var(--cp-plum-950)]">{{ $userName }}</span>
+                                        <span class="block text-xs font-semibold text-[color:var(--cp-ink-muted)]">Compte client</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-xs text-[color:var(--cp-ink-muted)]"></i>
+                                </button>
+
+                                <div
+                                    x-cloak
+                                    x-show="open"
+                                    @click.outside="open = false"
+                                    x-transition
+                                    class="absolute right-0 mt-3 w-64 rounded-[1.75rem] border border-[color:var(--cp-border)] bg-white p-2 shadow-2xl"
+                                >
+                                    <div class="rounded-[1.3rem] bg-[#f8f4ff] px-4 py-4">
+                                        <p class="text-sm font-black text-[color:var(--cp-plum-950)]">{{ $userName }}</p>
+                                        <p class="mt-1 text-xs font-medium text-[color:var(--cp-ink-muted)]">{{ $user?->email }}</p>
+                                    </div>
+                                    <div class="mt-2 space-y-1">
+                                        <a href="{{ route('profile') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
+                                            <i class="fa-regular fa-user text-[color:var(--cp-plum-800)]"></i>
+                                            <span>Mon profil</span>
+                                        </a>
+                                        <a href="{{ route('bookings') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[color:var(--cp-ink-soft)] hover:bg-[#f6f0ff]">
+                                            <i class="fa-regular fa-calendar-check text-[color:var(--cp-plum-800)]"></i>
+                                            <span>Mes réservations</span>
+                                        </a>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[#b42318] hover:bg-[#fff1f1]">
+                                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                                <span>Déconnexion</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                    <i class="fas fa-chevron-right text-xs"></i>
-                </button>
 
-                {{-- Language Selector --}}
-                <div x-data="{ open: false }">
                     <button
-                        @click="open = !open"
-                        class="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium"
+                        type="button"
+                        @click="mobileMenuOpen = !mobileMenuOpen"
+                        class="cp-icon-button lg:hidden"
+                        :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
+                        aria-controls="mobile-main-menu"
                     >
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-globe"></i>
-                            <span>{{ __('Language') }}</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm font-semibold">{{ strtoupper(session('locale', 'fr')) }}</span>
-                            <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
-                        </div>
+                        <i class="fa-solid fa-bars-staggered text-base" x-show="!mobileMenuOpen"></i>
+                        <i class="fa-solid fa-xmark text-base" x-show="mobileMenuOpen" x-cloak></i>
                     </button>
-                    <div x-show="open" x-transition class="ml-8 mt-2 space-y-1">
-                        <button
-                            onclick="changeLanguage('fr')"
-                            class="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-                        >
-                            <i class="fas fa-flag"></i>
-                            <span>Français</span>
-                        </button>
-                        <button
-                            onclick="changeLanguage('en')"
-                            class="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-                        >
-                            <i class="fas fa-flag-usa"></i>
-                            <span>English</span>
-                        </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div
+        x-cloak
+        x-show="mobileMenuOpen"
+        @click="mobileMenuOpen = false"
+        class="fixed inset-0 top-[5.5rem] bg-[#1f1230]/38 backdrop-blur-sm lg:hidden"
+    ></div>
+
+    <div class="cp-shell lg:hidden">
+        <div
+            id="mobile-main-menu"
+            x-cloak
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="relative mt-3 rounded-[2rem] border border-[color:var(--cp-border)] bg-[color:var(--cp-panel-strong)] p-5 shadow-2xl"
+        >
+            <div class="cp-kicker">
+                <span class="cp-eyebrow-dot"></span>
+                <span>Navigation claire</span>
+            </div>
+
+            <form action="{{ route('search') }}" method="GET" class="mt-4 flex items-center gap-3 rounded-[1.4rem] border border-[color:var(--cp-border)] bg-white px-4 py-4">
+                <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ $searchQuery }}"
+                    placeholder="Rechercher un service, un événement ou un package"
+                    class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
+                >
+            </form>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <a href="{{ $mobileLink }}" class="cp-secondary-button !rounded-[1.2rem] !px-4 !py-4 text-sm">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>Appeler</span>
+                </a>
+                <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !rounded-[1.2rem] !px-4 !py-4 text-sm">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+            </div>
+
+            <div class="mt-6 space-y-2">
+                @foreach($mainNavigation as $item)
+                    @php($active = $isRouteActive($item['patterns']))
+                    <a
+                        href="{{ route($item['route']) }}"
+                        @click="mobileMenuOpen = false"
+                        class="{{ $active ? 'border-[color:var(--cp-plum-800)] bg-[#f4edff]' : 'border-transparent bg-white/75' }} block rounded-[1.5rem] border px-4 py-4 shadow-sm"
+                    >
+                        <span class="block text-base font-black text-[color:var(--cp-plum-950)]">{{ $item['label'] }}</span>
+                        <span class="mt-1 block text-sm text-[color:var(--cp-ink-muted)]">{{ $item['summary'] }}</span>
+                    </a>
+                @endforeach
+            </div>
+
+            <div class="mt-6 rounded-[1.6rem] bg-[#281b37] p-4 text-white">
+                <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">Accès direct</p>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    @foreach($secondaryNavigation as $item)
+                        <a href="{{ route($item['route']) }}" @click="mobileMenuOpen = false" class="rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold text-white/90 transition hover:bg-white/15">
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white/80 p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Langue</p>
+                    <div class="mt-3 flex gap-2">
+                        <button type="button" onclick="changeLanguage('fr')" class="cp-secondary-button !rounded-full !px-4 !py-3 text-sm">FR</button>
+                        <button type="button" onclick="changeLanguage('en')" class="cp-secondary-button !rounded-full !px-4 !py-3 text-sm">EN</button>
                     </div>
                 </div>
 
-                {{-- Currency Selector --}}
-                <div x-data="{ open: false }">
-                    <button
-                        @click="open = !open"
-                        class="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium"
-                    >
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>{{ __('Currency') }}</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm font-semibold">{{ session('currency', 'XOF') }}</span>
-                            <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
-                        </div>
-                    </button>
-                    <div x-show="open" x-transition class="ml-8 mt-2 space-y-1">
-                        <button onclick="changeCurrency('XOF')" class="block w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">XOF</button>
-                        <button onclick="changeCurrency('EUR')" class="block w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">EUR</button>
-                        <button onclick="changeCurrency('USD')" class="block w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">USD</button>
-                        <button onclick="changeCurrency('GBP')" class="block w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">GBP</button>
+                <div class="rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white/80 p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">Devise</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        @foreach(['XOF', 'EUR', 'USD', 'GBP'] as $currency)
+                            <button type="button" onclick="changeCurrency('{{ $currency }}')" class="cp-secondary-button !rounded-full !px-4 !py-3 text-sm">{{ $currency }}</button>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
-            {{-- Auth Buttons --}}
-            @if(!$isAuthenticated)
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                    <a href="{{ route('login') }}" class="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-200 dark:hover:bg-gray-700">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>{{ __('Login') }}</span>
-                    </a>
-                    <a href="{{ route('register') }}" class="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 shadow-lg">
-                        <i class="fas fa-user-plus"></i>
-                        <span>{{ __('Register') }}</span>
-                    </a>
-                </div>
-            @else
-                {{-- User Menu Mobile --}}
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ $user->email }}</p>
+            <div class="mt-4 rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white/80 p-4">
+                <button id="theme-toggle-mobile" type="button" class="flex w-full items-center justify-between gap-4 rounded-[1.2rem] bg-[#f6f0ff] px-4 py-4 text-left text-sm font-black text-[color:var(--cp-plum-900)]">
+                    <span>Changer le thème</span>
+                    <span>🌙</span>
+                </button>
+            </div>
+
+            <div class="mt-6 space-y-3 border-t border-[color:var(--cp-border)] pt-5">
+                @if(!$isAuthenticated)
+                    <a href="{{ route('login') }}" @click="mobileMenuOpen = false" class="cp-secondary-button !flex !w-full !rounded-[1.25rem] !py-4">Connexion</a>
+                    <a href="{{ route('register') }}" @click="mobileMenuOpen = false" class="cp-primary-button !flex !w-full !rounded-[1.25rem] !py-4">Créer un compte</a>
+                @else
+                    <div class="rounded-[1.5rem] bg-[#f8f4ff] px-4 py-4">
+                        <p class="text-sm font-black text-[color:var(--cp-plum-950)]">{{ $userName }}</p>
+                        <p class="mt-1 text-xs font-medium text-[color:var(--cp-ink-muted)]">{{ $user?->email }}</p>
                     </div>
-                    <a href="{{ route('profile') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium">
-                        <i class="fas fa-user"></i>
-                        <span>{{ __('My Profile') }}</span>
+                    <a href="{{ route('profile') }}" @click="mobileMenuOpen = false" class="cp-secondary-button !flex !w-full !justify-start !rounded-[1.25rem] !py-4">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Mon profil</span>
                     </a>
-                    <a href="{{ route('bookings') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium">
-                        <i class="fas fa-ticket-alt"></i>
-                        <span>{{ __('My Bookings') }}</span>
+                    <a href="{{ route('bookings') }}" @click="mobileMenuOpen = false" class="cp-secondary-button !flex !w-full !justify-start !rounded-[1.25rem] !py-4">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>Mes réservations</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex items-center space-x-3 w-full px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>{{ __('Logout') }}</span>
+                        <button type="submit" class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] border border-[#f2c9c4] bg-[#fff5f4] px-4 py-4 text-sm font-black text-[#b42318]">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span>Déconnexion</span>
                         </button>
                     </form>
-                </div>
-            @endif
+                @endif
+            </div>
+
+            <div class="mt-5 rounded-[1.5rem] bg-[#1e112c] px-4 py-4 text-white">
+                <p class="text-sm font-black">{{ $mobileDisplay }}</p>
+                <p class="mt-1 text-xs font-medium text-white/70">{{ $supportEmail }}</p>
+            </div>
         </div>
     </div>
-    </header>
 </div>
 
-    <script>
-    // Enhanced autocomplete for header search input with keyboard navigation and footer
-    (function () {
-        const input = document.getElementById('site-search');
-        const container = document.getElementById('search-suggestions');
-        const list = document.getElementById('search-suggestions-list');
-        const footer = document.getElementById('search-suggestions-footer');
-        const queryDisplay = document.getElementById('search-query-display');
-        const queryHidden = document.getElementById('search-full-query');
-        let timer = null;
-        let suggestions = [];
-        let selectedIndex = -1;
-        let lastQuery = '';
-
-        function hide() {
-            container.classList.add('hidden');
-            list.innerHTML = '';
-            suggestions = [];
-            selectedIndex = -1;
-            if (footer) footer.classList.add('hidden');
-        }
-
-        function show(items, q) {
-            list.innerHTML = '';
-            suggestions = items || [];
-            selectedIndex = -1;
-            if (!items || items.length === 0) {
-                hide();
-                return;
-            }
-            items.forEach((it, idx) => {
-                const li = document.createElement('li');
-                li.className = 'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer';
-                li.tabIndex = -1;
-                li.setAttribute('data-index', idx);
-                li.innerHTML =
-                    `<div class="flex items-center justify-between"><div><span class="font-medium">${escapeHtml(it.title)}</span><div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(it.type)}</div></div><div class="ml-3 text-sm text-indigo-600">→</div></div>`;
-                li.addEventListener('mousedown', function (e) {
-                    e.preventDefault();
-                    goToSuggestion(idx);
-                });
-                list.appendChild(li);
-            });
-            container.classList.remove('hidden');
-            if (footer) {
-                footer.classList.remove('hidden');
-                if (queryDisplay) queryDisplay.textContent = q;
-                if (queryHidden) queryHidden.value = q;
-            }
-        }
-
-        function escapeHtml(unsafe) {
-            return (unsafe || '').toString().replace(/[&<>\"']/g, function (m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#039;" }[m];
-            });
-        }
-
-        function fetchSuggestions(q) {
-            lastQuery = q;
-            if (!q || q.length < 2) { hide(); return; }
-            fetch("{{ url('/search/suggest') }}?q=" + encodeURIComponent(q))
-                .then(r => r.json())
-                .then(data => {
-                    show(data.results || [], q);
-                })
-                .catch(() => hide());
-        }
-
-        function goToSuggestion(idx) {
-            if (!suggestions[idx]) return;
-            const it = suggestions[idx];
-            if (it.slug) {
-                let path = '/';
-                if (it.type === 'package') path = '/packages/' + it.slug;
-                else if (it.type === 'event') path = '/events/' + it.slug;
-                else if (it.type === 'page') path = '/' + it.slug;
-                else path = '/search?q=' + encodeURIComponent(it.title);
-                window.location.href = path;
-            } else {
-                window.location.href = '/search?q=' + encodeURIComponent(it.title);
-            }
-        }
-
-        function updateActiveItem() {
-            Array.from(list.children).forEach((li, idx) => {
-                if (idx === selectedIndex) {
-                    li.classList.add('bg-gray-100', 'dark:bg-gray-700');
-                    li.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
-                    li.scrollIntoView({ block: 'nearest' });
-                } else {
-                    li.classList.remove('bg-gray-100', 'dark:bg-gray-700');
-                    li.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
-                }
-            });
-        }
-
-        if (input) {
-            input.addEventListener('input', function (e) {
-                clearTimeout(timer);
-                const v = this.value.trim();
-                timer = setTimeout(() => fetchSuggestions(v), 220);
-            });
-            input.addEventListener('keydown', function (e) {
-                if (container.classList.contains('hidden')) return;
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (suggestions.length === 0) return;
-                    selectedIndex = (selectedIndex + 1) % suggestions.length;
-                    updateActiveItem();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (suggestions.length === 0) return;
-                    selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
-                    updateActiveItem();
-                } else if (e.key === 'Enter') {
-                    if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-                        e.preventDefault();
-                        goToSuggestion(selectedIndex);
-                    } else if (lastQuery.length > 0) {
-                        // Submit the "Voir tous les résultats"
-                        window.location.href = '/search?q=' + encodeURIComponent(lastQuery);
-                    }
-                } else if (e.key === 'Escape') {
-                    hide();
-                }
-            });
-        }
-        document.addEventListener('click', function (e) {
-            if (!input.contains(e.target) && !container.contains(e.target)) hide();
-        });
-    })();
-
-    function changeLanguage(lang) {
-        fetch('/language/change', {
+<script>
+    function postPreference(url, payload) {
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
             },
-            body: JSON.stringify({ language: lang })
-        }).then(() => location.reload());
+            body: JSON.stringify(payload),
+        }).then(() => window.location.reload());
+    }
+
+    function changeLanguage(language) {
+        postPreference('{{ route('language.change') }}', { language });
     }
 
     function changeCurrency(currency) {
-        fetch('/currency/change', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-            },
-            body: JSON.stringify({ currency })
-        }).then(() => location.reload());
+        postPreference('{{ route('currency.change') }}', { currency });
     }
-    </script>
+</script>

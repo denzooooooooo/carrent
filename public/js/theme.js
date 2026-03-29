@@ -44,10 +44,12 @@
     function setTheme(theme) {
         if (theme === 'dark') {
             html.setAttribute('data-theme', 'dark');
+            html.classList.add('dark');
             localStorage.setItem('theme', 'dark');
             updateToggleButton('dark');
         } else {
             html.setAttribute('data-theme', 'light');
+            html.classList.remove('dark');
             localStorage.setItem('theme', 'light');
             updateToggleButton('light');
         }

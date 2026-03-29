@@ -36,13 +36,13 @@
     <meta property="twitter:image" content="{{ $og_image ?? asset('logos/LOGO CARRE PREMIUM-Conciergerie privée.jpg') }}">
 
     {{-- Additional SEO --}}
-    <meta name="theme-color" content="#7C3AED">
-    <meta name="msapplication-TileColor" content="#7C3AED">
+    <meta name="theme-color" content="#2A163D">
+    <meta name="msapplication-TileColor" content="#2A163D">
     <link rel="alternate" hreflang="fr" href="{{ url()->current() }}">
     <link rel="alternate" hreflang="en" href="{{ url()->current() }}?lang=en">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=outfit:400,500,600,700,800,900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
@@ -62,6 +62,7 @@
         (function () {
             const theme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.classList.toggle('dark', theme === 'dark');
         })();
     </script>
 
@@ -70,7 +71,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 antialiased">
+<body class="cp-site-body antialiased">
 
     @php
         $isAuthenticated = auth()->check();
@@ -88,7 +89,7 @@
         'currentCurrency' => $currentCurrency
     ])
 
-    <main class="pt-24">
+    <main class="pt-24 lg:pt-32">
     @yield('content')
 </main>
 

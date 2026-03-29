@@ -137,13 +137,13 @@
     $featuredEventFamilyLabel = $featuredEvent ? ($familyLabels[$featuredEvent->family] ?? ucfirst($featuredEvent->family)) : null;
 @endphp
 
-<div class="min-h-screen bg-white">
+<div class="min-h-screen">
     <section class="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-amber-500">
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="absolute -left-20 top-12 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
         <div class="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-amber-300/20 blur-3xl"></div>
 
-        <div class="relative z-10 container mx-auto px-4 py-14 md:py-20">
+        <div class="cp-shell relative z-10 py-14 md:py-20">
             <div class="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,420px)] lg:items-end">
                 <div class="max-w-4xl">
                     <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-white/90 backdrop-blur">
@@ -189,7 +189,7 @@
     </section>
 
     <section class="relative -mt-8 bg-gray-50 pb-10 md:-mt-10 md:pb-14">
-        <div class="container mx-auto px-4">
+        <div class="cp-shell">
             <div class="mx-auto max-w-7xl rounded-3xl bg-white shadow-2xl shadow-purple-100/70 ring-1 ring-gray-100">
                 <div class="flex flex-col gap-6 border-b border-gray-100 px-5 py-6 md:px-8 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
@@ -513,7 +513,7 @@
     </section>
 
     <section class="bg-gray-50 pb-12 md:pb-16">
-        <div class="container mx-auto px-4">
+        <div class="cp-shell">
             <div class="mx-auto max-w-7xl">
                 <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                     <div>
@@ -1001,7 +1001,7 @@
     </section>
 
     <section class="bg-gradient-to-r from-purple-700 via-purple-600 to-amber-500 py-12 md:py-16">
-        <div class="container mx-auto px-4">
+        <div class="cp-shell">
             <div class="mx-auto max-w-5xl rounded-3xl border border-white/20 bg-white/10 px-6 py-8 text-center text-white backdrop-blur md:px-10 md:py-12">
                 <p class="text-xs font-bold uppercase tracking-[0.28em] text-white/70">{{ $t('Accompagnement sur mesure', 'Tailored assistance') }}</p>
                 <h2 class="mt-3 text-3xl font-black md:text-4xl">{{ $t('Vous cherchez un événement précis ou une offre VIP complète ?', 'Looking for a specific event or a complete VIP offer?') }}</h2>
@@ -1014,7 +1014,7 @@
                         <i class="fa-regular fa-envelope text-xs"></i>
                         <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
                     </a>
-                    <a href="tel:+225XXXXXXXXX" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">
+                    <a href="{{ config('carre_premium.contact.mobile_link') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">
                         <i class="fa-solid fa-phone text-xs"></i>
                         <span>{{ $t('Parler à un conseiller', 'Talk to an advisor') }}</span>
                     </a>

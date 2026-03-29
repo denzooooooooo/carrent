@@ -8,13 +8,13 @@
 @php
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
 
-    $mobilePhoneDisplay = '+225 01 01 22 15 15';
-    $mobilePhoneLink = 'tel:+2250101221515';
-    $landlinePhoneDisplay = '+225 27 21 59 42 58';
-    $landlinePhoneLink = 'tel:+2252721594258';
-    $emailAddress = 'infos@carrepremium.com';
+    $mobilePhoneDisplay = config('carre_premium.contact.mobile_display');
+    $mobilePhoneLink = config('carre_premium.contact.mobile_link');
+    $landlinePhoneDisplay = config('carre_premium.contact.landline_display');
+    $landlinePhoneLink = config('carre_premium.contact.landline_link');
+    $emailAddress = config('carre_premium.contact.support_email');
     $emailLink = 'mailto:' . $emailAddress . '?subject=' . rawurlencode($t('Demande de reservation de vol', 'Flight reservation request'));
-    $whatsAppLink = 'https://wa.me/2250101221515?text=' . rawurlencode($t(
+    $whatsAppLink = config('carre_premium.contact.whatsapp_url') . '?text=' . rawurlencode($t(
         'Bonjour, je souhaite reserver un vol avec Carré Premium.',
         'Hello, I would like to book a flight with Carré Premium.'
     ));
@@ -170,6 +170,12 @@
                         </div>
                     @endif
 
+                    @if(session('error'))
+                        <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     @if(session('info'))
                         <div class="mt-6 rounded-2xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-700">
                             {{ session('info') }}
@@ -209,7 +215,7 @@
                                     name="email"
                                     value="{{ old('email') }}"
                                     class="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
-                                    placeholder="infos@carrepremium.com"
+                                    placeholder="{{ $emailAddress }}"
                                     required
                                 >
                                 @error('email')

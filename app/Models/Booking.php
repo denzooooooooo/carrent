@@ -49,6 +49,9 @@ class Booking extends Model
         'receipt_number',
         'receipt_pdf_path',
         'documents_generated_at',
+        'payment_proof_path',
+        'payment_proof_uploaded_at',
+        'payment_proof_notes',
     ];
 
     protected $casts = [
@@ -58,6 +61,7 @@ class Booking extends Model
         'cancelled_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'documents_generated_at' => 'datetime',
+        'payment_proof_uploaded_at' => 'datetime',
         'total_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
@@ -113,6 +117,11 @@ class Booking extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function eventTickets()
+    {
+        return $this->hasMany(EventTicket::class);
     }
     
     public function flightBooking()
@@ -247,12 +256,43 @@ class Booking extends Model
 
     public function getInvoiceFilenameAttribute(): string
     {
-        return strtolower($this->invoice_number ?: 'facture-' . $this->booking_number) . '.pdf';
+        return strtolower($this->invoice_number ?: 'facture-' . $this->booking_number)
+            . '.'
+            . $this->documentExtension($this->invoice_pdf_path);
     }
 
     public function getReceiptFilenameAttribute(): string
     {
-        return strtolower($this->receipt_number ?: 'recu-' . $this->booking_number) . '.pdf';
+        return strtolower($this->receipt_number ?: 'recu-' . $this->booking_number)
+            . '.'
+            . $this->documentExtension($this->receipt_pdf_path);
+    }
+
+    public function getInvoiceMimeTypeAttribute(): string
+    {
+        return $this->mimeTypeForPath($this->invoice_pdf_path);
+    }
+
+    public function getReceiptMimeTypeAttribute(): string
+    {
+        return $this->mimeTypeForPath($this->receipt_pdf_path);
+    }
+
+    public function getPaymentProofFilenameAttribute(): string
+    {
+        return strtolower('preuve-paiement-' . $this->booking_number)
+            . '.'
+            . $this->documentExtension($this->payment_proof_path);
+    }
+
+    public function getPaymentProofMimeTypeAttribute(): string
+    {
+        return $this->mimeTypeForPath($this->payment_proof_path);
+    }
+
+    public function getHasPaymentProofAttribute(): bool
+    {
+        return filled($this->payment_proof_path);
     }
 
     public function getTravelDateLabelAttribute(): ?string
@@ -308,5 +348,25 @@ class Booking extends Model
         }
 
         return $date ? Carbon::parse($date) : null;
+    }
+
+    protected function documentExtension(?string $path, string $default = 'html'): string
+    {
+        if (!$path) {
+            return $default;
+        }
+
+        return pathinfo($path, PATHINFO_EXTENSION) ?: $default;
+    }
+
+    protected function mimeTypeForPath(?string $path): string
+    {
+        return match ($this->documentExtension($path)) {
+            'pdf' => 'application/pdf',
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => 'text/html',
+        };
     }
 }

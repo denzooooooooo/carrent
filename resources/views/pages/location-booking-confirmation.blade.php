@@ -186,7 +186,7 @@
         <a href="{{ route('contact') }}" class="border-2 border-blue-300 text-blue-600 font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl hover:bg-blue-50 transition-all text-center">
           Nous contacter
         </a>
-        <a href="tel:+225XXXXXXXXX" class="border-2 border-blue-300 text-blue-600 font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl hover:bg-blue-50 transition-all text-center">
+        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="border-2 border-blue-300 text-blue-600 font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl hover:bg-blue-50 transition-all text-center">
           Appeler maintenant
         </a>
       </div>

@@ -7,163 +7,376 @@
 @section('og_description', 'Réservez vos packages touristiques de luxe en Côte d\'Ivoire. Circuits exclusifs, hébergements premium et expériences uniques avec notre service de conciergerie privée.')
 
 @section('content')
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $searchTerm = trim((string) request('q'));
+    $selectedType = (string) request('type');
+    $selectedDestination = (string) request('destination');
+    $selectedDuration = (string) request('duration');
 
+    $typeLabels = [
+        'helicopter' => $t('Hélicoptère', 'Helicopter'),
+        'helicoptère' => $t('Hélicoptère', 'Helicopter'),
+        'private_jet' => $t('Jet privé', 'Private jet'),
+        'jet' => $t('Jet privé', 'Private jet'),
+        'cruise' => $t('Croisière', 'Cruise'),
+        'safari' => 'Safari',
+        'city_tour' => $t('City tour', 'City tour'),
+    ];
 
-<div class="min-h-screen bg-white">
-  {{-- Hero --}}
-  <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-  <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">Packages touristiques</h1>
-  <p class="text-base sm:text-lg md:text-xl text-white/90">Découvrez des expériences uniques avec nos packages touristiques exclusifs</p>
-    </div>
-  </section>
+    $durationLabels = [
+        '1-3' => $t('1 à 3 jours', '1 to 3 days'),
+        '4-7' => $t('4 à 7 jours', '4 to 7 days'),
+        '1-2-weeks' => $t('1 à 2 semaines', '1 to 2 weeks'),
+        'more-than-2-weeks' => $t('Plus de 2 semaines', 'More than 2 weeks'),
+    ];
 
-  {{-- Filters --}}
-  <section class="py-6 md:py-8 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <div class="max-w-6xl mx-auto">
-        <form method="GET" action="{{ route('packages') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Type de packages touristiques</label>
-              <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">Tous les packages touristiques</option>
-                @foreach($packageTypes as $type)
-                  <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
-                    {{ $type }}
-                  </option>
-                @endforeach
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Destination') }}</label>
-              <select name="destination" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All destinations') }}</option>
-                @foreach($destinations as $destination)
-                  <option value="{{ $destination }}" {{ request('destination') == $destination ? 'selected' : '' }}>
-                    {{ $destination }}
-                  </option>
-                @endforeach
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Duration') }}</label>
-              <select name="duration" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-purple-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All durations') }}</option>
-                <option value="1-3" {{ request('duration') == '1-3' ? 'selected' : '' }}>{{ __('1-3 days') }}</option>
-                <option value="4-7" {{ request('duration') == '4-7' ? 'selected' : '' }}>{{ __('4-7 days') }}</option>
-                <option value="1-2-weeks" {{ request('duration') == '1-2-weeks' ? 'selected' : '' }}>{{ __('1-2 weeks') }}</option>
-                <option value="more-than-2-weeks" {{ request('duration') == 'more-than-2-weeks' ? 'selected' : '' }}>{{ __('More than 2 weeks') }}</option>
-              </select>
-            </div>
-            <div class="flex items-end gap-2">
-              <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
-                {{ __('Search') }}
-              </button>
-              @if(request()->hasAny(['type', 'destination', 'duration']))
-                <a href="{{ route('packages') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
-                  ✕
-                </a>
-              @endif
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
+    $activeFilters = collect([
+        $searchTerm !== '' ? ['label' => $t('Recherche', 'Search'), 'value' => $searchTerm] : null,
+        $selectedType !== '' ? ['label' => $t('Type', 'Type'), 'value' => $typeLabels[$selectedType] ?? ucfirst(str_replace('_', ' ', $selectedType))] : null,
+        $selectedDestination !== '' ? ['label' => $t('Destination', 'Destination'), 'value' => $selectedDestination] : null,
+        $selectedDuration !== '' ? ['label' => $t('Durée', 'Duration'), 'value' => $durationLabels[$selectedDuration] ?? $selectedDuration] : null,
+        request()->boolean('featured') ? ['label' => $t('Sélection', 'Selection'), 'value' => $t('À la une', 'Featured')] : null,
+        ($selectedSort ?? 'featured') !== 'featured' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
+    ])->filter()->values();
 
-  {{-- Packages Grid --}}
-  <section class="py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <div class="max-w-6xl mx-auto">
-        @if($packages->count() > 0)
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-            @foreach($packages as $package)
-              <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
-                <div class="relative">
-                  @php
-                    $imageUrl = $package->getFirstMediaUrl('avatar', 'normal');
-                    $placeholder = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=300&fit=crop';
-                  @endphp
-                  <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $package->title_fr ?? $package->title_en ?? $package->title }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
-                  {{-- Hide admin flags like Featured from public listing and show friendly package type label --}}
-                  @php
-                    $packageTypeMap = [
-                      'helicopter' => 'Hélicoptère',
-                      'helicoptère' => 'Hélicoptère',
-                      'private_jet' => 'Jet privé',
-                      'jet' => 'Jet privé',
-                      'cruise' => 'Croisière',
-                      'safari' => 'Safari',
-                      'city_tour' => 'Visite',
-                    ];
-                    $packageTypeLabel = $packageTypeMap[$package->package_type] ?? ($package->package_type ? ucfirst($package->package_type) : 'Tour');
-                  @endphp
-                  <div class="absolute top-2 md:top-4 right-2 md:right-4">
-                    <span class="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm font-bold rounded-full">{{ $packageTypeLabel }}</span>
-                  </div>
-                </div>
-                <div class="p-4 md:p-6">
-                  <h3 class="text-lg md:text-xl font-black mb-4 line-clamp-2">{{ $package->title_fr ?? $package->title_en ?? $package->title }}</h3>
-                  <div class="flex items-center text-gray-600 mb-2 md:mb-3">
-                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-sm md:text-base">{{ $package->duration_text_fr ?? $package->duration . ' jours' }}</span>
-                  </div>
-                  <div class="flex items-center text-gray-600 mb-3 md:mb-4">
-                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span class="text-sm md:text-base">{{ $package->destination }}</span>
-                  </div>
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                          @if($package->discount_price)
-                            <span class="text-xl md:text-2xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
-                            <span class="text-xs md:text-sm text-gray-500 line-through ml-1 md:ml-2">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
-                          @else
-                            <span class="text-xl md:text-2xl font-black text-purple-600">À partir de {{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
-                          @endif
-                          <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">Prix / personne</span>
+    $resetUrl = route('packages');
+@endphp
+
+<div class="min-h-screen pb-14 sm:pb-16">
+    <section class="pt-4 sm:pt-6">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#241233] via-[#4c2872] to-[#d89b43] text-white shadow-[0_28px_90px_rgba(41,20,58,0.24)]">
+                <div class="grid gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
+                    <div class="max-w-3xl">
+                        <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                            <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                            <span>{{ $t('Packages signature', 'Signature packages') }}</span>
+                        </div>
+
+                        <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                            {{ $t('Des séjours premium compréhensibles en quelques secondes, même sur mobile.', 'Premium journeys that stay understandable in a few seconds, even on mobile.') }}
+                        </h1>
+
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+                            {{ $t('Chaque offre doit répondre tout de suite à trois questions: où part-on, combien de temps, et quel niveau d’expérience est inclus. Cette page pose enfin cette lecture clairement.', 'Each offer should answer three questions immediately: where you go, how long it lasts, and what level of experience is included. This page now makes that reading explicit.') }}
+                        </p>
+
+                        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <a href="#packages-filters" class="cp-primary-button !w-full sm:!w-auto">
+                                <i class="fa-solid fa-sliders text-sm"></i>
+                                <span>{{ $t('Filtrer les offres', 'Filter offers') }}</span>
+                            </a>
+                            <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                                <i class="fa-regular fa-envelope text-sm"></i>
+                                <span>{{ $t('Demander du sur-mesure', 'Request something bespoke') }}</span>
+                            </a>
+                        </div>
                     </div>
-                    <a href="{{ route('packages.show', $package->slug) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                      {{ __('View details') }}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            @endforeach
-          </div>
-        @else
-          <div class="text-center py-12">
-            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">{{ __('No packages available') }}</h3>
-            <p class="text-gray-500">{{ __('Come back soon to discover our new tour offers.') }}</p>
-          </div>
-        @endif
-      </div>
-    </div>
-  </section>
 
-  {{-- CTA Section --}}
-  <section class="py-12 md:py-16 bg-gradient-to-r from-purple-600 to-amber-600">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('A tailor-made package?') }}</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact our team to create your dream experience') }}</p>
-      <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-        <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-purple-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
-          {{ __('Request a quote') }}
-        </a>
-        <a href="tel:+225XXXXXXXXX" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg md:rounded-xl hover:bg-white hover:text-purple-600 transition-all text-sm md:text-base">
-          {{ __('Call Now') }}
-        </a>
-      </div>
-    </div>
-  </section>
+                    <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Résultats', 'Results') }}</p>
+                            <p class="mt-3 text-3xl font-black">{{ number_format($packages->total(), 0, ',', ' ') }}</p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('packages visibles avec vos critères', 'packages visible with your current criteria') }}</p>
+                        </div>
+
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Sélection premium', 'Premium selection') }}</p>
+                            <p class="mt-3 text-3xl font-black">{{ number_format($featuredPackagesCount, 0, ',', ' ') }}</p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('offres mises en avant', 'featured offers') }}</p>
+                        </div>
+
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('À partir de', 'Starting at') }}</p>
+                            <p class="mt-3 text-2xl font-black">
+                                {{ $startingPrice ? \App\Helpers\CurrencyHelper::format($startingPrice) : $t('Sur demande', 'On request') }}
+                            </p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('prix constaté sur les offres actives', 'price observed on active offers') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="packages-filters" class="-mt-6 pt-0">
+        <div class="cp-shell">
+            <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
+                <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Lecture rapide', 'Fast reading') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Filtres et tri cohérents', 'Consistent filters and sorting') }}</h2>
+                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                            {{ $t('Sur téléphone, on doit pouvoir comprendre une offre puis réduire la liste sans friction. Les filtres restent visibles, simples et alignés sur le reste du site.', 'On mobile, users should understand an offer first, then narrow the list without friction. Filters remain visible, simple and aligned with the rest of the site.') }}
+                        </p>
+                    </div>
+
+                    @if($activeFilters->isNotEmpty())
+                        <a href="{{ $resetUrl }}" class="cp-secondary-button !self-start lg:!self-auto">
+                            <i class="fa-solid fa-rotate-left text-sm"></i>
+                            <span>{{ $t('Réinitialiser', 'Reset') }}</span>
+                        </a>
+                    @endif
+                </div>
+
+                <form method="GET" action="{{ route('packages') }}" class="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))]">
+                    <div class="xl:col-span-2">
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Recherche', 'Search') }}</label>
+                        <div class="flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 shadow-sm">
+                            <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
+                            <input
+                                type="search"
+                                name="q"
+                                value="{{ request('q') }}"
+                                placeholder="{{ $t('Destination, thème, type de package…', 'Destination, theme, package type…') }}"
+                                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Type', 'Type') }}</label>
+                        <select name="type" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Tous les types', 'All types') }}</option>
+                            @foreach($packageTypes as $type)
+                                <option value="{{ $type }}" {{ $selectedType === $type ? 'selected' : '' }}>
+                                    {{ $typeLabels[$type] ?? ucfirst(str_replace('_', ' ', $type)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Destination', 'Destination') }}</label>
+                        <select name="destination" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Toutes les destinations', 'All destinations') }}</option>
+                            @foreach($destinations as $destination)
+                                <option value="{{ $destination }}" {{ $selectedDestination === $destination ? 'selected' : '' }}>
+                                    {{ $destination }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Durée', 'Duration') }}</label>
+                        <select name="duration" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Toutes les durées', 'All durations') }}</option>
+                            @foreach($durationLabels as $value => $label)
+                                <option value="{{ $value }}" {{ $selectedDuration === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Tri', 'Sort') }}</label>
+                        <select name="sort" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            @foreach($sortOptions as $value => $label)
+                                <option value="{{ $value }}" {{ ($selectedSort ?? 'featured') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="xl:col-span-2">
+                        <label class="flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-semibold text-[color:var(--cp-ink-soft)] shadow-sm">
+                            <input type="checkbox" name="featured" value="1" {{ request()->boolean('featured') ? 'checked' : '' }} class="h-4 w-4 rounded border-[color:var(--cp-border-strong)] text-[color:var(--cp-plum-800)] focus:ring-[color:var(--cp-plum-700)]">
+                            <span>{{ $t('Limiter à la sélection mise en avant', 'Only show featured offers') }}</span>
+                        </label>
+                    </div>
+
+                    <div class="xl:col-span-3 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button type="submit" class="cp-primary-button !w-full sm:!w-auto">
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                            <span>{{ $t('Appliquer les filtres', 'Apply filters') }}</span>
+                        </button>
+                    </div>
+                </form>
+
+                @if($activeFilters->isNotEmpty())
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        @foreach($activeFilters as $filter)
+                            <span class="inline-flex items-center gap-2 rounded-full bg-[#f4edff] px-3 py-2 text-xs font-bold text-[color:var(--cp-plum-800)]">
+                                <span class="uppercase tracking-[0.18em] text-[10px] text-[color:var(--cp-ink-muted)]">{{ $filter['label'] }}</span>
+                                <span>{{ $filter['value'] }}</span>
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-8 sm:pt-10">
+        <div class="cp-shell">
+            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Résultats', 'Results') }}</p>
+                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Packages disponibles', 'Available packages') }}</h2>
+                    <p class="mt-2 text-sm text-[color:var(--cp-ink-soft)]">
+                        {{ number_format($packages->total(), 0, ',', ' ') }}
+                        {{ $packages->total() > 1 ? $t('packages correspondent à vos critères', 'packages match your criteria') : $t('package correspond à vos critères', 'package matches your criteria') }}
+                    </p>
+                </div>
+
+                <div class="cp-pill">
+                    <i class="fa-solid fa-compass text-xs"></i>
+                    <span>{{ number_format(count($destinations), 0, ',', ' ') }} {{ $t('destinations actives', 'active destinations') }}</span>
+                </div>
+            </div>
+
+            @if($packages->count() > 0)
+                <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    @foreach($packages as $package)
+                        @php
+                            $packageTitle = app()->getLocale() === 'fr'
+                                ? ($package->title_fr ?? $package->title_en ?? $package->slug)
+                                : ($package->title_en ?? $package->title_fr ?? $package->slug);
+                            $packageDescription = app()->getLocale() === 'fr'
+                                ? ($package->description_fr ?? $package->description_en ?? '')
+                                : ($package->description_en ?? $package->description_fr ?? '');
+                            $packageImage = $package->getFirstMediaUrl('avatar', 'normal');
+                            $packageFallback = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&h=700&fit=crop';
+                            $displayPrice = $package->discount_price ?? $package->price;
+                            $durationLabel = app()->getLocale() === 'fr'
+                                ? ($package->duration_text_fr ?: ($package->duration ? $package->duration . ' jours' : $t('Durée sur demande', 'Duration on request')))
+                                : ($package->duration_text_en ?? $package->duration_text_fr ?? ($package->duration ? $package->duration . ' days' : $t('Durée sur demande', 'Duration on request')));
+                            $packageTypeLabel = $typeLabels[$package->package_type] ?? ucfirst(str_replace('_', ' ', $package->package_type ?? ''));
+                        @endphp
+
+                        <article class="group overflow-hidden rounded-[2rem] border border-[color:var(--cp-border)] bg-white/95 shadow-[0_18px_55px_rgba(41,20,58,0.10)] transition hover:-translate-y-1 hover:shadow-[0_28px_75px_rgba(41,20,58,0.16)]">
+                            <div class="relative overflow-hidden">
+                                <img src="{{ $packageImage ?: $packageFallback }}" alt="{{ $packageTitle }}" class="h-64 w-full object-cover transition duration-700 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/68 via-black/10 to-transparent"></div>
+
+                                <div class="absolute left-4 top-4 flex flex-wrap gap-2">
+                                    @if($package->is_featured)
+                                        <span class="rounded-full bg-[color:var(--cp-gold-400)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#2a163d]">
+                                            {{ $t('Sélection', 'Featured') }}
+                                        </span>
+                                    @endif
+                                    @if($packageTypeLabel)
+                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
+                                            {{ $packageTypeLabel }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+                                    <div>
+                                        <p class="text-xs font-black uppercase tracking-[0.2em] text-white/70">{{ $t('Destination', 'Destination') }}</p>
+                                        <p class="mt-1 text-lg font-black text-white">{{ $package->destination ?: $t('Sur demande', 'On request') }}</p>
+                                    </div>
+
+                                    <div class="rounded-[1.1rem] bg-white/92 px-4 py-3 text-right shadow-lg">
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('À partir de', 'From') }}</p>
+                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($displayPrice) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-5 sm:p-6">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="rounded-full bg-[#f4edff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
+                                        {{ $durationLabel }}
+                                    </span>
+                                    @if($package->max_participants)
+                                        <span class="rounded-full bg-[#fff6e8] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#a86308]">
+                                            {{ $package->min_participants }}-{{ $package->max_participants }} {{ $t('pers.', 'pax') }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <h3 class="mt-4 text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">
+                                    {{ $packageTitle }}
+                                </h3>
+
+                                <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                    {{ \Illuminate\Support\Str::limit($packageDescription, 150) }}
+                                </p>
+
+                                <div class="mt-5 grid grid-cols-2 gap-3">
+                                    <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Départ', 'Departure') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $package->departure_city ?: $t('À confirmer', 'To be confirmed') }}</p>
+                                    </div>
+                                    <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Date repère', 'Date cue') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">
+                                            {{ $package->event_date_start ? $package->event_date_start->format('d/m/Y') : $t('Flexible', 'Flexible') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        @if($package->discount_price)
+                                            <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif remisé', 'Discounted fare') }}</p>
+                                            <div class="mt-1 flex items-center gap-2">
+                                                <span class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($package->discount_price) }}</span>
+                                                <span class="text-sm font-semibold text-[color:var(--cp-ink-muted)] line-through">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                                            </div>
+                                        @else
+                                            <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif estimatif', 'Estimated fare') }}</p>
+                                            <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($package->price) }}</span>
+                                        @endif
+                                    </div>
+
+                                    <a href="{{ route('packages.show', $package->slug) }}" class="cp-primary-button !w-full sm:!w-auto">
+                                        <span>{{ $t('Voir le détail', 'View details') }}</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+
+                @if($packages->hasPages())
+                    <div class="mt-8">
+                        {{ $packages->links() }}
+                    </div>
+                @endif
+            @else
+                <div class="rounded-[2rem] border border-dashed border-[color:var(--cp-border-strong)] bg-white/70 px-6 py-14 text-center">
+                    <p class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Aucun package ne correspond à votre recherche.', 'No package matches your search.') }}</p>
+                    <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                        {{ $t('Essayez une destination plus large, retirez un filtre ou contactez l’équipe pour une proposition sur mesure.', 'Try a broader destination, remove one filter, or contact the team for a bespoke suggestion.') }}
+                    </p>
+                    <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <a href="{{ $resetUrl }}" class="cp-secondary-button">{{ $t('Voir toutes les offres', 'See all offers') }}</a>
+                        <a href="{{ route('contact') }}" class="cp-primary-button">{{ $t('Contacter un conseiller', 'Contact an advisor') }}</a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <section class="pt-10 sm:pt-12">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Demande sur mesure', 'Tailor-made request') }}</p>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Un voyage à composer complètement autour du client ?', 'Need a journey built entirely around the client?') }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
+                            {{ $t('Notre équipe peut recomposer une expérience complète avec transport, hébergement, activités et accompagnement humain clair.', 'Our team can rebuild the full experience with transport, accommodation, activities and clear human support.') }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e2aa54]">
+                            <i class="fa-regular fa-envelope text-sm"></i>
+                            <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
+                        </a>
+                        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                            <i class="fa-solid fa-phone text-sm"></i>
+                            <span>{{ $t('Appeler maintenant', 'Call now') }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 @endsection

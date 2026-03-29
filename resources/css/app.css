@@ -6,9 +6,212 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Outfit', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* Dark mode configuration for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
+
+:root {
+    --cp-page: #f5efe7;
+    --cp-page-alt: #fff9f2;
+    --cp-ink: #24192f;
+    --cp-ink-soft: #5e4f6f;
+    --cp-ink-muted: #7c6d8d;
+    --cp-panel: rgba(255, 252, 248, 0.82);
+    --cp-panel-strong: rgba(255, 255, 255, 0.94);
+    --cp-panel-dark: rgba(40, 27, 55, 0.8);
+    --cp-border: rgba(86, 47, 122, 0.14);
+    --cp-border-strong: rgba(86, 47, 122, 0.24);
+    --cp-plum-950: #1e112c;
+    --cp-plum-900: #2a163d;
+    --cp-plum-800: #4b2870;
+    --cp-plum-700: #6a3a98;
+    --cp-gold-500: #d9a441;
+    --cp-gold-400: #edbf66;
+    --cp-gold-300: #f4dca3;
+    --cp-success: #0f766e;
+    --cp-shadow-soft: 0 18px 50px rgba(40, 22, 58, 0.12);
+    --cp-shadow-strong: 0 28px 80px rgba(34, 18, 52, 0.22);
+}
+
+[data-theme='dark'] {
+    --cp-page: #110d19;
+    --cp-page-alt: #1b1526;
+    --cp-ink: #f4ebff;
+    --cp-ink-soft: #d8caec;
+    --cp-ink-muted: #ab98c5;
+    --cp-panel: rgba(31, 24, 42, 0.84);
+    --cp-panel-strong: rgba(36, 27, 49, 0.94);
+    --cp-border: rgba(237, 191, 102, 0.16);
+    --cp-border-strong: rgba(237, 191, 102, 0.28);
+    --cp-shadow-soft: 0 22px 70px rgba(0, 0, 0, 0.36);
+    --cp-shadow-strong: 0 30px 90px rgba(0, 0, 0, 0.48);
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body.cp-site-body {
+        min-height: 100vh;
+        color: var(--cp-ink);
+        background:
+            radial-gradient(circle at top, rgba(106, 58, 152, 0.15), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(217, 164, 65, 0.12), transparent 26%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(245, 239, 231, 0.96)),
+            var(--cp-page);
+    }
+
+    [data-theme='dark'] body.cp-site-body {
+        background:
+            radial-gradient(circle at top, rgba(106, 58, 152, 0.2), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(217, 164, 65, 0.12), transparent 26%),
+            linear-gradient(180deg, rgba(22, 16, 32, 0.86), rgba(17, 13, 25, 0.96)),
+            var(--cp-page);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    ::selection {
+        background: rgba(106, 58, 152, 0.22);
+        color: var(--cp-plum-950);
+    }
+}
+
+@layer components {
+    .cp-shell {
+        width: min(100% - 1.5rem, 76rem);
+        margin-inline: auto;
+    }
+
+    .cp-glass {
+        background: var(--cp-panel);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 1px solid var(--cp-border);
+        box-shadow: var(--cp-shadow-soft);
+    }
+
+    .cp-panel {
+        background: var(--cp-panel-strong);
+        border: 1px solid var(--cp-border);
+        box-shadow: var(--cp-shadow-soft);
+    }
+
+    .cp-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--cp-border);
+        background: rgba(255, 255, 255, 0.6);
+        padding: 0.5rem 0.85rem;
+        color: var(--cp-ink-soft);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .cp-primary-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        border-radius: 999px;
+        padding: 0.9rem 1.3rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, var(--cp-plum-800), var(--cp-gold-500));
+        box-shadow: 0 16px 35px rgba(75, 40, 112, 0.24);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .cp-primary-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 45px rgba(75, 40, 112, 0.28);
+    }
+
+    .cp-secondary-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        border-radius: 999px;
+        padding: 0.9rem 1.3rem;
+        font-weight: 800;
+        color: var(--cp-plum-900);
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(75, 40, 112, 0.14);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .cp-secondary-button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(75, 40, 112, 0.28);
+        background: #fff;
+    }
+
+    .cp-icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--cp-border);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--cp-ink-soft);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .cp-icon-button:hover {
+        transform: translateY(-1px);
+        border-color: var(--cp-border-strong);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .cp-link-muted {
+        color: var(--cp-ink-soft);
+        transition: color 0.2s ease;
+    }
+
+    .cp-link-muted:hover {
+        color: var(--cp-plum-800);
+    }
+
+    .cp-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--cp-gold-500);
+    }
+
+    .cp-eyebrow-dot {
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 0 6px rgba(217, 164, 65, 0.12);
+    }
+}
+
+@media (min-width: 640px) {
+    .cp-shell {
+        width: min(100% - 2rem, 78rem);
+    }
+}
+
+@media (min-width: 1024px) {
+    .cp-shell {
+        width: min(100% - 3rem, 80rem);
+    }
+}

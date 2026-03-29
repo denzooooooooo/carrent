@@ -199,16 +199,16 @@
           </svg>
         </div>
         <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6">
-          {{ __('Need a Flight?') }}
+          {{ __('Need a flight with support?') }}
         </h2>
         <p class="text-xl text-gray-600 mb-6 md:mb-8">
-          {{ __('We also offer international flight bookings') }}
+          {{ __('Our team now handles flight requests directly to give clients a clearer and more reliable process.') }}
         </p>
         <a
           href="{{ route('flights.index') }}"
           class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl text-base"
         >
-          <span>{{ __('Search for a Flight') }}</span>
+          <span>{{ __('Talk to an Advisor') }}</span>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -252,7 +252,7 @@
 
 {{-- WhatsApp Floating Chat Button --}}
 <a
-  href="https://wa.me/+2250101221515" 
+  href="{{ config('carre_premium.contact.whatsapp_url') }}" 
   target="_blank"
   class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-transform transform hover:scale-110"
   aria-label="Contact WhatsApp"

@@ -7,6 +7,17 @@
 @section('og_description', 'Rejoignez notre réseau de partenaires et bénéficiez de commissions attractives sur les réservations de voyages de luxe et événements exclusifs en Côte d\'Ivoire.')
 
 @section('content')
+@php
+  $supportEmail = config('carre_premium.contact.support_email');
+  $landlineDisplay = config('carre_premium.contact.landline_display');
+  $companyAddress = trim(
+    collect([
+      config('carre_premium.company.address'),
+      config('carre_premium.company.city'),
+      config('carre_premium.company.country'),
+    ])->filter()->implode(', ')
+  );
+@endphp
 <div class="min-h-screen bg-white">
   {{-- Hero --}}
   <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
@@ -105,6 +116,17 @@
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <p class="font-bold text-green-700">{{ session('success') }}</p>
+            </div>
+          </div>
+        @endif
+
+        @if(session('error'))
+          <div class="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl">
+            <div class="flex items-center space-x-3">
+              <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-4a1 1 0 00-.894.553l-2 4A1 1 0 008 12h4a1 1 0 00.894-1.447l-2-4A1 1 0 0010 6zm0 8a1.25 1.25 0 100 2.5A1.25 1.25 0 0010 14z" clip-rule="evenodd" />
+              </svg>
+              <p class="font-bold text-red-700">{{ session('error') }}</p>
             </div>
           </div>
         @endif
@@ -248,7 +270,7 @@
               </svg>
             </div>
             <h3 class="font-bold mb-2">{{ __('Phone') }}</h3>
-            <p>+225 27 21 59 42 58</p>
+            <p>{{ $landlineDisplay }}</p>
           </div>
           <div>
             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -258,7 +280,7 @@
               </svg>
             </div>
             <h3 class="font-bold mb-2">{{ __('Email') }}</h3>
-            <p>partnerships@carrepremium.com</p>
+            <p>{{ $supportEmail }}</p>
           </div>
           <div>
             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -267,7 +289,7 @@
               </svg>
             </div>
             <h3 class="font-bold mb-2">{{ __('Address') }}</h3>
-            <p>Abidjan, Côte d'Ivoire</p>
+            <p>{{ $companyAddress }}</p>
           </div>
         </div>
       </div>

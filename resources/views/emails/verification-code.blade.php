@@ -193,9 +193,9 @@
             </p>
             <p class="footer-text">
                 Besoin d'aide ? Contactez-nous à 
-                <a href="mailto:support@carrepremium.ci" class="footer-link">support@carrepremium.ci</a>
+                <a href="mailto:{{ config('carre_premium.contact.support_email') }}" class="footer-link">{{ config('carre_premium.contact.support_email') }}</a>
                 <br>
-                ou appelez le <strong>+225 27 21 59 42 58</strong>
+                ou appelez le <strong>{{ config('carre_premium.contact.landline_display') }}</strong>
             </p>
             
             <div class="social-links">

@@ -243,8 +243,8 @@
         <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h4 style="margin-top: 0; color: #4F46E5;">Besoin d'aide ?</h4>
             <p style="margin: 5px 0;">Notre équipe est à votre disposition 24/7</p>
-            <p style="margin: 5px 0;">📧 Email: support@carrepremium.ci</p>
-            <p style="margin: 5px 0;">📞 Téléphone: +225 XX XX XX XX XX</p>
+            <p style="margin: 5px 0;">📧 Email: {{ config('carre_premium.contact.support_email') }}</p>
+            <p style="margin: 5px 0;">📞 Téléphone: {{ config('carre_premium.contact.landline_display') }}</p>
         </div>
 
         <div class="footer">

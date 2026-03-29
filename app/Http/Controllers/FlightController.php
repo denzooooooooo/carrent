@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Services\BookingAccessService;
 use App\Services\DuffelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,12 +100,9 @@ class FlightController extends Controller
     /**
      * Page de confirmation après paiement
      */
-    public function confirmation(Booking $booking)
+    public function confirmation(Request $request, Booking $booking)
     {
-        // Vérifier l'accès
-        if (Auth::check() && $booking->user_id !== Auth::id() && !Auth::guard('admin')->check()) {
-            abort(403);
-        }
+        app(BookingAccessService::class)->authorize($request, $booking);
 
         $booking->load('flightBooking');
         

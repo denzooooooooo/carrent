@@ -1,145 +1,341 @@
 @extends('layouts.app')
 
-@section('title', __('Vehicle Rental - Quads, Cars and More') . ' - Carré Premium')
-@section('meta_description', __('Discover our vehicle rentals in Ivory Coast and Africa. Quads, cars, boats and premium vehicles with Carré Premium.'))
-@section('meta_keywords', __('vehicle rental, quads, luxury cars, boats, Ivory Coast, Africa, premium vehicles, Carré Premium'))
-@section('og_title', __('Vehicle Rental - Quads, Cars and More') . ' - Carré Premium')
-@section('og_description', __('Book your vehicles in Ivory Coast. Quads, cars, boats and exclusive vehicles with our private concierge service.'))
+@section('title', __('Location de véhicules premium') . ' - Carré Premium')
+@section('meta_description', __('Découvrez nos véhicules premium en Côte d’Ivoire. Chauffeur, location privée et solutions sur mesure avec Carré Premium.'))
+@section('meta_keywords', __('location de véhicules, voiture premium, transport privé, Côte d’Ivoire, Carré Premium'))
+@section('og_title', __('Location de véhicules premium') . ' - Carré Premium')
+@section('og_description', __('Réservez un véhicule premium avec un parcours plus clair, plus fiable et mieux structuré pour vos clients.'))
 
 @section('content')
+@php
+    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
+    $searchTerm = trim((string) request('q'));
+    $selectedCategory = (string) request('category');
+    $selectedType = (string) request('type');
+    $selectedCapacity = (string) request('capacity');
 
-<div class="min-h-screen bg-white">
-  {{-- Hero --}}
-  <section class="relative h-[30vh] md:h-[40vh] bg-gradient-to-r from-blue-600 to-cyan-600 overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 md:mb-4">{{ __('Vehicle Rental') }}</h1>
-      <p class="text-base sm:text-lg md:text-xl text-white/90">{{ __('Discover our premium vehicle offers') }}</p>
-    </div>
-  </section>
+    $capacityLabels = [
+        '1-2' => $t('1 à 2 passagers', '1 to 2 passengers'),
+        '3-5' => $t('3 à 5 passagers', '3 to 5 passengers'),
+        '6+' => $t('6 passagers et plus', '6 passengers and more'),
+    ];
 
-  {{-- Filters --}}
-  <section class="py-6 md:py-8 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <div class="max-w-6xl mx-auto">
-        <form method="GET" action="{{ route('location') }}" class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Category') }}</label>
-              <select name="category" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All categories') }}</option>
-                <option value="terrestre" {{ request('category') == 'terrestre' ? 'selected' : '' }}>{{ __('Terrestrial') }}</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">{{ __('Vehicle Type') }}</label>
-              <select name="type" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:border-blue-600 focus:outline-none text-sm md:text-base">
-                <option value="">{{ __('All types') }}</option>
-                <option value="voiture" {{ request('type') == 'voiture' ? 'selected' : '' }}>{{ __('Car') }}</option>
-              </select>
-            </div>
-            <div class="flex items-end gap-2">
-              <button type="submit" class="flex-1 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base">
-                {{ __('Search') }}
-              </button>
-              @if(request()->hasAny(['category', 'type']))
-                <a href="{{ route('location') }}" class="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-700 font-medium rounded-lg md:rounded-xl hover:bg-gray-300 transition-all text-sm md:text-base">
-                  ✕
-                </a>
-              @endif
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
+    $activeFilters = collect([
+        $searchTerm !== '' ? ['label' => $t('Recherche', 'Search'), 'value' => $searchTerm] : null,
+        $selectedCategory !== '' ? ['label' => $t('Catégorie', 'Category'), 'value' => ucfirst($selectedCategory)] : null,
+        $selectedType !== '' ? ['label' => $t('Type', 'Type'), 'value' => ucfirst($selectedType)] : null,
+        $selectedCapacity !== '' ? ['label' => $t('Capacité', 'Capacity'), 'value' => $capacityLabels[$selectedCapacity] ?? $selectedCapacity] : null,
+        ($selectedSort ?? 'recommended') !== 'recommended' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
+    ])->filter()->values();
 
-  {{-- Locations Grid --}}
-  <section class="py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <div class="max-w-6xl mx-auto">
-        @if($locations->count() > 0)
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-            @foreach($locations as $location)
-              <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all">
-                <div class="relative">
-                  @php
-                    $imageUrl = $location->image_url;
-                    $placeholder = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500&h=300&fit=crop';
-                  @endphp
-                  <img src="{{ $imageUrl ?: $placeholder }}" alt="{{ $location->name }}" class="w-full h-32 md:h-40 lg:h-48 object-cover">
-                  <div class="absolute top-2 md:top-4 left-2 md:left-4">
-                    <span class="px-2 md:px-3 py-1 bg-green-500 text-white text-xs md:text-sm font-bold rounded-full">{{ ucfirst($location->category) }}</span>
-                  </div>
-                  <div class="absolute top-2 md:top-4 right-2 md:right-4">
-                    <span class="px-2 md:px-3 py-1 bg-teal-600 text-white text-xs md:text-sm font-bold rounded-full">{{ ucfirst($location->type) }}</span>
-                  </div>
-                </div>
-                <div class="p-4 md:p-6">
-                  <h3 class="text-lg md:text-xl font-black mb-2 line-clamp-2">{{ $location->name }}</h3>
-                  <p class="text-gray-600 mb-3 md:mb-4 text-sm md:text-base line-clamp-3">{{ Str::limit($location->description, 120) }}</p>
-                  <div class="flex items-center text-gray-600 mb-2 md:mb-3">
-                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <span class="text-sm md:text-base">{{ $location->capacity }} {{ __('passengers') }}</span>
-                  </div>
-                  <div class="flex items-center text-gray-600 mb-3 md:mb-4">
-                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                    <span class="text-sm md:text-base">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }} / {{ __('day') }}</span>
-                  </div>
-                  @if($location->features && count($location->features) > 0)
-                    <div class="flex flex-wrap gap-1 mb-3 md:mb-4">
-                      @foreach(array_slice($location->features, 0, 3) as $feature)
-                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{{ $feature }}</span>
-                      @endforeach
-                      @if(count($location->features) > 3)
-                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">+{{ count($location->features) - 3 }}</span>
-                      @endif
+    $resetUrl = route('location');
+@endphp
+
+<div class="min-h-screen pb-14 sm:pb-16">
+    <section class="pt-4 sm:pt-6">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1d2239] via-[#234c7b] to-[#d49a46] text-white shadow-[0_28px_90px_rgba(20,34,59,0.24)]">
+                <div class="grid gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.18fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
+                    <div class="max-w-3xl">
+                        <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
+                            <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
+                            <span>{{ $t('Location premium', 'Premium rental') }}</span>
+                        </div>
+
+                        <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                            {{ $t('Une page location plus simple à lire, plus rassurante et plus claire sur mobile.', 'A rental page that is easier to read, more reassuring and clearer on mobile.') }}
+                        </h1>
+
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+                            {{ $t('Le client doit identifier en quelques secondes le type de véhicule, la capacité, le prix journalier et la prochaine action. Cette version remet cette hiérarchie au centre.', 'Clients should identify the vehicle type, seating capacity, daily rate and next action in seconds. This version puts that hierarchy back at the center.') }}
+                        </p>
+
+                        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <a href="#location-filters" class="cp-primary-button !w-full sm:!w-auto">
+                                <i class="fa-solid fa-car-side text-sm"></i>
+                                <span>{{ $t('Filtrer la flotte', 'Filter the fleet') }}</span>
+                            </a>
+                            <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                                <i class="fa-solid fa-headset text-sm"></i>
+                                <span>{{ $t('Besoin d’un véhicule précis ?', 'Need a specific vehicle?') }}</span>
+                            </a>
+                        </div>
                     </div>
-                  @endif
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+
+                    <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Résultats', 'Results') }}</p>
+                            <p class="mt-3 text-3xl font-black">{{ number_format($locations->total(), 0, ',', ' ') }}</p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('véhicules visibles avec vos critères', 'vehicles visible with your current criteria') }}</p>
+                        </div>
+
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Catégories', 'Categories') }}</p>
+                            <p class="mt-3 text-3xl font-black">{{ number_format(count($categories), 0, ',', ' ') }}</p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('familles de véhicules actives', 'active vehicle families') }}</p>
+                        </div>
+
+                        <div class="rounded-[1.8rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                            <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('À partir de', 'Starting at') }}</p>
+                            <p class="mt-3 text-2xl font-black">
+                                {{ $startingPrice ? \App\Helpers\CurrencyHelper::format($startingPrice) : $t('Sur demande', 'On request') }}
+                            </p>
+                            <p class="mt-2 text-sm text-white/78">{{ $t('par jour sur la flotte active', 'per day across the active fleet') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="location-filters" class="-mt-6 pt-0">
+        <div class="cp-shell">
+            <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
+                <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Parcours clarifié', 'Clearer flow') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Vrais filtres, lecture plus nette', 'Real filters, sharper reading') }}</h2>
+                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                            {{ $t('Les filtres sont maintenant reliés aux données réelles de la flotte. Le client ne clique plus sur des options trompeuses.', 'Filters now connect to the real fleet data. Clients are no longer clicking on misleading options.') }}
+                        </p>
+                    </div>
+
+                    @if($activeFilters->isNotEmpty())
+                        <a href="{{ $resetUrl }}" class="cp-secondary-button !self-start lg:!self-auto">
+                            <i class="fa-solid fa-rotate-left text-sm"></i>
+                            <span>{{ $t('Réinitialiser', 'Reset') }}</span>
+                        </a>
+                    @endif
+                </div>
+
+                <form method="GET" action="{{ route('location') }}" class="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))]">
+                    <div class="xl:col-span-2">
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Recherche', 'Search') }}</label>
+                        <div class="flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 shadow-sm">
+                            <i class="fa-solid fa-magnifying-glass text-sm text-[color:var(--cp-ink-muted)]"></i>
+                            <input
+                                type="search"
+                                name="q"
+                                value="{{ request('q') }}"
+                                placeholder="{{ $t('Nom, catégorie, type, description…', 'Name, category, type, description…') }}"
+                                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none placeholder:text-[color:var(--cp-ink-muted)]"
+                            >
+                        </div>
+                    </div>
+
                     <div>
-                      <span class="text-xl md:text-2xl font-black text-green-600">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</span>
-                      <span class="text-xs md:text-sm text-gray-500 ml-1 md:ml-2">{{ __('per day') }}</span>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Catégorie', 'Category') }}</label>
+                        <select name="category" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Toutes les catégories', 'All categories') }}</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category }}" {{ $selectedCategory === $category ? 'selected' : '' }}>
+                                    {{ ucfirst($category) }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <a href="{{ route('location.show', $location) }}" class="px-4 md:px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-lg md:rounded-xl hover:shadow-lg transition-all text-sm md:text-base text-center">
-                      {{ __('View details') }}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            @endforeach
-          </div>
-        @else
-          <div class="text-center py-12">
-            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">{{ __('No vehicles available') }}</h3>
-            <p class="text-gray-500">{{ __('Come back soon to discover our new premium vehicles.') }}</p>
-          </div>
-        @endif
-      </div>
-    </div>
-  </section>
 
-  {{-- CTA Section --}}
-  <section class="py-12 md:py-16 bg-gradient-to-r from-green-600 to-teal-600">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-4">{{ __('Need a custom vehicle?') }}</h2>
-      <p class="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8">{{ __('Contact our team for more details') }}</p>
-      <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-        <a href="{{ route('contact') }}" class="px-6 md:px-8 py-3 md:py-4 bg-white text-green-600 font-bold rounded-lg md:rounded-xl hover:shadow-2xl transition-all text-sm md:text-base">
-          {{ __('Request a quote') }}
-        </a>
-        <a href="tel:+225XXXXXXXXX" class="px-6 md:px-8 py-3 md:py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg md:rounded-xl hover:bg-white hover:text-green-600 transition-all text-sm md:text-base">
-          {{ __('Call Now') }}
-        </a>
-      </div>
-    </div>
-  </section>
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Type', 'Type') }}</label>
+                        <select name="type" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Tous les types', 'All types') }}</option>
+                            @foreach($types as $type)
+                                <option value="{{ $type }}" {{ $selectedType === $type ? 'selected' : '' }}>
+                                    {{ ucfirst($type) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Capacité', 'Capacity') }}</label>
+                        <select name="capacity" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            <option value="">{{ $t('Toutes les capacités', 'All capacities') }}</option>
+                            @foreach($capacityLabels as $value => $label)
+                                <option value="{{ $value }}" {{ $selectedCapacity === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Tri', 'Sort') }}</label>
+                        <select name="sort" class="w-full rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none">
+                            @foreach($sortOptions as $value => $label)
+                                <option value="{{ $value }}" {{ ($selectedSort ?? 'recommended') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="xl:col-span-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button type="submit" class="cp-primary-button !w-full sm:!w-auto">
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                            <span>{{ $t('Appliquer les filtres', 'Apply filters') }}</span>
+                        </button>
+                    </div>
+                </form>
+
+                @if($activeFilters->isNotEmpty())
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        @foreach($activeFilters as $filter)
+                            <span class="inline-flex items-center gap-2 rounded-full bg-[#f4edff] px-3 py-2 text-xs font-bold text-[color:var(--cp-plum-800)]">
+                                <span class="uppercase tracking-[0.18em] text-[10px] text-[color:var(--cp-ink-muted)]">{{ $filter['label'] }}</span>
+                                <span>{{ $filter['value'] }}</span>
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-8 sm:pt-10">
+        <div class="cp-shell">
+            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Flotte visible', 'Visible fleet') }}</p>
+                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Véhicules disponibles', 'Available vehicles') }}</h2>
+                    <p class="mt-2 text-sm text-[color:var(--cp-ink-soft)]">
+                        {{ number_format($locations->total(), 0, ',', ' ') }}
+                        {{ $locations->total() > 1 ? $t('véhicules correspondent à vos critères', 'vehicles match your criteria') : $t('véhicule correspond à vos critères', 'vehicle matches your criteria') }}
+                    </p>
+                </div>
+
+                <div class="cp-pill">
+                    <i class="fa-solid fa-layer-group text-xs"></i>
+                    <span>{{ number_format($totalLocationsCount, 0, ',', ' ') }} {{ $t('véhicules actifs au total', 'active vehicles in total') }}</span>
+                </div>
+            </div>
+
+            @if($locations->count() > 0)
+                <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    @foreach($locations as $location)
+                        @php
+                            $locationImage = $location->image_url ?: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900&h=700&fit=crop';
+                            $locationFeatures = collect($location->features ?? [])->filter()->take(3);
+                        @endphp
+
+                        <article class="group overflow-hidden rounded-[2rem] border border-[color:var(--cp-border)] bg-white/95 shadow-[0_18px_55px_rgba(24,37,67,0.10)] transition hover:-translate-y-1 hover:shadow-[0_28px_75px_rgba(24,37,67,0.16)]">
+                            <div class="relative overflow-hidden">
+                                <img src="{{ $locationImage }}" alt="{{ $location->name }}" class="h-64 w-full object-cover transition duration-700 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/72 via-black/10 to-transparent"></div>
+
+                                <div class="absolute left-4 top-4 flex flex-wrap gap-2">
+                                    @if($location->category)
+                                        <span class="rounded-full bg-[#e7f4ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#15588a]">
+                                            {{ ucfirst($location->category) }}
+                                        </span>
+                                    @endif
+                                    @if($location->type)
+                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#17486f]">
+                                            {{ ucfirst($location->type) }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+                                    <div>
+                                        <p class="text-xs font-black uppercase tracking-[0.2em] text-white/70">{{ $t('Capacité', 'Capacity') }}</p>
+                                        <p class="mt-1 text-lg font-black text-white">{{ $location->capacity }} {{ $t('passagers', 'passengers') }}</p>
+                                    </div>
+
+                                    <div class="rounded-[1.1rem] bg-white/92 px-4 py-3 text-right shadow-lg">
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Par jour', 'Per day') }}</p>
+                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-5 sm:p-6">
+                                <h3 class="text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">
+                                    {{ $location->name }}
+                                </h3>
+
+                                <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                                    {{ \Illuminate\Support\Str::limit($location->description, 150) }}
+                                </p>
+
+                                <div class="mt-5 grid grid-cols-2 gap-3">
+                                    <div class="rounded-[1.2rem] bg-[#eef7ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Catégorie', 'Category') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $location->category ? ucfirst($location->category) : $t('Sur demande', 'On request') }}</p>
+                                    </div>
+                                    <div class="rounded-[1.2rem] bg-[#eef7ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Type', 'Type') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $location->type ? ucfirst($location->type) : $t('Sur demande', 'On request') }}</p>
+                                    </div>
+                                </div>
+
+                                @if($locationFeatures->isNotEmpty())
+                                    <div class="mt-5 flex flex-wrap gap-2">
+                                        @foreach($locationFeatures as $feature)
+                                            <span class="rounded-full bg-[#f3f8fc] px-3 py-2 text-xs font-bold text-[#34516d]">
+                                                {{ $feature }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif indicatif', 'Indicative fare') }}</p>
+                                        <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</span>
+                                    </div>
+
+                                    <a href="{{ route('location.show', $location) }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#1e507b] hover:!bg-[#194668]">
+                                        <span>{{ $t('Voir le détail', 'View details') }}</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+
+                @if($locations->hasPages())
+                    <div class="mt-8">
+                        {{ $locations->links() }}
+                    </div>
+                @endif
+            @else
+                <div class="rounded-[2rem] border border-dashed border-[color:var(--cp-border-strong)] bg-white/70 px-6 py-14 text-center">
+                    <p class="text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Aucun véhicule ne correspond à vos critères.', 'No vehicle matches your current criteria.') }}</p>
+                    <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
+                        {{ $t('Élargissez la catégorie, retirez un filtre ou contactez directement l’équipe pour une demande précise.', 'Broaden the category, remove one filter, or contact the team directly for a specific request.') }}
+                    </p>
+                    <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <a href="{{ $resetUrl }}" class="cp-secondary-button">{{ $t('Voir toute la flotte', 'See the full fleet') }}</a>
+                        <a href="{{ route('contact') }}" class="cp-primary-button">{{ $t('Contacter un conseiller', 'Contact an advisor') }}</a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <section class="pt-10 sm:pt-12">
+        <div class="cp-shell">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#19304a] via-[#226695] to-[#d49a46] px-5 py-8 text-white shadow-[0_24px_70px_rgba(24,37,67,0.18)] sm:px-8">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Demande spécifique', 'Specific request') }}</p>
+                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d’un modèle précis, d’un chauffeur ou d’un trajet sur mesure ?', 'Need a precise model, a driver or a bespoke route?') }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
+                            {{ $t('L’équipe peut vous orienter vers une solution plus claire que la simple liste: disponibilité réelle, conditions et besoin client réunis dans la même discussion.', 'The team can guide you to a clearer solution than a simple list: real availability, conditions and customer need gathered in the same conversation.') }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#17304a] hover:!bg-[#e2aa54]">
+                            <i class="fa-regular fa-envelope text-sm"></i>
+                            <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
+                        </a>
+                        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !border-white/25 !bg-white/10 !text-white hover:!bg-white/15">
+                            <i class="fa-solid fa-phone text-sm"></i>
+                            <span>{{ $t('Appeler maintenant', 'Call now') }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 @endsection

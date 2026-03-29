@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Services\BookingAccessService;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
@@ -76,7 +77,7 @@ class LocationController extends Controller
             'special_requests' => $request->special_requests,
         ]);
 
-        return redirect()->route('payment.checkout', $booking)
+        return redirect(app(BookingAccessService::class)->bookingRoute('payment.checkout', $booking))
             ->with('success', 'Votre réservation de location a été créée avec succès! Veuillez procéder au paiement pour la confirmer.');
     }
 
@@ -95,8 +96,10 @@ class LocationController extends Controller
     /**
      * Afficher la page de confirmation de réservation de location.
      */
-    public function bookingConfirmation(\App\Models\Booking $booking)
+    public function bookingConfirmation(Request $request, \App\Models\Booking $booking)
     {
+        app(BookingAccessService::class)->authorize($request, $booking);
+
         if ($booking->booking_type !== 'location') {
             abort(404);
         }

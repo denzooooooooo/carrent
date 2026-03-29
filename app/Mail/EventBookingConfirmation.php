@@ -29,7 +29,10 @@ class EventBookingConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmation de votre réservation d\'événement - ' . $this->booking->booking_reference,
+            subject: ($this->booking->status === 'confirmed'
+                ? 'Confirmation de votre réservation d\'événement - '
+                : 'Votre réservation d\'événement a bien été enregistrée - ')
+                . $this->booking->booking_reference,
         );
     }
 

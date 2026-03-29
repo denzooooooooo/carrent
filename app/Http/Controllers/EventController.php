@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\EventBooking;
 use App\Models\Event;
+use App\Services\BookingAccessService;
 use App\Services\EventDiscoveryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -256,7 +257,7 @@ class EventController extends Controller
                 'total_amount' => $totalPrice,
                 'currency' => 'XOF',
                 'final_amount' => $totalPrice,
-                'status' => $requiresBankTransfer ? 'pending_payment' : 'pending',
+                'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => $requiresBankTransfer ? 'bank_transfer' : null,
                 'notes' => $requiresBankTransfer
@@ -284,19 +285,20 @@ class EventController extends Controller
         }
 
         if ($requiresBankTransfer) {
-            return redirect()->route('payment.instructions', $booking)
+            return redirect(app(BookingAccessService::class)->bookingRoute('payment.instructions', $booking))
                 ->with('info', 'Votre reservation a ete creee. Suivez les instructions de virement bancaire pour finaliser le paiement.');
         }
 
-        return redirect()->route('payment.cinetpay.redirect', $booking)
+        return redirect(app(BookingAccessService::class)->bookingRoute('payment.cinetpay.redirect', $booking))
             ->with('success', 'Votre réservation a été créée. Redirection vers le paiement sécurisé...');
     }
 
     /**
      * Afficher la page de confirmation de réservation.
      */
-    public function bookingConfirmation(\App\Models\Booking $booking)
+    public function bookingConfirmation(Request $request, \App\Models\Booking $booking)
     {
+        app(BookingAccessService::class)->authorize($request, $booking);
         $booking->load(['event', 'eventBooking.zone', 'eventBooking.package', 'eventBooking.packageOption']);
         return view('pages.event-booking-confirmation', compact('booking'));
     }

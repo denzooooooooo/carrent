@@ -41,7 +41,7 @@
         </div>
         <div class="footer">
             Carré Premium<br>
-            support@carrepremium.ci
+            {{ config('carre_premium.contact.support_email') }}
         </div>
     </div>
 </body>

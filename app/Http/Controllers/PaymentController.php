@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\FlightBooking;
 use App\Services\BookingAccessService;
+use App\Services\BookingFulfillmentService;
 use App\Services\CinetPayService;
 use App\Services\DocumentGeneratorService;
 use App\Services\DuffelService;
@@ -24,19 +25,22 @@ class PaymentController extends Controller
     protected $paymentSplitService;
     protected $documentGeneratorService;
     protected $bookingAccessService;
+    protected $bookingFulfillmentService;
 
     public function __construct(
         CinetPayService $cinetpayService,
         DuffelService $duffelService,
         PaymentSplitService $paymentSplitService,
         DocumentGeneratorService $documentGeneratorService,
-        BookingAccessService $bookingAccessService
+        BookingAccessService $bookingAccessService,
+        BookingFulfillmentService $bookingFulfillmentService
     ) {
         $this->cinetpayService = $cinetpayService;
         $this->duffelService = $duffelService;
         $this->paymentSplitService = $paymentSplitService;
         $this->documentGeneratorService = $documentGeneratorService;
         $this->bookingAccessService = $bookingAccessService;
+        $this->bookingFulfillmentService = $bookingFulfillmentService;
     }
 
     /**
@@ -117,13 +121,12 @@ class PaymentController extends Controller
             $paymentGateway = $request->input('payment_gateway', 'cinetpay');
 
             if ($paymentGateway === 'cinetpay') {
-                return redirect()->route('payment.cinetpay.process', [
-                    'booking' => $booking->id,
+                return redirect($this->bookingRoute('payment.cinetpay.process', $booking, [
                     'payment_channel' => $request->input('payment_channel', 'OM'),
-                ]);
+                ]));
             }
 
-            return redirect()->route('payment.checkout', ['booking' => $booking->id])
+            return redirect($this->bookingRoute('payment.checkout', $booking))
                 ->with('success', 'Réservation créée. Veuillez procéder au paiement.');
 
         } catch (\Exception $e) {
@@ -179,16 +182,77 @@ class PaymentController extends Controller
     /**
      * Page de checkout
      */
-    public function checkout(Booking $booking)
+    public function instructions(Request $request, Booking $booking)
     {
-        if (Auth::check() && $booking->user_id !== Auth::id() && !Auth::guard('admin')->check()) {
-            abort(403);
+        $this->authorizeBookingAccess($request, $booking);
+
+        $booking = $this->bookingFulfillmentService->ensureDocuments($booking);
+        $backUrl = $this->selectionBackUrl($booking);
+        $proofUploadUrl = $this->bookingRoute('payment.proof.upload', $booking);
+
+        return view('pages.payment.instructions', compact('booking', 'backUrl', 'proofUploadUrl'));
+    }
+
+    public function checkout(Request $request, Booking $booking)
+    {
+        $this->authorizeBookingAccess($request, $booking);
+
+        $booking->load([
+            'flightBooking',
+            'event',
+            'eventBooking.zone',
+            'eventBooking.package',
+            'eventBooking.packageOption',
+            'package',
+            'packageBooking.package',
+            'location',
+            'locationBooking',
+        ]);
+        $channels = $this->cinetpayService->getAvailableChannels();
+        $paymentProcessUrl = $this->bookingRoute('payment.cinetpay.process', $booking);
+
+        return view('pages.payment.unified-checkout', compact('booking', 'channels', 'paymentProcessUrl'));
+    }
+
+    public function uploadPaymentProof(Request $request, Booking $booking)
+    {
+        $this->authorizeBookingAccess($request, $booking);
+
+        $validated = $request->validate([
+            'payment_proof' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'payment_proof_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $path = $request->file('payment_proof')->store('payment-proofs', 'public');
+
+        $booking->update([
+            'payment_proof_path' => $path,
+            'payment_proof_uploaded_at' => now(),
+            'payment_proof_notes' => $validated['payment_proof_notes'] ?? null,
+            'payment_method' => 'bank_transfer',
+            'status' => $booking->status === 'cancelled' ? 'cancelled' : 'pending',
+        ]);
+
+        try {
+            Mail::send('emails.payment-proof-received', ['booking' => $booking->fresh([
+                'event',
+                'eventBooking.zone',
+                'eventBooking.package',
+                'eventBooking.packageOption',
+                'location',
+                'locationBooking',
+            ])], function ($message) use ($booking) {
+                $message->to($this->getCustomerEmail($booking))
+                    ->subject('Preuve de paiement reçue - ' . $booking->booking_number);
+            });
+        } catch (\Throwable $e) {
+            Log::warning('Unable to send payment proof received email', [
+                'booking_id' => $booking->id,
+                'message' => $e->getMessage(),
+            ]);
         }
 
-        $booking->load(['flightBooking']);
-        $channels = $this->cinetpayService->getAvailableChannels();
-
-        return view('pages.payment.unified-checkout', compact('booking', 'channels'));
+        return back()->with('success', 'Votre preuve de paiement a bien été envoyée. Notre équipe va la vérifier rapidement.');
     }
 
     /**
@@ -197,11 +261,16 @@ class PaymentController extends Controller
     public function processCinetPay(Request $request, Booking $booking)
     {
         try {
+            $this->authorizeBookingAccess($request, $booking);
+
             $request->validate([
                 'payment_channel' => 'required|string',
             ]);
 
             $paymentChannel = $request->payment_channel;
+            $booking->update([
+                'payment_method' => $this->mapChannelToBookingPaymentMethod($paymentChannel),
+            ]);
             $customerEmail = $this->getCustomerEmail($booking);
             $customerName = $this->getCustomerName($booking);
             $customerPhone = $this->getCustomerPhone($booking);
@@ -220,7 +289,7 @@ class PaymentController extends Controller
                 'customer_phone' => $customerPhone,
                 'customer_city' => 'Abidjan',
                 'customer_country' => 'CI',
-                'return_url' => route('payment.cinetpay.return', ['booking' => $booking->id]),
+                'return_url' => $this->bookingRoute('payment.cinetpay.return', $booking),
                 'channel' => $paymentChannel,
                 'metadata' => [
                     'booking_id' => $booking->id,
@@ -268,13 +337,14 @@ class PaymentController extends Controller
     /**
      * Rediriger directement vers CinetPay (route GET pour redirect depuis booking)
      */
-    public function redirectToCinetPay(Booking $booking)
+    public function redirectToCinetPay(Request $request, Booking $booking)
     {
+        $this->authorizeBookingAccess($request, $booking);
+
         // Utiliser 'ALL' comme canal de paiement par défaut pour montrer toutes les options
-        return redirect()->route('payment.cinetpay.process', [
-            'booking' => $booking,
-            'payment_channel' => 'ALL'
-        ]);
+        return redirect($this->bookingRoute('payment.cinetpay.process', $booking, [
+            'payment_channel' => 'ALL',
+        ]));
     }
 
     /**
@@ -283,11 +353,13 @@ class PaymentController extends Controller
     public function cinetpayReturn(Request $request, Booking $booking)
     {
         try {
+            $this->authorizeBookingAccess($request, $booking);
+
             $transactionId = $request->query('transaction_id') ?? $booking->payment_transaction_id;
             $wasAlreadyPaid = $booking->payment_status === 'paid';
 
             if (!$transactionId) {
-                return redirect()->route('payment.checkout', $booking)
+                return redirect($this->bookingRoute('payment.checkout', $booking))
                     ->with('error', 'Transaction introuvable.');
             }
 
@@ -300,7 +372,7 @@ class PaymentController extends Controller
             $status = $this->cinetpayService->checkPaymentStatus($transactionId);
 
             if (!$status['success']) {
-                return redirect()->route('payment.checkout', $booking)
+                return redirect($this->bookingRoute('payment.checkout', $booking))
                     ->with('error', 'Impossible de vérifier le statut du paiement.');
             }
 
@@ -309,7 +381,11 @@ class PaymentController extends Controller
                 $booking->update([
                     'status' => 'confirmed',
                     'payment_status' => 'paid',
-                    'payment_method' => 'cinetpay',
+                    'payment_method' => $this->mapProviderPaymentMethod(
+                        $status['payment_method'] ?? null,
+                        $booking->payment_method
+                    ),
+                    'confirmed_at' => $booking->confirmed_at ?: now(),
                 ]);
 
                 // Créer l'enregistrement de paiement
@@ -370,16 +446,16 @@ class PaymentController extends Controller
 
                 // Rediriger selon le type de réservation
                 if ($booking->booking_type === 'flight') {
-                    return redirect()->route('flight.booking.confirmation', $booking)
+                    return redirect($this->bookingRoute('flight.booking.confirmation', $booking))
                         ->with('success', 'Paiement réussi! Votre réservation de vol a été confirmée.');
                 } elseif ($booking->booking_type === 'event') {
-                    return redirect()->route('event.booking.confirmation', $booking)
+                    return redirect($this->bookingRoute('event.booking.confirmation', $booking))
                         ->with('success', 'Paiement réussi! Votre réservation d\'événement a été confirmée.');
                 } elseif ($booking->booking_type === 'package') {
-                    return redirect()->route('packages.booking.confirmation', $booking)
+                    return redirect($this->bookingRoute('packages.booking.confirmation', $booking))
                         ->with('success', 'Paiement réussi! Votre réservation de package a été confirmée.');
                 } elseif ($booking->booking_type === 'location') {
-                    return redirect()->route('location.booking.confirmation', $booking)
+                    return redirect($this->bookingRoute('location.booking.confirmation', $booking))
                         ->with('success', 'Paiement réussi! Votre réservation de location a été confirmée.');
                 }
 
@@ -387,7 +463,7 @@ class PaymentController extends Controller
                     ->with('success', 'Paiement réussi! Votre réservation a été confirmée.');
             }
 
-            return redirect()->route('payment.checkout', $booking)
+            return redirect($this->bookingRoute('payment.checkout', $booking))
                 ->with('error', 'Paiement non confirmé. Statut: ' . ($status['status'] ?? 'Inconnu'));
 
         } catch (\Exception $e) {
@@ -395,7 +471,7 @@ class PaymentController extends Controller
                 'booking_id' => $booking->id,
                 'message' => $e->getMessage(),
             ]);
-            return redirect()->route('payment.checkout', $booking)
+            return redirect($this->bookingRoute('payment.checkout', $booking))
                 ->with('error', 'Erreur lors de la vérification du paiement.');
         }
     }
@@ -434,7 +510,11 @@ class PaymentController extends Controller
                 $booking->update([
                     'status' => 'confirmed',
                     'payment_status' => 'paid',
-                    'payment_method' => 'cinetpay',
+                    'payment_method' => $this->mapProviderPaymentMethod(
+                        $paymentStatus['payment_method'] ?? null,
+                        $booking->payment_method
+                    ),
+                    'confirmed_at' => $booking->confirmed_at ?: now(),
                 ]);
 
                 $this->createPaymentRecord($booking, $transactionId, $paymentStatus);
@@ -565,6 +645,11 @@ class PaymentController extends Controller
     protected function createPaymentRecord(Booking $booking, string $transactionId, array $status)
     {
         try {
+            $paymentMethod = $this->mapProviderPaymentMethod(
+                $status['payment_method'] ?? null,
+                $booking->payment_method
+            );
+
             \App\Models\Payment::updateOrCreate(
                 ['transaction_id' => $transactionId],
                 [
@@ -572,7 +657,7 @@ class PaymentController extends Controller
                     'user_id' => $booking->user_id,
                     'amount' => $booking->final_amount,
                     'currency' => $booking->currency,
-                    'payment_method' => 'mobile_money',
+                    'payment_method' => $paymentMethod,
                     'payment_provider' => 'cinetpay',
                     'status' => 'completed',
                     'payment_date' => now(),
@@ -621,6 +706,10 @@ class PaymentController extends Controller
             $booking = $this->ensureBillingDocuments($booking);
             $email = $this->getCustomerEmail($booking);
 
+            if (!$email) {
+                return;
+            }
+
             if ($booking->booking_type === 'flight' && $booking->flightBooking && !empty($booking->flightBooking->duffel_order_id)) {
                 // Si on a un order Duffel, envoyer les billets
                 $duffelOrder = $this->duffelService->getOrderStatus($booking->flightBooking->duffel_order_id);
@@ -651,60 +740,60 @@ class PaymentController extends Controller
 
     protected function ensureBillingDocuments(Booking $booking): Booking
     {
-        $booking->loadMissing([
-            'user',
-            'event',
-            'eventBooking.zone',
-            'eventBooking.event',
-            'package',
-            'packageBooking.package',
-            'location',
-            'locationBooking',
-            'flightBooking',
-            'payment',
-            'payments',
-        ]);
+        return $this->bookingFulfillmentService->ensureDocuments($booking);
+    }
 
-        $updates = [];
+    protected function authorizeBookingAccess(Request $request, Booking $booking): void
+    {
+        $this->bookingAccessService->authorize($request, $booking);
+    }
 
-        if (blank($booking->invoice_number)) {
-            $booking->invoice_number = $this->documentGeneratorService->makeInvoiceNumber($booking);
-            $updates['invoice_number'] = $booking->invoice_number;
+    protected function bookingRoute(string $routeName, Booking $booking, array $parameters = []): string
+    {
+        return $this->bookingAccessService->bookingRoute($routeName, $booking, $parameters);
+    }
+
+    protected function mapChannelToBookingPaymentMethod(?string $channel): string
+    {
+        return match ($channel) {
+            'CREDIT_CARD' => 'credit_card',
+            'bank_transfer' => 'bank_transfer',
+            default => 'mobile_money',
+        };
+    }
+
+    protected function mapProviderPaymentMethod(?string $providerMethod, ?string $fallback = null): string
+    {
+        $value = strtoupper((string) $providerMethod);
+
+        if (str_contains($value, 'CARD') || str_contains($value, 'VISA') || str_contains($value, 'MASTER')) {
+            return 'credit_card';
         }
 
-        if (blank($booking->receipt_number)) {
-            $booking->receipt_number = $this->documentGeneratorService->makeReceiptNumber($booking);
-            $updates['receipt_number'] = $booking->receipt_number;
+        if (str_contains($value, 'BANK')) {
+            return 'bank_transfer';
         }
 
-        if (blank($booking->invoice_pdf_path) || !Storage::disk('public')->exists($booking->invoice_pdf_path)) {
-            $updates['invoice_pdf_path'] = $this->documentGeneratorService->generateInvoice($booking);
-            $booking->invoice_pdf_path = $updates['invoice_pdf_path'];
+        if ($fallback) {
+            return $fallback;
         }
 
-        if (blank($booking->receipt_pdf_path) || !Storage::disk('public')->exists($booking->receipt_pdf_path)) {
-            $updates['receipt_pdf_path'] = $this->documentGeneratorService->generatePaymentReceipt($booking);
-            $booking->receipt_pdf_path = $updates['receipt_pdf_path'];
-        }
+        return 'mobile_money';
+    }
 
-        if ($updates !== []) {
-            $updates['documents_generated_at'] = now();
-            $booking->update($updates);
-            $booking->refresh();
-        }
-
-        return $booking->loadMissing([
-            'user',
-            'event',
-            'eventBooking.zone',
-            'eventBooking.event',
-            'package',
-            'packageBooking.package',
-            'location',
-            'locationBooking',
-            'flightBooking',
-            'payment',
-            'payments',
-        ]);
+    protected function selectionBackUrl(Booking $booking): string
+    {
+        return match ($booking->booking_type) {
+            'event' => $booking->event?->slug
+                ? route('events.show', $booking->event->slug)
+                : route('events'),
+            'package' => $booking->package?->slug
+                ? route('packages.show', $booking->package->slug)
+                : route('packages'),
+            'location' => $booking->location
+                ? route('location.show', $booking->location)
+                : route('location'),
+            default => route('home'),
+        };
     }
 }

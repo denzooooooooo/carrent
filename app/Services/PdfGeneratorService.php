@@ -5,6 +5,7 @@ namespace App\Services;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking;
 use App\Models\Payment;
+use Illuminate\Support\Facades\Route;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PdfGeneratorService
@@ -16,27 +17,24 @@ class PdfGeneratorService
     {
         $booking = $payment->booking;
         $user = $booking->user;
-        
-        // Générer QR Code pour vérification
+
+        $qrCodePayload = Route::has('verify.payment')
+            ? route('verify.payment', $payment->transaction_id)
+            : ($payment->transaction_id ?? $booking->booking_number);
+
         $qrCode = base64_encode(QrCode::format('png')
             ->size(150)
-            ->generate(route('verify.payment', $payment->transaction_id)));
+            ->generate($qrCodePayload));
 
         $data = [
             'payment' => $payment,
             'booking' => $booking,
             'user' => $user,
             'qrCode' => $qrCode,
-            'company' => [
-                'name' => 'Carré Premium',
-                'address' => 'Abidjan, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX',
-                'email' => 'contact@carrepremium.com',
-                'website' => 'www.carrepremium.com'
-            ]
+            'company' => $this->companyProfile(),
         ];
 
-        $pdf = Pdf::loadView('pdf.payment-receipt', $data);
+        $pdf = Pdf::loadView('pdf.payment_receipt', $data);
         $pdf->setPaper('a4', 'portrait');
         
         return $pdf;
@@ -55,9 +53,13 @@ class PdfGeneratorService
         $tva = $subtotal * 0.18;
         $total = $subtotal + $tva;
         
+        $qrCodePayload = Route::has('verify.booking')
+            ? route('verify.booking', $booking->booking_reference ?? $booking->booking_number)
+            : ($booking->booking_reference ?? $booking->booking_number);
+
         $qrCode = base64_encode(QrCode::format('png')
             ->size(150)
-            ->generate(route('verify.booking', $booking->booking_reference)));
+            ->generate($qrCodePayload));
 
         $data = [
             'booking' => $booking,
@@ -67,16 +69,11 @@ class PdfGeneratorService
             'tva' => $tva,
             'total' => $total,
             'qrCode' => $qrCode,
-            'invoiceNumber' => 'INV-' . date('Y') . '-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT),
-            'company' => [
-                'name' => 'Carré Premium SARL',
-                'address' => 'Abidjan, Plateau, Côte d\'Ivoire',
-                'phone' => '+225 XX XX XX XX',
-                'email' => 'facturation@carrepremium.com',
-                'website' => 'www.carrepremium.com',
-                'siret' => 'CI-ABJ-XXXX-XXXX',
-                'tva' => 'FR-TVA-XXXXXXXXX'
-            ]
+            'invoice_number' => 'INV-' . date('Y') . '-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT),
+            'company' => $this->companyProfile([
+                'name' => config('carre_premium.company.legal_name', config('carre_premium.company.name')),
+                'email' => config('carre_premium.contact.billing_email'),
+            ]),
         ];
 
         $pdf = Pdf::loadView('pdf.invoice', $data);
@@ -183,5 +180,20 @@ class PdfGeneratorService
     public function save($pdf, $path)
     {
         return $pdf->save($path);
+    }
+
+    protected function companyProfile(array $overrides = []): array
+    {
+        return array_merge([
+            'name' => config('carre_premium.company.name'),
+            'address' => config('carre_premium.company.address'),
+            'city' => config('carre_premium.company.city'),
+            'country' => config('carre_premium.company.country'),
+            'phone' => config('carre_premium.contact.landline_display'),
+            'email' => config('carre_premium.contact.email'),
+            'website' => config('carre_premium.company.website'),
+            'tax_id' => config('carre_premium.company.tax_id'),
+            'registration' => config('carre_premium.company.registration'),
+        ], $overrides);
     }
 }

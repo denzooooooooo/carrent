@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings', [AuthController::class, 'bookings'])->name('bookings');
     Route::get('/bookings/{booking}/details', [AuthController::class, 'showBooking'])->name('user.booking.details');
     Route::get('/bookings/{booking}/documents/{documentType}', [AuthController::class, 'downloadBookingDocument'])->name('user.booking.documents.download');
+    Route::get('/bookings/{booking}/tickets/{ticket}', [AuthController::class, 'downloadEventTicket'])->name('user.booking.tickets.download');
     Route::get('/bookings/{booking}/download', [AuthController::class, 'downloadBookingDocument'])
         ->defaults('documentType', 'invoice')
         ->name('user.booking.download');
@@ -112,6 +113,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('bookings.update-payment-status');
         Route::post('bookings/{id}/resend-receipt', [App\Http\Controllers\Admin\BookingController::class, 'resendReceipt'])
             ->name('bookings.resend-receipt');
+        Route::get('bookings/{booking}/documents/{documentType}', [App\Http\Controllers\Admin\BookingController::class, 'downloadDocument'])
+            ->name('bookings.documents.download');
+        Route::get('bookings/{booking}/tickets/{ticket}', [App\Http\Controllers\Admin\BookingController::class, 'downloadTicket'])
+            ->name('bookings.tickets.download');
 
         // Gestion des vols
         Route::resource('flights', App\Http\Controllers\Admin\FlightController::class);
@@ -285,6 +290,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/instructions/{booking}', [App\Http\Controllers\PaymentController::class, 'instructions'])->name('payment.instructions');
 Route::get('/payment/checkout/{booking}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+Route::post('/payment/proof/{booking}', [App\Http\Controllers\PaymentController::class, 'uploadPaymentProof'])->name('payment.proof.upload');
 
 // CinetPay Routes
 Route::match(['GET', 'POST'], '/payment/cinetpay/process/{booking}', [App\Http\Controllers\PaymentController::class, 'processCinetPay'])->name('payment.cinetpay.process');

@@ -227,7 +227,7 @@
         <a href="{{ route('contact') }}" class="px-8 py-4 bg-white text-purple-600 font-bold rounded-xl hover:shadow-2xl transition-all">
           {{ __('Contact us') }}
         </a>
-        <a href="tel:+225XXXXXXXXX" class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all">
+        <a href="{{ config('carre_premium.contact.mobile_link') }}" class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-purple-600 transition-all">
           {{ __('Call now') }}
         </a>
       </div>

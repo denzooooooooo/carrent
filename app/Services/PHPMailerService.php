@@ -176,6 +176,12 @@ class PHPMailerService
      */
     protected function getVerificationEmailTemplate($name, $code)
     {
+        $supportEmail = config('carre_premium.contact.support_email');
+        $supportPhone = config('carre_premium.contact.landline_display');
+        $companyName = config('carre_premium.company.name');
+        $companyCity = config('carre_premium.company.city');
+        $companyCountry = config('carre_premium.company.country');
+
         return "
         <!DOCTYPE html>
         <html>
@@ -197,11 +203,11 @@ class PHPMailerService
             <div class='container'>
                 <div class='header'>
                     <h1>🔐 Code de Vérification</h1>
-                    <p>Carré Premium</p>
+                    <p>$companyName</p>
                 </div>
                 <div class='content'>
                     <p>Bonjour <strong>$name</strong>,</p>
-                    <p>Merci de vous être inscrit sur Carré Premium ! Pour finaliser votre inscription, veuillez utiliser le code de vérification ci-dessous :</p>
+                    <p>Merci de vous être inscrit sur $companyName ! Pour finaliser votre inscription, veuillez utiliser le code de vérification ci-dessous :</p>
                     
                     <div class='code-box'>
                         <div class='code'>$code</div>
@@ -210,19 +216,19 @@ class PHPMailerService
                     
                     <p><strong>⏰ Ce code expire dans 10 minutes.</strong></p>
                     
-                    <p>Si vous n'avez pas créé de compte sur Carré Premium, vous pouvez ignorer cet email en toute sécurité.</p>
+                    <p>Si vous n'avez pas créé de compte sur $companyName, vous pouvez ignorer cet email en toute sécurité.</p>
                     
                     <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
                     
                     <p style='color: #666; font-size: 14px;'>
                         <strong>Besoin d'aide ?</strong><br>
-                        Contactez notre support : <a href='mailto:support@carrepremium.ci'>support@carrepremium.ci</a><br>
-                        Téléphone : +225 27 21 59 42 58
+                        Contactez notre support : <a href='mailto:$supportEmail'>$supportEmail</a><br>
+                        Téléphone : $supportPhone
                     </p>
                 </div>
                 <div class='footer'>
-                    <p>&copy; " . date('Y') . " Carré Premium. Tous droits réservés.</p>
-                    <p>Abidjan, Côte d'Ivoire</p>
+                    <p>&copy; " . date('Y') . " $companyName. Tous droits réservés.</p>
+                    <p>$companyCity, $companyCountry</p>
                 </div>
             </div>
         </body>

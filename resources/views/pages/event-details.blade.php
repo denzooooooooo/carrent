@@ -19,7 +19,7 @@
         </div>
 
         <div class="absolute inset-x-0 bottom-0">
-            <div class="container mx-auto px-4 pb-8">
+            <div class="cp-shell pb-8">
                 <div class="max-w-4xl rounded-3xl bg-white/95 p-6 shadow-2xl backdrop-blur md:p-8">
                     <div class="mb-4 flex flex-wrap gap-2">
                         <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-800">
@@ -83,7 +83,7 @@
         </div>
     </section>
 
-    <div class="container mx-auto px-4 py-8 md:py-12">
+    <div class="cp-shell py-8 md:py-12">
         <div class="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(340px,0.9fr)]">
             <div class="space-y-6">
                 <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">

@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Services\GoogleFlightsService;
 use App\Models\Event;
 use App\Models\Location;
+use App\Mail\ContactMessage;
 
 
 class HomeController extends Controller
@@ -38,13 +41,92 @@ class HomeController extends Controller
         return view('pages.packages');
     }
 
-    public function location()
+    public function location(Request $request)
     {
-        $locations = Location::where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $baseQuery = Location::query()->active();
+        $query = Location::query()->active();
 
-        return view('pages.location', compact('locations'));
+        if ($request->filled('q')) {
+            $search = '%' . trim($request->input('q')) . '%';
+
+            $query->where(function ($builder) use ($search) {
+                $builder
+                    ->where('name_fr', 'like', $search)
+                    ->orWhere('name_en', 'like', $search)
+                    ->orWhere('description_fr', 'like', $search)
+                    ->orWhere('description_en', 'like', $search)
+                    ->orWhere('category', 'like', $search)
+                    ->orWhere('type', 'like', $search);
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        if ($request->filled('capacity')) {
+            match ($request->input('capacity')) {
+                '1-2' => $query->whereBetween('capacity', [1, 2]),
+                '3-5' => $query->whereBetween('capacity', [3, 5]),
+                '6+' => $query->where('capacity', '>=', 6),
+                default => null,
+            };
+        }
+
+        $selectedSort = $request->input('sort', 'recommended');
+
+        match ($selectedSort) {
+            'price_low' => $query->orderBy('price_per_day'),
+            'price_high' => $query->orderByDesc('price_per_day'),
+            'capacity_high' => $query->orderByDesc('capacity'),
+            'name' => $query->orderBy('name_fr')->orderBy('name_en'),
+            default => $query->orderByDesc('created_at'),
+        };
+
+        $locations = $query
+            ->paginate(9)
+            ->appends($request->query());
+
+        $categories = (clone $baseQuery)
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category')
+            ->values();
+
+        $types = (clone $baseQuery)
+            ->whereNotNull('type')
+            ->where('type', '!=', '')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type')
+            ->values();
+
+        $sortOptions = [
+            'recommended' => 'Recommandés',
+            'price_low' => 'Prix croissant',
+            'price_high' => 'Prix décroissant',
+            'capacity_high' => 'Grande capacité',
+            'name' => 'Nom A-Z',
+        ];
+
+        $totalLocationsCount = (clone $baseQuery)->count();
+        $startingPrice = (clone $baseQuery)->min('price_per_day');
+
+        return view('pages.location', compact(
+            'locations',
+            'categories',
+            'types',
+            'selectedSort',
+            'sortOptions',
+            'totalLocationsCount',
+            'startingPrice'
+        ));
     }
 
     public function about()
@@ -99,7 +181,7 @@ class HomeController extends Controller
 
     public function storeContact(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
@@ -107,8 +189,25 @@ class HomeController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        // Here you can add logic to send email or save to database
-        // For now, we'll just flash a success message
+        $payload = array_merge($validated, [
+            'source_page' => $request->headers->get('referer') ?: $request->fullUrl(),
+            'submitted_at' => now()->toDateTimeString(),
+        ]);
+
+        try {
+            Mail::to(config('carre_premium.contact.support_email'))
+                ->send(new ContactMessage($payload));
+        } catch (\Throwable $e) {
+            Log::error('Contact request delivery failed', [
+                'email' => $validated['email'],
+                'subject' => $validated['subject'],
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Votre demande n’a pas pu être envoyée pour le moment. Veuillez réessayer ou nous contacter directement par téléphone.');
+        }
 
         Session::flash('success', 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
 

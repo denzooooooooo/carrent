@@ -22,6 +22,7 @@ class BookingPaymentDocumentsMail extends Mailable
             'event',
             'eventBooking.zone',
             'eventBooking.event',
+            'eventTickets',
             'package',
             'packageBooking.package',
             'location',
@@ -34,7 +35,8 @@ class BookingPaymentDocumentsMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Facture et recu de paiement - ' . $this->booking->booking_number,
+            subject: ($this->booking->booking_type === 'event' ? 'Documents et billets - ' : 'Facture et recu de paiement - ')
+                . $this->booking->booking_number,
         );
     }
 
@@ -55,13 +57,21 @@ class BookingPaymentDocumentsMail extends Mailable
         if ($this->booking->invoice_pdf_path) {
             $attachments[] = Attachment::fromStorageDisk('public', $this->booking->invoice_pdf_path)
                 ->as($this->booking->invoice_filename)
-                ->withMime('application/pdf');
+                ->withMime($this->booking->invoice_mime_type);
         }
 
         if ($this->booking->receipt_pdf_path) {
             $attachments[] = Attachment::fromStorageDisk('public', $this->booking->receipt_pdf_path)
                 ->as($this->booking->receipt_filename)
-                ->withMime('application/pdf');
+                ->withMime($this->booking->receipt_mime_type);
+        }
+
+        foreach ($this->booking->eventTickets as $ticket) {
+            if ($ticket->ticket_pdf_path) {
+                $attachments[] = Attachment::fromStorageDisk('public', $ticket->ticket_pdf_path)
+                    ->as($ticket->document_filename)
+                    ->withMime($ticket->document_mime_type);
+            }
         }
 
         return $attachments;

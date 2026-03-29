@@ -15,8 +15,8 @@
             </svg>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-green-800">Réservation confirmée !</h2>
-            <p class="text-green-700">Votre réservation a été créée avec succès.</p>
+            <h2 class="text-lg font-semibold text-green-800">Réservation enregistrée</h2>
+            <p class="text-green-700">Votre demande a bien été créée. La confirmation finale dépend du statut de paiement.</p>
           </div>
         </div>
       </div>
@@ -143,8 +143,8 @@
           <div>
             <h4 class="text-sm font-semibold text-blue-800 mb-1">Informations importantes</h4>
             <p class="text-sm text-blue-700">
-              Un email de confirmation vous a été envoyé. Conservez votre référence de réservation.
-              Pour toute question, contactez-nous au +225 XX XX XX XX.
+              Un email récapitulatif vous a été envoyé. Conservez votre référence de réservation.
+              Pour toute question, contactez-nous au {{ config('carre_premium.contact.landline_display') }}.
             </p>
           </div>
         </div>

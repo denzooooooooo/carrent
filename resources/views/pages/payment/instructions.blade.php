@@ -3,6 +3,22 @@
 @section('title', 'Instructions Paiement - Carré Premium')
 
 @section('content')
+@php
+    $bookingTypeLabel = match ($booking->booking_type) {
+        'event' => 'événement',
+        'package' => 'package',
+        'location' => 'location',
+        'flight' => 'vol',
+        default => 'réservation',
+    };
+    $supportEmail = config('carre_premium.contact.support_email');
+    $billingEmail = config('carre_premium.contact.billing_email');
+    $mobilePhoneDisplay = config('carre_premium.contact.mobile_display');
+    $mobilePhoneLink = config('carre_premium.contact.mobile_link');
+    $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
+    $companyName = config('carre_premium.company.legal_name');
+    $companyTaxId = config('carre_premium.company.tax_id');
+@endphp
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
     <div class="max-w-2xl mx-auto">
         <!-- Header -->
@@ -17,7 +33,7 @@
             </h1>
             <p class="text-xl text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
                 Réservation <strong class="text-blue-600 font-bold">{{ $booking->booking_number }}</strong><br>
-                Montant: <strong class="text-2xl text-blue-600">{{ number_format($booking->final_amount, 0, ' ', ' ') }} XOF</strong>
+                Montant: <strong class="text-2xl text-blue-600">{{ number_format($booking->final_amount, 0, ' ', ' ') }} {{ $booking->currency }}</strong>
             </p>
         </div>
 
@@ -36,11 +52,17 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 shadow-lg">
+                <p class="text-lg font-semibold text-red-800">{{ session('error') }}</p>
+            </div>
+        @endif
+
         <!-- Payment Instructions Card -->
         <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden mb-12">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
                 <h2 class="text-2xl md:text-3xl font-bold mb-2">Virement bancaire sécurisé</h2>
-                <p class="opacity-90">Pour votre package VIP {{ $booking->final_amount > 2000000 ? 'Premium' : 'Standard' }}</p>
+                <p class="opacity-90">Pour votre {{ $bookingTypeLabel }} {{ $booking->final_amount > 2000000 ? 'Premium' : 'Standard' }}</p>
             </div>
             <div class="p-8 md:p-12 space-y-8">
                 <!-- IMPORTANT: Reference Obligatoire -->
@@ -85,7 +107,7 @@
                             </div>
                             <div>
                                 <span class="font-semibold text-gray-700">Titulaire:</span>
-                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">CARRÉ PREMIUM SARL</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">{{ strtoupper($companyName) }}</span>
                             </div>
                             <div>
                                 <span class="font-semibold text-gray-700">RIB:</span>
@@ -94,6 +116,10 @@
                             <div>
                                 <span class="font-semibold text-gray-700">BIC/Swift:</span>
                                 <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">BLAC CICIAXXX</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">N° fiscal:</span>
+                                <span class="block mt-1 bg-white px-3 py-2 rounded-lg border text-gray-900 font-mono">{{ $companyTaxId }}</span>
                             </div>
                         </div>
                     </div>
@@ -106,7 +132,7 @@
                             </li>
                             <li class="flex items-start">
                                 <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mr-3 mt-0.5 flex-shrink-0">2</span>
-                                <span>Envoyez preuve virement WhatsApp <strong>+225 07 07 07 07 07</strong> ou email admin@carrepremium.ci</span>
+                                <span>Envoyez votre preuve de paiement par WhatsApp ou email pour accélérer la validation.</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mr-3 mt-0.5 flex-shrink-0">3</span>
@@ -116,15 +142,85 @@
                     </div>
                 </div>
 
+                <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Envoyer votre preuve de paiement</h3>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Déposez votre reçu ici pour que l’équipe puisse vérifier votre virement rapidement.
+                            </p>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            @if($booking->has_payment_proof)
+                                <span class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 font-semibold text-green-700">
+                                    Preuve déjà envoyée
+                                </span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700">
+                                    En attente de preuve
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <form action="{{ $proofUploadUrl }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-4">
+                        @csrf
+                        <div>
+                            <label for="payment_proof" class="block text-sm font-semibold text-gray-700 mb-2">Fichier justificatif</label>
+                            <input
+                                id="payment_proof"
+                                type="file"
+                                name="payment_proof"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700"
+                            >
+                            @error('payment_proof')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="payment_proof_notes" class="block text-sm font-semibold text-gray-700 mb-2">Note (optionnel)</label>
+                            <textarea
+                                id="payment_proof_notes"
+                                name="payment_proof_notes"
+                                rows="3"
+                                class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700"
+                                placeholder="Exemple : virement effectué depuis le compte de M. X, ce matin à 09h15."
+                            >{{ old('payment_proof_notes', $booking->payment_proof_notes) }}</textarea>
+                            @error('payment_proof_notes')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
+                            Envoyer la preuve
+                        </button>
+                    </form>
+                </div>
+
+                <div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Besoin d’aide pendant le paiement ?</h3>
+                    <div class="flex flex-col gap-3 text-sm text-gray-700">
+                        <a href="{{ $mobilePhoneLink }}" class="font-semibold text-blue-700 hover:text-blue-800">
+                            Téléphone : {{ $mobilePhoneDisplay }}
+                        </a>
+                        <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-700 hover:text-blue-800">
+                            WhatsApp : {{ config('carre_premium.contact.whatsapp_display') }}
+                        </a>
+                        <a href="mailto:{{ $supportEmail }}" class="font-semibold text-blue-700 hover:text-blue-800">
+                            Email : {{ $supportEmail }}
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t">
-                    <a href="{{ route('events.show', $event->slug ?? '') }}" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 px-6 rounded-xl text-center transition-all">
-                        ← Modifier réservation
+                    <a href="{{ $backUrl }}" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 px-6 rounded-xl text-center transition-all">
+                        ← Retour à la réservation
                     </a>
-                    <button onclick="copyReference()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                    <button type="button" onclick="copyReference(this)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl">
                         Copier RIB & Référence
                     </button>
-                    <a href="https://wa.me/2250707070707?text=Preuve%20virement%20{{ $booking->booking_number }}%20- {{ $booking->final_amount }}XOF" target="_blank" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-all shadow-lg hover:shadow-xl">
+                    <a href="{{ $whatsAppUrl }}?text={{ rawurlencode('Preuve de paiement ' . $booking->booking_number . ' - ' . $booking->final_amount . ' ' . $booking->currency) }}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-all shadow-lg hover:shadow-xl">
                         WhatsApp Preuve
                     </a>
                 </div>
@@ -149,7 +245,7 @@
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-3">❓ Problème?</h3>
-                    <p class="text-gray-600 mb-6">WhatsApp +225 07 07 07 07 07 ou admin@carrepremium.ci</p>
+                    <p class="text-gray-600 mb-6">WhatsApp {{ config('carre_premium.contact.whatsapp_display') }} ou {{ $billingEmail }}</p>
                 </div>
             </div>
         </div>
@@ -157,22 +253,20 @@
 </div>
 
 <script>
-function copyReference() {
+function copyReference(button) {
     const ref = '{{ $booking->booking_number }}';
     const rib = 'CI23 1234 5678 9012 3456 7890 123';
-    const text = `Réservation: ${ref}\\nMontant: {{ $booking->final_amount }} XOF\\nRIB: ${rib}\\n\\n[Preuve virement]`;
+    const text = `Réservation: ${ref}\\nMontant: {{ $booking->final_amount }} {{ $booking->currency }}\\nRIB: ${rib}\\nEmail: {{ $billingEmail }}\\n\\n[Preuve virement]`;
     
     navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target;
-        const original = btn.textContent;
-        btn.textContent = '✅ Copié!';
-        btn.style.background = '#10b981';
+        const original = button.textContent;
+        button.textContent = '✅ Copié!';
+        button.style.background = '#10b981';
         setTimeout(() => {
-            btn.textContent = original;
-            btn.style.background = '';
+            button.textContent = original;
+            button.style.background = '';
         }, 2000);
     });
 }
 </script>
 @endsection
-
