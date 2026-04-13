@@ -1,238 +1,315 @@
 @extends('layouts.app')
 
-@section('title', 'Contact - Carré Premium')
-@section('meta_description', 'Contactez Carré Premium pour une réservation, une demande sur mesure, un paiement ou un accompagnement client.')
-@section('meta_keywords', 'contact carré premium, support client, réservation premium, conciergerie abidjan, contact voyage luxe')
-@section('og_title', 'Contact - Carré Premium')
-@section('og_description', 'Écrivez à Carré Premium ou contactez directement un conseiller pour vos réservations et demandes sur mesure.')
-
-@push('head')
-@php
-    $contactSchema = [
-        '@context' => 'https://schema.org',
-        '@type' => 'ContactPage',
-        'name' => 'Contact Carré Premium',
-        'url' => url('/contact'),
-        'mainEntity' => [
-            '@type' => 'Organization',
-            'name' => config('carre_premium.company.name'),
-            'email' => config('carre_premium.contact.support_email'),
-            'telephone' => config('carre_premium.contact.landline_display'),
-        ],
-    ];
-@endphp
-<script type="application/ld+json">{!! json_encode($contactSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
-@endpush
+@section('title', __('Contactez Carré Premium - Conciergerie privée') . ' - Carré Premium')
+@section('meta_description', 'Contactez Carré Premium, votre conciergerie privée en Côte d\'Ivoire. Réservations 24/7, service client premium pour vos voyages de luxe, événements VIP et packages touristiques.')
+@section('meta_keywords', 'contact, conciergerie privée, Côte d\'Ivoire, service client, réservations, voyages luxe, événements VIP, Carré Premium')
+@section('og_title', __('Contactez Carré Premium - Conciergerie privée') . ' - Carré Premium')
+@section('og_description', 'Notre équipe est disponible 24/7 pour vous accompagner dans vos projets de voyages de luxe et événements exclusifs en Côte d\'Ivoire.')
 
 @section('content')
 @php
-    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
-    $supportEmail = config('carre_premium.contact.support_email');
-    $landlineDisplay = config('carre_premium.contact.landline_display');
-    $landlineLink = config('carre_premium.contact.landline_link');
-    $mobileDisplay = config('carre_premium.contact.mobile_display');
-    $mobileLink = config('carre_premium.contact.mobile_link');
-    $whatsAppUrl = config('carre_premium.contact.whatsapp_url');
-    $companyAddress = collect([
-        config('carre_premium.company.address'),
-        config('carre_premium.company.city'),
-        config('carre_premium.company.country'),
-    ])->filter()->implode(', ');
-    $subject = old('subject', request('subject', 'general'));
+  $supportEmail = config('carre_premium.contact.support_email');
+  $landlineDisplay = config('carre_premium.contact.landline_display');
+  $mobileDisplay = config('carre_premium.contact.mobile_display');
+  $companyAddress = trim(
+    collect([
+      config('carre_premium.company.address'),
+      config('carre_premium.company.city'),
+      config('carre_premium.company.country'),
+    ])->filter()->implode(', ')
+  );
 @endphp
+<div class="min-h-screen bg-white">
+  {{-- Hero --}}
+  <section class="relative h-[40vh] bg-gradient-to-r from-purple-600 to-amber-600 overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="relative z-10 container mx-auto h-full flex flex-col justify-center px-4">
+      <h1 class="text-5xl font-black text-white mb-4">{{ __('Contact Us') }}</h1>
+      <p class="text-xl text-white/90">{{ __('Our team is available 24/7') }}</p>
+    </div>
+  </section>
 
-<div class="cp-page">
-    <section class="cp-page-hero">
-        <div class="cp-shell">
-            <div class="overflow-hidden rounded-[2.35rem] bg-gradient-to-br from-[#22112f] via-[#4d2973] to-[#d9a64d] px-6 py-8 text-white shadow-[0_28px_90px_rgba(41,20,58,0.22)] sm:px-8 sm:py-10">
-                <div class="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(300px,360px)]">
-                    <div class="max-w-3xl">
-                        <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
-                            <span class="cp-eyebrow-dot !bg-[color:var(--cp-gold-300)]"></span>
-                            <span>{{ $t('Contact & support', 'Contact & support') }}</span>
-                        </div>
-                        <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                            {{ $t('Un seul point d’entrée pour poser une question, débloquer un paiement ou demander du sur-mesure.', 'One clear entry point to ask a question, unblock a payment or request something bespoke.') }}
-                        </h1>
-                        <p class="mt-4 max-w-2xl text-sm leading-7 text-white/84 sm:text-base">
-                            {{ $t('Réservation VIP, demande corporate, besoin urgent ou voyage sur mesure: choisissez le canal qui vous convient et l’équipe Carré Premium reprend la main.', 'VIP booking, corporate request, urgent need or bespoke travel: choose the contact channel that suits you and the Carré Premium team takes over.') }}
-                        </p>
-                    </div>
+  {{-- Contact Info Cards --}}
+  <section class="py-12">
+    <div class="container mx-auto">
+      <div class="grid md:grid-cols-4 gap-6 -mt-20 relative z-20 mb-12">
+        @php
+          $contactCards = [
+            [
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>',
+              'title' => __('Phone'),
+              'info' => __('Landline: :landline<br>Mobile: :mobile', ['landline' => $landlineDisplay, 'mobile' => $mobileDisplay]),
+              'subinfo' => __('Mon-Sun: 24/7')
+            ],
+            [
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>',
+              'title' => __('Email'),
+              'info' => $supportEmail,
+              'subinfo' => __('Response within 24h')
+            ],
+            [
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>',
+              'title' => __('Address'),
+              'info' => $companyAddress,
+              'subinfo' => __('Ivory Coast')
+            ],
+            [
+              'icon' => '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" /><path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" /></svg>',
+              'title' => 'WhatsApp',
+              'info' => $mobileDisplay,
+              'subinfo' => __('Live chat')
+            ]
+          ];
+        @endphp
 
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                        <a href="{{ $landlineLink }}" class="rounded-[1.55rem] border border-white/15 bg-white/10 px-5 py-5 text-left backdrop-blur transition hover:bg-white/14">
-                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Téléphone', 'Phone') }}</p>
-                            <p class="mt-2 text-lg font-black">{{ $landlineDisplay }}</p>
-                        </a>
-                        <a href="mailto:{{ $supportEmail }}" class="rounded-[1.55rem] border border-white/15 bg-white/10 px-5 py-5 text-left backdrop-blur transition hover:bg-white/14">
-                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{{ $t('Email', 'Email') }}</p>
-                            <p class="mt-2 break-all text-lg font-black">{{ $supportEmail }}</p>
-                        </a>
-                    </div>
-                </div>
+        @foreach($contactCards as $card)
+          <div class="bg-white rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-600 to-amber-600 rounded-2xl flex items-center justify-center text-white mb-4">
+              {!! $card['icon'] !!}
             </div>
+            <h3 class="text-lg font-bold mb-2">{{ $card['title'] }}</h3>
+            <p class="text-purple-600 font-semibold mb-1">{!! $card['info'] !!}</p>
+            <p class="text-sm text-gray-600">{{ $card['subinfo'] }}</p>
+          </div>
+        @endforeach
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12">
+        {{-- Contact Form --}}
+        <div class="bg-white rounded-3xl p-8 shadow-xl">
+          <h2 class="text-3xl font-black mb-6">{{ __('Send us a Message') }}</h2>
+
+          @if(session('success'))
+            <div class="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-xl">
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <p class="font-bold text-green-700">{{ session('success') }}</p>
+              </div>
+            </div>
+          @endif
+
+          @if(session('error'))
+            <div class="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl">
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-4a1 1 0 00-.894.553l-2 4A1 1 0 008 12h4a1 1 0 00.894-1.447l-2-4A1 1 0 0010 6zm0 8a1.25 1.25 0 100 2.5A1.25 1.25 0 0010 14z" clip-rule="evenodd" />
+                </svg>
+                <p class="font-bold text-red-700">{{ session('error') }}</p>
+              </div>
+            </div>
+          @endif
+
+          <form method="POST" action="{{ route('contact.store') }}" class="space-y-6">
+            @csrf
+            <div>
+              <label class="block text-sm font-bold mb-2">{{ __('Full name') }} *</label>
+              <input
+                type="text"
+                name="name"
+                value="{{ old('name') }}"
+                placeholder="{{ __('Your name') }}"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
+                required
+              />
+              @error('name')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-bold mb-2">{{ __('Email') }} *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value="{{ old('email') }}"
+                  placeholder="{{ $supportEmail }}"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
+                  required
+                />
+                @error('email')
+                  <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold mb-2">{{ __('Phone') }}</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value="{{ old('phone') }}"
+                  placeholder="+225 27 21 59 42 58 ou +225 01 01 22 15 15"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
+                />
+                @error('phone')
+                  <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold mb-2">{{ __('Subject') }} *</label>
+              <select
+                name="subject"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none"
+                required
+              >
+                <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>{{ __('General question') }}</option>
+                <option value="booking" {{ old('subject') == 'booking' ? 'selected' : '' }}>{{ __('Booking') }}</option>
+                <option value="payment" {{ old('subject') == 'payment' ? 'selected' : '' }}>{{ __('Payment') }}</option>
+                <option value="cancellation" {{ old('subject') == 'cancellation' ? 'selected' : '' }}>{{ __('Cancellation') }}</option>
+                <option value="complaint" {{ old('subject') == 'complaint' ? 'selected' : '' }}>{{ __('Complaint') }}</option>
+                <option value="partnership" {{ old('subject') == 'partnership' ? 'selected' : '' }}>{{ __('Partnership') }}</option>
+              </select>
+              @error('subject')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold mb-2">{{ __('Message') }} *</label>
+              <textarea
+                name="message"
+                placeholder="{{ __('Describe your request...') }}"
+                rows="6"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white focus:border-purple-600 focus:outline-none resize-none"
+                required
+              >{{ old('message') }}</textarea>
+              @error('message')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-xl hover:shadow-2xl transition-all flex items-center justify-center space-x-2"
+            >
+              <span>{{ __('Send Message') }}</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </form>
         </div>
-    </section>
 
-    <section class="cp-page-overlap">
-        <div class="cp-shell">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_360px]">
-                <div class="cp-panel rounded-[2rem] p-6 sm:p-8">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Nous écrire', 'Write to us') }}</p>
-                            <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Décrivez votre besoin clairement', 'Describe your need clearly') }}</h2>
-                        </div>
-                        <div class="cp-pill">
-                            <i class="fa-solid fa-clock text-xs"></i>
-                            <span>{{ $t('Réponse sous 24h ouvrées', 'Reply within 24 business hours') }}</span>
-                        </div>
-                    </div>
+        {{-- FAQ & Info --}}
+        <div class="space-y-6">
+          {{-- FAQ --}}
+          <div class="bg-white rounded-3xl p-8 shadow-xl">
+            <h2 class="text-3xl font-black mb-6">{{ __('Frequently Asked Questions') }}</h2>
 
-                    @if(session('success'))
-                        <div class="mt-5 rounded-[1.4rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+            <div class="space-y-4">
+              @php
+                $faqs = [
+                  [
+                    'q' => __('How to book a flight?'),
+                    'a' => __('Search for your flight, select your options, fill in passenger information and proceed to secure payment.')
+                  ],
+                  [
+                    'q' => __('Can I cancel my booking?'),
+                    'a' => __('Yes, according to fare conditions. Cancellation fees vary depending on the type of ticket.')
+                  ],
+                  [
+                    'q' => __('What payment methods do you accept?'),
+                    'a' => __('Credit card, Mobile Money (Orange Money, MTN Money, Moov Money), bank transfer and PayPal.')
+                  ],
+                  [
+                    'q' => __('How do I receive my ticket?'),
+                    'a' => __('Your e-ticket will be sent by email immediately after payment confirmation.')
+                  ]
+                ];
+              @endphp
 
-                    @if(session('error'))
-                        <div class="mt-5 rounded-[1.4rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('contact.store') }}" class="mt-6 grid gap-4">
-                        @csrf
-
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label for="name" class="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Nom complet', 'Full name') }}</label>
-                                <input id="name" name="name" type="text" value="{{ old('name') }}" required class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3.5 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]">
-                                @error('name') <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label for="phone" class="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Téléphone', 'Phone') }}</label>
-                                <input id="phone" name="phone" type="tel" value="{{ old('phone') }}" class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3.5 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]" placeholder="{{ $mobileDisplay }}">
-                                @error('phone') <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                        <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px]">
-                            <div>
-                                <label for="email" class="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Email', 'Email') }}</label>
-                                <input id="email" name="email" type="email" value="{{ old('email') }}" required class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3.5 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]">
-                                @error('email') <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label for="subject" class="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Sujet', 'Subject') }}</label>
-                                <select id="subject" name="subject" required class="w-full rounded-[1.25rem] border border-[color:var(--cp-border)] bg-white px-4 py-3.5 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]">
-                                    <option value="general" @selected($subject === 'general')>{{ $t('Question générale', 'General question') }}</option>
-                                    <option value="booking" @selected($subject === 'booking')>{{ $t('Réservation', 'Booking') }}</option>
-                                    <option value="payment" @selected($subject === 'payment')>{{ $t('Paiement', 'Payment') }}</option>
-                                    <option value="cancellation" @selected($subject === 'cancellation')>{{ $t('Annulation', 'Cancellation') }}</option>
-                                    <option value="complaint" @selected($subject === 'complaint')>{{ $t('Réclamation', 'Complaint') }}</option>
-                                    <option value="partnership" @selected($subject === 'partnership')>{{ $t('Partenariat', 'Partnership') }}</option>
-                                </select>
-                                @error('subject') <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="message" class="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Message', 'Message') }}</label>
-                            <textarea id="message" name="message" rows="7" required class="w-full rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white px-4 py-4 text-sm font-medium text-[color:var(--cp-plum-950)] outline-none transition focus:border-[color:var(--cp-border-strong)] focus:ring-2 focus:ring-[rgba(75,40,112,0.12)]" placeholder="{{ $t('Expliquez votre besoin, votre service concerné et ce qui vous bloque.', 'Describe your need, the related service and what is blocking you.') }}">{{ old('message') }}</textarea>
-                            @error('message') <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p> @enderror
-                        </div>
-
-                        <button type="submit" class="cp-primary-button !flex !w-full !justify-center sm:!w-auto">
-                            <i class="fa-regular fa-paper-plane text-sm"></i>
-                            <span>{{ $t('Envoyer la demande', 'Send request') }}</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="cp-panel rounded-[2rem] p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Accès direct', 'Direct access') }}</p>
-                        <div class="mt-5 grid gap-3">
-                            <a href="{{ $mobileLink }}" class="cp-secondary-button !flex !w-full !justify-between !rounded-[1.2rem] !py-3 text-sm">
-                                <span>{{ $t('Appeler un conseiller', 'Call an advisor') }}</span>
-                                <i class="fa-solid fa-phone text-sm"></i>
-                            </a>
-                            <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !flex !w-full !justify-between !rounded-[1.2rem] !py-3 text-sm">
-                                <span>{{ $t('Ouvrir WhatsApp', 'Open WhatsApp') }}</span>
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
-                            </a>
-                            <a href="mailto:{{ $supportEmail }}" class="cp-secondary-button !flex !w-full !justify-between !rounded-[1.2rem] !py-3 text-sm">
-                                <span>{{ $t('Envoyer un email', 'Send an email') }}</span>
-                                <i class="fa-regular fa-envelope text-sm"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="cp-panel rounded-[2rem] p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Coordonnées', 'Contact details') }}</p>
-                        <div class="mt-5 space-y-4 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                            <div>
-                                <p class="font-black text-[color:var(--cp-plum-950)]">{{ $t('Téléphone fixe', 'Landline') }}</p>
-                                <p>{{ $landlineDisplay }}</p>
-                            </div>
-                            <div>
-                                <p class="font-black text-[color:var(--cp-plum-950)]">{{ $t('Mobile / WhatsApp', 'Mobile / WhatsApp') }}</p>
-                                <p>{{ $mobileDisplay }}</p>
-                            </div>
-                            <div>
-                                <p class="font-black text-[color:var(--cp-plum-950)]">{{ $t('Adresse', 'Address') }}</p>
-                                <p>{{ $companyAddress }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="cp-panel rounded-[2rem] p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('FAQ rapide', 'Quick FAQ') }}</p>
-                        <div class="mt-4 space-y-3">
-                            @foreach([
-                                ['q' => $t('Comment suivre ma réservation ?', 'How do I track my booking?'), 'a' => $t('Depuis votre profil, rubrique Mes réservations, ou via le lien reçu après commande.', 'From your profile under My bookings, or via the link received after purchase.')],
-                                ['q' => $t('Puis-je payer plus tard ?', 'Can I pay later?'), 'a' => $t('Oui si le dossier est créé, vous pouvez revenir au checkout tant que la réservation reste ouverte.', 'Yes, if the booking exists you can return to checkout while it remains open.')],
-                                ['q' => $t('Puis-je demander du sur-mesure ?', 'Can I request something bespoke?'), 'a' => $t('Oui. Le plus simple est de détailler votre besoin dans le formulaire ou par téléphone.', 'Yes. The easiest way is to describe it in the form or by phone.')],
-                            ] as $faq)
-                                <details class="event-accordion p-0">
-                                    <summary class="cursor-pointer list-none px-4 py-4 text-sm font-black text-[color:var(--cp-plum-950)]">{{ $faq['q'] }}</summary>
-                                    <div class="px-4 pb-4 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $faq['a'] }}</div>
-                                </details>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+              @foreach($faqs as $faq)
+                <details class="group">
+                  <summary class="flex items-center justify-between cursor-pointer p-4 bg-gray-50 rounded-xl hover:bg-purple-50 transition-colors">
+                    <span class="font-bold">{{ $faq['q'] }}</span>
+                    <svg class="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <p class="mt-3 px-4 text-gray-600">{{ $faq['a'] }}</p>
+                </details>
+              @endforeach
             </div>
+          </div>
 
-            <div class="cp-panel mt-6 rounded-[2rem] p-6 sm:p-8">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Adresse', 'Address') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Notre base à Abidjan', 'Our base in Abidjan') }}</h2>
-                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $companyAddress }}</p>
-                    </div>
-                    <div class="cp-pill">
-                        <i class="fa-solid fa-location-dot text-xs"></i>
-                        <span>{{ $t('Support client et coordination', 'Client support and coordination') }}</span>
-                    </div>
-                </div>
-
-                <div class="mt-6 aspect-[16/7] overflow-hidden rounded-[1.7rem] bg-[#ebe4f6]">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2!2d-4.0!3d5.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTgnMDAuMCJOIDTCsDAwJzAwLjAiVw!5e0!3m2!1sfr!2sci!4v1234567890&q=Abidjan+Marcory+Biétry+Boulevard+de+Marseille,+Côte+d'Ivoire"
-                        width="100%"
-                        height="100%"
-                        style="border:0"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                </div>
+          {{-- Horaires --}}
+          <div class="bg-gradient-to-r from-purple-600 to-amber-600 rounded-3xl p-8 shadow-xl text-white">
+            <h3 class="text-2xl font-black mb-4">{{ __('Opening Hours') }}</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center pb-3 border-b border-white/20">
+                <span class="font-semibold">{{ __('Monday - Friday') }}</span>
+                <span>08:00 - 20:00</span>
+              </div>
+              <div class="flex justify-between items-center pb-3 border-b border-white/20">
+                <span class="font-semibold">{{ __('Saturday') }}</span>
+                <span>09:00 - 18:00</span>
+              </div>
+              <div class="flex justify-between items-center pb-3 border-b border-white/20">
+                <span class="font-semibold">{{ __('Sunday') }}</span>
+                <span>10:00 - 16:00</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="font-semibold">{{ __('Emergencies') }}</span>
+                <span class="font-bold">24/7</span>
+              </div>
             </div>
+          </div>
+
+          {{-- Social Media --}}
+          <div class="bg-white rounded-3xl p-8 shadow-xl">
+            <h3 class="text-2xl font-black mb-6">{{ __('Follow Us') }}</h3>
+            <div class="space-y-4">
+              @php
+                $socials = [
+                  ['name' => 'Facebook', 'icon' => 'fab fa-facebook-f', 'color' => 'from-blue-600 to-blue-700', 'url' => 'https://www.facebook.com/agence.carrepremium'],
+                  ['name' => 'Instagram', 'icon' => 'fab fa-instagram', 'color' => 'from-pink-600 to-purple-600', 'url' => 'https://www.instagram.com/carre.premium'],
+                  ['name' => 'LinkedIn', 'icon' => 'fab fa-linkedin-in', 'color' => 'from-blue-700 to-blue-800', 'url' => 'https://www.linkedin.com/company/carre-premium']
+                ];
+              @endphp
+
+              @foreach($socials as $social)
+                <a
+                  href="{{ $social['url'] ?? '#' }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center space-x-4 p-4 bg-gradient-to-r {{ $social['color'] }} rounded-xl text-white hover:shadow-lg hover:scale-105 transition-all group"
+                  aria-label="{{ $social['name'] }}"
+                >
+                  <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                    <i class="{{ $social['icon'] }} text-2xl"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-bold text-lg">{{ $social['name'] }}</p>
+                    <p class="text-sm text-white/80">{{ __('Follow us on') }} {{ $social['name'] }}</p>
+                  </div>
+                  <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                </a>
+              @endforeach
+            </div>
+          </div>
         </div>
-    </section>
+      </div>
+
+      {{-- Map --}}
+      <div class="mt-12 bg-white rounded-3xl p-8 shadow-xl">
+        <h2 class="text-3xl font-black mb-6">{{ __('Our Location') }}</h2>
+        <div class="aspect-video bg-gray-200 rounded-2xl overflow-hidden">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2!2d-4.0!3d5.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTgnMDAuMCJOIDTCsDAwJzAwLjAiVw!5e0!3m2!1sfr!2sci!4v1234567890&q=Abidjan+Marcory+Biétry+Boulevard+de+Marseille,+Côte+d'Ivoire"
+            width="100%"
+            height="100%"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 @endsection

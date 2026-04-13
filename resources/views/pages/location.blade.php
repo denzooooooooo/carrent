@@ -4,30 +4,11 @@
 @section('meta_description', __('Découvrez nos véhicules premium en Côte d’Ivoire. Chauffeur, location privée et solutions sur mesure avec Carré Premium.'))
 @section('meta_keywords', __('location de véhicules, voiture premium, transport privé, Côte d’Ivoire, Carré Premium'))
 @section('og_title', __('Location de véhicules premium') . ' - Carré Premium')
-@section('og_description', __('Réservez un véhicule premium avec chauffeur ou en mise à disposition pour vos arrivées, rendez-vous et séjours.'))
+@section('og_description', __('Réservez un véhicule premium avec un parcours plus clair, plus fiable et mieux structuré pour vos clients.'))
 
 @section('content')
 @php
     $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
-    $locations = $locations ?? new \Illuminate\Pagination\LengthAwarePaginator(
-        collect(),
-        0,
-        9,
-        request()->integer('page', 1),
-        ['path' => route('location'), 'query' => request()->query()]
-    );
-    $categories = isset($categories) ? collect($categories)->filter()->values() : collect();
-    $types = isset($types) ? collect($types)->filter()->values() : collect();
-    $selectedSort = isset($selectedSort) && $selectedSort !== '' ? (string) $selectedSort : (string) request('sort', 'recommended');
-    $sortOptions = $sortOptions ?? [
-        'recommended' => $t('Recommandés', 'Recommended'),
-        'price_low' => $t('Prix croissant', 'Price low to high'),
-        'price_high' => $t('Prix décroissant', 'Price high to low'),
-        'capacity_high' => $t('Grande capacité', 'Highest capacity'),
-        'name' => $t('Nom A-Z', 'Name A-Z'),
-    ];
-    $totalLocationsCount = isset($totalLocationsCount) ? (int) $totalLocationsCount : (int) $locations->total();
-    $startingPrice = $startingPrice ?? null;
     $searchTerm = trim((string) request('q'));
     $selectedCategory = (string) request('category');
     $selectedType = (string) request('type');
@@ -44,16 +25,16 @@
         $selectedCategory !== '' ? ['label' => $t('Catégorie', 'Category'), 'value' => ucfirst($selectedCategory)] : null,
         $selectedType !== '' ? ['label' => $t('Type', 'Type'), 'value' => ucfirst($selectedType)] : null,
         $selectedCapacity !== '' ? ['label' => $t('Capacité', 'Capacity'), 'value' => $capacityLabels[$selectedCapacity] ?? $selectedCapacity] : null,
-        $selectedSort !== 'recommended' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
+        ($selectedSort ?? 'recommended') !== 'recommended' ? ['label' => $t('Tri', 'Sort'), 'value' => $sortOptions[$selectedSort] ?? $selectedSort] : null,
     ])->filter()->values();
 
     $resetUrl = route('location');
 @endphp
 
-<div class="cp-page">
-    <section class="cp-page-hero">
+<div class="min-h-screen pb-14 sm:pb-16">
+    <section class="pt-4 sm:pt-6">
         <div class="cp-shell">
-            <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#22112f] via-[#4d2973] to-[#d9a64d] text-white shadow-[0_28px_90px_rgba(41,20,58,0.24)]">
+            <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1d2239] via-[#234c7b] to-[#d49a46] text-white shadow-[0_28px_90px_rgba(20,34,59,0.24)]">
                 <div class="grid gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.18fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
                     <div class="max-w-3xl">
                         <div class="cp-kicker !text-[color:var(--cp-gold-300)]">
@@ -62,11 +43,11 @@
                         </div>
 
                         <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                            {{ $t('Une flotte premium pour vos arrivées, rendez-vous et déplacements sur mesure.', 'A premium fleet for arrivals, appointments and bespoke mobility.') }}
+                            {{ $t('Une page location plus simple à lire, plus rassurante et plus claire sur mobile.', 'A rental page that is easier to read, more reassuring and clearer on mobile.') }}
                         </h1>
 
                         <p class="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                            {{ $t('Berlines, SUV, vans et véhicules avec chauffeur pour accueillir un client, assurer un transfert aéroport ou accompagner un séjour haut de gamme.', 'Sedans, SUVs, vans and chauffeur-driven vehicles to welcome a client, handle an airport transfer or support a high-end stay.') }}
+                            {{ $t('Le client doit identifier en quelques secondes le type de véhicule, la capacité, le prix journalier et la prochaine action. Cette version remet cette hiérarchie au centre.', 'Clients should identify the vehicle type, seating capacity, daily rate and next action in seconds. This version puts that hierarchy back at the center.') }}
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -107,15 +88,15 @@
         </div>
     </section>
 
-    <section id="location-filters" class="cp-page-overlap">
+    <section id="location-filters" class="-mt-6 pt-0">
         <div class="cp-shell">
             <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
                 <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Sélection flotte', 'Fleet selection') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Catégorie, capacité et style de conduite', 'Category, capacity and driving style') }}</h2>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Parcours clarifié', 'Clearer flow') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Vrais filtres, lecture plus nette', 'Real filters, sharper reading') }}</h2>
                         <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                            {{ $t('Choisissez le véhicule selon la catégorie, le nombre de passagers et le type de trajet à assurer, tout en gardant le tarif journalier en repère.', 'Choose the vehicle by category, passenger count and trip type while keeping daily pricing as a clear reference.') }}
+                            {{ $t('Les filtres sont maintenant reliés aux données réelles de la flotte. Le client ne clique plus sur des options trompeuses.', 'Filters now connect to the real fleet data. Clients are no longer clicking on misleading options.') }}
                         </p>
                     </div>
 
@@ -207,7 +188,7 @@
         </div>
     </section>
 
-    <section class="cp-page-section">
+    <section class="pt-8 sm:pt-10">
         <div class="cp-shell">
             <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -231,21 +212,6 @@
                         @php
                             $locationImage = $location->image_url ?: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900&h=700&fit=crop';
                             $locationFeatures = collect($location->features ?? [])->filter()->take(3);
-                            $locationName = app()->getLocale() === 'fr'
-                                ? ($location->name_fr ?? $location->name_en ?? $t('Véhicule premium', 'Premium vehicle'))
-                                : ($location->name_en ?? $location->name_fr ?? $t('Véhicule premium', 'Premium vehicle'));
-                            $locationDescription = app()->getLocale() === 'fr'
-                                ? ($location->description_fr ?? $location->description_en ?? '')
-                                : ($location->description_en ?? $location->description_fr ?? '');
-                            $locationDescription = trim((string) $locationDescription) !== ''
-                                ? $locationDescription
-                                : $t('Solution de mobilité premium avec disponibilité à confirmer selon vos dates et votre besoin.', 'Premium mobility solution with availability to confirm according to your dates and needs.');
-                            $capacityLabel = $location->capacity
-                                ? $location->capacity . ' ' . $t('passagers', 'passengers')
-                                : $t('Capacité sur demande', 'Capacity on request');
-                            $priceLabel = $location->price_per_day
-                                ? \App\Helpers\CurrencyHelper::format($location->price_per_day)
-                                : $t('Sur demande', 'On request');
                         @endphp
 
                         <article class="group overflow-hidden rounded-[2rem] border border-[color:var(--cp-border)] bg-white/95 shadow-[0_18px_55px_rgba(24,37,67,0.10)] transition hover:-translate-y-1 hover:shadow-[0_28px_75px_rgba(24,37,67,0.16)]">
@@ -255,12 +221,12 @@
 
                                 <div class="absolute left-4 top-4 flex flex-wrap gap-2">
                                     @if($location->category)
-                                        <span class="rounded-full bg-[#f4edff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
+                                        <span class="rounded-full bg-[#e7f4ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#15588a]">
                                             {{ ucfirst($location->category) }}
                                         </span>
                                     @endif
                                     @if($location->type)
-                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
+                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#17486f]">
                                             {{ ucfirst($location->type) }}
                                         </span>
                                     @endif
@@ -269,40 +235,40 @@
                                 <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
                                     <div>
                                         <p class="text-xs font-black uppercase tracking-[0.2em] text-white/70">{{ $t('Capacité', 'Capacity') }}</p>
-                                        <p class="mt-1 text-lg font-black text-white">{{ $capacityLabel }}</p>
+                                        <p class="mt-1 text-lg font-black text-white">{{ $location->capacity }} {{ $t('passagers', 'passengers') }}</p>
                                     </div>
 
                                     <div class="rounded-[1.1rem] bg-white/92 px-4 py-3 text-right shadow-lg">
                                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Par jour', 'Per day') }}</p>
-                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $priceLabel }}</p>
+                                        <p class="mt-1 text-lg font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="p-5 sm:p-6">
                                 <h3 class="text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">
-                                    {{ $locationName }}
+                                    {{ $location->name }}
                                 </h3>
 
                                 <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                                    {{ \Illuminate\Support\Str::limit($locationDescription, 150) }}
+                                    {{ \Illuminate\Support\Str::limit($location->description, 150) }}
                                 </p>
 
                                 <div class="mt-5 grid grid-cols-2 gap-3">
-                                    <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
-                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Catégorie', 'Category') }}</p>
-                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $location->category ? ucfirst($location->category) : $t('Sur demande', 'On request') }}</p>
+                                    <div class="rounded-[1.2rem] bg-[#eef7ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Catégorie', 'Category') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $location->category ? ucfirst($location->category) : $t('Sur demande', 'On request') }}</p>
                                     </div>
-                                    <div class="rounded-[1.2rem] bg-[#faf6ff] px-4 py-3">
-                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Type', 'Type') }}</p>
-                                        <p class="mt-2 text-sm font-bold text-[color:var(--cp-plum-950)]">{{ $location->type ? ucfirst($location->type) : $t('Sur demande', 'On request') }}</p>
+                                    <div class="rounded-[1.2rem] bg-[#eef7ff] px-4 py-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5b7393]">{{ $t('Type', 'Type') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-[#10233e]">{{ $location->type ? ucfirst($location->type) : $t('Sur demande', 'On request') }}</p>
                                     </div>
                                 </div>
 
                                 @if($locationFeatures->isNotEmpty())
                                     <div class="mt-5 flex flex-wrap gap-2">
                                         @foreach($locationFeatures as $feature)
-                                            <span class="rounded-full bg-[#f6f0ff] px-3 py-2 text-xs font-bold text-[color:var(--cp-plum-800)]">
+                                            <span class="rounded-full bg-[#f3f8fc] px-3 py-2 text-xs font-bold text-[#34516d]">
                                                 {{ $feature }}
                                             </span>
                                         @endforeach
@@ -312,10 +278,10 @@
                                 <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p class="text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Tarif indicatif', 'Indicative fare') }}</p>
-                                        <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $priceLabel }}</span>
+                                        <span class="mt-1 block text-2xl font-black text-[color:var(--cp-plum-950)]">{{ \App\Helpers\CurrencyHelper::format($location->price_per_day) }}</span>
                                     </div>
 
-                                    <a href="{{ route('location.show', $location) }}" class="cp-primary-button !w-full sm:!w-auto">
+                                    <a href="{{ route('location.show', $location) }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#1e507b] hover:!bg-[#194668]">
                                         <span>{{ $t('Voir le détail', 'View details') }}</span>
                                         <i class="fa-solid fa-arrow-right text-xs"></i>
                                     </a>
@@ -345,20 +311,20 @@
         </div>
     </section>
 
-    <section class="cp-page-section-lg">
+    <section class="pt-10 sm:pt-12">
         <div class="cp-shell">
-            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
+            <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#19304a] via-[#226695] to-[#d49a46] px-5 py-8 text-white shadow-[0_24px_70px_rgba(24,37,67,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div class="max-w-3xl">
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Demande spécifique', 'Specific request') }}</p>
                         <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d’un modèle précis, d’un chauffeur ou d’un trajet sur mesure ?', 'Need a precise model, a driver or a bespoke route?') }}</h2>
                         <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
-                            {{ $t('L’équipe peut vous proposer la bonne configuration selon le niveau de service attendu, la durée de mise à disposition et la disponibilité réelle.', 'The team can recommend the right setup according to service level, rental duration and real availability.') }}
+                            {{ $t('L’équipe peut vous orienter vers une solution plus claire que la simple liste: disponibilité réelle, conditions et besoin client réunis dans la même discussion.', 'The team can guide you to a clearer solution than a simple list: real availability, conditions and customer need gathered in the same conversation.') }}
                         </p>
                     </div>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
-                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e2aa54]">
+                        <a href="{{ route('contact') }}" class="cp-primary-button !bg-[#f0bb61] !text-[#17304a] hover:!bg-[#e2aa54]">
                             <i class="fa-regular fa-envelope text-sm"></i>
                             <span>{{ $t('Demander un devis', 'Request a quote') }}</span>
                         </a>

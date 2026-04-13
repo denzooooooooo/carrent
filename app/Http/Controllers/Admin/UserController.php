@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class UserController extends Controller
@@ -39,27 +39,17 @@ class UserController extends Controller
             $query->where('country', $request->country);
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        $users = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Statistiques
-        $totalUsers = User::count();
-        $activeUsers = User::where('is_active', true)->count();
         $stats = [
-            'total' => $totalUsers,
-            'active' => $activeUsers,
-            'inactive' => max($totalUsers - $activeUsers, 0),
+            'total' => User::count(),
+            'active' => User::where('is_active', true)->count(),
             'new' => User::where('created_at', '>=', Carbon::now()->subDays(30))->count(),
             'total_points' => User::sum('loyalty_points'),
         ];
 
-        $countries = User::query()
-            ->whereNotNull('country')
-            ->where('country', '!=', '')
-            ->distinct()
-            ->orderBy('country')
-            ->pluck('country');
-
-        return view('admin.users.index', compact('users', 'stats', 'countries'));
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
     /**
@@ -89,7 +79,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = User::create([
+            User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
@@ -102,21 +92,9 @@ class UserController extends Controller
                 'is_active' => $request->has('is_active'),
             ]);
 
-            Log::info('Admin user created', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]);
-
             return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
         } catch (\Exception $e) {
-            Log::error('Admin user creation failed', [
-                'admin_id' => auth('admin')->id(),
-                'email' => $request->input('email'),
-                'message' => $e->getMessage(),
-            ]);
-
-            return back()->withInput()->with('error', 'La création de l’utilisateur a échoué. Vérifie les champs puis réessaie.');
+            return back()->withInput()->with('error', 'Erreur lors de la création de l\'utilisateur.');
         }
     }
 
@@ -135,19 +113,7 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-
-        return response()->json([
-            'id' => $user->id,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'email' => $user->email,
-            'phone' => $user->phone,
-            'country' => $user->country,
-            'city' => $user->city,
-            'address' => $user->address,
-            'loyalty_points' => $user->loyalty_points,
-            'is_active' => (bool) $user->is_active,
-        ]);
+        return response()->json($user);
     }
 
     /**
@@ -171,18 +137,6 @@ class UserController extends Controller
         ]);
 
         try {
-            $original = $user->only([
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-                'country',
-                'city',
-                'address',
-                'loyalty_points',
-                'is_active',
-            ]);
-
             $data = [
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
@@ -199,25 +153,11 @@ class UserController extends Controller
                 $data['password'] = Hash::make($request->password);
             }
 
-            $user->update($data);
-
-            Log::info('Admin user updated', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'changes' => array_keys(array_diff_assoc($data, $original)),
-            ]);
+            $user->update($data);   
 
             return redirect()->route('admin.users.index')->with('success', 'Utilisateur modifié avec succès.');
         } catch (\Exception $e) {
-            Log::error('Admin user update failed', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $user->id,
-                'email' => $request->input('email', $user->email),
-                'message' => $e->getMessage(),
-            ]);
-
-            return back()->withInput()->with('error', 'La modification de l’utilisateur a échoué. Vérifie les données puis réessaie.');
+            return back()->withInput()->with('error', 'Erreur lors de la modification de l\'utilisateur.');
         }
     }
 
@@ -228,24 +168,11 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $email = $user->email;
             $user->delete();
-
-            Log::warning('Admin user deleted', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $id,
-                'email' => $email,
-            ]);
 
             return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès.');
         } catch (\Exception $e) {
-            Log::error('Admin user deletion failed', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $id,
-                'message' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', 'La suppression de l’utilisateur a échoué.');
+            return back()->with('error', 'Erreur lors de la suppression de l\'utilisateur.');
         }
     }
 
@@ -258,27 +185,15 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->update(['is_active' => !$user->is_active]);
 
-            Log::info('Admin user status toggled', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $user->id,
-                'is_active' => (bool) $user->is_active,
-            ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Statut mis à jour avec succès.',
                 'is_active' => $user->is_active
             ]);
         } catch (\Exception $e) {
-            Log::error('Admin user status toggle failed', [
-                'admin_id' => auth('admin')->id(),
-                'user_id' => $id,
-                'message' => $e->getMessage(),
-            ]);
-
             return response()->json([
                 'success' => false,
-                'message' => 'La mise à jour du statut a échoué.'
+                'message' => 'Erreur lors de la mise à jour du statut.'
             ], 500);
         }
     }

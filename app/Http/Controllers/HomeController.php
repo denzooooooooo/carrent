@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Mail;
 use App\Services\GoogleFlightsService;
 use App\Models\Event;
 use App\Models\Location;
-use App\Models\TourPackage;
 use App\Mail\ContactMessage;
 
 
@@ -18,39 +17,14 @@ class HomeController extends Controller
 
     public function index()
     {
+        // Charger les événements actifs avec leurs relations pour le carrousel
         $events = Event::where('is_active', true)
             ->with(['category', 'type', 'seatZones'])
-            ->orderByDesc('is_featured')
-            ->orderBy('event_date')
-            ->orderBy('event_time')
-            ->take(6)
+            ->orderBy('created_at', 'desc')
+            ->take(8)
             ->get();
 
-        $featuredPackages = TourPackage::query()
-            ->where('is_active', true)
-            ->orderByDesc('is_featured')
-            ->orderByDesc('created_at')
-            ->take(3)
-            ->get();
-
-        $featuredLocations = Location::query()
-            ->active()
-            ->orderByDesc('created_at')
-            ->take(3)
-            ->get();
-
-        $stats = [
-            'events' => Event::query()->where('is_active', true)->count(),
-            'packages' => TourPackage::query()->where('is_active', true)->count(),
-            'locations' => Location::query()->active()->count(),
-            'starting_package_price' => TourPackage::query()
-                ->where('is_active', true)
-                ->selectRaw('MIN(COALESCE(discount_price, price)) as starting_price')
-                ->value('starting_price'),
-            'starting_location_price' => Location::query()->active()->min('price_per_day'),
-        ];
-
-        return view('pages.home', compact('events', 'featuredPackages', 'featuredLocations', 'stats'));
+        return view('pages.home', compact('events'));
     }
 
     public function events()
@@ -64,7 +38,7 @@ class HomeController extends Controller
 
     public function packages()
     {
-        return app(PackageController::class)->index(request());
+        return view('pages.packages');
     }
 
     public function location(Request $request)
@@ -213,25 +187,9 @@ class HomeController extends Controller
             'phone' => 'nullable|string|max:20',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
-            'company_name' => 'nullable|string|max:255',
-            'website' => 'nullable|url|max:255',
-            'partnership_type' => 'nullable|string|max:100',
         ]);
 
-        $message = $validated['message'];
-
-        if (!empty($validated['company_name']) || !empty($validated['partnership_type']) || !empty($validated['website'])) {
-            $message = collect([
-                !empty($validated['company_name']) ? 'Entreprise: ' . $validated['company_name'] : null,
-                !empty($validated['partnership_type']) ? 'Type de partenariat: ' . $validated['partnership_type'] : null,
-                !empty($validated['website']) ? 'Site web: ' . $validated['website'] : null,
-                null,
-                $validated['message'],
-            ])->filter(static fn ($value) => $value !== null)->implode("\n");
-        }
-
         $payload = array_merge($validated, [
-            'message' => $message,
             'source_page' => $request->headers->get('referer') ?: $request->fullUrl(),
             'submitted_at' => now()->toDateTimeString(),
         ]);

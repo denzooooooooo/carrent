@@ -317,7 +317,6 @@ Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
 Route::get('/cookies', [HomeController::class, 'cookies'])->name('cookies');
-Route::view('/cart', 'pages.cart')->name('cart');
 
 // --- Services de Conciergerie ---
 Route::get('/visa-service', [HomeController::class, 'visaService'])->name('visa.service');

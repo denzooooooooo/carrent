@@ -1,602 +1,271 @@
 @extends('layouts.app')
 
-@section('title', 'Accueil - Carré Premium')
-@section('meta_description', 'Carré Premium réunit événements VIP, packages signature, mobilité premium et accompagnement humain pour vivre, voyager et arriver autrement.')
-@section('meta_keywords', 'conciergerie premium, événements VIP, packages luxe, location premium, vols accompagnés, Carré Premium, Abidjan')
-@section('og_title', 'Accueil - Carré Premium')
-@section('og_description', 'Découvrez les événements VIP, packages signature, solutions de mobilité premium et vols accompagnés de Carré Premium.')
-
-@push('styles')
-<style>
-    .cp-home-glow {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .cp-home-glow::before,
-    .cp-home-glow::after {
-        content: '';
-        position: absolute;
-        border-radius: 999px;
-        filter: blur(20px);
-        pointer-events: none;
-        opacity: 0.42;
-    }
-
-    .cp-home-glow::before {
-        top: -6rem;
-        right: -4rem;
-        width: 16rem;
-        height: 16rem;
-        background: radial-gradient(circle, rgba(240, 187, 97, 0.42), transparent 68%);
-    }
-
-    .cp-home-glow::after {
-        bottom: -7rem;
-        left: -5rem;
-        width: 18rem;
-        height: 18rem;
-        background: radial-gradient(circle, rgba(110, 67, 168, 0.32), transparent 68%);
-    }
-
-    .cp-home-track {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        scroll-snap-type: x mandatory;
-    }
-
-    .cp-home-track::-webkit-scrollbar {
-        display: none;
-    }
-
-    .cp-home-card {
-        scroll-snap-align: start;
-    }
-
-    .cp-home-hero-slide {
-        transition: opacity 0.45s ease, transform 0.45s ease;
-    }
-
-    .cp-home-dot {
-        transition: width 0.25s ease, opacity 0.25s ease, background-color 0.25s ease;
-    }
-
-    @keyframes cp-home-float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
-    }
-
-    .cp-home-float {
-        animation: cp-home-float 5.4s ease-in-out infinite;
-    }
-</style>
-@endpush
+@section('title', __('Home - Carré Premium'))
 
 @section('content')
-@php
-    $t = fn (string $fr, string $en) => app()->getLocale() === 'fr' ? $fr : $en;
-    $supportPhone = config('carre_premium.contact.mobile_display', '+225 01 01 22 15 15');
-    $supportPhoneLink = config('carre_premium.contact.mobile_link', 'tel:+2250101221515');
-    $supportEmail = config('carre_premium.contact.support_email', 'infos@carrepremium.com');
-    $whatsAppUrl = config('carre_premium.contact.whatsapp_url', 'https://wa.me/2250101221515');
-    $events = $events ?? collect();
-    $featuredPackages = $featuredPackages ?? collect();
-    $featuredLocations = $featuredLocations ?? collect();
-    $stats = $stats ?? [];
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  {{-- Hero Carrousel responsive (nouveau) --}}
+  @include('components.home-carousel')
+  {{-- Texte de bienvenue --}}
+  <section class="py-12 bg-white dark:bg-gray-900">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{{ __('Welcome to Carré Premium') }}</h2>
+      <p class="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{{ __('Discover our tailor-made tourist packages, private flights, and 24/7 concierge service to organize your most exclusive experiences. Our advisors are at your disposal to personalize every detail.') }}</br>
+      <blockquote class="italic text-amber-600">"{{ __('Carré Premium, our limit is the reflection of our imagination.') }}"</blockquote>
+      </p>
+    </div>
+  </section>
 
-    $eventCards = $events->map(function ($event) use ($t) {
-        $title = app()->getLocale() === 'fr'
-            ? ($event->title_fr ?? $event->title_en ?? 'Événement VIP')
-            : ($event->title_en ?? $event->title_fr ?? 'VIP event');
 
-        return [
-            'type' => $t('Événement', 'Event'),
-            'title' => $title,
-            'subtitle' => collect([$event->venue_name, $event->city])->filter()->join(' · '),
-            'image' => $event->getFirstMediaUrl('avatar', 'normal')
-                ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1400&h=900&fit=crop',
-            'url' => route('events.show', $event->slug ?? $event->id),
-            'meta' => $event->event_date?->format('d/m/Y'),
-            'price' => $event->min_price ? \App\Helpers\CurrencyHelper::format($event->min_price) : $t('Sur demande', 'On request'),
-        ];
-    })->values();
+  {{-- Événements à la Une - Carrousel Dynamique --}}
+  @include('components.events-carousel')
 
-    $packageCards = $featuredPackages->map(function ($package) use ($t) {
-        $title = app()->getLocale() === 'fr'
-            ? ($package->title_fr ?? $package->title_en ?? 'Package signature')
-            : ($package->title_en ?? $package->title_fr ?? 'Signature package');
-
-        return [
-            'type' => $t('Package', 'Package'),
-            'title' => $title,
-            'subtitle' => $package->destination ?: $t('Voyage signature', 'Signature escape'),
-            'image' => $package->getFirstMediaUrl('avatar', 'normal')
-                ?: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&h=900&fit=crop',
-            'url' => route('packages.show', $package->slug),
-            'meta' => $package->duration_text_fr ?: $package->duration . ' ' . $t('jours', 'days'),
-            'price' => \App\Helpers\CurrencyHelper::format($package->discount_price ?: $package->price),
-        ];
-    })->values();
-
-    $locationCards = $featuredLocations->map(function ($location) use ($t) {
-        return [
-            'type' => $t('Mobilité', 'Mobility'),
-            'title' => $location->name,
-            'subtitle' => ucfirst($location->category ?: $t('premium', 'premium')),
-            'image' => $location->image_url
-                ?: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1400&h=900&fit=crop',
-            'url' => route('location.show', $location->id),
-            'meta' => $location->capacity ? $location->capacity . ' ' . $t('pers.', 'guests') : null,
-            'price' => \App\Helpers\CurrencyHelper::format($location->price_per_day) . '/' . $t('jour', 'day'),
-        ];
-    })->values();
-
-    $heroSlides = collect()
-        ->merge($eventCards->take(3))
-        ->merge($packageCards->take(2))
-        ->merge($locationCards->take(2))
-        ->take(7)
-        ->values();
-
-    if ($heroSlides->isEmpty()) {
-        $heroSlides = collect([
-            [
-                'type' => $t('Carré Premium', 'Carré Premium'),
-                'title' => $t('Des expériences premium à vivre, offrir ou réserver.', 'Premium experiences to live, gift or book.'),
-                'subtitle' => $t('Événements VIP, voyages signature, mobilité premium et accompagnement humain.', 'VIP events, signature journeys, premium mobility and human guidance.'),
-                'image' => 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1400&h=900&fit=crop',
-                'url' => route('contact'),
-                'meta' => $t('Conseiller dédié', 'Dedicated advisor'),
-                'price' => $t('Sur demande', 'On request'),
-            ],
-        ]);
-    }
-
-    $serviceCards = [
-        [
-            'title' => $t('Événements VIP', 'VIP events'),
-            'description' => $t('Billetterie premium, accès exclusifs et expériences fortes.', 'Premium ticketing, exclusive access and high-impact experiences.'),
-            'route' => route('events'),
-            'cta' => $t('Voir les événements', 'See events'),
-            'icon' => 'fa-ticket',
-            'image' => $eventCards->first()['image'] ?? 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1400&h=900&fit=crop',
-        ],
-        [
-            'title' => $t('Packages signature', 'Signature packages'),
-            'description' => $t('Séjours, circuits et expériences luxe présentés comme des collections.', 'Trips, circuits and luxury experiences presented like curated collections.'),
-            'route' => route('packages'),
-            'cta' => $t('Explorer les packages', 'Explore packages'),
-            'icon' => 'fa-suitcase-rolling',
-            'image' => $packageCards->first()['image'] ?? 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&h=900&fit=crop',
-        ],
-        [
-            'title' => $t('Mobilité premium', 'Premium mobility'),
-            'description' => $t('Véhicules, transferts et solutions de déplacement haut de gamme.', 'Vehicles, transfers and high-end mobility solutions.'),
-            'route' => route('location'),
-            'cta' => $t('Voir la flotte', 'See the fleet'),
-            'icon' => 'fa-car-side',
-            'image' => $locationCards->first()['image'] ?? 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1400&h=900&fit=crop',
-        ],
-        [
-            'title' => $t('Vols accompagnés', 'Supported flights'),
-            'description' => $t('Demandes gérées avec un conseiller pour sécuriser chaque étape.', 'Requests handled with an advisor to secure each step.'),
-            'route' => route('flights.index'),
-            'cta' => $t('Parler à un conseiller', 'Talk to an advisor'),
-            'icon' => 'fa-plane-departure',
-            'image' => 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1400&h=900&fit=crop',
-        ],
-    ];
-
-    $statsCards = [
-        ['label' => $t('Événements actifs', 'Active events'), 'value' => number_format((int) ($stats['events'] ?? $events->count()), 0, ',', ' ')],
-        ['label' => $t('Packages signature', 'Signature packages'), 'value' => number_format((int) ($stats['packages'] ?? $featuredPackages->count()), 0, ',', ' ')],
-        ['label' => $t('Solutions mobilité', 'Mobility options'), 'value' => number_format((int) ($stats['locations'] ?? $featuredLocations->count()), 0, ',', ' ')],
-        ['label' => $t('Point de départ package', 'Package entry point'), 'value' => !empty($stats['starting_package_price']) ? \App\Helpers\CurrencyHelper::format($stats['starting_package_price']) : $t('Sur demande', 'On request')],
-    ];
-
-    $mixedMoments = collect()
-        ->merge($eventCards)
-        ->merge($packageCards)
-        ->merge($locationCards)
-        ->take(10)
-        ->values();
-@endphp
-
-<div class="cp-page">
-    <section class="cp-page-hero">
-        <div class="cp-shell">
-            <div class="cp-home-glow overflow-hidden rounded-[2.6rem] bg-[linear-gradient(135deg,#170d23_0%,#3f225f_42%,#d9a441_100%)] px-5 py-8 text-white shadow-[0_28px_90px_rgba(34,18,52,0.28)] sm:px-8 sm:py-10 xl:px-10 xl:py-12">
-                <div class="grid gap-8 xl:grid-cols-[minmax(0,1.04fr)_minmax(360px,470px)] xl:items-center">
-                    <div class="max-w-3xl">
-                        <div class="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[color:var(--cp-gold-300)] backdrop-blur">
-                            <span class="h-2.5 w-2.5 rounded-full bg-current"></span>
-                            {{ $t('Carré Premium', 'Carré Premium') }}
-                        </div>
-
-                        <h1 class="mt-5 text-3xl font-black leading-tight sm:text-4xl xl:text-[4rem] xl:leading-[1.02]">
-                            {{ $t('Des expériences premium à vivre en grand, de l’événement VIP au voyage signature.', 'Premium experiences to live at full scale, from VIP events to signature journeys.') }}
-                        </h1>
-
-                        <p class="mt-5 max-w-2xl text-sm leading-7 text-white/82 sm:text-base">
-                            {{ $t('Billetterie événementielle, séjours exclusifs, flotte premium et demandes de vols accompagnées par une équipe qui connaît les attentes du voyage haut de gamme.', 'Event ticketing, exclusive escapes, premium mobility and flight requests handled by a team that understands high-end travel expectations.') }}
-                        </p>
-
-                        <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                            <a href="{{ route('events') }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e4ae54]">
-                                <i class="fa-solid fa-ticket text-sm"></i>
-                                <span>{{ $t('Explorer les collections', 'Explore the collections') }}</span>
-                            </a>
-                            <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/20 !bg-white/10 !text-white hover:!bg-white/16">
-                                <i class="fa-solid fa-headset text-sm"></i>
-                                <span>{{ $t('Parler à un conseiller', 'Talk to an advisor') }}</span>
-                            </a>
-                        </div>
-
-                        <div class="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                            @foreach($statsCards as $item)
-                                <div class="rounded-[1.55rem] border border-white/12 bg-white/10 p-4 backdrop-blur">
-                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/56">{{ $item['label'] }}</p>
-                                    <p class="mt-2 text-2xl font-black sm:text-[1.75rem]">{{ $item['value'] }}</p>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="relative" data-home-hero>
-                        <div class="absolute -left-5 top-6 hidden h-24 w-24 rounded-full bg-white/12 blur-3xl xl:block"></div>
-                        <div class="relative overflow-hidden rounded-[2rem] border border-white/14 bg-black/15 shadow-[0_20px_60px_rgba(17,10,29,0.32)]">
-                            <div class="relative aspect-[4/5] sm:aspect-[4/4]">
-                                @foreach($heroSlides as $index => $slide)
-                                    <a
-                                        href="{{ $slide['url'] }}"
-                                        class="cp-home-hero-slide absolute inset-0 {{ $index === 0 ? 'opacity-100 translate-x-0' : 'pointer-events-none translate-x-6 opacity-0' }}"
-                                        data-home-hero-slide
-                                    >
-                                        <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] }}" class="h-full w-full object-cover">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-[#110a1b]/96 via-[#110a1b]/18 to-transparent"></div>
-
-                                        <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                                            <div class="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)] shadow">
-                                                <span>{{ $slide['type'] }}</span>
-                                            </div>
-                                            <h2 class="mt-4 text-2xl font-black leading-tight text-white sm:text-[2rem]">{{ $slide['title'] }}</h2>
-                                            @if(!empty($slide['subtitle']))
-                                                <p class="mt-3 text-sm leading-7 text-white/80">{{ $slide['subtitle'] }}</p>
-                                            @endif
-
-                                            <div class="mt-5 flex items-end justify-between gap-3">
-                                                <div>
-                                                    @if(!empty($slide['meta']))
-                                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-white/56">{{ $slide['meta'] }}</p>
-                                                    @endif
-                                                    @if(!empty($slide['price']))
-                                                        <p class="mt-2 text-xl font-black text-[color:var(--cp-gold-300)]">{{ $slide['price'] }}</p>
-                                                    @endif
-                                                </div>
-                                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/12 text-white backdrop-blur">
-                                                    <i class="fa-solid fa-arrow-right text-sm"></i>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-
-                            <div class="absolute inset-x-0 top-0 flex items-center justify-between p-4">
-                                <div class="rounded-full border border-white/14 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/78 backdrop-blur">
-                                    {{ $t('À la une', 'Featured now') }}
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" data-home-prev class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white backdrop-blur transition hover:bg-white/18">
-                                        <i class="fa-solid fa-arrow-left text-xs"></i>
-                                    </button>
-                                    <button type="button" data-home-next class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white backdrop-blur transition hover:bg-white/18">
-                                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if($heroSlides->count() > 1)
-                            <div class="mt-4 flex items-center justify-center gap-2">
-                                @foreach($heroSlides as $index => $slide)
-                                    <button type="button" data-home-dot="{{ $index }}" class="cp-home-dot h-2.5 w-2.5 rounded-full bg-white/32 {{ $index === 0 ? '!w-9 !bg-[color:var(--cp-gold-300)]' : '' }}"></button>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        <div class="cp-home-float absolute -bottom-3 -left-3 hidden rounded-[1.5rem] border border-white/14 bg-white/12 px-4 py-4 text-white shadow-xl backdrop-blur md:block">
-                            <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/56">{{ $t('Support direct', 'Direct support') }}</p>
-                            <p class="mt-2 text-lg font-black">{{ $supportPhone }}</p>
-                            <p class="mt-1 text-sm text-white/76">{{ $supportEmail }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  {{-- Nos Services Premium --}}
+  <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center mb-12 md:mb-16">
+        <div class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-3 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-4 md:mb-6 border-2 border-white/30">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          <span>{{ __('OUR PREMIUM SERVICES') }}</span>
         </div>
-    </section>
+        <h2 class="text-5xl md:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
+          {{ __('Excellence at Your Fingertips') }}
+        </h2>
+        <p class="text-xl text-white/90 max-w-3xl mx-auto">
+          {{ __('Discover our complete range of premium services for unforgettable experiences') }}
+        </p>
+      </div>
 
-    <section class="cp-page-overlap">
-        <div class="cp-shell">
-            <div class="cp-panel rounded-[2rem] px-4 py-5 sm:px-6 sm:py-6">
-                <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 lg:flex-row lg:items-end lg:justify-between">
-                    <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Univers', 'Universes') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Événements, voyages, mobilité et vols accompagnés.', 'Events, travel, mobility and assisted flights.') }}</h2>
-                    </div>
-                    <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="cp-secondary-button !self-start lg:!self-auto">
-                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                        <span>{{ $t('WhatsApp direct', 'Direct WhatsApp') }}</span>
-                    </a>
-                </div>
-
-                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    @foreach($serviceCards as $card)
-                        <a href="{{ $card['route'] }}" class="group relative overflow-hidden rounded-[1.75rem] border border-[color:var(--cp-border)] bg-[color:var(--cp-plum-950)] text-white shadow-[0_18px_44px_rgba(32,20,47,0.14)] transition hover:-translate-y-1 hover:shadow-[0_28px_64px_rgba(32,20,47,0.18)]">
-                            <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" class="absolute inset-0 h-full w-full object-cover opacity-32 transition duration-700 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#130b1d] via-[#130b1d]/76 to-transparent"></div>
-                            <div class="relative flex min-h-[18rem] flex-col justify-end p-5">
-                                <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/12 backdrop-blur">
-                                    <i class="fa-solid {{ $card['icon'] }}"></i>
-                                </span>
-                                <h3 class="mt-4 text-2xl font-black">{{ $card['title'] }}</h3>
-                                <p class="mt-3 text-sm leading-7 text-white/76">{{ $card['description'] }}</p>
-                                <span class="mt-5 inline-flex items-center gap-2 text-sm font-black text-[color:var(--cp-gold-300)]">
-                                    <span>{{ $card['cta'] }}</span>
-                                    <i class="fa-solid fa-arrow-right text-xs transition group-hover:translate-x-1"></i>
-                                </span>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+        {{-- Service Cards --}}
+        <a href="{{ route('flights.index') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
             </div>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Private Flights') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Private jets and helicopters for your exclusive travel') }}</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>{{ __('Discover') }}</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        <a href="{{ route('events') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('VIP Events') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Exclusive access to world sports and cultural events') }}</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>{{ __('Book') }}</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        <a href="{{ route('packages') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-amber-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Luxury Packages') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('Tailor-made experiences: safaris, yachting, exclusive tours') }}</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>{{ __('Explore') }}</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        <a href="{{ route('contact') }}" class="group">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+            <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-3 md:mb-4">{{ __('Concierge') }}</h3>
+            <p class="text-base text-white/80 mb-4 md:mb-6">{{ __('24/7 service to organize your most exclusive desires') }}</p>
+            <div class="flex items-center text-amber-400 font-semibold">
+              <span>{{ __('Contact') }}</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {{-- Véhicules de Luxe --}}
+  <section class="py-24 bg-gradient-to-br from-amber-900 via-amber-800 to-purple-900">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12 md:mb-16">
+        <div class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-3 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-black mb-4 md:mb-6 border-2 border-white/30">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>{{ __('PREMIUM VEHICLE RENTAL') }}</span>
         </div>
-    </section>
+        <h2 class="text-6xl md:text-7xl font-black text-white mb-4 md:mb-6 leading-tight">
+          {{ __('Drive Excellence') }}
+        </h2>
+        <p class="text-2xl text-white/90 max-w-3xl mx-auto">
+          {{ __('Private Jets • Luxury Cars • Sports Cars • Premium 4x4') }}
+        </p>
+      </div>
 
-    <section class="cp-page-section">
-        <div class="cp-shell">
-            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div class="max-w-3xl">
-                    <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Sélections signature', 'Signature selections') }}</p>
-                    <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Des sélections qui donnent déjà le ton du départ.', 'Selections that already set the tone for departure.') }}</h2>
-                </div>
-                <div class="flex gap-2">
-                    <button type="button" class="cp-icon-button" data-carousel-prev="moments">
-                        <i class="fa-solid fa-arrow-left text-xs"></i>
-                    </button>
-                    <button type="button" class="cp-icon-button" data-carousel-next="moments">
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </button>
-                </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+        @php
+          $vehicles = [
+            ['icon' => 'motorcycle', 'title' => __('Premium Vehicles'), 'desc' => __('Rental with or without guide'), 'image' => 'https://i.pinimg.com/736x/c0/7a/ca/c07acad260e24f8cd0868d5d9c6169b5.jpg'],
+            ['icon' => 'car', 'title' => __('Sports Cars'), 'desc' => __('Ferrari, Lamborghini, Porsche'), 'image' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=300&fit=crop'],
+            ['icon' => 'car', 'title' => __('Luxury 4x4'), 'desc' => __('Range Rover, G-Wagon'), 'image' => 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=300&fit=crop'],
+            ['icon' => 'motorcycle', 'title' => __('Premium Flights'), 'desc' => __('Private jet rental for your travels'), 'image' => 'https://i.pinimg.com/1200x/22/5f/4d/225f4d17aa8a81f488d0794c0e4fdb80.jpg']
+          ];
+        @endphp
+
+        @foreach($vehicles as $vehicle)
+          <a
+            href="{{ route('packages') }}"
+            class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-500 hover:-translate-y-4"
+          >
+            <div class="aspect-square overflow-hidden relative">
+              <img
+                src="{{ $vehicle['image'] }}"
+                alt="{{ $vehicle['title'] }}"
+                class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+              <div class="absolute top-6 left-6 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/30">
+                @if($vehicle['icon'] === 'motorcycle')
+                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                @else
+                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                @endif
+              </div>
             </div>
 
-            <div class="cp-home-track flex gap-4 overflow-x-auto pb-2" data-carousel-track="moments">
-                @foreach($mixedMoments as $card)
-                    <a href="{{ $card['url'] }}" class="cp-home-card group min-w-[19rem] max-w-[19rem] overflow-hidden rounded-[1.9rem] border border-[color:var(--cp-border)] bg-white shadow-[0_16px_40px_rgba(41,20,58,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_54px_rgba(41,20,58,0.12)] sm:min-w-[22rem] sm:max-w-[22rem]">
-                        <div class="relative aspect-[4/3] overflow-hidden">
-                            <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#120a1d]/86 via-[#120a1d]/18 to-transparent"></div>
-                            <div class="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">
-                                {{ $card['type'] }}
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <h3 class="text-xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $card['title'] }}</h3>
-                                    @if(!empty($card['subtitle']))
-                                        <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ \Illuminate\Support\Str::limit($card['subtitle'], 86) }}</p>
-                                    @endif
-                                </div>
-                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(75,40,112,0.08)] text-[color:var(--cp-plum-800)]">
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </span>
-                            </div>
-                            <div class="mt-5 flex items-center justify-between gap-3 border-t border-[color:var(--cp-border)] pt-4">
-                                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $card['meta'] ?: $t('Collection premium', 'Premium selection') }}</span>
-                                <span class="text-sm font-black text-[color:var(--cp-plum-950)]">{{ $card['price'] }}</span>
-                            </div>
-                        </div>
-                    </a>
-                @endforeach
+            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <h3 class="text-2xl font-black mb-2 group-hover:text-amber-400 transition-colors">
+                {{ $vehicle['title'] }}
+              </h3>
+              <p class="text-white/80 text-sm mb-4">{{ $vehicle['desc'] }}</p>
+
+              <div class="flex items-center justify-between p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+                <span class="font-bold text-base">{{ __('Available') }}</span>
+                <svg class="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </div>
             </div>
+          </a>
+        @endforeach
+      </div>
+    </div>
+  </section>
+
+  {{-- Flights Section --}}
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center justify-center space-x-2 md:space-x-3 mb-4 md:mb-6">
+          <svg class="w-10 h-10 md:w-12 md:h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
         </div>
-    </section>
+        <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6">
+          {{ __('Need a flight with support?') }}
+        </h2>
+        <p class="text-xl text-gray-600 mb-6 md:mb-8">
+          {{ __('Our team now handles flight requests directly to give clients a clearer and more reliable process.') }}
+        </p>
+        <a
+          href="{{ route('flights.index') }}"
+          class="inline-flex items-center space-x-2 md:space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-xl text-base"
+        >
+          <span>{{ __('Talk to an Advisor') }}</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
 
-    <section class="cp-page-section">
-        <div class="cp-shell">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-                <div class="space-y-6">
-                    <div class="mb-2">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('En ce moment', 'Right now') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Deux sélections pour prolonger le voyage dès le premier regard.', 'Two selections to extend the journey from the very first glance.') }}</h2>
-                    </div>
-
-                    <div class="grid gap-6 lg:grid-cols-2">
-                        <article class="cp-panel rounded-[2rem] p-5 sm:p-6">
-                            <div class="flex items-center justify-between gap-3">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Packages', 'Packages') }}</p>
-                                    <h3 class="mt-2 text-xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Évasion signature', 'Signature escapes') }}</h3>
-                                </div>
-                                <a href="{{ route('packages') }}" class="cp-secondary-button !px-4 !py-2.5 text-sm">{{ $t('Tout voir', 'View all') }}</a>
-                            </div>
-                            <div class="mt-5 space-y-4">
-                                @foreach($packageCards->take(3) as $card)
-                                    <a href="{{ $card['url'] }}" class="group flex gap-4 rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
-                                        <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" class="h-24 w-24 rounded-[1.2rem] object-cover sm:h-28 sm:w-28">
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">{{ $card['type'] }}</p>
-                                            <h4 class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $card['title'] }}</h4>
-                                            <p class="mt-2 text-sm leading-6 text-[color:var(--cp-ink-soft)]">{{ \Illuminate\Support\Str::limit($card['subtitle'], 52) }}</p>
-                                            <div class="mt-3 flex items-center justify-between gap-3">
-                                                <span class="text-sm font-black text-[color:var(--cp-plum-950)]">{{ $card['price'] }}</span>
-                                                <span class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $card['meta'] }}</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </article>
-
-                        <article class="cp-panel rounded-[2rem] p-5 sm:p-6">
-                            <div class="flex items-center justify-between gap-3">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--cp-ink-muted)]">{{ $t('Mobilité', 'Mobility') }}</p>
-                                    <h3 class="mt-2 text-xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Arrivées premium', 'Premium arrivals') }}</h3>
-                                </div>
-                                <a href="{{ route('location') }}" class="cp-secondary-button !px-4 !py-2.5 text-sm">{{ $t('Tout voir', 'View all') }}</a>
-                            </div>
-                            <div class="mt-5 space-y-4">
-                                @foreach($locationCards->take(3) as $card)
-                                    <a href="{{ $card['url'] }}" class="group flex gap-4 rounded-[1.5rem] border border-[color:var(--cp-border)] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
-                                        <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" class="h-24 w-24 rounded-[1.2rem] object-cover sm:h-28 sm:w-28">
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-plum-800)]">{{ $card['type'] }}</p>
-                                            <h4 class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $card['title'] }}</h4>
-                                            <p class="mt-2 text-sm leading-6 text-[color:var(--cp-ink-soft)]">{{ \Illuminate\Support\Str::limit($card['subtitle'], 52) }}</p>
-                                            <div class="mt-3 flex items-center justify-between gap-3">
-                                                <span class="text-sm font-black text-[color:var(--cp-plum-950)]">{{ $card['price'] }}</span>
-                                                <span class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $card['meta'] ?: $t('Service premium', 'Premium service') }}</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </article>
-                    </div>
-                </div>
-
-                <aside class="cp-panel rounded-[2rem] p-6 sm:p-7 xl:sticky xl:top-28">
-                    <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Conciergerie', 'Concierge') }}</p>
-                    <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Un conseiller dédié pour les demandes urgentes, corporate ou sur mesure.', 'A dedicated advisor for urgent, corporate or bespoke requests.') }}</h2>
-                    <p class="mt-4 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                        {{ $t('Appelez, écrivez sur WhatsApp ou transmettez votre demande de vol: l’équipe reprend la main dès qu’un besoin demande plus qu’une simple réservation.', 'Call, message on WhatsApp or submit a flight request: the team steps in as soon as your need requires more than a simple booking.') }}
-                    </p>
-
-                    <div class="mt-6 space-y-3">
-                        <a href="{{ $supportPhoneLink }}" class="flex items-center justify-between gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/85 px-4 py-4 text-sm font-semibold text-[color:var(--cp-plum-950)] transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
-                            <span class="flex items-center gap-3"><i class="fa-solid fa-phone text-[color:var(--cp-plum-800)]"></i> {{ $supportPhone }}</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-[color:var(--cp-ink-muted)]"></i>
-                        </a>
-                        <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/85 px-4 py-4 text-sm font-semibold text-[color:var(--cp-plum-950)] transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
-                            <span class="flex items-center gap-3"><i class="fa-brands fa-whatsapp text-[color:var(--cp-success)]"></i> {{ $t('WhatsApp direct', 'Direct WhatsApp') }}</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-[color:var(--cp-ink-muted)]"></i>
-                        </a>
-                        <a href="{{ route('flights.index') }}" class="flex items-center justify-between gap-3 rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white/85 px-4 py-4 text-sm font-semibold text-[color:var(--cp-plum-950)] transition hover:-translate-y-0.5 hover:border-[color:var(--cp-border-strong)]">
-                            <span class="flex items-center gap-3"><i class="fa-solid fa-plane-departure text-[color:var(--cp-plum-800)]"></i> {{ $t('Demande de vol accompagnée', 'Assisted flight request') }}</span>
-                            <i class="fa-solid fa-arrow-right text-xs text-[color:var(--cp-ink-muted)]"></i>
-                        </a>
-                    </div>
-
-                    <div class="mt-6 rounded-[1.6rem] bg-[linear-gradient(135deg,rgba(75,40,112,0.08),rgba(217,164,65,0.14))] p-5">
-                        <p class="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Email support', 'Support email') }}</p>
-                        <p class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $supportEmail }}</p>
-                        <p class="mt-3 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Pour les besoins corporate, demandes groupe ou paiements assistés.', 'For corporate requests, group demands or assisted payments.') }}</p>
-                    </div>
-                </aside>
-            </div>
-        </div>
-    </section>
-
-    <section class="cp-page-section">
-        <div class="cp-shell">
-            <div class="overflow-hidden rounded-[2.4rem] bg-[linear-gradient(135deg,#231332_0%,#4b2870_54%,#d9a441_100%)] px-5 py-8 text-white shadow-[0_24px_74px_rgba(34,18,52,0.22)] sm:px-8 sm:py-10">
-                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                    <div class="max-w-3xl">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-gold-300)]">{{ $t('Prêt à partir', 'Ready to begin') }}</p>
-                        <h2 class="mt-3 text-3xl font-black sm:text-4xl">{{ $t('Choisissez votre prochaine expérience premium.', 'Choose your next premium experience.') }}</h2>
-                        <p class="mt-4 text-sm leading-7 text-white/82 sm:text-base">{{ $t('Commencez par la collection qui vous ressemble le plus, puis laissez Carré Premium vous accompagner jusqu’à la confirmation.', 'Start with the collection that fits you best, then let Carré Premium guide you through to confirmation.') }}</p>
-                    </div>
-                    <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                        <a href="{{ route('events') }}" class="cp-primary-button !w-full sm:!w-auto !bg-[#f0bb61] !text-[#2a163d] hover:!bg-[#e4ae54]">
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
-                            <span>{{ $t('Découvrir les expériences', 'Discover the experiences') }}</span>
-                        </a>
-                        <a href="{{ route('contact') }}" class="cp-secondary-button !w-full sm:!w-auto !border-white/18 !bg-white/10 !text-white hover:!bg-white/14">
-                            <i class="fa-solid fa-headset text-sm"></i>
-                            <span>{{ $t('Être accompagné', 'Get guidance') }}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  {{-- CTA Final --}}
+  <section class="py-24 bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-5xl md:text-6xl font-black text-white mb-6 md:mb-8">
+        {{ __('Ready for an Unforgettable Experience?') }}
+      </h2>
+      <p class="text-2xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto">
+        {{ __('Contact our concierge to create your tailor-made experience') }}
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 md:gap-6">
+        <a
+          href="{{ route('events') }}"
+          class="inline-flex items-center justify-center space-x-2 px-10 py-5 bg-white text-purple-900 font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          <span>{{ __('VIP EVENTS') }}</span>
+        </a>
+        <a
+          href="{{ route('packages') }}"
+          class="inline-flex items-center justify-center space-x-2 px-10 py-5 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-black text-lg rounded-full hover:scale-110 transition-all duration-300 shadow-2xl"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+          <span>{{ __('LUXURY PACKAGES') }}</span>
+        </a>
+      </div>
+    </div>
+  </section>
 </div>
+
+{{-- WhatsApp Floating Chat Button --}}
+<a
+  href="{{ config('carre_premium.contact.whatsapp_url') }}" 
+  target="_blank"
+  class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-transform transform hover:scale-110"
+  aria-label="Contact WhatsApp"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 32"
+    fill="white"
+    class="w-12 h-12"
+  >
+    <path d="M19.11 17.47c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.66.15-.2.3-.76.97-.93 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.77-1.64-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.51.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.9-2.2-.24-.57-.48-.5-.66-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.02-1.05 2.5 1.08 2.9 1.23 3.1c.15.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.28-.2-.58-.35z"/>
+    <path d="M16.04 2.003c-7.732 0-14.037 6.305-14.037 14.037 0 2.48.66 4.9 1.9 7.03L2 30l7.1-1.86c2.07 1.13 4.4 1.72 6.94 1.72h.01c7.73 0 14.04-6.31 14.04-14.04 0-3.75-1.46-7.27-4.11-9.92-2.65-2.65-6.17-4.1-9.94-4.1zm0 25.66c-2.11 0-4.17-.56-5.96-1.62l-.43-.26-4.22 1.11 1.13-4.11-.28-.44c-1.13-1.83-1.73-3.94-1.73-6.12 0-6.35 5.17-11.52 11.52-11.52 3.08 0 5.97 1.2 8.15 3.37 2.18 2.18 3.38 5.07 3.38 8.15 0 6.35-5.17 11.52-11.52 11.52z"/>
+  </svg>
+</a>
+
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const hero = document.querySelector('[data-home-hero]');
-
-    if (hero) {
-        const slides = Array.from(hero.querySelectorAll('[data-home-hero-slide]'));
-        const dots = Array.from(document.querySelectorAll('[data-home-dot]'));
-        const prevButton = hero.querySelector('[data-home-prev]');
-        const nextButton = hero.querySelector('[data-home-next]');
-        let active = 0;
-        let timer = null;
-
-        const renderHero = (index) => {
-            active = (index + slides.length) % slides.length;
-
-            slides.forEach((slide, slideIndex) => {
-                const isActive = slideIndex === active;
-                slide.classList.toggle('opacity-100', isActive);
-                slide.classList.toggle('translate-x-0', isActive);
-                slide.classList.toggle('pointer-events-none', !isActive);
-                slide.classList.toggle('opacity-0', !isActive);
-                slide.classList.toggle('translate-x-6', !isActive);
-            });
-
-            dots.forEach((dot, dotIndex) => {
-                dot.classList.toggle('!w-9', dotIndex === active);
-                dot.classList.toggle('!bg-[color:var(--cp-gold-300)]', dotIndex === active);
-                dot.classList.toggle('bg-white/32', dotIndex !== active);
-            });
-        };
-
-        const startHero = () => {
-            if (slides.length < 2) return;
-            stopHero();
-            timer = window.setInterval(() => renderHero(active + 1), 5200);
-        };
-
-        const stopHero = () => {
-            if (timer) {
-                window.clearInterval(timer);
-                timer = null;
-            }
-        };
-
-        prevButton?.addEventListener('click', () => renderHero(active - 1));
-        nextButton?.addEventListener('click', () => renderHero(active + 1));
-        hero.addEventListener('mouseenter', stopHero);
-        hero.addEventListener('mouseleave', startHero);
-
-        dots.forEach((dot) => {
-            dot.addEventListener('click', () => renderHero(Number(dot.dataset.homeDot || 0)));
-        });
-
-        renderHero(0);
-        startHero();
-    }
-
-    document.querySelectorAll('[data-carousel-track]').forEach((track) => {
-        const key = track.dataset.carouselTrack;
-        const prev = document.querySelector(`[data-carousel-prev="${key}"]`);
-        const next = document.querySelector(`[data-carousel-next="${key}"]`);
-        const amount = () => Math.min(track.clientWidth * 0.88, 380);
-
-        prev?.addEventListener('click', () => {
-            track.scrollBy({ left: -amount(), behavior: 'smooth' });
-        });
-
-        next?.addEventListener('click', () => {
-            track.scrollBy({ left: amount(), behavior: 'smooth' });
-        });
-    });
-});
-</script>
-@endpush

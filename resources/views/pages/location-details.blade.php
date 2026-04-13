@@ -14,8 +14,8 @@
     $pricePerDay = (float) ($location->price_per_day ?? 0);
 @endphp
 
-<div class="cp-page">
-    <section class="cp-page-hero">
+<div class="min-h-screen pb-24 sm:pb-28">
+    <section class="pt-4 sm:pt-6">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1d2239] via-[#234c7b] to-[#d49a46] text-white shadow-[0_30px_90px_rgba(20,34,59,0.24)]">
                 <div class="grid gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
@@ -101,15 +101,15 @@
         </div>
     </section>
 
-    <section class="cp-page-overlap">
+    <section class="-mt-6 pt-0">
         <div class="cp-shell">
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,420px)]">
                 <div class="space-y-6">
                     <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
                         <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
                             <div class="max-w-3xl">
-                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Vue d’ensemble', 'Overview') }}</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Le véhicule en un coup d’œil', 'The vehicle at a glance') }}</h2>
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Lecture rapide', 'Quick reading') }}</p>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Ce que le client doit savoir avant de reserver', 'What the client should know before booking') }}</h2>
                             </div>
                             <div class="cp-pill">
                                 <i class="fa-solid fa-wallet text-xs"></i>
@@ -154,21 +154,21 @@
                     @endif
 
                     <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Réservation', 'Booking') }}</p>
-                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Comment réserver ce véhicule', 'How to reserve this vehicle') }}</h2>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Processus', 'Process') }}</p>
+                        <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Reservation plus claire', 'Clearer booking flow') }}</h2>
 
                         <div class="mt-6 grid gap-4 md:grid-cols-3">
                             <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
                                 <p class="text-sm font-black text-[color:var(--cp-plum-950)]">1. {{ $t('Choisir les dates', 'Choose the dates') }}</p>
-                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Indiquez la période souhaitée pour afficher une estimation précise.', 'Enter your preferred dates to display an accurate estimate.') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Le client saisit simplement le debut et la fin de location.', 'The client simply enters rental start and end dates.') }}</p>
                             </div>
                             <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
                                 <p class="text-sm font-black text-[color:var(--cp-plum-950)]">2. {{ $t('Voir le montant estime', 'See the estimated amount') }}</p>
-                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Le récapitulatif ajuste automatiquement le nombre de jours et le montant estimé.', 'The summary automatically adjusts the number of days and the estimated amount.') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Le recapitulatif calcule les jours et le total sans ambiguite.', 'The summary calculates days and total without ambiguity.') }}</p>
                             </div>
                             <div class="rounded-[1.4rem] bg-[#f8fafc] px-4 py-4">
                                 <p class="text-sm font-black text-[color:var(--cp-plum-950)]">3. {{ $t('Payer puis confirmer', 'Pay then confirm') }}</p>
-                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('Vous validez ensuite la demande avant le règlement sécurisé et la confirmation.', 'You then confirm the request before secure payment and final confirmation.') }}</p>
+                                <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">{{ $t('La reservation passe ensuite vers le paiement securise et la confirmation.', 'The booking then proceeds to secure payment and confirmation.') }}</p>
                             </div>
                         </div>
                     </section>
@@ -180,7 +180,7 @@
                             <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Reservation', 'Booking') }}</p>
                             <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Demande de location', 'Rental request') }}</h2>
                             <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                                {{ $t('Renseignez vos coordonnées et vos dates pour lancer la demande et obtenir le montant associé.', 'Enter your details and dates to submit the request and get the associated amount.') }}
+                                {{ $t('On garde le tunnel simple: coordonnees, dates, recapitulatif, puis paiement.', 'The funnel stays simple: contact details, dates, summary, then payment.') }}
                             </p>
                         </div>
 
@@ -313,7 +313,7 @@
                         <div class="mt-5 border-t border-[color:var(--cp-border)] pt-5">
                             <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-ink-muted)]">{{ $t('Support', 'Support') }}</p>
                             <p class="mt-2 text-sm leading-7 text-[color:var(--cp-ink-soft)]">
-                                {{ $t('Si vous hésitez sur les dates, le modèle ou le niveau de service, l’équipe peut ajuster la proposition avant validation.', 'If you are unsure about dates, model or service level, the team can adjust the proposal before validation.') }}
+                                {{ $t('Si le client hesite sur les dates ou le vehicule exact, l equipe peut clarifier avant validation.', 'If the client is unsure about dates or the exact vehicle, the team can clarify before validation.') }}
                             </p>
                             <div class="mt-4 flex flex-col gap-3">
                                 <a href="{{ config('carre_premium.contact.mobile_link') }}" class="cp-secondary-button !justify-center">
@@ -332,7 +332,7 @@
         </div>
     </section>
 
-    <section class="cp-page-section-lg">
+    <section class="pt-10 sm:pt-12">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#19304a] via-[#226695] to-[#d49a46] px-5 py-8 text-white shadow-[0_24px_70px_rgba(24,37,67,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -340,7 +340,7 @@
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-white/60">{{ $t('Besoin specifique', 'Specific need') }}</p>
                         <h2 class="mt-3 text-2xl font-black sm:text-3xl">{{ $t('Besoin d un autre modele, d un chauffeur ou d une solution sur mesure ?', 'Need another model, a driver or a bespoke solution?') }}</h2>
                         <p class="mt-3 text-sm leading-7 text-white/80 sm:text-base">
-                            {{ $t('L’équipe peut encore ajuster le véhicule, le chauffeur, les horaires ou le niveau de mise à disposition selon votre besoin.', 'The team can still adjust the vehicle, driver, schedule or service level according to your needs.') }}
+                            {{ $t('La page aide a comprendre l offre, mais l equipe peut encore ajuster le vehicule, le timing et le mode d accompagnement.', 'The page helps users understand the offer, but the team can still adjust the vehicle, timing and support mode.') }}
                         </p>
                     </div>
 

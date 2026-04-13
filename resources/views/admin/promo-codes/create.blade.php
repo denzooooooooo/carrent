@@ -1,28 +1,21 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Créer un package')
+@section('title', 'Créer un code promo')
 
 @section('content')
-    @php
-        $package = new \App\Models\TourPackage();
-    @endphp
-
     <div class="mx-auto max-w-7xl space-y-8 py-2">
         <section class="admin-page-header">
             <div class="max-w-3xl">
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--admin-brand)]">Catalogue premium</p>
-                <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Créer un package</h1>
+                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--admin-brand)]">Offres & incentives</p>
+                <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Créer un code promo</h1>
                 <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-                    Conçois une offre complète: destination, durée, prix, services, médias et visibilité commerciale.
+                    Prépare une remise exploitable par le site et l’équipe commerciale, avec fenêtre de validité et ciblage clair.
                 </p>
             </div>
-
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('admin.packages.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    Retour à la liste
-                </a>
-            </div>
+            <a href="{{ route('admin.promo-codes.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                <i class="fas fa-arrow-left"></i>
+                Retour à la liste
+            </a>
         </section>
 
         @if ($errors->any())
@@ -42,9 +35,9 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.packages.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('admin.promo-codes.store') }}" method="POST" class="space-y-6">
             @csrf
-            @include('admin.packages._form', ['package' => $package, 'categories' => $categories, 'packageTypes' => $packageTypes])
+            @include('admin.promo-codes._form')
         </form>
     </div>
 @endsection

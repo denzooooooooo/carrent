@@ -55,8 +55,8 @@
     $startingTotal = $unitPrice * $defaultParticipants;
 @endphp
 
-<div class="cp-page">
-    <section class="cp-page-hero">
+<div class="min-h-screen pb-24 sm:pb-28">
+    <section class="pt-4 sm:pt-6">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#241233] via-[#4c2872] to-[#d89b43] text-white shadow-[0_30px_90px_rgba(41,20,58,0.24)]">
                 <div class="grid gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,420px)] lg:px-10 lg:py-12">
@@ -148,15 +148,15 @@
         </div>
     </section>
 
-    <section class="cp-page-overlap">
+    <section class="-mt-6 pt-0">
         <div class="cp-shell">
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,420px)]">
                 <div class="space-y-6">
                     <section class="cp-panel rounded-[2rem] p-5 sm:p-6 md:p-8">
                         <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
                             <div class="max-w-3xl">
-                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Vue d’ensemble', 'Overview') }}</p>
-                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('L’essentiel du séjour', 'The essentials of the stay') }}</h2>
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('Vue d ensemble', 'Overview') }}</p>
+                                <h2 class="mt-2 text-2xl font-black text-[color:var(--cp-plum-950)] sm:text-3xl">{{ $t('Ce que le client doit comprendre tout de suite', 'What the client should understand immediately') }}</h2>
                             </div>
                             <div class="cp-pill">
                                 <i class="fa-solid fa-wallet text-xs"></i>
@@ -462,7 +462,7 @@
     </section>
 
     @if($similarPackages->count() > 0)
-        <section class="cp-page-section-lg">
+        <section class="pt-10 sm:pt-12">
             <div class="cp-shell">
                 <div class="mb-5">
                     <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('A considerer aussi', 'Also worth considering') }}</p>
@@ -506,7 +506,7 @@
         </section>
     @endif
 
-    <section class="cp-page-section-lg">
+    <section class="pt-10 sm:pt-12">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

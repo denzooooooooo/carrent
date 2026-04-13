@@ -1,414 +1,246 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Détails du Package')
+@section('title', 'Détail package')
 
 @section('content')
-@php
-$typeConfig = [
-    'sport_event' => ['label' => 'Événement Sportif', 'icon' => 'fa-trophy',        'color' => 'bg-orange-100 text-orange-800'],
-    'motorsport'  => ['label' => 'Motorsport / F1',   'icon' => 'fa-flag-checkered', 'color' => 'bg-red-100 text-red-800'],
-    'football'    => ['label' => 'Football',           'icon' => 'fa-futbol',         'color' => 'bg-green-100 text-green-800'],
-    'helicopter'  => ['label' => 'Hélicoptère',        'icon' => 'fa-helicopter',     'color' => 'bg-sky-100 text-sky-800'],
-    'private_jet' => ['label' => 'Jet Privé',          'icon' => 'fa-plane',          'color' => 'bg-indigo-100 text-indigo-800'],
-    'cruise'      => ['label' => 'Croisière',          'icon' => 'fa-ship',           'color' => 'bg-blue-100 text-blue-800'],
-    'safari'      => ['label' => 'Safari',             'icon' => 'fa-paw',            'color' => 'bg-yellow-100 text-yellow-800'],
-    'city_tour'   => ['label' => 'Visite de Ville',   'icon' => 'fa-city',           'color' => 'bg-purple-100 text-purple-800'],
-    'adventure'   => ['label' => 'Aventure',           'icon' => 'fa-mountain',       'color' => 'bg-lime-100 text-lime-800'],
-    'luxury'      => ['label' => 'Luxe',               'icon' => 'fa-gem',            'color' => 'bg-pink-100 text-pink-800'],
-];
-$type           = $package->package_type ?? 'luxury';
-$cfg            = $typeConfig[$type] ?? ['label' => $type, 'icon' => 'fa-tag', 'color' => 'bg-gray-100 text-gray-700'];
-$currency       = $package->currency ?? 'XOF';
-$currencySymbol = match($currency) { 'EUR' => '€', 'USD' => '$', default => 'FCFA' };
-$priceDecimals  = $currency === 'XOF' ? 0 : 2;
-$isSport        = in_array($type, ['sport_event', 'motorsport', 'football']);
-@endphp
+    @php
+        $typeConfig = [
+            'sport_event' => ['label' => 'Événement sportif', 'icon' => 'fa-trophy', 'tone' => 'bg-orange-100 text-orange-800'],
+            'motorsport' => ['label' => 'Motorsport / F1', 'icon' => 'fa-flag-checkered', 'tone' => 'bg-red-100 text-red-800'],
+            'football' => ['label' => 'Football', 'icon' => 'fa-futbol', 'tone' => 'bg-green-100 text-green-800'],
+            'helicopter' => ['label' => 'Hélicoptère', 'icon' => 'fa-helicopter', 'tone' => 'bg-sky-100 text-sky-800'],
+            'private_jet' => ['label' => 'Jet privé', 'icon' => 'fa-plane', 'tone' => 'bg-indigo-100 text-indigo-800'],
+            'cruise' => ['label' => 'Croisière', 'icon' => 'fa-ship', 'tone' => 'bg-blue-100 text-blue-800'],
+            'safari' => ['label' => 'Safari', 'icon' => 'fa-paw', 'tone' => 'bg-yellow-100 text-yellow-800'],
+            'city_tour' => ['label' => 'City tour', 'icon' => 'fa-city', 'tone' => 'bg-purple-100 text-purple-800'],
+            'adventure' => ['label' => 'Aventure', 'icon' => 'fa-mountain', 'tone' => 'bg-lime-100 text-lime-800'],
+            'luxury' => ['label' => 'Luxe', 'icon' => 'fa-gem', 'tone' => 'bg-pink-100 text-pink-800'],
+        ];
 
-<div class="max-w-7xl mx-auto">
-    <!-- Header avec Actions -->
-    <div class="flex justify-between items-start mb-6">
-        <div>
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-                <h1 class="text-3xl font-bold text-gray-900">{{ $package->title_fr }}</h1>
-                @if($package->is_featured)
-                    <span class="px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
-                        <i class="fas fa-star"></i>EN VEDETTE
+        $type = $typeConfig[$package->package_type] ?? ['label' => $package->package_type, 'icon' => 'fa-tag', 'tone' => 'bg-slate-100 text-slate-800'];
+        $mainImage = $package->getFirstMediaUrl('avatar', 'normal');
+        $placeholder = 'https://placehold.co/1200x720/4c1d95/ffffff?text=' . urlencode($package->title_fr);
+        $gallery = $package->getMedia('gallery');
+        $currency = $package->currency ?? 'XOF';
+        $currencyLabel = match ($currency) {
+            'EUR' => 'EUR',
+            'USD' => 'USD',
+            default => 'FCFA',
+        };
+        $priceDecimals = $currency === 'XOF' ? 0 : 2;
+        $displayPrice = ($package->discount_price && $package->discount_price < $package->price) ? $package->discount_price : $package->price;
+
+        $renderList = static function ($items) {
+            return collect($items ?? [])
+                ->map(function ($item) {
+                    if (is_array($item)) {
+                        return $item['title'] ?? $item['description'] ?? implode(' - ', array_filter($item));
+                    }
+
+                    return $item;
+                })
+                ->filter(fn ($item) => filled($item))
+                ->values();
+        };
+
+        $includedFr = $renderList($package->included_services_fr);
+        $excludedFr = $renderList($package->excluded_services_fr);
+        $itineraryFr = $renderList($package->itinerary_fr);
+    @endphp
+
+    <div class="mx-auto max-w-7xl space-y-8 py-2">
+        <section class="admin-page-header">
+            <div class="max-w-4xl">
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $package->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                        {{ $package->is_active ? 'Actif' : 'Inactif' }}
                     </span>
-                @endif
-                <span class="px-3 py-1 text-xs font-semibold rounded-full
-                    {{ $package->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                    {{ $package->is_active ? 'Actif' : 'Inactif' }}
-                </span>
-                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $cfg['color'] }} flex items-center gap-1">
-                    <i class="fas {{ $cfg['icon'] }}"></i>{{ $cfg['label'] }}
-                </span>
-            </div>
-            <p class="text-gray-600">{{ $package->destination }} • {{ $package->duration_text_fr ?: $package->duration . ' jours' }}</p>
-            @if($isSport && $package->event_date_start)
-                <p class="text-orange-600 font-medium mt-1 flex items-center gap-2">
-                    <i class="fas fa-calendar-alt"></i>
-                    {{ \Carbon\Carbon::parse($package->event_date_start)->format('d/m/Y') }}
-                    @if($package->event_date_end && $package->event_date_end != $package->event_date_start)
-                        → {{ \Carbon\Carbon::parse($package->event_date_end)->format('d/m/Y') }}
+                    <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold {{ $type['tone'] }}">
+                        <i class="fas {{ $type['icon'] }}"></i>
+                        {{ $type['label'] }}
+                    </span>
+                    @if ($package->is_featured)
+                        <span class="rounded-full bg-[var(--admin-accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--admin-warning)]">
+                            Mis en avant
+                        </span>
                     @endif
+                </div>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">{{ $package->title_fr }}</h1>
+                <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
+                    {{ $package->description_fr ?: 'Aucune description française renseignée pour ce package.' }}
                 </p>
-            @endif
-        </div>
-        
-        <div class="flex space-x-2">
-            <a href="{{ route('admin.packages.index') }}" 
-               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                <i class="fas fa-arrow-left mr-2"></i>Retour
-            </a>
-            <a href="{{ route('admin.packages.edit', $package) }}" 
-               class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-purple-700 transition">
-                <i class="fas fa-edit mr-2"></i>Modifier
-            </a>
-        </div>
-    </div>
-
-    <!-- Statistiques Clés -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-5 text-white">
-            <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-calendar-check text-3xl opacity-80"></i>
-                <span class="text-sm font-medium">Réservations</span>
             </div>
-            <p class="text-3xl font-bold">{{ $stats['total_bookings'] }}</p>
-            <p class="text-xs opacity-80 mt-1">{{ $stats['confirmed_bookings'] }} confirmées</p>
-        </div>
 
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-5 text-white">
-            <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-coins text-3xl opacity-80"></i>
-                <span class="text-sm font-medium">Revenus</span>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('admin.packages.edit', $package) }}" class="admin-btn-primary px-5 py-3 text-sm">
+                    <i class="fas fa-pen"></i>
+                    Modifier
+                </a>
+                <a href="{{ route('admin.packages.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </a>
             </div>
-            <p class="text-3xl font-bold">{{ number_format($stats['total_revenue'], $priceDecimals) }} {{ $currencySymbol }}</p>
-            <p class="text-xs opacity-80 mt-1">Total généré</p>
-        </div>
+        </section>
 
-        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-5 text-white">
-            <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-star text-3xl opacity-80"></i>
-                <span class="text-sm font-medium">Note</span>
-            </div>
-            <p class="text-3xl font-bold">{{ number_format($stats['average_rating'], 1) }}/5</p>
-            <p class="text-xs opacity-80 mt-1">{{ $stats['total_reviews'] }} avis</p>
-        </div>
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Réservations</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ number_format($stats['total_bookings'], 0, ',', ' ') }}</p>
+                <p class="mt-2 text-sm text-slate-600">{{ number_format($stats['confirmed_bookings'], 0, ',', ' ') }} confirmées</p>
+            </article>
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Revenus</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ number_format($stats['total_revenue'], $priceDecimals, ',', ' ') }}</p>
+                <p class="mt-2 text-sm text-slate-600">{{ $currencyLabel }} confirmés</p>
+            </article>
+            <article class="admin-kpi admin-kpi-accent p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Prix affiché</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ number_format($displayPrice, $priceDecimals, ',', ' ') }}</p>
+                <p class="mt-2 text-sm text-slate-600">{{ $currencyLabel }}</p>
+            </article>
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Participants</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ $package->max_participants }}</p>
+                <p class="mt-2 text-sm text-slate-600">min {{ $package->min_participants }}</p>
+            </article>
+            <article class="admin-kpi p-6">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Avis</p>
+                <p class="mt-4 text-3xl font-bold text-slate-950">{{ number_format($stats['average_rating'], 1, ',', ' ') }}/5</p>
+                <p class="mt-2 text-sm text-slate-600">{{ number_format($stats['total_reviews'], 0, ',', ' ') }} avis</p>
+            </article>
+        </section>
 
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-5 text-white">
-            <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-tag text-3xl opacity-80"></i>
-                <span class="text-sm font-medium">Prix</span>
-            </div>
-            <p class="text-3xl font-bold">{{ number_format($package->price, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}</p>
-            @if($package->discount_price)
-                <p class="text-xs opacity-80 mt-1 line-through">{{ number_format($package->discount_price, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}</p>
-            @endif
-        </div>
-
-        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-5 text-white">
-            <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-users text-3xl opacity-80"></i>
-                <span class="text-sm font-medium">Participants</span>
-            </div>
-            <p class="text-3xl font-bold">{{ $package->max_participants }}</p>
-            <p class="text-xs opacity-80 mt-1">max par groupe</p>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Colonne Principale -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Images -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <!-- Image Principale -->
-                @php
-                    $mainImage = $package->getFirstMediaUrl('avatar', 'normal');
-                    $placeholder = 'https://placehold.co/800x480/4c1d95/ffffff?text=Package+Voyage';
-                @endphp
-                <img src="{{ $mainImage ?: $placeholder }}" 
-                     alt="{{ $package->title_fr }}" 
-                     class="w-full h-96 object-cover"
-                     onerror="this.src='{{ $placeholder }}'">
-
-                <!-- Galerie -->
-                @if($package->getMedia('gallery')->count() > 0)
-                    <div class="p-4">
-                        <h3 class="font-bold text-gray-900 mb-3">Galerie Photos</h3>
-                        <div class="grid grid-cols-4 gap-2">
-                            @foreach($package->getMedia('gallery') as $media)
-                                <a href="{{ $media->getUrl() }}" target="_blank" class="group">
-                                    <img src="{{ $media->getUrl('small') }}" 
-                                         alt="Galerie" 
-                                         class="w-full h-24 object-cover rounded-lg shadow hover:shadow-lg transition transform group-hover:scale-105">
-                                </a>
-                            @endforeach
+        <section class="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <div class="space-y-6">
+                <article class="admin-panel overflow-hidden">
+                    <div class="relative aspect-[16/8] overflow-hidden bg-slate-100">
+                        <img src="{{ $mainImage ?: $placeholder }}" alt="{{ $package->title_fr }}" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ $placeholder }}';">
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-6 pb-6 pt-14 text-white">
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">{{ $package->category->name_fr ?? 'Sans catégorie' }}</p>
+                            <p class="mt-2 text-2xl font-bold">{{ $package->destination }}</p>
+                            <p class="mt-2 text-sm text-white/80">{{ $package->duration_text_fr ?: $package->duration . ' jours' }} · {{ $package->departure_city ?: 'Départ flexible' }}</p>
                         </div>
                     </div>
-                @endif
-            </div>
-
-            <!-- Description -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                    <i class="fas fa-align-left text-primary mr-2"></i>
-                    Description
-                </h2>
-                
-                <div class="prose max-w-none">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Français</h3>
-                    <p class="text-gray-700 mb-4 leading-relaxed">
-                        {{ $package->description_fr ?: 'Aucune description disponible' }}
-                    </p>
-
-                    @if($package->description_en)
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 mt-6">English</h3>
-                        <p class="text-gray-700 leading-relaxed">{{ $package->description_en }}</p>
+                    @if ($gallery->count() > 0)
+                        <div class="grid gap-3 border-t border-[#eadfce] p-5 sm:grid-cols-3">
+                            @foreach ($gallery as $media)
+                                <img src="{{ $media->getUrl('small') }}" alt="Galerie" class="h-24 w-full rounded-[1rem] object-cover">
+                            @endforeach
+                        </div>
                     @endif
-                </div>
-            </div>
+                </article>
 
-            <!-- Services Inclus/Exclus -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                    <i class="fas fa-list-check text-primary mr-2"></i>
-                    Services
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Services Inclus -->
-                    <div>
-                        <h3 class="font-semibold text-green-700 mb-3 flex items-center">
-                            <i class="fas fa-check-circle mr-2"></i>Inclus
-                        </h3>
-                        @if($package->included_services_fr && count($package->included_services_fr) > 0)
-                            <ul class="space-y-2">
-                                @foreach($package->included_services_fr as $service)
-                                    <li class="flex items-start text-gray-700">
-                                        <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                                        <span>{{ $service }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-gray-500 italic">Aucun service inclus spécifié</p>
-                        @endif
+                <article class="admin-panel p-6 sm:p-7">
+                    <h2 class="text-xl font-bold text-slate-950">Descriptions et contenus</h2>
+                    <div class="mt-6 grid gap-4 lg:grid-cols-2">
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Titre EN</p>
+                            <p class="mt-3 text-sm font-semibold text-slate-900">{{ $package->title_en ?: 'Non renseigné' }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Description EN</p>
+                            <p class="mt-3 text-sm leading-7 text-slate-700">{{ $package->description_en ?: 'Non renseignée' }}</p>
+                        </div>
                     </div>
+                </article>
 
-                    <!-- Services Exclus -->
-                    <div>
-                        <h3 class="font-semibold text-red-700 mb-3 flex items-center">
-                            <i class="fas fa-times-circle mr-2"></i>Non Inclus
-                        </h3>
-                        @if($package->excluded_services_fr && count($package->excluded_services_fr) > 0)
-                            <ul class="space-y-2">
-                                @foreach($package->excluded_services_fr as $service)
-                                    <li class="flex items-start text-gray-700">
-                                        <i class="fas fa-times text-red-500 mr-2 mt-1"></i>
-                                        <span>{{ $service }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-gray-500 italic">Aucun service exclu spécifié</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- Itinéraire -->
-            @if($package->itinerary_fr && count($package->itinerary_fr) > 0)
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-route text-primary mr-2"></i>
-                        Itinéraire Détaillé
-                    </h2>
-
-                    <div class="space-y-4">
-                        @foreach($package->itinerary_fr as $index => $day)
-                            <div class="flex">
-                                <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                                    {{ $index + 1 }}
-                                </div>
-                                <div class="ml-4 flex-1 bg-gray-50 rounded-lg p-4">
-                                    <h4 class="font-bold text-gray-900 mb-1">
-                                        {{ $day['title'] ?? 'Jour ' . ($index + 1) }}
-                                    </h4>
-                                    <p class="text-gray-700">{{ $day['description'] ?? '' }}</p>
-                                </div>
+                <article class="admin-panel p-6 sm:p-7">
+                    <h2 class="text-xl font-bold text-slate-950">Services et itinéraire</h2>
+                    <div class="mt-6 grid gap-4 lg:grid-cols-3">
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Inclus FR</p>
+                            <div class="mt-3 space-y-2 text-sm text-slate-700">
+                                @forelse ($includedFr as $item)
+                                    <p>{{ $item }}</p>
+                                @empty
+                                    <p class="text-slate-500">Aucun service inclus.</p>
+                                @endforelse
                             </div>
-                        @endforeach
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Exclus FR</p>
+                            <div class="mt-3 space-y-2 text-sm text-slate-700">
+                                @forelse ($excludedFr as $item)
+                                    <p>{{ $item }}</p>
+                                @empty
+                                    <p class="text-slate-500">Aucun service exclu.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Itinéraire FR</p>
+                            <div class="mt-3 space-y-2 text-sm text-slate-700">
+                                @forelse ($itineraryFr as $index => $item)
+                                    <p><span class="font-semibold text-slate-900">Étape {{ $index + 1 }}:</span> {{ $item }}</p>
+                                @empty
+                                    <p class="text-slate-500">Aucun itinéraire renseigné.</p>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
-                </div>
-            @endif
-        </div>
+                </article>
+            </div>
 
-        <!-- Colonne Latérale -->
-        <div class="space-y-6">
-            <!-- Informations Essentielles -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Informations</h3>
-                
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-layer-group w-5 text-primary mr-2"></i>Catégorie
-                        </span>
-                        <span class="font-semibold">{{ $package->category->name_fr ?? 'N/A' }}</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-plane-departure w-5 text-primary mr-2"></i>Type
-                        </span>
-                        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full {{ $cfg['color'] }}">
-                            <i class="fas {{ $cfg['icon'] }}"></i>{{ $cfg['label'] }}
-                        </span>
-                    </div>
-
-                    @if($currency)
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-coins w-5 text-primary mr-2"></i>Devise
-                        </span>
-                        <span class="font-semibold">{{ $currency }} ({{ $currencySymbol }})</span>
-                    </div>
-                    @endif
-
-                    @if($isSport && $package->event_date_start)
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-calendar-alt w-5 text-primary mr-2"></i>Dates événement
-                        </span>
-                        <span class="font-semibold text-orange-600 text-sm">
-                            {{ \Carbon\Carbon::parse($package->event_date_start)->format('d/m/Y') }}
-                            @if($package->event_date_end && $package->event_date_end != $package->event_date_start)
-                                → {{ \Carbon\Carbon::parse($package->event_date_end)->format('d/m/Y') }}
+            <div class="space-y-6">
+                <article class="admin-panel p-6 sm:p-7">
+                    <h2 class="text-xl font-bold text-slate-950">Fiche commerciale</h2>
+                    <div class="mt-5 space-y-4 text-sm text-slate-700">
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Destination</p>
+                            <p class="mt-2 font-semibold text-slate-900">{{ $package->destination }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Départ</p>
+                            <p class="mt-2 font-semibold text-slate-900">{{ $package->departure_city ?: 'Flexible' }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Prix de base</p>
+                            <p class="mt-2 font-semibold text-slate-900">{{ number_format($package->price, $priceDecimals, ',', ' ') }} {{ $currencyLabel }}</p>
+                            @if ($package->discount_price && $package->discount_price < $package->price)
+                                <p class="mt-1 text-xs text-slate-500">Prix promo {{ number_format($package->discount_price, $priceDecimals, ',', ' ') }} {{ $currencyLabel }}</p>
                             @endif
-                        </span>
-                    </div>
-                    @endif
-
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-map-marker-alt w-5 text-primary mr-2"></i>Destination
-                        </span>
-                        <span class="font-semibold">{{ $package->destination }}</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-city w-5 text-primary mr-2"></i>Départ
-                        </span>
-                        <span class="font-semibold">{{ $package->departure_city ?: 'Flexible' }}</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-clock w-5 text-primary mr-2"></i>Durée
-                        </span>
-                        <span class="font-semibold">{{ $package->duration }} jour(s)</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-users w-5 text-primary mr-2"></i>Participants
-                        </span>
-                        <span class="font-semibold">{{ $package->min_participants }} - {{ $package->max_participants }}</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-gray-600 flex items-center">
-                            <i class="fas fa-hashtag w-5 text-primary mr-2"></i>Slug
-                        </span>
-                        <span class="font-mono text-sm">{{ $package->slug }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dates Disponibles -->
-            @if($availableDates->count() > 0)
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-calendar-alt text-primary mr-2"></i>
-                        Dates Disponibles
-                    </h3>
-                    
-                    <div class="space-y-2 max-h-64 overflow-y-auto">
-                        @foreach($availableDates as $date)
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <p class="font-semibold text-gray-900">
-                                        {{ $date->available_date->format('d/m/Y') }}
-                                    </p>
-                                    <p class="text-xs text-gray-600">
-                                        {{ $date->available_spots }} places
-                                    </p>
-                                </div>
-                @if($date->price_override)
-                                    <span class="text-sm font-bold text-primary">
-                                        {{ number_format($date->price_override, $priceDecimals, ',', ' ') }} {{ $currencySymbol }}
-                                    </span>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Dates événement</p>
+                            <p class="mt-2 font-semibold text-slate-900">
+                                {{ optional($package->event_date_start)->format('d/m/Y') ?: 'Non renseignées' }}
+                                @if ($package->event_date_end)
+                                    - {{ $package->event_date_end->format('d/m/Y') }}
                                 @endif
-                            </div>
-                        @endforeach
+                            </p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Slug</p>
+                            <p class="mt-2 font-semibold text-slate-900">{{ $package->slug }}</p>
+                        </div>
                     </div>
-                </div>
-            @endif
+                </article>
 
-            <!-- Actions Rapides -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Actions</h3>
-                
-                <div class="space-y-2">
-                    <form action="{{ route('admin.packages.toggle-status', $package) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full py-2 px-4 rounded-lg transition
-                            {{ $package->is_active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
-                            <i class="fas fa-{{ $package->is_active ? 'ban' : 'check' }} mr-2"></i>
-                            {{ $package->is_active ? 'Désactiver' : 'Activer' }}
-                        </button>
-                    </form>
-
-                    <form action="{{ route('admin.packages.toggle-featured', $package) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full py-2 px-4 rounded-lg transition
-                            {{ $package->is_featured ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' }}">
-                            <i class="fas fa-star mr-2"></i>
-                            {{ $package->is_featured ? 'Retirer Vedette' : 'Mettre en Vedette' }}
-                        </button>
-                    </form>
-
-                    <a href="{{ route('admin.packages.edit', $package) }}" 
-                       class="block w-full py-2 px-4 text-center bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition">
-                        <i class="fas fa-edit mr-2"></i>Modifier
-                    </a>
-
-                    <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" 
-                          onsubmit="return confirm('Êtes-vous sûr ? Cette action est irréversible.');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full py-2 px-4 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
-                            <i class="fas fa-trash mr-2"></i>Supprimer
-                        </button>
-                    </form>
-                </div>
+                <article class="admin-panel p-6 sm:p-7">
+                    <h2 class="text-xl font-bold text-slate-950">Disponibilités et SEO</h2>
+                    <div class="mt-5 space-y-4">
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Dates disponibles</p>
+                            <div class="mt-3 space-y-2 text-sm text-slate-700">
+                                @forelse ($availableDates as $date)
+                                    <p>{{ \Carbon\Carbon::parse($date->available_date)->format('d/m/Y') }} · {{ $date->available_spots ?? 'n/a' }} places</p>
+                                @empty
+                                    <p class="text-slate-500">Aucune date d’inventaire enregistrée.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Meta title FR</p>
+                            <p class="mt-2 text-sm font-semibold text-slate-900">{{ $package->meta_title_fr ?: 'Non renseigné' }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Meta description FR</p>
+                            <p class="mt-2 text-sm leading-7 text-slate-700">{{ $package->meta_description_fr ?: 'Non renseignée' }}</p>
+                        </div>
+                    </div>
+                </article>
             </div>
-
-            <!-- Métadonnées -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Métadonnées</h3>
-                
-                <div class="text-sm text-gray-600 space-y-2">
-                    <p><strong>Créé le:</strong> {{ $package->created_at->format('d/m/Y H:i') }}</p>
-                    <p><strong>Modifié le:</strong> {{ $package->updated_at->format('d/m/Y H:i') }}</p>
-                    @if($package->video_url)
-                        <p><strong>Vidéo:</strong> <a href="{{ $package->video_url }}" target="_blank" class="text-primary hover:underline">Voir</a></p>
-                    @endif
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
-</div>
 @endsection

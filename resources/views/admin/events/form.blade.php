@@ -6,15 +6,6 @@
     @php
         $isEdit = $event->exists;
         $route = $isEdit ? route('admin.events.update', $event) : route('admin.events.store');
-        $formatAdminTime = static function ($value): string {
-            if (blank($value)) {
-                return '';
-            }
-
-            $stringValue = $value instanceof \DateTimeInterface ? $value->format('H:i') : trim((string) $value);
-
-            return preg_match('/^\d{2}:\d{2}:\d{2}$/', $stringValue) ? substr($stringValue, 0, 5) : $stringValue;
-        };
 
         $packageDefaults = [
             [
@@ -112,7 +103,7 @@
         $coverUrl = $isEdit ? $event->getFirstMediaUrl('avatar', 'small') : null;
         $previewTitle = old('title_fr', $event->title_fr) ?: 'Titre à renseigner';
         $previewDate = old('event_date', $event->event_date ? $event->event_date->format('Y-m-d') : '');
-        $previewTime = $formatAdminTime(old('event_time', $event->event_time));
+        $previewTime = old('event_time', $event->event_time);
         $previewVenue = old('venue_name', $event->venue_name) ?: 'Lieu à renseigner';
         $previewCity = old('city', $event->city) ?: 'Ville';
         $previewCountry = old('country', $event->country) ?: 'Pays';
@@ -187,36 +178,56 @@
             </div>
         @endif
 
+        @if (session('debug_data') || session('debug_logs'))
+            <details class="admin-panel p-5">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-700">Données de debug</summary>
+                <div class="mt-4 space-y-4">
+                    @if (session('debug_data'))
+                        <pre class="overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-slate-100">{{ json_encode(session('debug_data'), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                    @endif
+                    @if (session('debug_logs'))
+                        <pre class="overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-slate-100">{{ session('debug_logs') }}</pre>
+                    @endif
+                </div>
+            </details>
+        @endif
+
         <form action="{{ $route }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if ($isEdit)
                 @method('PUT')
             @endif
 
-            <section class="admin-panel border border-[#eadfce] bg-white p-3 sm:p-4">
-                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="-mx-1 overflow-x-auto px-1">
-                        <div class="flex min-w-max flex-nowrap gap-2">
-                            <button type="button" @click="tab = 'essentials'" :class="tab === 'essentials' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
-                            <i class="fas fa-pen-ruler"></i>
-                            Essentiel
-                            </button>
-                            <button type="button" @click="tab = 'content'" :class="tab === 'content' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
-                            <i class="fas fa-align-left"></i>
-                            Contenu
-                            </button>
-                            <button type="button" @click="tab = 'offers'" :class="tab === 'offers' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
-                            <i class="fas fa-box-open"></i>
-                            Offres
-                            </button>
-                            <button type="button" @click="tab = 'advanced'" :class="tab === 'advanced' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
-                            <i class="fas fa-sliders"></i>
-                            Avancé
-                            </button>
-                        </div>
+            <section class="admin-panel sticky top-4 z-20 border border-[#eadfce] bg-white/95 p-4 backdrop-blur sm:p-5">
+                <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Édition guidée</p>
+                        <p class="mt-1 text-sm text-slate-600">Les actions importantes restent visibles. Les champs secondaires sont séparés.</p>
                     </div>
 
-                    <div class="flex flex-wrap gap-3 lg:justify-end">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" @click="tab = 'essentials'" :class="tab === 'essentials' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            <i class="fas fa-pen-ruler"></i>
+                            Essentiel
+                        </button>
+                        <button type="button" @click="tab = 'content'" :class="tab === 'content' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            <i class="fas fa-align-left"></i>
+                            Contenu
+                        </button>
+                        <button type="button" @click="tab = 'offers'" :class="tab === 'offers' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            <i class="fas fa-box-open"></i>
+                            Offres
+                        </button>
+                        <button type="button" @click="tab = 'advanced'" :class="tab === 'advanced' ? 'admin-btn-primary' : 'admin-btn-ghost'" class="px-4 py-2.5 text-sm">
+                            <i class="fas fa-sliders"></i>
+                            Avancé
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('admin.events.index') }}" class="admin-btn-ghost px-5 py-3 text-sm">
+                            Annuler
+                        </a>
                         <button type="submit" class="admin-btn-primary px-6 py-3 text-sm">
                             <i class="fas fa-floppy-disk"></i>
                             {{ $isEdit ? 'Enregistrer' : 'Créer l’événement' }}
@@ -307,7 +318,7 @@
                                 </div>
                                 <div>
                                     <label for="event_time" class="mb-2 block text-sm font-semibold text-slate-700">Heure début *</label>
-                                    <input type="time" name="event_time" id="event_time" required value="{{ $formatAdminTime(old('event_time', $event->event_time)) }}" class="w-full px-4 py-3 text-sm">
+                                    <input type="time" name="event_time" id="event_time" required value="{{ old('event_time', $event->event_time) }}" class="w-full px-4 py-3 text-sm">
                                 </div>
                                 <div>
                                     <label for="end_date" class="mb-2 block text-sm font-semibold text-slate-700">Date fin</label>
@@ -315,7 +326,7 @@
                                 </div>
                                 <div>
                                     <label for="end_time" class="mb-2 block text-sm font-semibold text-slate-700">Heure fin</label>
-                                    <input type="time" name="end_time" id="end_time" value="{{ $formatAdminTime(old('end_time', $event->end_time)) }}" class="w-full px-4 py-3 text-sm">
+                                    <input type="time" name="end_time" id="end_time" value="{{ old('end_time', $event->end_time) }}" class="w-full px-4 py-3 text-sm">
                                 </div>
 
                                 <div class="md:col-span-2">
@@ -685,7 +696,7 @@
                         <div class="mt-4">
                             <label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Téléverser une image</label>
                             <input type="file" name="image" id="image" accept="image/*" class="w-full px-4 py-3 text-sm">
-                            <p class="mt-2 text-xs text-slate-500">Format image, 5 MB max.</p>
+                            <p class="mt-2 text-xs text-slate-500">Format image, 2 MB max.</p>
                         </div>
 
                         @if ($isEdit && $coverUrl)

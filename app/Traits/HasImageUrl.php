@@ -29,6 +29,22 @@ trait HasImageUrl
     }
 
     /**
+     * Backward-compatible helper for older Blade views.
+     */
+    public function getImageUrl()
+    {
+        return $this->image_url;
+    }
+
+    /**
+     * Backward-compatible helper for older Blade views.
+     */
+    public function getAvatarUrl()
+    {
+        return $this->avatar_url;
+    }
+
+    /**
      * Get the full URLs for gallery images
      */
     public function getGalleryUrlsAttribute()

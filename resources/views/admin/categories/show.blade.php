@@ -107,7 +107,7 @@
                             </h3>
                             <div class="space-y-2">
                                 @foreach($category->packages->take(5) as $package)
-                                    <a href="{{ route('admin.packages.show', $package->id) }}" 
+                                    <a href="{{ route('admin.packages.show', $package) }}" 
                                        class="block p-3 bg-green-50 rounded-lg hover:bg-green-100 transition">
                                         <span class="font-medium text-gray-900">{{ $package->title_fr }}</span>
                                         <span class="text-sm text-gray-500 ml-2">{{ number_format($package->price, 0) }}€</span>

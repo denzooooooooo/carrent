@@ -55,8 +55,8 @@
     ];
     $availability = $availabilityMap[$event->availability_state] ?? $availabilityMap['available'];
     $supportText = $t(
-        'Un conseiller peut vous aider à choisir la formule, la zone ou le niveau d’expérience le plus adapté.',
-        'An advisor can help you choose the package, seating area or level of experience that fits best.'
+        'Un conseiller peut vous orienter avant la commande si vous hésitez entre plusieurs formules ou zones.',
+        'An advisor can guide you before checkout if you hesitate between several packages or seat zones.'
     );
     $defaultName = old('name', trim((auth()->user()?->first_name ?? '') . ' ' . (auth()->user()?->last_name ?? '')));
     $defaultEmail = old('email', auth()->user()?->email ?? '');
@@ -91,40 +91,18 @@
         [
             'number' => '03',
             'title' => $t('Finaliser le paiement', 'Complete payment'),
-            'description' => $t('Le mode de règlement proposé dépend du montant final et du service réservé.', 'The payment method offered depends on the final amount and the service booked.'),
+            'description' => $t('Le site envoie vers le bon mode de paiement selon le total.', 'The site sends you to the right payment mode according to the total.'),
         ],
     ];
     $heroSignals = [
-        $t('Places officielles', 'Official inventory'),
-        $t('Support dédié', 'Dedicated support'),
-        $t('Paiement sécurisé', 'Secure payment'),
+        $t('Boutons visibles', 'Visible buttons'),
+        $t('Réservation guidée', 'Guided booking'),
+        $t('Paiement adapté', 'Adaptive payment'),
     ];
-    $initialOfferTab = old('zone_id')
-        ? 'zones'
-        : ((old('package_id') || old('package_option_id')) ? 'packages' : $defaultOfferTab);
 @endphp
 
-<div data-event-details data-initial-offer-tab="{{ $initialOfferTab }}" class="cp-page">
-    @if($errors->any())
-        <section class="cp-page-hero">
-            <div class="cp-shell">
-                <div class="event-page-alert rounded-[1.8rem] border border-red-200 bg-red-50/90 px-5 py-5 text-red-800 shadow-[0_18px_50px_rgba(127,29,29,0.08)]">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
-                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-red-700">{{ $t('Vérification requise', 'Review required') }}</p>
-                            <p class="mt-2 text-lg font-black text-red-900">{{ $t('Merci de corriger les informations de réservation avant de continuer.', 'Please correct the booking information before continuing.') }}</p>
-                        </div>
-                        <button type="button" data-open-booking-errors class="cp-secondary-button !w-full !justify-center !border-red-200 !bg-white !text-red-800 sm:!w-auto">
-                            <i class="fa-solid fa-pen-to-square text-sm"></i>
-                            <span>{{ $t('Reprendre la commande', 'Resume checkout') }}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    @endif
-
-    <section class="cp-page-hero">
+<div x-data="{ offerTab: '{{ $defaultOfferTab }}' }" class="min-h-screen pb-24 sm:pb-28">
+    <section class="pt-4 sm:pt-6">
         <div class="cp-shell">
             <div class="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_400px]">
                 <div class="event-surface cp-fade-up overflow-hidden rounded-[2.45rem] p-5 sm:p-7 xl:p-9">
@@ -155,7 +133,7 @@
                         {{ $leadText }}
                     </p>
 
-                    <div class="event-hero-actions mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                         @if($hasInventory)
                             <a href="#event-offers" class="cp-primary-button !w-full sm:!w-auto">
                                 <i class="fa-solid fa-ticket text-sm"></i>
@@ -181,7 +159,7 @@
 
                     <div class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                         @foreach($heroFacts as $item)
-                            <div class="event-summary-card rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-4">
+                            <div class="rounded-[1.35rem] border border-[color:var(--cp-border)] bg-white px-4 py-4">
                                 <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $item['label'] }}</p>
                                 <p class="mt-2 text-sm font-black text-[color:var(--cp-plum-950)] sm:text-base">{{ $item['value'] }}</p>
                                 <p class="mt-2 text-sm leading-6 text-[color:var(--cp-ink-soft)]">{{ $item['meta'] }}</p>
@@ -219,7 +197,7 @@
 
                     <div class="event-surface cp-fade-up rounded-[2rem] p-5 sm:p-6" style="animation-delay: 0.12s">
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Réservation', 'Booking') }}</p>
-                        <h2 class="mt-3 text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $t('Réserver votre place', 'Reserve your place') }}</h2>
+                        <h2 class="mt-3 text-2xl font-black leading-tight text-[color:var(--cp-plum-950)]">{{ $t('Un parcours simple jusqu’à la commande', 'A simple path to checkout') }}</h2>
                         <div class="mt-4 grid gap-2">
                             @foreach($bookingSteps as $step)
                                 <div class="flex items-center gap-3 rounded-[1.15rem] bg-[#faf6ff] px-4 py-3">
@@ -245,7 +223,7 @@
         </div>
     </section>
 
-    <section class="cp-page-section">
+    <section class="pt-6">
         <div class="cp-shell">
             <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
                 <div class="space-y-6">
@@ -271,7 +249,7 @@
                         </div>
                     </section>
 
-                    <section id="event-offers" class="event-surface event-section-anchor rounded-[2.1rem] p-5 sm:p-6 md:p-8">
+                    <section id="event-offers" class="event-surface rounded-[2.1rem] p-5 sm:p-6 md:p-8">
                         <div class="flex flex-col gap-4 border-b border-[color:var(--cp-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
                             <div class="max-w-3xl">
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Offres', 'Offers') }}</p>
@@ -282,18 +260,12 @@
                             </div>
 
                             @if($hasPackages && $hasSeatZones)
-                                <div class="flex flex-wrap gap-2" data-offer-tab-controls>
-                                    <button type="button" data-offer-tab-button="packages" @class([
-                                        'event-tab',
-                                        'is-active' => $initialOfferTab === 'packages',
-                                    ])>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" @click="offerTab = 'packages'" :class="offerTab === 'packages' ? 'event-tab is-active' : 'event-tab'">
                                         <i class="fa-solid fa-box-open text-xs"></i>
                                         <span>{{ $packageCount }} {{ $t('packages', 'packages') }}</span>
                                     </button>
-                                    <button type="button" data-offer-tab-button="zones" @class([
-                                        'event-tab',
-                                        'is-active' => $initialOfferTab === 'zones',
-                                    ])>
+                                    <button type="button" @click="offerTab = 'zones'" :class="offerTab === 'zones' ? 'event-tab is-active' : 'event-tab'">
                                         <i class="fa-solid fa-couch text-xs"></i>
                                         <span>{{ $seatZoneCount }} {{ $t('zones', 'zones') }}</span>
                                     </button>
@@ -311,13 +283,7 @@
                         </div>
 
                         @if($hasPackages)
-                            <div
-                                data-offer-tab-panel="packages"
-                                @class([
-                                    'mt-6 space-y-5',
-                                    'hidden' => $hasSeatZones && $initialOfferTab !== 'packages',
-                                ])
-                            >
+                            <div x-show="offerTab === 'packages'" x-transition.opacity x-cloak class="mt-6 space-y-5">
                                 @foreach($event->packages as $package)
                                     @php
                                         $packageDescription = app()->getLocale() === 'fr'
@@ -384,9 +350,7 @@
                                                         data-package-option-id=""
                                                         data-package-name="{{ $package->name }}"
                                                         data-selection-label="{{ $package->name }}"
-                                                        data-parent-label=""
-                                                        data-price="{{ \App\Helpers\CurrencyHelper::convert($package->price) }}"
-                                                        data-base-price="{{ $package->price }}"
+                                                        data-price="{{ $package->price }}"
                                                         data-available="{{ $package->available_quantity }}"
                                                         data-max-per-order="{{ max(1, $package->max_per_order ?? 1) }}"
                                                         data-minimum-quantity="{{ max(1, $package->minimum_quantity ?? 1) }}"
@@ -429,9 +393,7 @@
                                                             data-package-option-id="{{ $option->id }}"
                                                             data-package-name="{{ $package->name }}"
                                                             data-selection-label="{{ $option->full_label }}"
-                                                            data-parent-label="{{ $package->name }}"
-                                                            data-price="{{ \App\Helpers\CurrencyHelper::convert($option->price) }}"
-                                                            data-base-price="{{ $option->price }}"
+                                                            data-price="{{ $option->price }}"
                                                             data-available="{{ $option->available_quantity }}"
                                                             data-max-per-order="{{ max(1, $option->max_per_order ?? $package->max_per_order ?? 1) }}"
                                                             data-minimum-quantity="{{ max(1, $package->minimum_quantity ?? 1) }}"
@@ -451,13 +413,7 @@
                         @endif
 
                         @if($hasSeatZones)
-                            <div
-                                data-offer-tab-panel="zones"
-                                @class([
-                                    'mt-6',
-                                    'hidden' => $hasPackages && $initialOfferTab !== 'zones',
-                                ])
-                            >
+                            <div x-show="offerTab === 'zones'" x-transition.opacity x-cloak class="@if($hasPackages) mt-6 @else mt-6 @endif">
                                 <div class="grid gap-4 lg:grid-cols-2">
                                     @foreach($event->seatZones as $zone)
                                         <article data-offer-card class="event-offer-card event-card-hover rounded-[1.9rem] border border-[color:var(--cp-border)] bg-white p-5">
@@ -495,9 +451,7 @@
                                                     data-zone-id="{{ $zone->id }}"
                                                     data-zone-name="{{ $zone->zone_name }}"
                                                     data-selection-label="{{ $zone->zone_name }}"
-                                                    data-parent-label=""
-                                                    data-price="{{ \App\Helpers\CurrencyHelper::convert($zone->price) }}"
-                                                    data-base-price="{{ $zone->price }}"
+                                                    data-price="{{ $zone->price }}"
                                                     data-available="{{ $zone->available_seats }}"
                                                     data-max-per-order="{{ max(1, $zone->available_seats) }}"
                                                     data-minimum-quantity="1"
@@ -587,7 +541,7 @@
                                     <summary class="flex items-center justify-between gap-4 px-5 py-4">
                                         <div>
                                             <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--cp-ink-muted)]">{{ $t('Programme', 'Program') }}</p>
-                                            <p class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $t('Programme complet', 'Full program') }}</p>
+                                            <p class="mt-2 text-lg font-black text-[color:var(--cp-plum-950)]">{{ $t('Déroulé de l’expérience', 'Experience flow') }}</p>
                                         </div>
                                         <i class="fa-solid fa-chevron-down text-xs text-[color:var(--cp-ink-muted)]"></i>
                                     </summary>
@@ -611,8 +565,8 @@
                     </section>
                 </div>
 
-                <aside id="reservation-panel" class="xl:sticky xl:top-[calc(var(--cp-header-height,5rem)+1.2rem)] xl:self-start">
-                    <div class="event-surface event-sticky-rail rounded-[2.1rem] p-5 sm:p-6">
+                <aside id="reservation-panel" class="xl:sticky xl:top-24 xl:self-start">
+                    <div class="event-surface rounded-[2.1rem] p-5 sm:p-6">
                         <div class="border-b border-[color:var(--cp-border)] pb-5">
                             <p class="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--cp-plum-800)]">{{ $t('Commande', 'Checkout') }}</p>
                             <h2 class="mt-3 text-2xl font-black text-[color:var(--cp-plum-950)]">{{ $t('Votre réservation', 'Your booking') }}</h2>
@@ -709,7 +663,7 @@
     </section>
 
     @if($relatedEvents->isNotEmpty())
-        <section class="cp-page-section-lg">
+        <section class="pt-10 sm:pt-12">
             <div class="cp-shell">
                 <div class="mb-5">
                     <p class="text-xs font-black uppercase tracking-[0.24em] text-[color:var(--cp-plum-800)]">{{ $t('À voir aussi', 'Also worth seeing') }}</p>
@@ -743,7 +697,7 @@
         </section>
     @endif
 
-    <section class="cp-page-section-lg">
+    <section class="pt-10 sm:pt-12">
         <div class="cp-shell">
             <div class="overflow-hidden rounded-[2.1rem] bg-gradient-to-r from-[#26153a] via-[#4d2d72] to-[#d7a147] px-5 py-8 text-white shadow-[0_24px_70px_rgba(41,20,58,0.18)] sm:px-8">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -926,10 +880,9 @@
 @if($hasInventory)
     @push('scripts')
     <script>
-    window.currentCurrency = @json(\App\Helpers\CurrencyHelper::current());
+    window.currentCurrency = 'XOF';
 
     document.addEventListener('DOMContentLoaded', function () {
-        const eventPage = document.querySelector('[data-event-details]');
         const modal = document.getElementById('bookingModal');
         const closeModal = document.getElementById('closeModal');
         const modalTitleEl = document.getElementById('modalTitle');
@@ -963,16 +916,12 @@
         const mobileSelectedTotal = document.getElementById('mobileSelectedTotal');
         const mobileBookingAction = document.getElementById('mobileBookingAction');
         const mobileBookingActionLabel = document.getElementById('mobileBookingActionLabel');
-        const tabButtons = Array.from(document.querySelectorAll('[data-offer-tab-button]'));
-        const tabPanels = Array.from(document.querySelectorAll('[data-offer-tab-panel]'));
-        const openBookingErrorsButton = document.querySelector('[data-open-booking-errors]');
 
         let currentItem = null;
         let currentQuantity = 1;
         let minRequired = 1;
         let maxAllowed = 1;
         let currentSelectionCard = null;
-        let currentOfferTab = eventPage?.dataset.initialOfferTab || @json($initialOfferTab);
 
         const previousSelection = {
             zoneId: @json(old('zone_id')),
@@ -982,33 +931,14 @@
             hasErrors: {{ $errors->any() ? 'true' : 'false' }},
         };
 
-        const setOfferTab = (tabId) => {
-            if (!tabId) {
-                return;
-            }
-
-            currentOfferTab = tabId;
-
-            tabButtons.forEach((button) => {
-                const isActive = button.dataset.offerTabButton === tabId;
-                button.classList.toggle('is-active', isActive);
-                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            });
-
-            tabPanels.forEach((panel) => {
-                panel.classList.toggle('hidden', panel.dataset.offerTabPanel !== tabId);
-            });
-        };
-
         const normalizeButtonData = (button, type) => ({
             type,
             id: type === 'seat' ? button.dataset.zoneId : button.dataset.packageId,
             packageId: type === 'package' ? button.dataset.packageId : '',
             packageOptionId: type === 'package' ? (button.dataset.packageOptionId || '') : '',
-            name: button.dataset.selectionLabel || (type === 'seat' ? button.dataset.zoneName : button.dataset.packageName),
-            meta: [button.dataset.parentLabel || '', button.dataset.meta || ''].filter(Boolean).join(' · '),
+            name: type === 'seat' ? button.dataset.zoneName : button.dataset.packageName,
+            meta: button.dataset.meta || button.dataset.selectionLabel || '',
             price: parseFloat(button.dataset.price),
-            basePrice: parseFloat(button.dataset.basePrice || button.dataset.price),
             available: parseInt(button.dataset.available, 10),
             maxPerOrder: parseInt(button.dataset.maxPerOrder, 10),
             minimumQuantity: parseInt(button.dataset.minimumQuantity, 10),
@@ -1022,16 +952,7 @@
         }).format(price);
 
         const scrollToOffers = () => {
-            const target = document.getElementById('event-offers');
-
-            if (!target) {
-                return;
-            }
-
-            const headerOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cp-header-height')) || 0;
-            const top = target.getBoundingClientRect().top + window.scrollY - headerOffset - 18;
-
-            window.scrollTo({ top, behavior: 'smooth' });
+            document.getElementById('event-offers')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         const showModalWindow = () => {
@@ -1099,7 +1020,7 @@
 
             const total = currentItem.price * currentQuantity;
             totalPriceEl.textContent = formatPrice(total);
-            paymentModeHint.classList.toggle('hidden', (currentItem.basePrice * currentQuantity) <= 1500000);
+            paymentModeHint.classList.toggle('hidden', total <= 1500000);
             syncSelectionPreview();
         };
 
@@ -1121,7 +1042,6 @@
 
             currentItem = item;
             currentQuantity = minRequired;
-            setOfferTab(item.type === 'seat' ? 'zones' : 'packages');
 
             modalTitleEl.textContent = item.type === 'seat'
                 ? @json($t('Commander cette zone', 'Order this seat zone'))
@@ -1152,12 +1072,6 @@
         document.querySelectorAll('.select-package-btn').forEach((button) => {
             button.addEventListener('click', function () {
                 openModalForSelection(normalizeButtonData(this, 'package'), this);
-            });
-        });
-
-        tabButtons.forEach((button) => {
-            button.addEventListener('click', function () {
-                setOfferTab(this.dataset.offerTabButton);
             });
         });
 
@@ -1200,15 +1114,6 @@
             }
         });
 
-        openBookingErrorsButton?.addEventListener('click', function () {
-            if (currentItem) {
-                showModalWindow();
-                return;
-            }
-
-            scrollToOffers();
-        });
-
         if (previousSelection.hasErrors) {
             let previousButton = null;
 
@@ -1237,8 +1142,6 @@
             updateQuantityButtons();
             syncSelectionPreview();
         }
-
-        setOfferTab(currentOfferTab);
     });
     </script>
     @endpush

@@ -9,6 +9,7 @@ use App\Models\EventType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -165,6 +166,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -183,8 +185,14 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin category creation failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'category',
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La création de la catégorie a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -200,6 +208,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -218,8 +227,14 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin event category creation failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'event_category',
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La création de la catégorie événement a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -236,6 +251,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -254,8 +270,14 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin event type creation failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'event_type',
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La création du type d’événement a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -349,6 +371,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -370,8 +393,15 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin category update failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'category',
+                'category_id' => $id,
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La mise à jour de la catégorie a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -389,6 +419,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -410,8 +441,15 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin event category update failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'event_category',
+                'category_id' => $id,
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La mise à jour de la catégorie événement a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -430,6 +468,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+        $validated['is_active'] = $request->boolean('is_active');
 
         DB::beginTransaction();
         try {
@@ -451,8 +490,15 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin event type update failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => 'event_type',
+                'event_type_id' => $id,
+                'name_fr' => $request->input('name_fr'),
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()->withInput()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La mise à jour du type d’événement a échoué. Vérifie les champs puis réessaie.');
         }
     }
 
@@ -503,8 +549,14 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin category deletion failed', [
+                'admin_id' => auth('admin')->id(),
+                'type' => $type,
+                'item_id' => $id,
+                'message' => $e->getMessage(),
+            ]);
             return redirect()->back()
-                ->with('error', 'Erreur : ' . $e->getMessage());
+                ->with('error', 'La suppression a échoué. Vérifie les dépendances de cet élément puis réessaie.');
         }
     }
 

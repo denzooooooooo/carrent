@@ -62,21 +62,21 @@
         const icon = ICONS[theme];
         const text = TEXTS[theme];
         
-        document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach((button) => {
-            const label = button.querySelector('[data-theme-toggle-label]');
-            const iconSpan = button.querySelector('[data-theme-toggle-icon]');
+        // Mettre à jour le bouton desktop
+        if (toggle) {
+            toggle.innerHTML = icon;
+            toggle.setAttribute('aria-label', text);
+            toggle.setAttribute('title', text);
+        }
 
-            if (label) {
-                label.textContent = text;
-            }
-
+        // Mettre à jour le bouton mobile
+        const toggleMobile = document.getElementById('theme-toggle-mobile');
+        if (toggleMobile) {
+            const iconSpan = toggleMobile.querySelector('span:last-child');
             if (iconSpan) {
                 iconSpan.textContent = icon;
             }
-
-            button.setAttribute('aria-label', text);
-            button.setAttribute('title', text);
-        });
+        }
     }
 
     /**
